@@ -4,6 +4,15 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 export async function middleware(request: NextRequest) {
   console.log(`[Middleware] Processing ${request.nextUrl.pathname}`);
   
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // If env vars are missing, skip auth checks (for build time)
+  if (!url || !key) {
+    console.warn('[Middleware] Missing Supabase env vars, skipping auth checks')
+    return NextResponse.next()
+  }
+  
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -11,8 +20,8 @@ export async function middleware(request: NextRequest) {
   })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    key,
     {
       cookies: {
         get(name: string) {

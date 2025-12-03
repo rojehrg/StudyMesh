@@ -10,12 +10,20 @@ export async function GET(request: Request) {
   console.log('[OAuth Callback] Code received:', !!code);
 
   if (code) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!url || !key) {
+      console.error('[OAuth Callback] Missing Supabase environment variables')
+      return NextResponse.redirect(`${origin}/login?error=config_error`)
+    }
+
     const cookieStore = await cookies()
     const response = NextResponse.redirect(`${origin}${next}`)
     
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      url,
+      key,
       {
         cookies: {
           getAll() {
