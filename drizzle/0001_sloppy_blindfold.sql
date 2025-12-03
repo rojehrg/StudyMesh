@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD COLUMN "looking_to_help" boolean DEFAULT false;

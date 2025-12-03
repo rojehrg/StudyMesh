@@ -1,0 +1,201 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { PlusCircle, LogIn, Users, Loader2, Search, Clock, Building2 } from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function ClassesPage() {
+  const [loading, setLoading] = useState(true);
+  const [pods, setPods] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const supabase = createClient();
+
+  useEffect(() => {
+    loadPods();
+  }, []);
+
+  const loadPods = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get all pods where user is a member
+      const { data: podMembers } = await supabase
+        .from('pod_members')
+        .select('pod_id')
+        .eq('user_id', user.id);
+
+      if (!podMembers || podMembers.length === 0) {
+        setPods([]);
+        return;
+      }
+
+      const podIds = podMembers.map(pm => pm.pod_id);
+
+      // Get pod details
+      const { data: podsData } = await supabase
+        .from('pods')
+        .select('*')
+        .in('id', podIds)
+        .order('created_at', { ascending: false });
+
+      // Get member counts for each pod
+      const podsWithCounts = await Promise.all(
+        (podsData || []).map(async (pod) => {
+          const { count } = await supabase
+            .from('pod_members')
+            .select('*', { count: 'exact', head: true })
+            .eq('pod_id', pod.id);
+
+          return { ...pod, memberCount: count || 0 };
+        })
+      );
+
+      setPods(podsWithCounts);
+    } catch (error) {
+      console.error("Error loading pods:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPods = pods.filter(pod =>
+    pod.pod_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pod.business_unit?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+    >
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Enablement Pods</h1>
+          <p className="text-gray-500 mt-1">Collaborate with your team in focused pods</p>
+        </div>
+        <div className="flex gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/classes/join">
+              <LogIn className="mr-2 h-4 w-4" />
+              Join Pod
+            </Link>
+          </Button>
+          <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+            <Link href="/classes/create">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create Pod
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {pods.length > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search pods by name or business unit..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      )}
+
+      {filteredPods.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPods.map((pod, index) => (
+            <motion.div
+              key={pod.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Link href={`/classes/${pod.pod_code}`}>
+                <Card className="hover-lift cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="group-hover:text-teal-600 transition-colors">
+                          {pod.pod_name}
+                        </CardTitle>
+                        <CardDescription className="mt-2 flex items-center gap-1">
+                          <Building2 className="w-3 h-3" />
+                          {pod.business_unit || "General"}
+                        </CardDescription>
+                      </div>
+                      <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-200">
+                        {pod.pod_code}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Users className="w-4 h-4" />
+                        <span>{pod.memberCount} {pod.memberCount === 1 ? 'member' : 'members'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Clock className="w-3 h-3" />
+                        <span className="text-xs">
+                          {new Date(pod.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    {pod.initiative_owner && (
+                      <div className="mt-3 pt-3 border-t text-xs text-gray-500">
+                        Owner: {pod.initiative_owner}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      ) : pods.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No pods yet</h3>
+            <p className="text-gray-500 mb-6 max-w-sm">
+              Spin up a pod or join one with a share code to get started with enablement.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" asChild>
+                <Link href="/classes/join">Join Pod</Link>
+              </Button>
+              <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+                <Link href="/classes/create">Create Pod</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-dashed">
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-500">No pods match your search</p>
+          </CardContent>
+        </Card>
+      )}
+    </motion.div>
+  );
+}
+

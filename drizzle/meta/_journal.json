@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1764737396264,
+      "tag": "0000_oval_quentin_quire",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764752250611,
+      "tag": "0001_sloppy_blindfold",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764752715348,
+      "tag": "0002_soft_zodiak",
+      "breakpoints": true
+    }
+  ]
+}
