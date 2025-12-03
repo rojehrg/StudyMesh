@@ -24,7 +24,7 @@ export default function SignupPage() {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -36,9 +36,15 @@ export default function SignupPage() {
         throw error;
       }
 
-      // Check if session established (auto-confirm enabled?)
-      // If not, tell user to check email
-      setError("Check your email to confirm your account.");
+      // Check if user was auto-confirmed (email confirmation disabled)
+      if (data.session) {
+        // User is already logged in, redirect to onboarding
+        router.push('/onboarding');
+        return;
+      }
+
+      // Email confirmation required
+      setError("Check your email to confirm your account. If you don't see it, check your spam folder.");
     } catch (err: any) {
       setError(err.message);
     } finally {
