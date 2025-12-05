@@ -20,6 +20,9 @@ export default function WorkingCirclesPage() {
   const [currentUserExpertise, setCurrentUserExpertise] = useState<string[]>([]);
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [openRequests, setOpenRequests] = useState<any[]>([]);
+  const [requestSkill, setRequestSkill] = useState("");
+  const [currentProfile, setCurrentProfile] = useState<any>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -40,6 +43,7 @@ export default function WorkingCirclesPage() {
 
       if (!currentProfile) return;
       
+      setCurrentProfile(currentProfile);
       setCurrentUserExpertise(currentProfile.expertise_skills || []);
 
       // Get all pods user is in
@@ -103,6 +107,7 @@ export default function WorkingCirclesPage() {
             department: otherProfile.department,
             expertiseSkills: otherProfile.expertise_skills || [],
             lookingToHelp: otherProfile.looking_to_help || false,
+            slackHandle: otherProfile.slack_handle || "",
             score: result.score,
             canHelp: result.skills.a_to_b,
             canAskHelp: result.skills.b_to_a,
@@ -113,6 +118,13 @@ export default function WorkingCirclesPage() {
         .sort((a, b) => b.score - a.score);
 
       setMatches(matchResults);
+      
+      // Load open requests
+      const { data: requests } = await supabase
+        .from('open_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setOpenRequests(requests || []);
     } catch (error) {
       console.error("Error loading matches:", error);
     } finally {
@@ -152,6 +164,20 @@ export default function WorkingCirclesPage() {
 
       if (error) throw error;
 
+      // Optional Slack webhook
+      const slackHandle = selectedMatch?.slackHandle;
+      if (slackHandle) {
+        fetch('/api/slack/nudge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientSlackHandle: slackHandle,
+            senderName,
+            topic,
+          }),
+        }).catch(() => {});
+      }
+
       toast.success("Nudge sent!", {
         description: type === 'ask' ? `Asked for help with ${topic}` : `Offered help with ${topic}`
       });
@@ -164,12 +190,60 @@ export default function WorkingCirclesPage() {
     }
   };
 
+  const saveOpenRequest = async () => {
+    if (!requestSkill.trim()) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const skill = requestSkill.trim();
+      const { error } = await supabase.from('open_requests').insert({
+        user_id: user.id,
+        skill,
+        status: 'open',
+      });
+      if (error) throw error;
+      setRequestSkill("");
+      toast.success("Request saved", { description: `We'll notify you when someone with ${skill} joins.` });
+      loadAllMatches(); // refresh
+    } catch (error) {
+      console.error("Error saving request:", error);
+      toast.error("Failed to save request");
+    }
+  };
+
+  const notifyRequester = async (request: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const content = `Someone can help with ${request.skill}`;
+      const { error } = await supabase.from('notifications').insert({
+        recipient_id: request.user_id,
+        sender_id: user.id,
+        type: 'nudge',
+        content,
+        metadata: { topic: request.skill, request_id: request.id },
+        read: false,
+      });
+      if (error) throw error;
+      await supabase.from('open_requests').update({ status: 'notified' }).eq('id', request.id);
+      toast.success("Requester notified");
+      setOpenRequests(openRequests.map(r => r.id === request.id ? { ...r, status: 'notified' } : r));
+    } catch (error) {
+      console.error("Error notifying requester:", error);
+      toast.error("Failed to notify requester");
+    }
+  };
+
   const filteredMatches = matches.filter(m =>
     m.major?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.canHelp.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
     m.canAskHelp.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const requestsICanHelp = openRequests.filter(r => r.status === 'open' && currentProfile && r.user_id !== currentProfile.user_id &&
+    (currentProfile.expertise_skills || []).some((s: string) => s.toLowerCase().includes((r.skill || "").toLowerCase())));
+  const myRequests = openRequests.filter(r => currentProfile && r.user_id === currentProfile.user_id);
 
   if (loading) {
     return (
@@ -203,6 +277,59 @@ export default function WorkingCirclesPage() {
           />
         </div>
       )}
+
+      {/* Open Requests */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-teal-600" />
+            Open Help Requests
+          </CardTitle>
+          <CardDescription>Save what you need help with; we’ll notify you when someone can help.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Skill you need help with"
+              value={requestSkill}
+              onChange={(e) => setRequestSkill(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
+            />
+            <Button onClick={saveOpenRequest} variant="outline">Save request</Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-gray-800">Requests I created</div>
+              {myRequests.length === 0 ? (
+                <p className="text-sm text-gray-500">No saved requests.</p>
+              ) : myRequests.map(r => (
+                <div key={r.id} className="p-3 rounded-xl border bg-gray-50 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{r.skill}</p>
+                    <p className="text-xs text-gray-500">Status: {r.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-gray-800">Requests I can help with</div>
+              {requestsICanHelp.length === 0 ? (
+                <p className="text-sm text-gray-500">No matching requests right now.</p>
+              ) : requestsICanHelp.map(r => (
+                <div key={r.id} className="p-3 rounded-xl border bg-teal-50/40 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{r.skill}</p>
+                    <p className="text-xs text-gray-500">Someone needs help</p>
+                  </div>
+                  <Button size="sm" onClick={() => notifyRequester(r)} className="bg-teal-600 hover:bg-teal-700">
+                    Notify requester
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {filteredMatches.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

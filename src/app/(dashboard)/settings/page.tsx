@@ -9,10 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Plus, X, Save, User, Briefcase, Clock, Sparkles } from "lucide-react";
+import { Loader2, Plus, X, Save, User, Briefcase, Clock, Sparkles, MessageCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+
+const ringStyle = (value: number) => {
+  const clamped = Math.min(100, Math.max(0, value || 0));
+  return {
+    background: `conic-gradient(#0d9488 ${clamped * 3.6}deg, #e5e7eb 0deg)`,
+  };
+};
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +51,9 @@ export default function SettingsPage() {
           expertiseSkills: data.expertise_skills || [],
           growthSkills: data.growth_skills || [],
           lookingToHelp: data.looking_to_help || false,
+          slackHandle: data.slack_handle || "",
+          expertiseLevels: data.expertise_levels || {},
+          growthLevels: data.growth_levels || {},
         });
       }
     } catch (error) {
@@ -67,8 +77,11 @@ export default function SettingsPage() {
           bio: profile.bio,
           expertise_skills: profile.expertiseSkills,
           growth_skills: profile.growthSkills,
+          expertise_levels: profile.expertiseLevels || {},
+          growth_levels: profile.growthLevels || {},
           preferred_group_size: profile.preferred_group_size || 3,
           looking_to_help: profile.lookingToHelp || false,
+          slack_handle: profile.slackHandle || null,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id);
@@ -93,10 +106,17 @@ export default function SettingsPage() {
     if (!input.trim()) return;
 
     const skillsKey = type === 'expertise' ? 'expertiseSkills' : 'growthSkills';
-    if (!profile[skillsKey].includes(input.trim())) {
+    const levelsKey = type === 'expertise' ? 'expertiseLevels' : 'growthLevels';
+    const defaultLevel = type === 'expertise' ? 70 : 40;
+    const normalized = input.trim();
+    if (!profile[skillsKey].includes(normalized)) {
       setProfile({
         ...profile,
-        [skillsKey]: [...profile[skillsKey], input.trim()]
+        [skillsKey]: [...profile[skillsKey], normalized],
+        [levelsKey]: {
+          ...(profile[levelsKey] || {}),
+          [normalized.toLowerCase()]: defaultLevel,
+        }
       });
     }
 
@@ -109,9 +129,25 @@ export default function SettingsPage() {
 
   const removeSkill = (type: 'expertise' | 'growth', skill: string) => {
     const skillsKey = type === 'expertise' ? 'expertiseSkills' : 'growthSkills';
+    const levelsKey = type === 'expertise' ? 'expertiseLevels' : 'growthLevels';
+    const updatedLevels = { ...(profile[levelsKey] || {}) };
+    delete updatedLevels[skill.toLowerCase()];
     setProfile({
       ...profile,
-      [skillsKey]: profile[skillsKey].filter((s: string) => s !== skill)
+      [skillsKey]: profile[skillsKey].filter((s: string) => s !== skill),
+      [levelsKey]: updatedLevels,
+    });
+  };
+
+  const setLevel = (type: 'expertise' | 'growth', skill: string, value: number) => {
+    const key = type === 'expertise' ? 'expertiseLevels' : 'growthLevels';
+    const normalized = skill.toLowerCase();
+    setProfile({
+      ...profile,
+      [key]: {
+        ...(profile[key] || {}),
+        [normalized]: value,
+      }
     });
   };
 
@@ -205,6 +241,19 @@ export default function SettingsPage() {
                   onChange={(e) => setProfile({...profile, bio: e.target.value})}
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="slack">Slack Handle (optional)</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="slack"
+                    placeholder="@yourhandle or U123ABC"
+                    value={profile.slackHandle || ""}
+                    onChange={(e) => setProfile({...profile, slackHandle: e.target.value.trim()})}
+                  />
+                  <MessageCircle className="w-4 h-4 text-gray-400" />
+                </div>
+                <p className="text-xs text-gray-500">Used for “Message on Slack” and optional nudge webhook.</p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -227,18 +276,39 @@ export default function SettingsPage() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.expertiseSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>
                 )}
-                {profile.expertiseSkills.map((skill: string) => (
-                  <Badge key={skill} variant="secondary" className="bg-teal-100 text-teal-700 hover:bg-teal-200 pl-3 pr-1 py-1.5">
-                    {skill}
-                    <button onClick={() => removeSkill('expertise', skill)} className="ml-2 hover:bg-teal-300 rounded-full p-0.5 transition-colors">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+                {profile.expertiseSkills.map((skill: string) => {
+                  const level = (profile.expertiseLevels || {})[skill.toLowerCase()] ?? 70;
+                  return (
+                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-3 py-2 shadow-sm">
+                      <div className="w-10 h-10 rounded-full" style={ringStyle(level)}>
+                        <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-700">
+                          {level}%
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-[140px]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-800">{skill}</span>
+                          <span className="text-xs text-gray-500">Proficiency</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={level}
+                          onChange={(e) => setLevel('expertise', skill, Number(e.target.value))}
+                          className="w-full accent-teal-600"
+                        />
+                      </div>
+                      <button onClick={() => removeSkill('expertise', skill)} className="text-gray-400 hover:text-red-500">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -260,18 +330,39 @@ export default function SettingsPage() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.growthSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>
                 )}
-                {profile.growthSkills.map((skill: string) => (
-                  <Badge key={skill} variant="secondary" className="bg-cyan-100 text-cyan-700 hover:bg-cyan-200 pl-3 pr-1 py-1.5">
-                    {skill}
-                    <button onClick={() => removeSkill('growth', skill)} className="ml-2 hover:bg-cyan-300 rounded-full p-0.5 transition-colors">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+                {profile.growthSkills.map((skill: string) => {
+                  const level = (profile.growthLevels || {})[skill.toLowerCase()] ?? 40;
+                  return (
+                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-3 py-2 shadow-sm">
+                      <div className="w-10 h-10 rounded-full" style={ringStyle(level)}>
+                        <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-700">
+                          {level}%
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-[140px]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-800">{skill}</span>
+                          <span className="text-xs text-gray-500">Confidence</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={level}
+                          onChange={(e) => setLevel('growth', skill, Number(e.target.value))}
+                          className="w-full accent-cyan-600"
+                        />
+                      </div>
+                      <button onClick={() => removeSkill('growth', skill)} className="text-gray-400 hover:text-red-500">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

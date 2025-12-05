@@ -27,6 +27,7 @@ export default function PodDetailPage() {
   const [currentUserExpertise, setCurrentUserExpertise] = useState<string[]>([]);
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [senderName, setSenderName] = useState<string>("A teammate");
 
   useEffect(() => {
     loadPodData();
@@ -44,11 +45,12 @@ export default function PodDetailPage() {
       // Get current user's profile for expertise skills
       const { data: currentProfile } = await supabase
         .from('profiles')
-        .select('expertise_skills')
+        .select('expertise_skills, major')
         .eq('user_id', user.id)
         .single();
       
       setCurrentUserExpertise(currentProfile?.expertise_skills || []);
+      setSenderName(currentProfile?.major || "A teammate");
 
       // Get pod details
       const { data: podData, error: podError } = await supabase
@@ -91,6 +93,7 @@ export default function PodDetailPage() {
             expertiseSkills: profile?.expertise_skills || [],
             growthSkills: profile?.growth_skills || [],
             lookingToHelp: profile?.looking_to_help || false,
+            slackHandle: profile?.slack_handle || "",
           };
         });
 
@@ -143,6 +146,21 @@ export default function PodDetailPage() {
       });
 
       if (error) throw error;
+
+      // Optional Slack webhook
+      const slackHandle = selectedMember?.slackHandle;
+      if (slackHandle) {
+        fetch('/api/slack/nudge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientSlackHandle: slackHandle,
+            senderName,
+            topic,
+            podCode: pod?.pod_code,
+          }),
+        }).catch(() => {});
+      }
 
       toast.success("Nudge sent!", {
         description: type === 'ask' ? `Asked for help with ${topic}` : `Offered help with ${topic}`
@@ -264,15 +282,39 @@ export default function PodDetailPage() {
                   </div>
 
                   {member.userId !== currentUserId && (
-                    <Button
-                      onClick={() => openNudgeDialog(member)}
-                      size="sm"
-                      variant="outline"
-                      className="shrink-0 hover:bg-teal-50 hover:border-teal-300"
-                    >
-                      <Bell className="h-3.5 w-3.5 mr-1" />
-                      Nudge
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        onClick={() => openNudgeDialog(member)}
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0 hover:bg-teal-50 hover:border-teal-300"
+                      >
+                        <Bell className="h-3.5 w-3.5 mr-1" />
+                        Nudge
+                      </Button>
+                      {member.slackHandle && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="justify-start text-teal-700 hover:bg-teal-50"
+                          onClick={() => {
+                            const handle = member.slackHandle.trim();
+                            const isId = handle.startsWith("U") || handle.startsWith("W");
+                            const href = isId
+                              ? `https://slack.com/app_redirect?channel=${handle}`
+                              : undefined;
+                            if (href) {
+                              window.open(href, "_blank");
+                            } else {
+                              navigator.clipboard.writeText(handle.replace("@", ""));
+                              toast.success("Slack handle copied");
+                            }
+                          }}
+                        >
+                          Message on Slack
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </motion.div>
               ))}

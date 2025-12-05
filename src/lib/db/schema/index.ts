@@ -7,7 +7,9 @@ export const profiles = pgTable("profiles", {
   studyTimePreference: text("study_time_preference"),
   strengths: text("strengths").array(), // Array of strings
   expertiseSkills: text("expertise_skills").array(), // Skills I can teach
+  expertiseLevels: jsonb("expertise_levels").default({}), // Skill -> proficiency (0-100)
   growthSkills: text("growth_skills").array(), // Skills I want to learn
+  growthLevels: jsonb("growth_levels").default({}), // Skill -> proficiency (0-100)
   academicGoal: text("academic_goal"),
   reliability: integer("reliability").default(0),
   locationPreference: text("location_preference"),
@@ -18,6 +20,7 @@ export const profiles = pgTable("profiles", {
   major: text("major"), // Used for "Current Teams / Projects"
   bio: text("bio"),
   currentProjects: text("current_projects").array(),
+  slackHandle: text("slack_handle"), // Slack user handle or ID
   lookingToHelp: boolean("looking_to_help").default(false), // Status: actively offering help
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -59,6 +62,14 @@ export const notifications = pgTable("notifications", {
   content: text("content").notNull(),
   metadata: jsonb("metadata").default({}), // Additional context (topic, pod_id, etc.)
   read: boolean("read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const openRequests = pgTable("open_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull(),
+  skill: text("skill").notNull(),
+  status: text("status").default("open"), // open, notified, closed
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
