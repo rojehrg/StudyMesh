@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Search, Sparkles, Bell, Users } from "lucide-react";
+import { Loader2, Search, Sparkles, Bell, Users, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -279,136 +279,179 @@ export default function WorkingCirclesPage() {
         </div>
       )}
 
-      {/* Open Requests */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-teal-600" />
-            Open Help Requests
-          </CardTitle>
-          <CardDescription>Save what you need help with; we’ll notify you when someone can help.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Skill you need help with"
-              value={requestSkill}
-              onChange={(e) => setRequestSkill(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
-            />
-            <Button onClick={saveOpenRequest} variant="outline">Save request</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="text-sm font-semibold text-gray-800">Requests I created</div>
-              {myRequests.length === 0 ? (
-                <p className="text-sm text-gray-500">No saved requests.</p>
-              ) : myRequests.map(r => (
-                <div key={r.id} className="p-3 rounded-xl border bg-gray-50 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{r.skill}</p>
-                    <p className="text-xs text-gray-500">Status: {r.status}</p>
-                  </div>
-                </div>
-              ))}
+      {/* Help Requests Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* My Requests */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-teal-600" />
+              My Help Requests
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Jot down what you need help with
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex gap-2">
+              <Input
+                placeholder="e.g. SQL optimization, React hooks..."
+                value={requestSkill}
+                onChange={(e) => setRequestSkill(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
+                className="h-9 text-sm"
+              />
+              <Button onClick={saveOpenRequest} size="sm" className="bg-teal-600 hover:bg-teal-700 h-9">
+                Add
+              </Button>
             </div>
-            <div className="space-y-3">
-              <div className="text-sm font-semibold text-gray-800">Requests I can help with</div>
-              {requestsICanHelp.length === 0 ? (
-                <p className="text-sm text-gray-500">No matching requests right now.</p>
-              ) : requestsICanHelp.map(r => (
-                <div key={r.id} className="p-3 rounded-xl border bg-teal-50/40 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{r.skill}</p>
-                    <p className="text-xs text-gray-500">Someone needs help</p>
+            {myRequests.length === 0 ? (
+              <p className="text-xs text-gray-400 italic py-2">No requests yet. Add skills you need help with.</p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {myRequests.map(r => (
+                  <div key={r.id} className={`p-2.5 rounded-lg border flex items-center justify-between ${
+                    r.status === 'notified' ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'
+                  }`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{r.skill}</p>
+                      <p className={`text-xs ${r.status === 'notified' ? 'text-teal-600' : 'text-gray-500'}`}>
+                        {r.status === 'open' ? 'Waiting for match...' : r.status === 'notified' ? 'Someone can help!' : r.status}
+                      </p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await supabase.from('open_requests').delete().eq('id', r.id);
+                        setOpenRequests(openRequests.filter(req => req.id !== r.id));
+                        toast.success("Request removed");
+                      }}
+                      className="text-gray-400 hover:text-red-500 p-1 ml-2"
+                      title="Remove request"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <Button size="sm" onClick={() => notifyRequester(r)} className="bg-teal-600 hover:bg-teal-700">
-                    Notify requester
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Requests I Can Help */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Bell className="w-4 h-4 text-cyan-600" />
+              You Can Help
+            </CardTitle>
+            <CardDescription className="text-xs">
+              People need help with skills you have
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {requestsICanHelp.length === 0 ? (
+              <p className="text-xs text-gray-400 italic py-2">No matching requests right now.</p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {requestsICanHelp.map(r => (
+                  <div key={r.id} className="p-2.5 rounded-lg border border-cyan-200 bg-cyan-50/50 flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{r.skill}</p>
+                      <p className="text-xs text-cyan-600">Someone needs your help</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => notifyRequester(r)}
+                      className="bg-cyan-600 hover:bg-cyan-700 h-7 text-xs px-3"
+                    >
+                      Offer help
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {filteredMatches.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMatches.map((match, index) => (
             <motion.div
               key={match.userId}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: index * 0.03 }}
             >
-              <Card className="hover-lift h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="h-12 w-12 border-2 border-teal-100">
-                        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold">
-                          {(match.major || '?')[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+              <Card className="hover:shadow-md transition-shadow h-full">
+                <CardContent className="p-4">
+                  {/* Header Row */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <Avatar className="h-9 w-9 border border-teal-100 shrink-0">
+                      <AvatarFallback className="bg-teal-50 text-teal-700 font-medium text-sm">
+                        {(match.major || '?')[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium text-gray-900 text-sm truncate">
+                          {match.major || "Team Member"}
+                        </p>
+                        {match.lookingToHelp && (
+                          <Sparkles className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 truncate">{match.department}</p>
+                    </div>
+                    <Badge className="bg-teal-50 text-teal-700 border-0 text-xs shrink-0">
+                      {match.score}%
+                    </Badge>
+                  </div>
+
+                  {/* Skills - Compact */}
+                  <div className="space-y-2 mb-3">
+                    {match.canAskHelp.length > 0 && (
                       <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <CardTitle className="text-lg">{match.major || "Team Member"}</CardTitle>
-                          {match.lookingToHelp && (
-                            <Badge className="bg-cyan-100 text-cyan-700 border-cyan-200 text-xs">
-                              <Sparkles className="w-3 h-3 mr-1" />
-                              Looking to Help
-                            </Badge>
+                        <p className="text-[10px] uppercase tracking-wider text-cyan-600 font-medium mb-1">Can help you</p>
+                        <div className="flex flex-wrap gap-1">
+                          {match.canAskHelp.slice(0, 3).map((skill: string) => (
+                            <span key={skill} className="bg-cyan-50 text-cyan-700 text-xs px-2 py-0.5 rounded">
+                              {skill}
+                            </span>
+                          ))}
+                          {match.canAskHelp.length > 3 && (
+                            <span className="text-xs text-gray-400">+{match.canAskHelp.length - 3}</span>
                           )}
                         </div>
-                        <CardDescription>{match.department}</CardDescription>
                       </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <Badge className="bg-teal-100 text-teal-700 border-teal-200">
-                        {match.score}% match
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        {match.sharedPods} {match.sharedPods === 1 ? 'pod' : 'pods'}
-                      </Badge>
-                    </div>
+                    )}
+                    {match.canHelp.length > 0 && (
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-teal-600 font-medium mb-1">You can help</p>
+                        <div className="flex flex-wrap gap-1">
+                          {match.canHelp.slice(0, 3).map((skill: string) => (
+                            <span key={skill} className="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded">
+                              {skill}
+                            </span>
+                          ))}
+                          {match.canHelp.length > 3 && (
+                            <span className="text-xs text-gray-400">+{match.canHelp.length - 3}</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {match.canHelp.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-teal-700 mb-2">You can help with:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {match.canHelp.map((skill: string) => (
-                          <Badge key={skill} className="bg-teal-50 text-teal-700 border-teal-200">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {match.canAskHelp.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-cyan-700 mb-2">They can help you with:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {match.canAskHelp.map((skill: string) => (
-                          <Badge key={skill} className="bg-cyan-50 text-cyan-700 border-cyan-200">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="pt-2">
-                    <Button
-                      onClick={() => openNudgeDialog(match)}
-                      variant="outline"
-                      size="sm"
-                      className="w-full hover:bg-teal-50 hover:border-teal-300"
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      Send Nudge
-                    </Button>
-                  </div>
+
+                  {/* Action */}
+                  <Button
+                    onClick={() => openNudgeDialog(match)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full h-8 text-xs hover:bg-teal-50 hover:border-teal-300"
+                  >
+                    <Bell className="mr-1.5 h-3 w-3" />
+                    Nudge
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>

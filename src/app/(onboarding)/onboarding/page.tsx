@@ -21,6 +21,8 @@ export default function OnboardingPage() {
 
   // Form State
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     department: "",
     role: "",
     bio: "",
@@ -78,14 +80,16 @@ export default function OnboardingPage() {
         .from('profiles')
         .upsert({
           user_id: user.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
           department: formData.department,
           major: formData.role, // Mapping 'Job Title' to 'major' column
           bio: formData.bio,
-          expertise_skills: formData.expertiseSkills, 
+          expertise_skills: formData.expertiseSkills,
           growth_skills: formData.growthSkills,
           updated_at: new Date().toISOString(),
-        }, { 
-          onConflict: 'user_id' 
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
@@ -119,7 +123,7 @@ export default function OnboardingPage() {
             />
           </div>
           <div className="flex justify-between mt-2 text-sm text-gray-500 font-medium">
-            <span className={step >= 1 ? "text-teal-600" : ""}>Role & Dept</span>
+            <span className={step >= 1 ? "text-teal-600" : ""}>About You</span>
             <span className={step >= 2 ? "text-teal-600" : ""}>Skills</span>
             <span className={step >= 3 ? "text-teal-600" : ""}>Bio</span>
           </div>
@@ -135,15 +139,37 @@ export default function OnboardingPage() {
             >
               <Card className="shadow-lg border-0">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Tell us about your role</CardTitle>
+                  <CardTitle className="text-2xl">Tell us about yourself</CardTitle>
                   <CardDescription>This helps us match you with the right pods.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={e => setFormData({...formData, firstName: e.target.value})}
+                        className="h-11"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={e => setFormData({...formData, lastName: e.target.value})}
+                        className="h-11"
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="dept">Department</Label>
-                    <Input 
+                    <Input
                       id="dept"
-                      placeholder="e.g. Engineering, Sales, Product" 
+                      placeholder="e.g. Engineering, Sales, Product"
                       value={formData.department}
                       onChange={e => setFormData({...formData, department: e.target.value})}
                       className="h-11"
@@ -151,9 +177,9 @@ export default function OnboardingPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Job Title</Label>
-                    <Input 
+                    <Input
                       id="role"
-                      placeholder="e.g. Senior Account Executive" 
+                      placeholder="e.g. Senior Account Executive"
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value})}
                       className="h-11"
@@ -161,9 +187,9 @@ export default function OnboardingPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="justify-end pt-2">
-                  <Button 
-                    onClick={() => setStep(2)} 
-                    disabled={!formData.department || !formData.role}
+                  <Button
+                    onClick={() => setStep(2)}
+                    disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
                     className="bg-teal-600 hover:bg-teal-700 h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />

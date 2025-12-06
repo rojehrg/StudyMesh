@@ -3,6 +3,8 @@ import { pgTable, text, timestamp, boolean, uuid, jsonb, integer } from "drizzle
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().unique(), // References Supabase Auth User ID
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   studyStyle: text("study_style"),
   studyTimePreference: text("study_time_preference"),
   strengths: text("strengths").array(), // Array of strings

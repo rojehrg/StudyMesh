@@ -1,33 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Plus, X, Save, User, Briefcase, Clock, Sparkles, MessageCircle } from "lucide-react";
+import { Loader2, Plus, X, Check, User, Briefcase, Clock, Sparkles, MessageCircle, Cloud, CloudOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-
-const ringStyle = (value: number) => {
-  const clamped = Math.min(100, Math.max(0, value || 0));
-  return {
-    background: `conic-gradient(#0d9488 ${clamped * 3.6}deg, #e5e7eb 0deg)`,
-  };
-};
+import { ProficiencyRing } from "@/components/proficiency-ring";
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [profile, setProfile] = useState<any>(null);
   const [expertiseInput, setExpertiseInput] = useState("");
   const [growthInput, setGrowthInput] = useState("");
-  
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedRef = useRef<string>("");
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -48,6 +43,8 @@ export default function SettingsPage() {
       if (data) {
         setProfile({
           ...data,
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
           expertiseSkills: data.expertise_skills || [],
           growthSkills: data.growth_skills || [],
           lookingToHelp: data.looking_to_help || false,
@@ -63,8 +60,8 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const saveProfile = useCallback(async (profileData: any) => {
+    setSaveStatus('saving');
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -72,34 +69,61 @@ export default function SettingsPage() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          department: profile.department,
-          major: profile.major,
-          bio: profile.bio,
-          expertise_skills: profile.expertiseSkills,
-          growth_skills: profile.growthSkills,
-          expertise_levels: profile.expertiseLevels || {},
-          growth_levels: profile.growthLevels || {},
-          preferred_group_size: profile.preferred_group_size || 3,
-          looking_to_help: profile.lookingToHelp || false,
-          slack_handle: profile.slackHandle || null,
+          first_name: profileData.firstName,
+          last_name: profileData.lastName,
+          department: profileData.department,
+          major: profileData.major,
+          bio: profileData.bio,
+          expertise_skills: profileData.expertiseSkills,
+          growth_skills: profileData.growthSkills,
+          expertise_levels: profileData.expertiseLevels || {},
+          growth_levels: profileData.growthLevels || {},
+          preferred_group_size: profileData.preferred_group_size || 3,
+          looking_to_help: profileData.lookingToHelp || false,
+          slack_handle: profileData.slackHandle || null,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id);
 
       if (error) throw error;
-      
-      toast.success("Profile updated successfully!", {
-        description: "Your changes have been saved."
-      });
+
+      setSaveStatus('saved');
+      lastSavedRef.current = JSON.stringify(profileData);
+
+      // Reset to idle after showing "saved" briefly
+      setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
       console.error("Error saving profile:", error);
+      setSaveStatus('error');
       toast.error("Failed to save", {
         description: "Please try again."
       });
-    } finally {
-      setSaving(false);
     }
-  };
+  }, [supabase]);
+
+  // Auto-save with debounce when profile changes
+  useEffect(() => {
+    if (!profile || loading) return;
+
+    const currentData = JSON.stringify(profile);
+    if (currentData === lastSavedRef.current) return;
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounce save - wait 1 second after last change
+    saveTimeoutRef.current = setTimeout(() => {
+      saveProfile(profile);
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [profile, loading, saveProfile]);
 
   const addSkill = (type: 'expertise' | 'growth') => {
     const input = type === 'expertise' ? expertiseInput : growthInput;
@@ -107,7 +131,8 @@ export default function SettingsPage() {
 
     const skillsKey = type === 'expertise' ? 'expertiseSkills' : 'growthSkills';
     const levelsKey = type === 'expertise' ? 'expertiseLevels' : 'growthLevels';
-    const defaultLevel = type === 'expertise' ? 70 : 40;
+    // Default: Expertise = Advanced (75), Growth = Beginner (25)
+    const defaultLevel = type === 'expertise' ? 75 : 25;
     const normalized = input.trim();
     if (!profile[skillsKey].includes(normalized)) {
       setProfile({
@@ -178,14 +203,44 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
           <p className="text-gray-500 mt-1">Manage your profile and preferences</p>
         </div>
-        <Button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="bg-teal-600 hover:bg-teal-700"
-        >
-          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-          Save Changes
-        </Button>
+        <div className="flex items-center gap-2 text-sm">
+          {saveStatus === 'saving' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2 text-gray-500"
+            >
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Saving...</span>
+            </motion.div>
+          )}
+          {saveStatus === 'saved' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-2 text-teal-600"
+            >
+              <Check className="h-4 w-4" />
+              <span>Saved</span>
+            </motion.div>
+          )}
+          {saveStatus === 'error' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2 text-red-500"
+            >
+              <CloudOff className="h-4 w-4" />
+              <span>Error saving</span>
+            </motion.div>
+          )}
+          {saveStatus === 'idle' && (
+            <div className="flex items-center gap-2 text-gray-400">
+              <Cloud className="h-4 w-4" />
+              <span>Auto-save on</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
@@ -211,6 +266,26 @@ export default function SettingsPage() {
               <CardDescription>Update your work profile details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="John"
+                    value={profile.firstName || ""}
+                    onChange={(e) => setProfile({...profile, firstName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Doe"
+                    value={profile.lastName || ""}
+                    onChange={(e) => setProfile({...profile, lastName: e.target.value})}
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="department">Department</Label>
@@ -276,34 +351,26 @@ export default function SettingsPage() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex flex-col gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.expertiseSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>
                 )}
                 {profile.expertiseSkills.map((skill: string) => {
-                  const level = (profile.expertiseLevels || {})[skill.toLowerCase()] ?? 70;
+                  const level = (profile.expertiseLevels || {})[skill.toLowerCase()] ?? 75;
+                  // Normalize old values to quadrant values
+                  const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-3 py-2 shadow-sm">
-                      <div className="w-10 h-10 rounded-full" style={ringStyle(level)}>
-                        <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-700">
-                          {level}%
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-[140px]">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-800">{skill}</span>
-                          <span className="text-xs text-gray-500">Proficiency</span>
-                        </div>
-                        <input
-                          type="range"
-                          min={0}
-                          max={100}
-                          value={level}
-                          onChange={(e) => setLevel('expertise', skill, Number(e.target.value))}
-                          className="w-full accent-teal-600"
+                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-4 py-3 shadow-sm">
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-800 block mb-2">{skill}</span>
+                        <ProficiencyRing
+                          value={normalizedLevel}
+                          onChange={(val) => setLevel('expertise', skill, val)}
+                          size="sm"
+                          color="teal"
                         />
                       </div>
-                      <button onClick={() => removeSkill('expertise', skill)} className="text-gray-400 hover:text-red-500">
+                      <button onClick={() => removeSkill('expertise', skill)} className="text-gray-400 hover:text-red-500 p-1">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -330,34 +397,26 @@ export default function SettingsPage() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex flex-col gap-2 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.growthSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>
                 )}
                 {profile.growthSkills.map((skill: string) => {
-                  const level = (profile.growthLevels || {})[skill.toLowerCase()] ?? 40;
+                  const level = (profile.growthLevels || {})[skill.toLowerCase()] ?? 25;
+                  // Normalize old values to quadrant values
+                  const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-3 py-2 shadow-sm">
-                      <div className="w-10 h-10 rounded-full" style={ringStyle(level)}>
-                        <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-700">
-                          {level}%
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-[140px]">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-800">{skill}</span>
-                          <span className="text-xs text-gray-500">Confidence</span>
-                        </div>
-                        <input
-                          type="range"
-                          min={0}
-                          max={100}
-                          value={level}
-                          onChange={(e) => setLevel('growth', skill, Number(e.target.value))}
-                          className="w-full accent-cyan-600"
+                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-4 py-3 shadow-sm">
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-800 block mb-2">{skill}</span>
+                        <ProficiencyRing
+                          value={normalizedLevel}
+                          onChange={(val) => setLevel('growth', skill, val)}
+                          size="sm"
+                          color="cyan"
                         />
                       </div>
-                      <button onClick={() => removeSkill('growth', skill)} className="text-gray-400 hover:text-red-500">
+                      <button onClick={() => removeSkill('growth', skill)} className="text-gray-400 hover:text-red-500 p-1">
                         <X className="h-4 w-4" />
                       </button>
                     </div>

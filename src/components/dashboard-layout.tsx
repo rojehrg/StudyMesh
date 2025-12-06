@@ -1,27 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Users, 
-  Bell, 
-  PlusCircle, 
-  LogIn, 
-  Settings, 
-  Info, 
-  ChevronLeft, 
-  Menu, 
-  LogOut 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  PlusCircle,
+  LogIn,
+  Settings,
+  Info,
+  ChevronLeft,
+  Menu,
+  LogOut,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { motion, AnimatePresence } from "framer-motion";
+import { Switch } from "@/components/ui/switch";
+import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { NudgesDropdown } from "@/components/nudges-dropdown";
 
 interface SidebarItemProps {
   icon: any;
@@ -78,9 +81,58 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
+  const [lookingToHelp, setLookingToHelp] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, looking_to_help')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setProfile(data);
+        setLookingToHelp(data.looking_to_help || false);
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
+
+  const toggleLookingToHelp = async (checked: boolean) => {
+    setLookingToHelp(checked);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ looking_to_help: checked, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast.success(checked ? "You're now looking to help!" : "Help status turned off", {
+        description: checked ? "Teammates can see you're available" : "You won't appear as available to help"
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setLookingToHelp(!checked); // Revert on error
+      toast.error("Failed to update status");
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -91,7 +143,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
     { icon: Users, label: "Working Circles", href: "/groups" },
-    { icon: Bell, label: "Notifications", href: "/notifications" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: LogIn, label: "Join Pod", href: "/classes/join" },
     { icon: Settings, label: "Settings", href: "/settings" },
@@ -136,6 +187,54 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
+        {/* Looking to Help Toggle */}
+        <div className={cn(
+          "mx-3 mt-3 p-3 rounded-xl border-2 transition-all duration-300",
+          lookingToHelp
+            ? "bg-teal-50 border-teal-200"
+            : "bg-gray-50 border-gray-200"
+        )}>
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+              lookingToHelp ? "bg-teal-600" : "bg-gray-300"
+            )}>
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            {!isCollapsed && (
+              <motion.div
+                initial={false}
+                animate={{ opacity: isCollapsed ? 0 : 1 }}
+                className="flex-1 min-w-0"
+              >
+                <div className="flex items-center justify-between">
+                  <span className={cn(
+                    "text-sm font-medium",
+                    lookingToHelp ? "text-teal-700" : "text-gray-600"
+                  )}>
+                    Looking to Help
+                  </span>
+                  <Switch
+                    checked={lookingToHelp}
+                    onCheckedChange={toggleLookingToHelp}
+                    className="data-[state=checked]:bg-teal-600"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {lookingToHelp ? "Visible to teammates" : "Toggle to help others"}
+                </p>
+              </motion.div>
+            )}
+            {isCollapsed && (
+              <Switch
+                checked={lookingToHelp}
+                onCheckedChange={toggleLookingToHelp}
+                className="data-[state=checked]:bg-teal-600 hidden"
+              />
+            )}
+          </div>
+        </div>
+
         {/* Nav Items */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
@@ -156,23 +255,34 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
             <Avatar className="h-9 w-9 border-2 border-teal-100">
               <AvatarImage src="" />
-              <AvatarFallback className="bg-teal-100 text-teal-700 font-medium">U</AvatarFallback>
+              <AvatarFallback className="bg-teal-100 text-teal-700 font-medium">
+                {profile?.first_name?.[0]?.toUpperCase() || "U"}
+              </AvatarFallback>
             </Avatar>
-            
+
             <motion.div
               initial={false}
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
               className="ml-3 overflow-hidden"
             >
-              <p className="text-sm font-medium text-gray-900 truncate">User Name</p>
-              <p className="text-xs text-gray-500 truncate">user@example.com</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : "User"}
+              </p>
+              {lookingToHelp && (
+                <p className="text-xs text-teal-600 truncate flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Available to help
+                </p>
+              )}
             </motion.div>
 
             <motion.button
               onClick={handleLogout}
               initial={false}
-              animate={{ 
-                marginLeft: isCollapsed ? 0 : "auto", 
+              animate={{
+                marginLeft: isCollapsed ? 0 : "auto",
                 opacity: isCollapsed ? 0 : 1,
                 width: isCollapsed ? 0 : "auto"
               }}
@@ -190,12 +300,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         "flex-1 flex flex-col min-h-screen transition-all duration-300",
         isCollapsed ? "md:ml-20" : "md:ml-64"
       )}>
-        {/* Header (Mobile Toggle) */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 md:hidden sticky top-0 z-30">
-          <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)}>
-            <Menu className="w-6 h-6 text-gray-700" />
-          </Button>
-          <span className="ml-3 font-bold text-lg">Meshflow</span>
+        {/* Header */}
+        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-30">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
+              <Menu className="w-6 h-6 text-gray-700" />
+            </Button>
+            <span className="ml-3 font-bold text-lg md:hidden">Meshflow</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <NudgesDropdown />
+          </div>
         </header>
 
         {/* Page Content */}
