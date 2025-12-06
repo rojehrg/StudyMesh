@@ -1,170 +1,239 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Users, Target, Zap, Shield, TrendingUp, Network, Brain } from "lucide-react";
+import { Sparkles, Users, Target, Zap, Shield, TrendingUp, Network, Brain, ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+};
 
 export default function AboutPage() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 max-w-5xl mx-auto"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="max-w-4xl mx-auto space-y-12"
     >
-      <div className="text-center space-y-4 py-8">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 bg-teal-50 px-4 py-2 rounded-full border border-teal-200"
-        >
-          <Sparkles className="w-5 h-5 text-teal-600" />
+      {/* Hero Section */}
+      <motion.div variants={itemVariants} className="text-center py-8">
+        <div className="inline-flex items-center gap-2 bg-teal-50 px-4 py-2 rounded-full border border-teal-200 mb-6">
+          <Sparkles className="w-4 h-4 text-teal-600" />
           <span className="text-teal-700 font-medium text-sm">About Meshflow</span>
-        </motion.div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           The Intelligent Enablement Platform
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
           Built for high-performing teams that know knowledge flow is the key to outperformance
         </p>
-      </div>
+      </motion.div>
 
-      <Card className="border-2 border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-lg hover-lift">
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center gap-3">
-            <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            Our Mission
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-800 leading-relaxed text-lg">
-            Meshflow helps teams <strong className="text-teal-700">outperform by filling knowledge gaps</strong>. The best teams aren't just skilled—they're connected. When expertise flows freely between teammates, blockers disappear, delivery accelerates, and everyone grows.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Mission Card */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-teal-50 rounded-2xl p-8 border-2 border-teal-100"
+      >
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
+            <Brain className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Our Mission</h2>
+            <p className="text-gray-700 text-lg leading-relaxed">
+              Meshflow helps teams <strong className="text-teal-700">outperform by filling knowledge gaps</strong>.
+              The best teams aren't just skilled—they're connected. When expertise flows freely between
+              teammates, blockers disappear, delivery accelerates, and everyone grows.
+            </p>
+          </div>
+        </div>
+      </motion.div>
 
+      {/* Problem & Solution */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          variants={itemVariants}
+          whileHover={{ y: -4 }}
+          className="bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-sm"
         >
-          <Card className="hover-lift h-full bg-white shadow-md border-2 border-gray-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-3">
-                <Target className="w-6 h-6 text-rose-600" />
-              </div>
-              <CardTitle className="text-xl">The Problem</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 leading-relaxed">
-                Teams struggle with knowledge silos. Someone has the answer, but no one knows who to ask. Projects stall. Frustration builds. Potential goes unrealized.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+            <Target className="w-5 h-5 text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">The Problem</h3>
+          <p className="text-gray-600 leading-relaxed">
+            Teams struggle with knowledge silos. Someone has the answer, but no one knows who to ask.
+            Projects stall. Frustration builds. Potential goes unrealized.
+          </p>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          variants={itemVariants}
+          whileHover={{ y: -4 }}
+          className="bg-teal-50 rounded-2xl p-6 border-2 border-teal-100"
         >
-          <Card className="hover-lift h-full bg-teal-50 shadow-md border-2 border-teal-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center mb-3">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              <CardTitle className="text-xl">Our Solution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700 leading-relaxed">
-                Meshflow uses intelligent matching to connect knowledge holders with knowledge seekers. You list what you know and what you want to learn—we handle the rest.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center mb-4">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Our Solution</h3>
+          <p className="text-gray-700 leading-relaxed">
+            Meshflow uses intelligent matching to connect knowledge holders with knowledge seekers.
+            You list what you know and what you want to learn—we handle the rest.
+          </p>
         </motion.div>
       </div>
 
-      <Card className="shadow-lg border-2 border-gray-100">
-        <CardHeader className="bg-gray-50 border-b">
-          <CardTitle className="text-2xl flex items-center gap-2">
-            <Network className="w-6 h-6 text-teal-600" />
-            How We're Different
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6 pt-6">
+      {/* How It's Different */}
+      <motion.div variants={itemVariants} className="space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <Network className="w-6 h-6 text-teal-600" />
+          <h2 className="text-2xl font-bold text-gray-900">How We're Different</h2>
+        </div>
+
+        <div className="space-y-4">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="flex items-start gap-4 p-4 rounded-xl bg-teal-50/50 border border-teal-100"
+            whileHover={{ x: 4 }}
+            className="flex items-start gap-4 p-5 rounded-xl bg-white border-2 border-gray-100 shadow-sm"
           >
-            <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
-              <Brain className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+              <Brain className="w-5 h-5 text-teal-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Intelligent Matching</h3>
-              <p className="text-gray-700">
-                Our smart algorithm understands context and skill variations. Matches are based on complementary expertise, not rigid categories.
+              <h4 className="font-bold text-gray-900 mb-1">Intelligent Matching</h4>
+              <p className="text-gray-600 text-sm">
+                Our smart algorithm understands context and skill variations. Matches are based on
+                complementary expertise, not rigid categories.
               </p>
             </div>
+            <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="flex items-start gap-4 p-4 rounded-xl bg-cyan-50/50 border border-cyan-100"
+            whileHover={{ x: 4 }}
+            className="flex items-start gap-4 p-5 rounded-xl bg-white border-2 border-gray-100 shadow-sm"
           >
-            <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center shrink-0">
-              <Shield className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5 text-cyan-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Org-Scoped Privacy</h3>
-              <p className="text-gray-700">
-                Your data stays within your organization. No external sharing, no public profiles. Complete security and privacy.
+              <h4 className="font-bold text-gray-900 mb-1">Org-Scoped Privacy</h4>
+              <p className="text-gray-600 text-sm">
+                Your data stays within your organization. No external sharing, no public profiles.
+                Complete security and privacy.
               </p>
             </div>
+            <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="flex items-start gap-4 p-4 rounded-xl bg-teal-50/50 border border-teal-100"
+            whileHover={{ x: 4 }}
+            className="flex items-start gap-4 p-5 rounded-xl bg-white border-2 border-gray-100 shadow-sm"
           >
-            <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
-              <TrendingUp className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5 text-teal-600" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 mb-1 text-lg">Performance-Driven</h3>
-              <p className="text-gray-700">
-                Built from real-world experience: teams that consistently fill knowledge gaps outperform those that don't. Simple as that.
+              <h4 className="font-bold text-gray-900 mb-1">Performance-Driven</h4>
+              <p className="text-gray-600 text-sm">
+                Built from real-world experience: teams that consistently fill knowledge gaps
+                outperform those that don't. Simple as that.
               </p>
             </div>
+            <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-1" />
           </motion.div>
-        </CardContent>
-      </Card>
 
-      <Card className="bg-gray-50 border-dashed">
-        <CardHeader>
-          <CardTitle>Built for B2B Teams</CardTitle>
-          <CardDescription>From enterprise orgs to specialized teams</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 leading-relaxed">
-            Whether you're a large organization with multiple departments or a smaller team with diverse specializations—Meshflow helps you stay connected, unblocked, and moving fast.
-          </p>
-        </CardContent>
-      </Card>
+          <motion.div
+            whileHover={{ x: 4 }}
+            className="flex items-start gap-4 p-5 rounded-xl bg-white border-2 border-gray-100 shadow-sm"
+          >
+            <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-cyan-600" />
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 mb-1">Slack Integration</h4>
+              <p className="text-gray-600 text-sm">
+                Get notified where you already work. Nudges can trigger Slack messages so you never
+                miss a collaboration opportunity.
+              </p>
+            </div>
+            <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-1" />
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Key Features Grid */}
+      <motion.div variants={itemVariants}>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Key Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-5 rounded-xl bg-gray-50 border border-gray-200">
+            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center mb-3">
+              <Target className="w-4 h-4 text-white" />
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-1">Skill Matching</h4>
+            <p className="text-sm text-gray-600">Fuzzy matching connects similar skills automatically</p>
+          </div>
+          <div className="p-5 rounded-xl bg-gray-50 border border-gray-200">
+            <div className="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center mb-3">
+              <Users className="w-4 h-4 text-white" />
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-1">Pod Organization</h4>
+            <p className="text-sm text-gray-600">Group by project, team, or initiative</p>
+          </div>
+          <div className="p-5 rounded-xl bg-gray-50 border border-gray-200">
+            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center mb-3">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-1">Contextual Nudges</h4>
+            <p className="text-sm text-gray-600">Ask for help or offer expertise directly</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* CTA */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-gray-900 rounded-2xl p-8 text-center text-white"
+      >
+        <h2 className="text-2xl font-bold mb-3">Ready to collaborate?</h2>
+        <p className="text-gray-300 mb-6 max-w-md mx-auto">
+          Start mapping your skills and connecting with teammates who can help you grow.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/settings">
+            <Button className="bg-teal-600 hover:bg-teal-700 text-white">
+              Update Your Profile
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href="/groups">
+            <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              Find Matches
+            </Button>
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Footer note */}
+      <motion.p variants={itemVariants} className="text-center text-sm text-gray-500 pb-8">
+        Built for B2B teams • From enterprise orgs to specialized teams
+      </motion.p>
     </motion.div>
   );
 }
-

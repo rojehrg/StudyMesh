@@ -174,6 +174,7 @@ export default function WorkingCirclesPage() {
             recipientSlackHandle: slackHandle,
             senderName,
             topic,
+            nudgeType: type,
           }),
         }).catch(() => {});
       }

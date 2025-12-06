@@ -115,7 +115,7 @@
 .blob-1 {
   width: 600px;
   height: 600px;
-  background: linear-gradient(135deg, #14b8a6, #06b6d4);
+  background: #14b8a6;
   top: -15%;
   right: -10%;
   animation: blob-float 25s ease-in-out infinite;
@@ -124,7 +124,7 @@
 .blob-2 {
   width: 500px;
   height: 500px;
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  background: #06b6d4;
   bottom: -10%;
   left: -10%;
   animation: blob-float-2 30s ease-in-out infinite;
@@ -134,7 +134,7 @@
 .blob-3 {
   width: 450px;
   height: 450px;
-  background: linear-gradient(135deg, #06b6d4, #14b8a6);
+  background: #0d9488;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);

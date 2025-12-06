@@ -158,6 +158,7 @@ export default function PodDetailPage() {
             senderName,
             topic,
             podCode: pod?.pod_code,
+            nudgeType: type,
           }),
         }).catch(() => {});
       }
@@ -225,78 +226,83 @@ export default function PodDetailPage() {
           </CardHeader>
         </Card>
 
-        {/* Members List - Simpler, More Compact */}
+        {/* Members List - Compact Grid Layout */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="w-5 h-5 text-teal-600" />
-              Pod Members
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="w-5 h-5 text-teal-600" />
+                Pod Members
+              </CardTitle>
+              <span className="text-sm text-gray-500">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className={`grid gap-3 ${members.length > 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
               {members.map((member, index) => (
                 <motion.div
                   key={member.userId}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex items-start gap-3 p-3 rounded-xl border hover:border-teal-200 hover:bg-teal-50/30 transition-all"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.03 }}
+                  whileHover={{ y: -2 }}
+                  className="p-3 rounded-xl border-2 border-gray-100 hover:border-teal-200 hover:bg-teal-50/20 transition-all bg-white"
                 >
-                  <Avatar className="h-10 w-10 border-2 border-teal-100 shrink-0">
-                    <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
-                      {(member.major || member.department || '?')[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="font-semibold text-gray-900 text-sm">
-                        {member.major || "Team Member"}
-                      </h4>
-                      {member.userId === currentUserId && (
-                        <Badge variant="secondary" className="bg-teal-100 text-teal-700 text-xs">You</Badge>
-                      )}
-                      {member.lookingToHelp && member.userId !== currentUserId && (
-                        <Badge className="bg-cyan-100 text-cyan-700 border-cyan-200 text-xs">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Looking to Help
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500">{member.department || "No department"}</p>
-                    
-                    {/* Skills Preview */}
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {member.expertiseSkills.slice(0, 4).map((skill: string) => (
-                        <Badge key={skill} variant="secondary" className="text-xs bg-gray-100 text-gray-700 px-2 py-0">
-                          {skill}
-                        </Badge>
-                      ))}
-                      {member.expertiseSkills.length > 4 && (
-                        <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 px-2 py-0">
-                          +{member.expertiseSkills.length - 4}
-                        </Badge>
-                      )}
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-9 w-9 border-2 border-teal-100 shrink-0">
+                      <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
+                        {(member.major || member.department || '?')[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="font-semibold text-gray-900 text-sm truncate max-w-[120px]">
+                          {member.major || "Team Member"}
+                        </h4>
+                        {member.userId === currentUserId && (
+                          <Badge variant="secondary" className="bg-teal-100 text-teal-700 text-[10px] px-1.5 py-0">You</Badge>
+                        )}
+                        {member.lookingToHelp && member.userId !== currentUserId && (
+                          <span title="Looking to Help">
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 truncate">{member.department || "No department"}</p>
+
+                      {/* Skills - Compact */}
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {member.expertiseSkills.slice(0, 2).map((skill: string) => (
+                          <span key={skill} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                            {skill}
+                          </span>
+                        ))}
+                        {member.expertiseSkills.length > 2 && (
+                          <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">
+                            +{member.expertiseSkills.length - 2}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {member.userId !== currentUserId && (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
                       <Button
                         onClick={() => openNudgeDialog(member)}
                         size="sm"
                         variant="outline"
-                        className="shrink-0 hover:bg-teal-50 hover:border-teal-300"
+                        className="flex-1 h-7 text-xs hover:bg-teal-50 hover:border-teal-300"
                       >
-                        <Bell className="h-3.5 w-3.5 mr-1" />
+                        <Bell className="h-3 w-3 mr-1" />
                         Nudge
                       </Button>
                       {member.slackHandle && (
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="justify-start text-teal-700 hover:bg-teal-50"
+                          className="h-7 px-2 text-teal-700 hover:bg-teal-50"
                           onClick={() => {
                             const handle = member.slackHandle.trim();
                             const isId = handle.startsWith("U") || handle.startsWith("W");
@@ -310,8 +316,11 @@ export default function PodDetailPage() {
                               toast.success("Slack handle copied");
                             }
                           }}
+                          title="Message on Slack"
                         >
-                          Message on Slack
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+                          </svg>
                         </Button>
                       )}
                     </div>
