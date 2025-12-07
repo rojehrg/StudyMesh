@@ -419,3 +419,199 @@ export function calculateMatches(profileA: Profile, profileB: Profile, isSamePod
   };
 }
 
+// Calculate similarity score between two profiles (for "Similar to you" recommendations)
+// Higher score = more similar skill sets
+export function calculateSimilarity(profileA: Profile, profileB: Profile): {
+  score: number;
+  sharedExpertise: string[];
+  sharedGrowth: string[];
+  sharedCategory: string[];
+} {
+  const expertiseA = normalizeSkills(profileA.expertiseSkills || []);
+  const expertiseB = normalizeSkills(profileB.expertiseSkills || []);
+  const growthA = normalizeSkills(profileA.growthSkills || []);
+  const growthB = normalizeSkills(profileB.growthSkills || []);
+
+  const sharedExpertise: string[] = [];
+  const sharedGrowth: string[] = [];
+  const sharedCategory: string[] = [];
+
+  // Find shared expertise skills
+  for (const skillA of expertiseA) {
+    for (const skillB of expertiseB) {
+      if (areSkillsSimilar(skillA, skillB)) {
+        sharedExpertise.push(skillA);
+        break;
+      }
+    }
+  }
+
+  // Find shared growth goals
+  for (const skillA of growthA) {
+    for (const skillB of growthB) {
+      if (areSkillsSimilar(skillA, skillB)) {
+        sharedGrowth.push(skillA);
+        break;
+      }
+    }
+  }
+
+  // Find shared skill categories
+  const categoriesA = new Set<string>();
+  const categoriesB = new Set<string>();
+
+  for (const skill of [...expertiseA, ...growthA]) {
+    const cat = getSkillCategory(skill);
+    if (cat) categoriesA.add(cat);
+  }
+  for (const skill of [...expertiseB, ...growthB]) {
+    const cat = getSkillCategory(skill);
+    if (cat) categoriesB.add(cat);
+  }
+
+  for (const cat of categoriesA) {
+    if (categoriesB.has(cat)) {
+      sharedCategory.push(cat);
+    }
+  }
+
+  // Calculate similarity score (0-100)
+  const expertiseScore = Math.min(40, sharedExpertise.length * 15);
+  const growthScore = Math.min(30, sharedGrowth.length * 10);
+  const categoryScore = Math.min(20, sharedCategory.length * 5);
+  const deptScore = profileA.department?.toLowerCase() === profileB.department?.toLowerCase() ? 10 : 0;
+
+  return {
+    score: Math.min(100, expertiseScore + growthScore + categoryScore + deptScore),
+    sharedExpertise,
+    sharedGrowth,
+    sharedCategory,
+  };
+}
+
+// Analyze team/pod skill composition and identify gaps
+export interface TeamAnalysis {
+  totalMembers: number;
+  skillCoverage: Record<string, number>; // category -> count of members with skills
+  strongAreas: string[]; // categories with good coverage (>50%)
+  gapAreas: string[]; // categories with poor coverage (<25%)
+  topExpertise: Array<{ skill: string; count: number }>;
+  topGrowthNeeds: Array<{ skill: string; count: number }>;
+  balanceScore: number; // 0-100, higher = more balanced team
+  recommendations: string[];
+}
+
+export function analyzeTeamComposition(profiles: Profile[]): TeamAnalysis {
+  const totalMembers = profiles.length;
+  if (totalMembers === 0) {
+    return {
+      totalMembers: 0,
+      skillCoverage: {},
+      strongAreas: [],
+      gapAreas: [],
+      topExpertise: [],
+      topGrowthNeeds: [],
+      balanceScore: 0,
+      recommendations: ["Add team members to see analysis"],
+    };
+  }
+
+  // Count skills and categories
+  const expertiseCount: Record<string, number> = {};
+  const growthCount: Record<string, number> = {};
+  const categoryMembers: Record<string, Set<number>> = {};
+
+  profiles.forEach((profile, index) => {
+    const expertise = normalizeSkills(profile.expertiseSkills || []);
+    const growth = normalizeSkills(profile.growthSkills || []);
+
+    // Count expertise skills
+    for (const skill of expertise) {
+      const canonical = getCanonicalSkill(skill);
+      expertiseCount[canonical] = (expertiseCount[canonical] || 0) + 1;
+
+      const category = getSkillCategory(skill);
+      if (category) {
+        if (!categoryMembers[category]) categoryMembers[category] = new Set();
+        categoryMembers[category].add(index);
+      }
+    }
+
+    // Count growth needs
+    for (const skill of growth) {
+      const canonical = getCanonicalSkill(skill);
+      growthCount[canonical] = (growthCount[canonical] || 0) + 1;
+    }
+  });
+
+  // Calculate coverage for each category
+  const allCategories = Object.keys(SKILL_CATEGORIES);
+  const skillCoverage: Record<string, number> = {};
+  const strongAreas: string[] = [];
+  const gapAreas: string[] = [];
+
+  for (const category of allCategories) {
+    const memberCount = categoryMembers[category]?.size || 0;
+    const coveragePercent = Math.round((memberCount / totalMembers) * 100);
+    skillCoverage[category] = coveragePercent;
+
+    if (coveragePercent >= 50) strongAreas.push(category);
+    else if (coveragePercent < 25) gapAreas.push(category);
+  }
+
+  // Get top expertise and growth needs
+  const topExpertise = Object.entries(expertiseCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([skill, count]) => ({ skill, count }));
+
+  const topGrowthNeeds = Object.entries(growthCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([skill, count]) => ({ skill, count }));
+
+  // Calculate balance score
+  const coverageValues = Object.values(skillCoverage);
+  const avgCoverage = coverageValues.length > 0
+    ? coverageValues.reduce((a, b) => a + b, 0) / coverageValues.length
+    : 0;
+  const variance = coverageValues.length > 0
+    ? coverageValues.reduce((sum, val) => sum + Math.pow(val - avgCoverage, 2), 0) / coverageValues.length
+    : 0;
+  const balanceScore = Math.max(0, Math.min(100, Math.round(100 - Math.sqrt(variance))));
+
+  // Generate recommendations
+  const recommendations: string[] = [];
+
+  if (gapAreas.length > 0) {
+    recommendations.push(`Consider adding members with ${gapAreas.slice(0, 2).join(" or ")} skills`);
+  }
+
+  // Check if growth needs can be met internally
+  const unmatchedGrowth = topGrowthNeeds.filter(
+    need => !topExpertise.some(exp => areSkillsSimilar(exp.skill, need.skill))
+  );
+  if (unmatchedGrowth.length > 0) {
+    recommendations.push(`Team needs mentors for: ${unmatchedGrowth.slice(0, 2).map(n => n.skill).join(", ")}`);
+  }
+
+  if (strongAreas.length >= 3) {
+    recommendations.push(`Strong in ${strongAreas.slice(0, 3).join(", ")} - leverage for cross-training`);
+  }
+
+  if (recommendations.length === 0) {
+    recommendations.push("Team has good skill balance!");
+  }
+
+  return {
+    totalMembers,
+    skillCoverage,
+    strongAreas,
+    gapAreas,
+    topExpertise,
+    topGrowthNeeds,
+    balanceScore,
+    recommendations,
+  };
+}
+

@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { calculateMatches } from "@/lib/logic/matching";
+import { calculateMatches, calculateSimilarity } from "@/lib/logic/matching";
 import { NudgeDialog } from "@/components/nudge-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock, ArrowLeftRight } from "lucide-react";
+import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock, ArrowLeftRight, UserCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -24,6 +24,7 @@ export default function WorkingCirclesPage() {
   const [requestSkill, setRequestSkill] = useState("");
   const [currentProfile, setCurrentProfile] = useState<any>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [similarUsers, setSimilarUsers] = useState<any[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
@@ -130,7 +131,39 @@ export default function WorkingCirclesPage() {
         .sort((a, b) => b.score - a.score);
 
       setMatches(matchResults);
-      
+
+      // Calculate "Similar to you" recommendations
+      const similarResults = profiles
+        .map(otherProfile => {
+          const similarity = calculateSimilarity(
+            {
+              expertiseSkills: currentProfile.expertise_skills || [],
+              growthSkills: currentProfile.growth_skills || [],
+              department: currentProfile.department,
+            },
+            {
+              expertiseSkills: otherProfile.expertise_skills || [],
+              growthSkills: otherProfile.growth_skills || [],
+              department: otherProfile.department,
+            }
+          );
+
+          return {
+            userId: otherProfile.user_id,
+            major: otherProfile.major,
+            department: otherProfile.department,
+            score: similarity.score,
+            sharedExpertise: similarity.sharedExpertise,
+            sharedGrowth: similarity.sharedGrowth,
+            sharedCategory: similarity.sharedCategory,
+          };
+        })
+        .filter(s => s.score >= 20)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      setSimilarUsers(similarResults);
+
       // Load open requests
       const { data: requests } = await supabase
         .from('open_requests')
@@ -281,7 +314,7 @@ export default function WorkingCirclesPage() {
 
       {matches.length > 0 && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name, department, or skills..."
             value={searchQuery}
@@ -318,7 +351,7 @@ export default function WorkingCirclesPage() {
               </Button>
             </div>
             {myRequests.length === 0 ? (
-              <p className="text-xs text-gray-400 italic py-2">No requests yet. Add skills you need help with.</p>
+              <p className="text-xs text-muted-foreground italic py-2">No requests yet. Add skills you need help with.</p>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {myRequests.map(r => (
@@ -326,8 +359,8 @@ export default function WorkingCirclesPage() {
                     r.status === 'notified' ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'
                   }`}>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{r.skill}</p>
-                      <p className={`text-xs ${r.status === 'notified' ? 'text-teal-600' : 'text-gray-500'}`}>
+                      <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
+                      <p className={`text-xs ${r.status === 'notified' ? 'text-teal-600' : 'text-muted-foreground'}`}>
                         {r.status === 'open' ? 'Waiting for match...' : r.status === 'notified' ? 'Someone can help!' : r.status}
                       </p>
                     </div>
@@ -337,7 +370,7 @@ export default function WorkingCirclesPage() {
                         setOpenRequests(openRequests.filter(req => req.id !== r.id));
                         toast.success("Request removed");
                       }}
-                      className="text-gray-400 hover:text-red-500 p-1 ml-2"
+                      className="text-muted-foreground hover:text-red-500 p-1 ml-2"
                       title="Remove request"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -362,13 +395,13 @@ export default function WorkingCirclesPage() {
           </CardHeader>
           <CardContent>
             {requestsICanHelp.length === 0 ? (
-              <p className="text-xs text-gray-400 italic py-2">No matching requests right now.</p>
+              <p className="text-xs text-muted-foreground italic py-2">No matching requests right now.</p>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {requestsICanHelp.map(r => (
                   <div key={r.id} className="p-2.5 rounded-lg border border-cyan-200 bg-cyan-50/50 flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{r.skill}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
                       <p className="text-xs text-cyan-600">Someone needs your help</p>
                     </div>
                     <Button
@@ -385,6 +418,50 @@ export default function WorkingCirclesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Similar to You Section */}
+      {similarUsers.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <UserCheck className="w-4 h-4 text-purple-600" />
+              Similar to You
+            </CardTitle>
+            <CardDescription className="text-xs">
+              People with similar skills and interests - great for collaboration
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {similarUsers.map((user) => (
+                <div
+                  key={user.userId}
+                  className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-purple-100 bg-purple-50/50 hover:bg-purple-50 transition-colors"
+                >
+                  <Avatar className="h-8 w-8 border border-purple-200">
+                    <AvatarFallback className="bg-purple-100 text-purple-700 font-medium text-xs">
+                      {(user.major || '?')[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{user.major || "Team Member"}</p>
+                    <p className="text-[10px] text-purple-600">
+                      {user.sharedExpertise.length > 0
+                        ? `Shares: ${user.sharedExpertise.slice(0, 2).join(', ')}`
+                        : user.sharedCategory.length > 0
+                        ? `Both in: ${user.sharedCategory.slice(0, 2).join(', ')}`
+                        : `${user.score}% similar`}
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-[10px] ml-1">
+                    {user.score}%
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {filteredMatches.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -406,14 +483,14 @@ export default function WorkingCirclesPage() {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="font-medium text-gray-900 text-sm truncate">
+                        <p className="font-medium text-foreground text-sm truncate">
                           {match.major || "Team Member"}
                         </p>
                         {match.lookingToHelp && (
                           <Sparkles className="w-3.5 h-3.5 text-teal-500 shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 truncate">{match.department}</p>
+                      <p className="text-xs text-muted-foreground truncate">{match.department}</p>
                     </div>
                     {/* Reciprocal Badge */}
                     {match.isReciprocal && (
@@ -439,11 +516,11 @@ export default function WorkingCirclesPage() {
                       exit={{ opacity: 0, height: 0 }}
                       className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-100"
                     >
-                      <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium mb-2">Score Breakdown</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
                       <div className="space-y-1.5">
                         {match.breakdown.skills > 0 && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-gray-600">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
                               <Target className="w-3 h-3 text-teal-600" />
                               Skill Match
                             </span>
@@ -452,7 +529,7 @@ export default function WorkingCirclesPage() {
                         )}
                         {match.breakdown.samePod > 0 && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-gray-600">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
                               <Users className="w-3 h-3 text-cyan-600" />
                               Same Pod
                             </span>
@@ -461,7 +538,7 @@ export default function WorkingCirclesPage() {
                         )}
                         {match.breakdown.crossDepartment > 0 && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-gray-600">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
                               <Building2 className="w-3 h-3 text-purple-600" />
                               Cross-Department
                             </span>
@@ -470,7 +547,7 @@ export default function WorkingCirclesPage() {
                         )}
                         {match.breakdown.availability > 0 && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-gray-600">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
                               <Clock className="w-3 h-3 text-amber-600" />
                               Availability
                             </span>
@@ -479,7 +556,7 @@ export default function WorkingCirclesPage() {
                         )}
                         {match.isReciprocal && (
                           <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-200 mt-1">
-                            <span className="flex items-center gap-1.5 text-gray-600">
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
                               <ArrowLeftRight className="w-3 h-3 text-amber-500" />
                               Two-Way Match
                             </span>
@@ -502,7 +579,7 @@ export default function WorkingCirclesPage() {
                             </span>
                           ))}
                           {match.canAskHelp.length > 3 && (
-                            <span className="text-xs text-gray-400">+{match.canAskHelp.length - 3}</span>
+                            <span className="text-xs text-muted-foreground">+{match.canAskHelp.length - 3}</span>
                           )}
                         </div>
                       </div>
@@ -517,7 +594,7 @@ export default function WorkingCirclesPage() {
                             </span>
                           ))}
                           {match.canHelp.length > 3 && (
-                            <span className="text-xs text-gray-400">+{match.canHelp.length - 3}</span>
+                            <span className="text-xs text-muted-foreground">+{match.canHelp.length - 3}</span>
                           )}
                         </div>
                       </div>
@@ -549,8 +626,8 @@ export default function WorkingCirclesPage() {
             >
               <Sparkles className="w-10 h-10 text-teal-600" />
             </motion.div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to Working Circles!</h3>
-            <p className="text-gray-600 max-w-md mb-6">
+            <h3 className="text-xl font-semibold text-foreground mb-2">Welcome to Working Circles!</h3>
+            <p className="text-muted-foreground max-w-md mb-6">
               This is where you'll find teammates who can help you grow and people you can mentor.
               Join a pod to start matching with colleagues.
             </p>
@@ -567,7 +644,7 @@ export default function WorkingCirclesPage() {
       ) : (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-500">No matches found for "{searchQuery}"</p>
+            <p className="text-muted-foreground">No matches found for "{searchQuery}"</p>
           </CardContent>
         </Card>
       )}

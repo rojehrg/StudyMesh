@@ -216,7 +216,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center justify-between">
                   <span className={cn(
                     "text-sm font-medium",
-                    lookingToHelp ? "text-teal-700" : "text-gray-600"
+                    lookingToHelp ? "text-teal-700 dark:text-teal-400" : "text-muted-foreground"
                   )}>
                     Looking to Help
                   </span>
@@ -226,7 +226,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     className="data-[state=checked]:bg-teal-600"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {lookingToHelp ? "Visible to teammates" : "Toggle to help others"}
                 </p>
               </motion.div>

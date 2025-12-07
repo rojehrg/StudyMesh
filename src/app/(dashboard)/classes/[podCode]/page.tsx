@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { analyzeTeamComposition, TeamAnalysis } from "@/lib/logic/matching";
 import { NudgeDialog } from "@/components/nudge-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, BarChart3, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ export default function PodDetailPage() {
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [senderName, setSenderName] = useState<string>("A teammate");
+  const [teamAnalysis, setTeamAnalysis] = useState<TeamAnalysis | null>(null);
 
   useEffect(() => {
     loadPodData();
@@ -98,6 +100,17 @@ export default function PodDetailPage() {
         });
 
         setMembers(membersWithProfiles);
+
+        // Analyze team composition
+        if (profiles && profiles.length > 0) {
+          const analysisProfiles = profiles.map(p => ({
+            expertiseSkills: p.expertise_skills || [],
+            growthSkills: p.growth_skills || [],
+            department: p.department,
+          }));
+          const analysis = analyzeTeamComposition(analysisProfiles);
+          setTeamAnalysis(analysis);
+        }
       }
     } catch (error) {
       console.error("Error loading pod:", error);
@@ -226,6 +239,123 @@ export default function PodDetailPage() {
           </CardHeader>
         </Card>
 
+        {/* Team Analysis Card */}
+        {teamAnalysis && members.length > 1 && (
+          <Card className="border-2 border-purple-100 bg-purple-50/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-purple-600" />
+                Team Skill Analysis
+              </CardTitle>
+              <CardDescription>
+                Skill coverage and recommendations for your pod
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Balance Score */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-foreground">Skill Balance</span>
+                    <span className="text-sm font-bold text-purple-700">{teamAnalysis.balanceScore}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-purple-600 h-full rounded-full transition-all duration-500"
+                      style={{ width: `${teamAnalysis.balanceScore}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Strong Areas & Gaps */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {teamAnalysis.strongAreas.length > 0 && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-800">Strong Areas</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {teamAnalysis.strongAreas.slice(0, 4).map(area => (
+                        <Badge key={area} variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                          {area}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {teamAnalysis.gapAreas.length > 0 && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-medium text-amber-800">Gap Areas</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {teamAnalysis.gapAreas.slice(0, 4).map(area => (
+                        <Badge key={area} variant="secondary" className="bg-amber-100 text-amber-700 text-xs">
+                          {area}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Top Skills */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {teamAnalysis.topExpertise.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" />
+                      Top Team Expertise
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {teamAnalysis.topExpertise.slice(0, 4).map(item => (
+                        <span key={item.skill} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded">
+                          {item.skill} ({item.count})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {teamAnalysis.topGrowthNeeds.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Learning Goals
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {teamAnalysis.topGrowthNeeds.slice(0, 4).map(item => (
+                        <span key={item.skill} className="text-xs bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded">
+                          {item.skill} ({item.count})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Recommendations */}
+              {teamAnalysis.recommendations.length > 0 && (
+                <div className="pt-2 border-t border-purple-200">
+                  <p className="text-xs uppercase tracking-wider text-purple-600 font-medium mb-2">Recommendations</p>
+                  <ul className="space-y-1">
+                    {teamAnalysis.recommendations.slice(0, 3).map((rec, idx) => (
+                      <li key={idx} className="text-sm text-foreground flex items-start gap-2">
+                        <span className="text-purple-500 mt-0.5">•</span>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Members List - Compact Grid Layout */}
         <Card>
           <CardHeader className="pb-4">
@@ -234,7 +364,7 @@ export default function PodDetailPage() {
                 <Users className="w-5 h-5 text-teal-600" />
                 Pod Members
               </CardTitle>
-              <span className="text-sm text-gray-500">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
+              <span className="text-sm text-muted-foreground">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
             </div>
           </CardHeader>
           <CardContent>
@@ -257,7 +387,7 @@ export default function PodDetailPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-semibold text-gray-900 text-sm truncate max-w-[120px]">
+                        <h4 className="font-semibold text-foreground text-sm truncate max-w-[120px]">
                           {member.major || "Team Member"}
                         </h4>
                         {member.userId === currentUserId && (
@@ -269,17 +399,17 @@ export default function PodDetailPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 truncate">{member.department || "No department"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{member.department || "No department"}</p>
 
                       {/* Skills - Compact */}
                       <div className="mt-1.5 flex flex-wrap gap-1">
                         {member.expertiseSkills.slice(0, 2).map((skill: string) => (
-                          <span key={skill} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                          <span key={skill} className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                             {skill}
                           </span>
                         ))}
                         {member.expertiseSkills.length > 2 && (
-                          <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
                             +{member.expertiseSkills.length - 2}
                           </span>
                         )}
