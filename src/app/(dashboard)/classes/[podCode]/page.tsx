@@ -189,7 +189,7 @@ export default function PodDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -213,7 +213,7 @@ export default function PodDetailPage() {
         </div>
 
         {/* Pod Header - More Compact */}
-        <Card className="shadow-md border-2 border-teal-100">
+        <Card className="shadow-md border-2 border-primary/20">
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between">
               <div>
@@ -223,16 +223,16 @@ export default function PodDetailPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <div className="bg-teal-50 px-3 py-1.5 rounded-lg border-2 border-teal-200 font-mono text-base font-bold text-teal-700">
+                <div className="bg-primary/10 px-3 py-1.5 rounded-lg border-2 border-primary/30 font-mono text-base font-bold text-primary">
                   {pod.pod_code}
                 </div>
                 <Button 
                   onClick={copyPodCode} 
                   size="icon" 
                   variant="outline"
-                  className="hover:bg-teal-50 h-9 w-9"
+                  className="hover:bg-primary/10 h-9 w-9"
                 >
-                  {copied ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -241,10 +241,10 @@ export default function PodDetailPage() {
 
         {/* Team Analysis Card */}
         {teamAnalysis && members.length > 1 && (
-          <Card className="border-2 border-purple-100 bg-purple-50/30">
+          <Card className="border-2 border-purple-500/20 dark:border-purple-400/20 bg-purple-500/5 dark:bg-purple-400/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-purple-600" />
+                <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 Team Skill Analysis
               </CardTitle>
               <CardDescription>
@@ -257,9 +257,9 @@ export default function PodDetailPage() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-foreground">Skill Balance</span>
-                    <span className="text-sm font-bold text-purple-700">{teamAnalysis.balanceScore}%</span>
+                    <span className="text-sm font-bold text-purple-700 dark:text-purple-400">{teamAnalysis.balanceScore}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                     <div
                       className="bg-purple-600 h-full rounded-full transition-all duration-500"
                       style={{ width: `${teamAnalysis.balanceScore}%` }}
@@ -271,14 +271,14 @@ export default function PodDetailPage() {
               {/* Strong Areas & Gaps */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {teamAnalysis.strongAreas.length > 0 && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="p-3 bg-green-500/10 dark:bg-green-400/10 border border-green-500/30 dark:border-green-400/30 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-800">Strong Areas</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      <span className="text-sm font-medium text-green-700 dark:text-green-400">Strong Areas</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.strongAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                        <Badge key={area} variant="secondary" className="bg-green-500/20 dark:bg-green-400/20 text-green-700 dark:text-green-400 text-xs">
                           {area}
                         </Badge>
                       ))}
@@ -287,14 +287,14 @@ export default function PodDetailPage() {
                 )}
 
                 {teamAnalysis.gapAreas.length > 0 && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="p-3 bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/30 dark:border-amber-400/30 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm font-medium text-amber-800">Gap Areas</span>
+                      <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Gap Areas</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.gapAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-amber-100 text-amber-700 text-xs">
+                        <Badge key={area} variant="secondary" className="bg-amber-500/20 dark:bg-amber-400/20 text-amber-700 dark:text-amber-400 text-xs">
                           {area}
                         </Badge>
                       ))}
@@ -313,7 +313,7 @@ export default function PodDetailPage() {
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.topExpertise.slice(0, 4).map(item => (
-                        <span key={item.skill} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded">
+                        <span key={item.skill} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
                           {item.skill} ({item.count})
                         </span>
                       ))}
@@ -329,7 +329,7 @@ export default function PodDetailPage() {
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.topGrowthNeeds.slice(0, 4).map(item => (
-                        <span key={item.skill} className="text-xs bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded">
+                        <span key={item.skill} className="text-xs bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded">
                           {item.skill} ({item.count})
                         </span>
                       ))}
@@ -340,8 +340,8 @@ export default function PodDetailPage() {
 
               {/* Recommendations */}
               {teamAnalysis.recommendations.length > 0 && (
-                <div className="pt-2 border-t border-purple-200">
-                  <p className="text-xs uppercase tracking-wider text-purple-600 font-medium mb-2">Recommendations</p>
+                <div className="pt-2 border-t border-purple-500/20 dark:border-purple-400/20">
+                  <p className="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-medium mb-2">Recommendations</p>
                   <ul className="space-y-1">
                     {teamAnalysis.recommendations.slice(0, 3).map((rec, idx) => (
                       <li key={idx} className="text-sm text-foreground flex items-start gap-2">
@@ -361,7 +361,7 @@ export default function PodDetailPage() {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="w-5 h-5 text-teal-600" />
+                <Users className="w-5 h-5 text-primary" />
                 Pod Members
               </CardTitle>
               <span className="text-sm text-muted-foreground">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
@@ -376,11 +376,11 @@ export default function PodDetailPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.03 }}
                   whileHover={{ y: -2 }}
-                  className="p-3 rounded-xl border-2 border-gray-100 hover:border-teal-200 hover:bg-teal-50/20 transition-all bg-white"
+                  className="p-3 rounded-xl border-2 border-border hover:border-primary/30 hover:bg-primary/5 transition-all bg-card"
                 >
                   <div className="flex items-start gap-3">
-                    <Avatar className="h-9 w-9 border-2 border-teal-100 shrink-0">
-                      <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
+                    <Avatar className="h-9 w-9 border-2 border-primary/20 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                         {(member.major || member.department || '?')[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -391,11 +391,11 @@ export default function PodDetailPage() {
                           {member.major || "Team Member"}
                         </h4>
                         {member.userId === currentUserId && (
-                          <Badge variant="secondary" className="bg-teal-100 text-teal-700 text-[10px] px-1.5 py-0">You</Badge>
+                          <Badge variant="secondary" className="bg-primary/20 text-primary text-[10px] px-1.5 py-0">You</Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && (
                           <span title="Looking to Help">
-                            <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                           </span>
                         )}
                       </div>
@@ -418,12 +418,12 @@ export default function PodDetailPage() {
                   </div>
 
                   {member.userId !== currentUserId && (
-                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
                       <Button
                         onClick={() => openNudgeDialog(member)}
                         size="sm"
                         variant="outline"
-                        className="flex-1 h-7 text-xs hover:bg-teal-50 hover:border-teal-300"
+                        className="flex-1 h-7 text-xs hover:bg-primary/10 hover:border-primary/50"
                       >
                         <Bell className="h-3 w-3 mr-1" />
                         Nudge
@@ -432,7 +432,7 @@ export default function PodDetailPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-7 px-2 text-teal-700 hover:bg-teal-50"
+                          className="h-7 px-2 text-primary hover:bg-primary/10"
                           onClick={() => {
                             const handle = member.slackHandle.trim();
                             const isId = handle.startsWith("U") || handle.startsWith("W");

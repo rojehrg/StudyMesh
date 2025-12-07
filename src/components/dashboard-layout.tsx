@@ -28,6 +28,7 @@ import { NudgesDropdown } from "@/components/nudges-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { useGlobalShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { OnboardingTour } from "@/components/onboarding-tour";
 
 interface SidebarItemProps {
   icon: any;
@@ -142,7 +143,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
+    // Force a hard navigation to clear any cached state
+    window.location.href = "/login";
   };
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
@@ -345,6 +347,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsHelp />
+
+      {/* Onboarding Tour for New Users */}
+      <OnboardingTour />
     </div>
   );
 }

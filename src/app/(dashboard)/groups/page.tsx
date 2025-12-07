@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock, ArrowLeftRight, UserCheck } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
 export default function WorkingCirclesPage() {
@@ -509,63 +509,73 @@ export default function WorkingCirclesPage() {
                   </div>
 
                   {/* Expandable Score Breakdown */}
-                  {expandedCard === match.userId && match.breakdown && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="mb-3 p-2.5 bg-muted/50 rounded-lg border border-border"
-                    >
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
-                      <div className="space-y-1.5">
-                        {match.breakdown.skills > 0 && (
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <Target className="w-3 h-3 text-primary" />
-                              Skill Match
-                            </span>
-                            <span className="font-medium text-primary">+{match.breakdown.skills}</span>
+                  <AnimatePresence initial={false}>
+                    {expandedCard === match.userId && match.breakdown && (
+                      <motion.div
+                        key="breakdown"
+                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginBottom: 12 }}
+                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        transition={{
+                          duration: 0.2,
+                          ease: [0.4, 0, 0.2, 1],
+                          opacity: { duration: 0.15 }
+                        }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-2.5 bg-muted/50 rounded-lg border border-border">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
+                          <div className="space-y-1.5">
+                            {match.breakdown.skills > 0 && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Target className="w-3 h-3 text-primary" />
+                                  Skill Match
+                                </span>
+                                <span className="font-medium text-primary">+{match.breakdown.skills}</span>
+                              </div>
+                            )}
+                            {match.breakdown.samePod > 0 && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Users className="w-3 h-3 text-cyan-600" />
+                                  Same Pod
+                                </span>
+                                <span className="font-medium text-cyan-600 dark:text-cyan-400">+{match.breakdown.samePod}</span>
+                              </div>
+                            )}
+                            {match.breakdown.crossDepartment > 0 && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Building2 className="w-3 h-3 text-purple-600" />
+                                  Cross-Department
+                                </span>
+                                <span className="font-medium text-purple-700 dark:text-purple-400">+{match.breakdown.crossDepartment}</span>
+                              </div>
+                            )}
+                            {match.breakdown.availability > 0 && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Clock className="w-3 h-3 text-amber-600" />
+                                  Availability
+                                </span>
+                                <span className="font-medium text-amber-700">+{match.breakdown.availability}</span>
+                              </div>
+                            )}
+                            {match.isReciprocal && (
+                              <div className="flex items-center justify-between text-xs pt-1 border-t border-border mt-1">
+                                <span className="flex items-center gap-1.5 text-muted-foreground">
+                                  <ArrowLeftRight className="w-3 h-3 text-amber-500" />
+                                  Two-Way Match
+                                </span>
+                                <span className="font-medium text-amber-600">+5 bonus</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {match.breakdown.samePod > 0 && (
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <Users className="w-3 h-3 text-cyan-600" />
-                              Same Pod
-                            </span>
-                            <span className="font-medium text-cyan-600 dark:text-cyan-400">+{match.breakdown.samePod}</span>
-                          </div>
-                        )}
-                        {match.breakdown.crossDepartment > 0 && (
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <Building2 className="w-3 h-3 text-purple-600" />
-                              Cross-Department
-                            </span>
-                            <span className="font-medium text-purple-700 dark:text-purple-400">+{match.breakdown.crossDepartment}</span>
-                          </div>
-                        )}
-                        {match.breakdown.availability > 0 && (
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <Clock className="w-3 h-3 text-amber-600" />
-                              Availability
-                            </span>
-                            <span className="font-medium text-amber-700">+{match.breakdown.availability}</span>
-                          </div>
-                        )}
-                        {match.isReciprocal && (
-                          <div className="flex items-center justify-between text-xs pt-1 border-t border-border mt-1">
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <ArrowLeftRight className="w-3 h-3 text-amber-500" />
-                              Two-Way Match
-                            </span>
-                            <span className="font-medium text-amber-600">+5 bonus</span>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Skills - Compact */}
                   <div className="space-y-2 mb-3">

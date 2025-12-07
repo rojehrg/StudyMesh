@@ -24,17 +24,17 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "teal" }
   const colorClasses = color === "teal"
     ? {
         filled: "bg-teal-500",
-        empty: "bg-gray-200",
-        text: "text-teal-700",
-        hover: "hover:bg-teal-50 hover:border-teal-200",
-        selected: "bg-teal-50 border-teal-300",
+        empty: "bg-muted",
+        text: "text-teal-700 dark:text-teal-400",
+        hover: "hover:bg-teal-50 dark:hover:bg-teal-950 hover:border-teal-200 dark:hover:border-teal-700",
+        selected: "bg-teal-50 dark:bg-teal-950 border-teal-300 dark:border-teal-600",
       }
     : {
         filled: "bg-cyan-500",
-        empty: "bg-gray-200",
-        text: "text-cyan-700",
-        hover: "hover:bg-cyan-50 hover:border-cyan-200",
-        selected: "bg-cyan-50 border-cyan-300",
+        empty: "bg-muted",
+        text: "text-cyan-700 dark:text-cyan-400",
+        hover: "hover:bg-cyan-50 dark:hover:bg-cyan-950 hover:border-cyan-200 dark:hover:border-cyan-700",
+        selected: "bg-cyan-50 dark:bg-cyan-950 border-cyan-300 dark:border-cyan-600",
       };
 
   // Calculate which quadrants are filled (going clockwise from top-right)
@@ -76,7 +76,7 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "teal" }
 
         {/* Center circle */}
         <div className={cn(
-          "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full flex items-center justify-center",
+          "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card rounded-full flex items-center justify-center",
           innerSize
         )}>
           <span className={cn("text-xs font-semibold", colorClasses.text)}>
@@ -95,7 +95,7 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "teal" }
               "px-2 py-1 text-xs rounded-md border transition-all",
               value === level.value
                 ? colorClasses.selected + " border-current font-medium " + colorClasses.text
-                : "border-gray-200 text-gray-600 " + colorClasses.hover
+                : "border-border text-muted-foreground " + colorClasses.hover
             )}
           >
             {level.label}
@@ -112,8 +112,8 @@ export function ProficiencyDisplay({ value, size = "sm", color = "teal" }: Omit<
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
   const colorClasses = color === "teal"
-    ? { filled: "bg-teal-500", empty: "bg-gray-200", text: "text-teal-700" }
-    : { filled: "bg-cyan-500", empty: "bg-gray-200", text: "text-cyan-700" };
+    ? { filled: "bg-teal-500", empty: "bg-muted", text: "text-teal-700 dark:text-teal-400" }
+    : { filled: "bg-cyan-500", empty: "bg-muted", text: "text-cyan-700 dark:text-cyan-400" };
 
   const filledQuadrants = Math.round(value / 25);
 
@@ -143,7 +143,7 @@ export function ProficiencyDisplay({ value, size = "sm", color = "teal" }: Omit<
         })}
       </svg>
       <div className={cn(
-        "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full",
+        "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card rounded-full",
         innerSize
       )} />
     </div>

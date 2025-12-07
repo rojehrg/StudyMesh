@@ -52,7 +52,7 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
                 Sign In
               </Button>
             </Link>

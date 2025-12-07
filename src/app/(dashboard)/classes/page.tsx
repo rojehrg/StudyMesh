@@ -73,7 +73,7 @@ export default function ClassesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -86,8 +86,8 @@ export default function ClassesPage() {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Enablement Pods</h1>
-          <p className="text-gray-500 mt-1">Collaborate with your team in focused pods</p>
+          <h1 className="text-2xl font-bold text-foreground">My Enablement Pods</h1>
+          <p className="text-muted-foreground mt-1">Collaborate with your team in focused pods</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
@@ -107,7 +107,7 @@ export default function ClassesPage() {
 
       {pods.length > 0 && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search pods by name or business unit..."
             value={searchQuery}
@@ -139,18 +139,18 @@ export default function ClassesPage() {
                           {pod.business_unit || "General"}
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-200">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                         {pod.pod_code}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-muted-foreground">
                         <Users className="w-4 h-4" />
                         <span>{pod.memberCount} {pod.memberCount === 1 ? 'member' : 'members'}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         <span className="text-xs">
                           {new Date(pod.created_at).toLocaleDateString()}
@@ -158,7 +158,7 @@ export default function ClassesPage() {
                       </div>
                     </div>
                     {pod.initiative_owner && (
-                      <div className="mt-3 pt-3 border-t text-xs text-gray-500">
+                      <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
                         Owner: {pod.initiative_owner}
                       </div>
                     )}
@@ -171,11 +171,11 @@ export default function ClassesPage() {
       ) : pods.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-gray-300" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No pods yet</h3>
-            <p className="text-gray-500 mb-6 max-w-sm">
+            <h3 className="text-lg font-medium text-foreground mb-2">No pods yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm">
               Spin up a pod or join one with a share code to get started with enablement.
             </p>
             <div className="flex gap-3">
@@ -191,7 +191,7 @@ export default function ClassesPage() {
       ) : (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-500">No pods match your search</p>
+            <p className="text-muted-foreground">No pods match your search</p>
           </CardContent>
         </Card>
       )}
