@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock } from "lucide-react";
+import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock, ArrowLeftRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -105,6 +105,8 @@ export default function WorkingCirclesPage() {
               growthSkills: otherProfile.growth_skills || [],
               department: otherProfile.department,
               availability: otherProfile.availability,
+              updatedAt: otherProfile.updated_at, // For freshness decay
+              lookingToHelp: otherProfile.looking_to_help, // For active helper boost
             },
             isSamePod
           );
@@ -121,6 +123,7 @@ export default function WorkingCirclesPage() {
             canAskHelp: result.skills.b_to_a,
             sharedPods: sharedPodIds.length,
             breakdown: result.breakdown,
+            isReciprocal: result.isReciprocal,
           };
         })
         .filter(m => m.score > 0)
@@ -412,6 +415,12 @@ export default function WorkingCirclesPage() {
                       </div>
                       <p className="text-xs text-gray-500 truncate">{match.department}</p>
                     </div>
+                    {/* Reciprocal Badge */}
+                    {match.isReciprocal && (
+                      <span className="flex items-center gap-0.5 bg-amber-50 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full" title="Two-way match: you can help each other">
+                        <ArrowLeftRight className="w-2.5 h-2.5" />
+                      </span>
+                    )}
                     {/* Clickable Score Badge */}
                     <button
                       onClick={() => setExpandedCard(expandedCard === match.userId ? null : match.userId)}
@@ -466,6 +475,15 @@ export default function WorkingCirclesPage() {
                               Availability
                             </span>
                             <span className="font-medium text-amber-700">+{match.breakdown.availability}</span>
+                          </div>
+                        )}
+                        {match.isReciprocal && (
+                          <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-200 mt-1">
+                            <span className="flex items-center gap-1.5 text-gray-600">
+                              <ArrowLeftRight className="w-3 h-3 text-amber-500" />
+                              Two-Way Match
+                            </span>
+                            <span className="font-medium text-amber-600">+5 bonus</span>
                           </div>
                         )}
                       </div>
