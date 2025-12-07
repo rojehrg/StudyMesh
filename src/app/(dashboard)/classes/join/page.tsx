@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { calculateMatches } from "@/lib/logic/matching";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,6 +70,85 @@ export default function JoinPodPage() {
     }
   };
 
+  const notifyMatchingMembers = async (podId: string, newUserId: string, newUserName: string) => {
+    try {
+      // Get new user's profile
+      const { data: newUserProfile } = await supabase
+        .from('profiles')
+        .select('expertise_skills, growth_skills, department, availability')
+        .eq('user_id', newUserId)
+        .single();
+
+      if (!newUserProfile) return;
+
+      // Get existing pod members (excluding new user)
+      const { data: podMembers } = await supabase
+        .from('pod_members')
+        .select('user_id')
+        .eq('pod_id', podId)
+        .neq('user_id', newUserId);
+
+      if (!podMembers || podMembers.length === 0) return;
+
+      // Get their profiles
+      const { data: memberProfiles } = await supabase
+        .from('profiles')
+        .select('user_id, expertise_skills, growth_skills, department, availability')
+        .in('user_id', podMembers.map(m => m.user_id));
+
+      if (!memberProfiles) return;
+
+      // Calculate matches and notify those with score >= 30
+      const notifications = [];
+      const MIN_MATCH_SCORE = 30;
+
+      for (const memberProfile of memberProfiles) {
+        const result = calculateMatches(
+          {
+            expertiseSkills: memberProfile.expertise_skills || [],
+            growthSkills: memberProfile.growth_skills || [],
+            department: memberProfile.department,
+            availability: memberProfile.availability,
+          },
+          {
+            expertiseSkills: newUserProfile.expertise_skills || [],
+            growthSkills: newUserProfile.growth_skills || [],
+            department: newUserProfile.department,
+            availability: newUserProfile.availability,
+          },
+          true // same pod
+        );
+
+        if (result.score >= MIN_MATCH_SCORE) {
+          const skillsTheyCanLearn = result.skills.b_to_a; // new user can help them
+          const skillMatch = skillsTheyCanLearn.length > 0
+            ? ` They can help with: ${skillsTheyCanLearn.slice(0, 2).join(', ')}.`
+            : '';
+
+          notifications.push({
+            recipient_id: memberProfile.user_id,
+            sender_id: newUserId,
+            type: 'new_match',
+            content: `${newUserName} joined your pod with a ${result.score}% match!${skillMatch}`,
+            metadata: {
+              match_score: result.score,
+              skills: result.skills,
+              pod_id: podId,
+            },
+            read: false,
+          });
+        }
+      }
+
+      if (notifications.length > 0) {
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (error) {
+      console.error("Error notifying matching members:", error);
+      // Don't throw - this is a non-critical operation
+    }
+  };
+
   const handleJoin = async () => {
     if (!podPreview) return;
 
@@ -76,6 +156,15 @@ export default function JoinPodPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+
+      // Get current user's name for notification
+      const { data: currentProfile } = await supabase
+        .from('profiles')
+        .select('major')
+        .eq('user_id', user.id)
+        .single();
+
+      const userName = currentProfile?.major || "A new member";
 
       // Add user as member
       const { error } = await supabase
@@ -86,6 +175,9 @@ export default function JoinPodPage() {
         });
 
       if (error) throw error;
+
+      // Notify matching members asynchronously
+      notifyMatchingMembers(podPreview.id, user.id, userName);
 
       toast.success("Joined pod successfully!", {
         description: podPreview.pod_name

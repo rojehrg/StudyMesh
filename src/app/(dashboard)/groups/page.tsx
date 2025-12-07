@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Search, Sparkles, Bell, Users, X } from "lucide-react";
+import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ export default function WorkingCirclesPage() {
   const [openRequests, setOpenRequests] = useState<any[]>([]);
   const [requestSkill, setRequestSkill] = useState("");
   const [currentProfile, setCurrentProfile] = useState<any>(null);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -85,21 +86,28 @@ export default function WorkingCirclesPage() {
       // Calculate matches
       const matchResults = profiles
         .map(otherProfile => {
-          const result = calculateMatches(
-            {
-              expertiseSkills: currentProfile.expertise_skills || [],
-              growthSkills: currentProfile.growth_skills || [],
-            },
-            {
-              expertiseSkills: otherProfile.expertise_skills || [],
-              growthSkills: otherProfile.growth_skills || [],
-            }
-          );
-
           // Find which pods they share
           const sharedPodIds = allPodMembers
             .filter(m => m.user_id === otherProfile.user_id)
             .map(m => m.pod_id);
+
+          const isSamePod = sharedPodIds.length > 0;
+
+          const result = calculateMatches(
+            {
+              expertiseSkills: currentProfile.expertise_skills || [],
+              growthSkills: currentProfile.growth_skills || [],
+              department: currentProfile.department,
+              availability: currentProfile.availability,
+            },
+            {
+              expertiseSkills: otherProfile.expertise_skills || [],
+              growthSkills: otherProfile.growth_skills || [],
+              department: otherProfile.department,
+              availability: otherProfile.availability,
+            },
+            isSamePod
+          );
 
           return {
             userId: otherProfile.user_id,
@@ -112,6 +120,7 @@ export default function WorkingCirclesPage() {
             canHelp: result.skills.a_to_b,
             canAskHelp: result.skills.b_to_a,
             sharedPods: sharedPodIds.length,
+            breakdown: result.breakdown,
           };
         })
         .filter(m => m.score > 0)
@@ -403,10 +412,65 @@ export default function WorkingCirclesPage() {
                       </div>
                       <p className="text-xs text-gray-500 truncate">{match.department}</p>
                     </div>
-                    <Badge className="bg-teal-50 text-teal-700 border-0 text-xs shrink-0">
+                    {/* Clickable Score Badge */}
+                    <button
+                      onClick={() => setExpandedCard(expandedCard === match.userId ? null : match.userId)}
+                      className="flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full hover:bg-teal-100 transition-colors"
+                    >
                       {match.score}%
-                    </Badge>
+                      <ChevronDown className={`w-3 h-3 transition-transform ${expandedCard === match.userId ? 'rotate-180' : ''}`} />
+                    </button>
                   </div>
+
+                  {/* Expandable Score Breakdown */}
+                  {expandedCard === match.userId && match.breakdown && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-100"
+                    >
+                      <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium mb-2">Score Breakdown</p>
+                      <div className="space-y-1.5">
+                        {match.breakdown.skills > 0 && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-gray-600">
+                              <Target className="w-3 h-3 text-teal-600" />
+                              Skill Match
+                            </span>
+                            <span className="font-medium text-teal-700">+{match.breakdown.skills}</span>
+                          </div>
+                        )}
+                        {match.breakdown.samePod > 0 && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-gray-600">
+                              <Users className="w-3 h-3 text-cyan-600" />
+                              Same Pod
+                            </span>
+                            <span className="font-medium text-cyan-700">+{match.breakdown.samePod}</span>
+                          </div>
+                        )}
+                        {match.breakdown.crossDepartment > 0 && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-gray-600">
+                              <Building2 className="w-3 h-3 text-purple-600" />
+                              Cross-Department
+                            </span>
+                            <span className="font-medium text-purple-700">+{match.breakdown.crossDepartment}</span>
+                          </div>
+                        )}
+                        {match.breakdown.availability > 0 && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-gray-600">
+                              <Clock className="w-3 h-3 text-amber-600" />
+                              Availability
+                            </span>
+                            <span className="font-medium text-amber-700">+{match.breakdown.availability}</span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* Skills - Compact */}
                   <div className="space-y-2 mb-3">
@@ -458,15 +522,28 @@ export default function WorkingCirclesPage() {
           ))}
         </div>
       ) : matches.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-gray-300" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No matches yet</h3>
-            <p className="text-gray-500 max-w-sm mb-4">
-              Join pods and update your skills in Settings to find knowledge-sharing partners.
+        <Card className="border-dashed border-2 border-teal-200 bg-teal-50/30">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-5"
+            >
+              <Sparkles className="w-10 h-10 text-teal-600" />
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to Working Circles!</h3>
+            <p className="text-gray-600 max-w-md mb-6">
+              This is where you'll find teammates who can help you grow and people you can mentor.
+              Join a pod to start matching with colleagues.
             </p>
+            <div className="flex gap-3">
+              <Button variant="outline" asChild>
+                <a href="/classes/join">Join with Code</a>
+              </Button>
+              <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+                <a href="/classes/create">Create a Pod</a>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (

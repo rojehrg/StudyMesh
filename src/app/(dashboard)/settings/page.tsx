@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Plus, X, Check, User, Briefcase, Clock, Sparkles, MessageCircle, Cloud, CloudOff } from "lucide-react";
+import { Loader2, X, Check, User, Briefcase, Clock, Sparkles, MessageCircle, Cloud, CloudOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ProficiencyRing } from "@/components/proficiency-ring";
+import { SkillAutocomplete } from "@/components/skill-autocomplete";
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -340,17 +341,13 @@ export default function SettingsPage() {
               <CardDescription>Skills you can mentor others on</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a skill (e.g. Python, Sales)"
-                  value={expertiseInput}
-                  onChange={(e) => setExpertiseInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addSkill('expertise')}
-                />
-                <Button onClick={() => addSkill('expertise')} size="icon" variant="outline">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <SkillAutocomplete
+                value={expertiseInput}
+                onChange={setExpertiseInput}
+                onAdd={() => addSkill('expertise')}
+                placeholder="Add a skill (e.g. Python, Sales)"
+                type="expertise"
+              />
               <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.expertiseSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>
@@ -386,17 +383,13 @@ export default function SettingsPage() {
               <CardDescription>Skills you want to learn</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a skill (e.g. Leadership, SQL)"
-                  value={growthInput}
-                  onChange={(e) => setGrowthInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addSkill('growth')}
-                />
-                <Button onClick={() => addSkill('growth')} size="icon" variant="outline">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <SkillAutocomplete
+                value={growthInput}
+                onChange={setGrowthInput}
+                onAdd={() => addSkill('growth')}
+                placeholder="Add a skill (e.g. Leadership, SQL)"
+                type="growth"
+              />
               <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
                 {profile.growthSkills.length === 0 && (
                   <span className="text-sm text-gray-400 italic">No skills added yet...</span>

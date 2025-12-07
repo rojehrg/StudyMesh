@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckCheck, X, Loader2, Send } from "lucide-react";
+import { Bell, CheckCheck, X, Loader2, Send, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -96,12 +96,45 @@ export default function NotificationsPage() {
 
   const handleNotificationClick = async (notification: any) => {
     await markAsRead(notification.id);
-    
-    // Navigate based on metadata
+
+    // Navigate based on notification type and metadata
     const metadata = notification.metadata || {};
-    if (metadata.pod_code) {
+    if (notification.type === 'new_match') {
+      // Navigate to Working Circles to see the new match
+      router.push('/groups');
+    } else if (metadata.pod_code) {
       router.push(`/classes/${metadata.pod_code}`);
     }
+  };
+
+  const getNotificationIcon = (notification: any, isSent: boolean) => {
+    if (isSent) {
+      return <Send className="w-5 h-5 text-gray-500" />;
+    }
+    if (notification.type === 'new_match') {
+      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-amber-500' : 'text-gray-400'}`} />;
+    }
+    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-teal-600' : 'text-gray-400'}`} />;
+  };
+
+  const getNotificationTitle = (notification: any, isSent: boolean) => {
+    if (notification.type === 'new_match') {
+      return '✨ New Match Found';
+    }
+    if (notification.type === 'nudge') {
+      return isSent ? '👋 Nudge Sent' : '👋 Nudge Received';
+    }
+    return 'Notification';
+  };
+
+  const getNotificationBgClass = (notification: any) => {
+    if (notification.type === 'new_match' && !notification.read) {
+      return 'border-l-4 border-l-amber-500 bg-amber-50/30';
+    }
+    if (!notification.read) {
+      return 'border-l-4 border-l-teal-500 bg-teal-50/30';
+    }
+    return '';
   };
 
   const getTimeAgo = (dateString: string) => {
@@ -155,9 +188,9 @@ export default function NotificationsPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
           >
-            <Card 
+            <Card
               className={`hover:shadow-md transition-all cursor-pointer ${
-                !notification.read && !isSent ? 'border-l-4 border-l-teal-500 bg-teal-50/30' : ''
+                !isSent ? getNotificationBgClass(notification) : ''
               }`}
               onClick={() => !isSent && handleNotificationClick(notification)}
             >
@@ -165,19 +198,25 @@ export default function NotificationsPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                      !notification.read && !isSent ? 'bg-teal-100' : 'bg-gray-100'
+                      notification.type === 'new_match' && !notification.read && !isSent
+                        ? 'bg-amber-100'
+                        : !notification.read && !isSent
+                        ? 'bg-teal-100'
+                        : 'bg-gray-100'
                     }`}>
-                      {isSent ? <Send className="w-5 h-5 text-gray-500" /> : (
-                        <Bell className={`w-5 h-5 ${!notification.read ? 'text-teal-600' : 'text-gray-400'}`} />
-                      )}
+                      {getNotificationIcon(notification, isSent)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <CardTitle className="text-base font-medium">
-                          {notification.type === 'nudge' ? (isSent ? '👋 Nudge Sent' : '👋 Nudge Received') : 'Notification'}
+                          {getNotificationTitle(notification, isSent)}
                         </CardTitle>
                         {!notification.read && !isSent && (
-                          <Badge variant="secondary" className="bg-teal-100 text-teal-700 text-xs">
+                          <Badge variant="secondary" className={`text-xs ${
+                            notification.type === 'new_match'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-teal-100 text-teal-700'
+                          }`}>
                             New
                           </Badge>
                         )}

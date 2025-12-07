@@ -4,14 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { X, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { SkillAutocomplete } from "@/components/skill-autocomplete";
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
@@ -95,9 +96,10 @@ export default function OnboardingPage() {
       if (error) throw error;
 
       toast.success("Profile completed!", {
-        description: "Welcome to Meshflow"
+        description: "Let's find your first matches!"
       });
-      router.push("/dashboard");
+      // Redirect to Working Circles to show immediate matches
+      router.push("/groups");
       router.refresh();
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -217,18 +219,13 @@ export default function OnboardingPage() {
                     <Label className="text-teal-700 font-semibold flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" /> Expertise (I can mentor others)
                     </Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        placeholder="Add a skill (e.g. Python, Sales)" 
-                        value={formData.skillInput}
-                        onChange={e => setFormData({...formData, skillInput: e.target.value})}
-                        onKeyDown={e => e.key === 'Enter' && handleAddSkill('expertise')}
-                        className="h-11"
-                      />
-                      <Button variant="outline" size="icon" onClick={() => handleAddSkill('expertise')} className="h-11 w-11 shrink-0">
-                        <Plus className="h-5 w-5" />
-                      </Button>
-                    </div>
+                    <SkillAutocomplete
+                      value={formData.skillInput}
+                      onChange={(val) => setFormData({...formData, skillInput: val})}
+                      onAdd={() => handleAddSkill('expertise')}
+                      placeholder="Add a skill (e.g. Python, Sales)"
+                      type="expertise"
+                    />
                     <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-100">
                       {formData.expertiseSkills.length === 0 && (
                         <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
@@ -249,18 +246,13 @@ export default function OnboardingPage() {
                     <Label className="text-cyan-700 font-semibold flex items-center gap-2">
                       <ArrowRight className="w-4 h-4" /> Growth Areas (I want to learn)
                     </Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        placeholder="Add a skill (e.g. Leadership, SQL)" 
-                        value={formData.growthInput}
-                        onChange={e => setFormData({...formData, growthInput: e.target.value})}
-                        onKeyDown={e => e.key === 'Enter' && handleAddSkill('growth')}
-                        className="h-11"
-                      />
-                      <Button variant="outline" size="icon" onClick={() => handleAddSkill('growth')} className="h-11 w-11 shrink-0">
-                        <Plus className="h-5 w-5" />
-                      </Button>
-                    </div>
+                    <SkillAutocomplete
+                      value={formData.growthInput}
+                      onChange={(val) => setFormData({...formData, growthInput: val})}
+                      onAdd={() => handleAddSkill('growth')}
+                      placeholder="Add a skill (e.g. Leadership, SQL)"
+                      type="growth"
+                    />
                     <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-100">
                        {formData.growthSkills.length === 0 && (
                         <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>

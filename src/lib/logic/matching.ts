@@ -208,14 +208,25 @@ export function calculateCompatibility(
 }
 
 // Simplified interface for UI usage
-export function calculateMatches(profileA: Profile, profileB: Profile) {
+export function calculateMatches(profileA: Profile, profileB: Profile, isSamePod: boolean = false) {
   const { score: skillGap, details: skillDetails } = calculateSkillGapScore(profileA, profileB);
-  
+  const deptDiversity = calculateDepartmentDiversityScore(profileA, profileB);
+  const initiativeAlignment = isSamePod ? 20 : 0;
+  const availability = calculateAvailabilityScore(profileA, profileB);
+
+  const total = skillGap + deptDiversity + initiativeAlignment + availability;
+
   return {
-    score: skillGap,
+    score: Math.min(100, total),
     skills: {
       a_to_b: skillDetails.aMentorsB,
       b_to_a: skillDetails.bMentorsA,
+    },
+    breakdown: {
+      skills: skillGap,
+      samePod: initiativeAlignment,
+      crossDepartment: deptDiversity,
+      availability: availability,
     }
   };
 }
