@@ -294,7 +294,7 @@ export default function WorkingCirclesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -330,7 +330,7 @@ export default function WorkingCirclesPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-teal-600" />
+              <Sparkles className="w-4 h-4 text-primary" />
               My Help Requests
             </CardTitle>
             <CardDescription className="text-xs">
@@ -356,11 +356,11 @@ export default function WorkingCirclesPage() {
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {myRequests.map(r => (
                   <div key={r.id} className={`p-2.5 rounded-lg border flex items-center justify-between ${
-                    r.status === 'notified' ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200'
+                    r.status === 'notified' ? 'bg-primary/10 border-primary/30' : 'bg-muted/50 border-border'
                   }`}>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
-                      <p className={`text-xs ${r.status === 'notified' ? 'text-teal-600' : 'text-muted-foreground'}`}>
+                      <p className={`text-xs ${r.status === 'notified' ? 'text-primary' : 'text-muted-foreground'}`}>
                         {r.status === 'open' ? 'Waiting for match...' : r.status === 'notified' ? 'Someone can help!' : r.status}
                       </p>
                     </div>
@@ -399,10 +399,10 @@ export default function WorkingCirclesPage() {
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {requestsICanHelp.map(r => (
-                  <div key={r.id} className="p-2.5 rounded-lg border border-cyan-200 bg-cyan-50/50 flex items-center justify-between">
+                  <div key={r.id} className="p-2.5 rounded-lg border border-cyan-500/30 dark:border-cyan-400/30 bg-cyan-500/10 dark:bg-cyan-400/10 flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
-                      <p className="text-xs text-cyan-600">Someone needs your help</p>
+                      <p className="text-xs text-cyan-600 dark:text-cyan-400">Someone needs your help</p>
                     </div>
                     <Button
                       size="sm"
@@ -436,16 +436,16 @@ export default function WorkingCirclesPage() {
               {similarUsers.map((user) => (
                 <div
                   key={user.userId}
-                  className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-purple-100 bg-purple-50/50 hover:bg-purple-50 transition-colors"
+                  className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-purple-500/20 dark:border-purple-400/20 bg-purple-500/10 dark:bg-purple-400/10 hover:bg-purple-500/15 dark:hover:bg-purple-400/15 transition-colors"
                 >
-                  <Avatar className="h-8 w-8 border border-purple-200">
-                    <AvatarFallback className="bg-purple-100 text-purple-700 font-medium text-xs">
+                  <Avatar className="h-8 w-8 border border-purple-500/30 dark:border-purple-400/30">
+                    <AvatarFallback className="bg-purple-500/20 dark:bg-purple-400/20 text-purple-700 dark:text-purple-300 font-medium text-xs">
                       {(user.major || '?')[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{user.major || "Team Member"}</p>
-                    <p className="text-[10px] text-purple-600">
+                    <p className="text-[10px] text-purple-600 dark:text-purple-400">
                       {user.sharedExpertise.length > 0
                         ? `Shares: ${user.sharedExpertise.slice(0, 2).join(', ')}`
                         : user.sharedCategory.length > 0
@@ -453,7 +453,7 @@ export default function WorkingCirclesPage() {
                         : `${user.score}% similar`}
                     </p>
                   </div>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-[10px] ml-1">
+                  <Badge variant="secondary" className="bg-purple-500/20 dark:bg-purple-400/20 text-purple-700 dark:text-purple-300 text-[10px] ml-1">
                     {user.score}%
                   </Badge>
                 </div>
@@ -476,8 +476,8 @@ export default function WorkingCirclesPage() {
                 <CardContent className="p-4">
                   {/* Header Row */}
                   <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-9 w-9 border border-teal-100 shrink-0">
-                      <AvatarFallback className="bg-teal-50 text-teal-700 font-medium text-sm">
+                    <Avatar className="h-9 w-9 border border-primary/20 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
                         {(match.major || '?')[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -501,7 +501,7 @@ export default function WorkingCirclesPage() {
                     {/* Clickable Score Badge */}
                     <button
                       onClick={() => setExpandedCard(expandedCard === match.userId ? null : match.userId)}
-                      className="flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full hover:bg-teal-100 transition-colors"
+                      className="flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-1 rounded-full hover:bg-primary/20 transition-colors"
                     >
                       {match.score}%
                       <ChevronDown className={`w-3 h-3 transition-transform ${expandedCard === match.userId ? 'rotate-180' : ''}`} />
@@ -514,17 +514,17 @@ export default function WorkingCirclesPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-100"
+                      className="mb-3 p-2.5 bg-muted/50 rounded-lg border border-border"
                     >
                       <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
                       <div className="space-y-1.5">
                         {match.breakdown.skills > 0 && (
                           <div className="flex items-center justify-between text-xs">
                             <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <Target className="w-3 h-3 text-teal-600" />
+                              <Target className="w-3 h-3 text-primary" />
                               Skill Match
                             </span>
-                            <span className="font-medium text-teal-700">+{match.breakdown.skills}</span>
+                            <span className="font-medium text-primary">+{match.breakdown.skills}</span>
                           </div>
                         )}
                         {match.breakdown.samePod > 0 && (
@@ -533,7 +533,7 @@ export default function WorkingCirclesPage() {
                               <Users className="w-3 h-3 text-cyan-600" />
                               Same Pod
                             </span>
-                            <span className="font-medium text-cyan-700">+{match.breakdown.samePod}</span>
+                            <span className="font-medium text-cyan-600 dark:text-cyan-400">+{match.breakdown.samePod}</span>
                           </div>
                         )}
                         {match.breakdown.crossDepartment > 0 && (
@@ -542,7 +542,7 @@ export default function WorkingCirclesPage() {
                               <Building2 className="w-3 h-3 text-purple-600" />
                               Cross-Department
                             </span>
-                            <span className="font-medium text-purple-700">+{match.breakdown.crossDepartment}</span>
+                            <span className="font-medium text-purple-700 dark:text-purple-400">+{match.breakdown.crossDepartment}</span>
                           </div>
                         )}
                         {match.breakdown.availability > 0 && (
@@ -555,7 +555,7 @@ export default function WorkingCirclesPage() {
                           </div>
                         )}
                         {match.isReciprocal && (
-                          <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-200 mt-1">
+                          <div className="flex items-center justify-between text-xs pt-1 border-t border-border mt-1">
                             <span className="flex items-center gap-1.5 text-muted-foreground">
                               <ArrowLeftRight className="w-3 h-3 text-amber-500" />
                               Two-Way Match
@@ -571,10 +571,10 @@ export default function WorkingCirclesPage() {
                   <div className="space-y-2 mb-3">
                     {match.canAskHelp.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-cyan-600 font-medium mb-1">Can help you</p>
+                        <p className="text-[10px] uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-medium mb-1">Can help you</p>
                         <div className="flex flex-wrap gap-1">
                           {match.canAskHelp.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-cyan-50 text-cyan-700 text-xs px-2 py-0.5 rounded">
+                            <span key={skill} className="bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-400 text-xs px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
@@ -586,10 +586,10 @@ export default function WorkingCirclesPage() {
                     )}
                     {match.canHelp.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-teal-600 font-medium mb-1">You can help</p>
+                        <p className="text-[10px] uppercase tracking-wider text-primary font-medium mb-1">You can help</p>
                         <div className="flex flex-wrap gap-1">
                           {match.canHelp.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded">
+                            <span key={skill} className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
@@ -606,7 +606,7 @@ export default function WorkingCirclesPage() {
                     onClick={() => openNudgeDialog(match)}
                     variant="outline"
                     size="sm"
-                    className="w-full h-8 text-xs hover:bg-teal-50 hover:border-teal-300"
+                    className="w-full h-8 text-xs hover:bg-primary/10 hover:border-primary/50"
                   >
                     <Bell className="mr-1.5 h-3 w-3" />
                     Nudge
@@ -617,14 +617,14 @@ export default function WorkingCirclesPage() {
           ))}
         </div>
       ) : matches.length === 0 ? (
-        <Card className="border-dashed border-2 border-teal-200 bg-teal-50/30">
+        <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-5"
+              className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-5"
             >
-              <Sparkles className="w-10 h-10 text-teal-600" />
+              <Sparkles className="w-10 h-10 text-primary" />
             </motion.div>
             <h3 className="text-xl font-semibold text-foreground mb-2">Welcome to Working Circles!</h3>
             <p className="text-muted-foreground max-w-md mb-6">

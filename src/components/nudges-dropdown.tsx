@@ -146,7 +146,7 @@ export function NudgesDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5 text-gray-600" />
+          <Bell className="w-5 h-5 text-foreground" />
           {unreadCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {unreadCount > 9 ? '9+' : unreadCount}
@@ -156,32 +156,32 @@ export function NudgesDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0">
         {/* Header */}
-        <div className="p-3 border-b border-gray-100">
+        <div className="p-3 border-b border-border">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-900">Nudges</h3>
+            <h3 className="font-semibold text-foreground">Nudges</h3>
             {unreadCount > 0 && activeTab === 'received' && (
               <button
                 onClick={markAllAsRead}
-                className="text-xs text-teal-600 hover:text-teal-700 font-medium"
+                className="text-xs text-primary hover:text-primary/80 font-medium"
               >
                 Mark all read
               </button>
             )}
           </div>
           {/* Tabs */}
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 bg-muted p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('received')}
               className={cn(
                 "flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors",
                 activeTab === 'received'
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               Received
               {unreadCount > 0 && (
-                <span className="ml-1 bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full text-[10px]">
+                <span className="ml-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded-full text-[10px]">
                   {unreadCount}
                 </span>
               )}
@@ -191,8 +191,8 @@ export function NudgesDropdown() {
               className={cn(
                 "flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors",
                 activeTab === 'sent'
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               Sent
@@ -203,17 +203,17 @@ export function NudgesDropdown() {
         {/* Notifications List */}
         <div className="max-h-80 overflow-y-auto">
           {loading ? (
-            <div className="p-6 text-center text-gray-500 text-sm">Loading...</div>
+            <div className="p-6 text-center text-muted-foreground text-sm">Loading...</div>
           ) : displayedNotifications.length === 0 ? (
             <div className="p-6 text-center">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
                 {activeTab === 'received' ? (
-                  <Bell className="w-5 h-5 text-gray-400" />
+                  <Bell className="w-5 h-5 text-muted-foreground" />
                 ) : (
-                  <Send className="w-5 h-5 text-gray-400" />
+                  <Send className="w-5 h-5 text-muted-foreground" />
                 )}
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {activeTab === 'received' ? "No nudges yet" : "No sent nudges"}
               </p>
             </div>
@@ -223,37 +223,37 @@ export function NudgesDropdown() {
                 key={notification.id}
                 onClick={() => activeTab === 'received' && handleNotificationClick(notification)}
                 className={cn(
-                  "p-3 border-b border-gray-50 last:border-0 transition-colors",
-                  activeTab === 'received' && "cursor-pointer hover:bg-gray-50",
-                  !notification.read && activeTab === 'received' && "bg-teal-50/50"
+                  "p-3 border-b border-border/50 last:border-0 transition-colors",
+                  activeTab === 'received' && "cursor-pointer hover:bg-accent",
+                  !notification.read && activeTab === 'received' && "bg-primary/5"
                 )}
               >
                 <div className="flex items-start gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
                     !notification.read && activeTab === 'received'
-                      ? "bg-teal-100"
-                      : "bg-gray-100"
+                      ? "bg-primary/10"
+                      : "bg-muted"
                   )}>
                     {activeTab === 'sent' ? (
-                      <Send className="w-4 h-4 text-gray-500" />
+                      <Send className="w-4 h-4 text-muted-foreground" />
                     ) : (
                       <Bell className={cn(
                         "w-4 h-4",
-                        !notification.read ? "text-teal-600" : "text-gray-400"
+                        !notification.read ? "text-primary" : "text-muted-foreground"
                       )} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-700 line-clamp-2">
+                    <p className="text-sm text-foreground line-clamp-2">
                       {notification.content}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         {getTimeAgo(notification.created_at)}
                       </span>
                       {notification.metadata?.pod_code && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-mono">
+                        <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-mono">
                           {notification.metadata.pod_code}
                         </span>
                       )}
@@ -262,7 +262,7 @@ export function NudgesDropdown() {
                   {!notification.read && activeTab === 'received' && (
                     <button
                       onClick={(e) => markAsRead(notification.id, e)}
-                      className="text-gray-400 hover:text-teal-600 p-1"
+                      className="text-muted-foreground hover:text-primary p-1"
                       title="Mark as read"
                     >
                       <Check className="w-4 h-4" />

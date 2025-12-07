@@ -197,13 +197,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <div className={cn(
           "mx-3 mt-3 p-3 rounded-xl border-2 transition-all duration-300",
           lookingToHelp
-            ? "bg-teal-50 border-teal-200"
-            : "bg-gray-50 border-gray-200"
+            ? "bg-primary/10 border-primary/30"
+            : "bg-muted/50 border-border"
         )}>
           <div className="flex items-center gap-3">
             <div className={cn(
               "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-              lookingToHelp ? "bg-teal-600" : "bg-gray-300"
+              lookingToHelp ? "bg-primary" : "bg-muted-foreground/30"
             )}>
               <Sparkles className="w-4 h-4 text-white" />
             </div>
@@ -216,14 +216,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center justify-between">
                   <span className={cn(
                     "text-sm font-medium",
-                    lookingToHelp ? "text-teal-700 dark:text-teal-400" : "text-muted-foreground"
+                    lookingToHelp ? "text-primary" : "text-muted-foreground"
                   )}>
                     Looking to Help
                   </span>
                   <Switch
                     checked={lookingToHelp}
                     onCheckedChange={toggleLookingToHelp}
-                    className="data-[state=checked]:bg-teal-600"
+                    className="data-[state=checked]:bg-primary"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -235,7 +235,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <Switch
                 checked={lookingToHelp}
                 onCheckedChange={toggleLookingToHelp}
-                className="data-[state=checked]:bg-teal-600 hidden"
+                className="data-[state=checked]:bg-primary hidden"
               />
             )}
           </div>

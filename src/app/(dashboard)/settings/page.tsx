@@ -208,7 +208,7 @@ export default function SettingsPage() {
   if (!profile) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500">Profile not found. Please complete onboarding.</p>
+        <p className="text-muted-foreground">Profile not found. Please complete onboarding.</p>
       </div>
     );
   }
@@ -221,15 +221,15 @@ export default function SettingsPage() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-500 mt-1">Manage your profile and preferences</p>
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
         </div>
         <div className="flex items-center gap-2 text-sm">
           {saveStatus === 'saving' && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center gap-2 text-gray-500"
+              className="flex items-center gap-2 text-muted-foreground"
             >
               <Loader2 className="h-4 w-4 animate-spin" />
               <span>Saving...</span>
@@ -239,7 +239,7 @@ export default function SettingsPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 text-teal-600"
+              className="flex items-center gap-2 text-primary"
             >
               <Check className="h-4 w-4" />
               <span>Saved</span>
@@ -249,14 +249,14 @@ export default function SettingsPage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center gap-2 text-red-500"
+              className="flex items-center gap-2 text-destructive"
             >
               <CloudOff className="h-4 w-4" />
               <span>Error saving</span>
             </motion.div>
           )}
           {saveStatus === 'idle' && (
-            <div className="flex items-center gap-2 text-gray-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Cloud className="h-4 w-4" />
               <span>Auto-save on</span>
             </div>
@@ -346,9 +346,9 @@ export default function SettingsPage() {
                     value={profile.slackHandle || ""}
                     onChange={(e) => setProfile({...profile, slackHandle: e.target.value.trim()})}
                   />
-                  <MessageCircle className="w-4 h-4 text-gray-400" />
+                  <MessageCircle className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <p className="text-xs text-gray-500">Used for “Message on Slack” and optional nudge webhook.</p>
+                <p className="text-xs text-muted-foreground">Used for "Message on Slack" and optional nudge webhook.</p>
               </div>
             </CardContent>
           </Card>
@@ -368,18 +368,18 @@ export default function SettingsPage() {
                 placeholder="Add a skill (e.g. Python, Sales)"
                 type="expertise"
               />
-              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl border">
                 {profile.expertiseSkills.length === 0 && (
-                  <span className="text-sm text-gray-400 italic">No skills added yet...</span>
+                  <span className="text-sm text-muted-foreground italic">No skills added yet...</span>
                 )}
                 {profile.expertiseSkills.map((skill: string) => {
                   const level = (profile.expertiseLevels || {})[skill.toLowerCase()] ?? 75;
                   // Normalize old values to quadrant values
                   const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-4 py-3 shadow-sm">
+                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl border px-4 py-3 shadow-sm">
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-800 block mb-2">{skill}</span>
+                        <span className="text-sm font-medium text-foreground block mb-2">{skill}</span>
                         <ProficiencyRing
                           value={normalizedLevel}
                           onChange={(val) => setLevel('expertise', skill, val)}
@@ -387,7 +387,7 @@ export default function SettingsPage() {
                           color="teal"
                         />
                       </div>
-                      <button onClick={() => removeSkill('expertise', skill)} className="text-gray-400 hover:text-red-500 p-1">
+                      <button onClick={() => removeSkill('expertise', skill)} className="text-muted-foreground hover:text-destructive p-1">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -410,18 +410,18 @@ export default function SettingsPage() {
                 placeholder="Add a skill (e.g. Leadership, SQL)"
                 type="growth"
               />
-              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-gray-50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl border">
                 {profile.growthSkills.length === 0 && (
-                  <span className="text-sm text-gray-400 italic">No skills added yet...</span>
+                  <span className="text-sm text-muted-foreground italic">No skills added yet...</span>
                 )}
                 {profile.growthSkills.map((skill: string) => {
                   const level = (profile.growthLevels || {})[skill.toLowerCase()] ?? 25;
                   // Normalize old values to quadrant values
                   const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-white rounded-xl border px-4 py-3 shadow-sm">
+                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl border px-4 py-3 shadow-sm">
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-800 block mb-2">{skill}</span>
+                        <span className="text-sm font-medium text-foreground block mb-2">{skill}</span>
                         <ProficiencyRing
                           value={normalizedLevel}
                           onChange={(val) => setLevel('growth', skill, val)}
@@ -429,7 +429,7 @@ export default function SettingsPage() {
                           color="cyan"
                         />
                       </div>
-                      <button onClick={() => removeSkill('growth', skill)} className="text-gray-400 hover:text-red-500 p-1">
+                      <button onClick={() => removeSkill('growth', skill)} className="text-muted-foreground hover:text-destructive p-1">
                         <X className="h-4 w-4" />
                       </button>
                     </div>
@@ -448,14 +448,14 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Looking to Help Status */}
-              <div className="flex items-center justify-between p-4 bg-teal-50 border-2 border-teal-200 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-primary/10 border-2 border-primary/20 rounded-xl">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shrink-0">
+                    <Sparkles className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <div>
-                    <Label className="text-base font-semibold text-gray-900">Looking to Help</Label>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <Label className="text-base font-semibold text-foreground">Looking to Help</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
                       Show teammates you're actively available to mentor and assist
                     </p>
                   </div>
@@ -463,7 +463,7 @@ export default function SettingsPage() {
                 <Switch
                   checked={profile.lookingToHelp}
                   onCheckedChange={(checked) => setProfile({...profile, lookingToHelp: checked})}
-                  className="data-[state=checked]:bg-teal-600"
+                  className="data-[state=checked]:bg-primary"
                 />
               </div>
 
@@ -478,7 +478,7 @@ export default function SettingsPage() {
                   onChange={(e) => setProfile({...profile, preferred_group_size: parseInt(e.target.value)})}
                   className="w-24"
                 />
-                <p className="text-xs text-gray-500">Ideal number of people in your working circles (2-10)</p>
+                <p className="text-xs text-muted-foreground">Ideal number of people in your working circles (2-10)</p>
               </div>
 
               <div className="space-y-3">
@@ -491,8 +491,8 @@ export default function SettingsPage() {
                         key={day}
                         className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
                           isChecked
-                            ? 'border-teal-400 bg-teal-50'
-                            : 'hover:border-teal-300 hover:bg-teal-50/30'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50 hover:bg-accent'
                         }`}
                       >
                         <input
@@ -505,14 +505,14 @@ export default function SettingsPage() {
                               : days.filter((d: string) => d !== day);
                             setProfile({ ...profile, availableDays: newDays });
                           }}
-                          className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                          className="w-4 h-4 text-primary rounded border-border focus:ring-primary accent-primary"
                         />
-                        <span className="text-sm font-medium text-gray-700">{day}</span>
+                        <span className="text-sm font-medium text-foreground">{day}</span>
                       </label>
                     );
                   })}
                 </div>
-                <p className="text-xs text-gray-500">Select days you're typically available for collaboration</p>
+                <p className="text-xs text-muted-foreground">Select days you're typically available for collaboration</p>
               </div>
 
               <div className="space-y-3">
@@ -530,8 +530,8 @@ export default function SettingsPage() {
                         key={value}
                         className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
                           isChecked
-                            ? 'border-teal-400 bg-teal-50'
-                            : 'hover:border-teal-300 hover:bg-teal-50/30'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50 hover:bg-accent'
                         }`}
                       >
                         <input
@@ -544,14 +544,14 @@ export default function SettingsPage() {
                               : times.filter((t: string) => t !== value);
                             setProfile({ ...profile, timePreferences: newTimes });
                           }}
-                          className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                          className="w-4 h-4 text-primary rounded border-border focus:ring-primary accent-primary"
                         />
-                        <span className="text-sm font-medium text-gray-700">{label}</span>
+                        <span className="text-sm font-medium text-foreground">{label}</span>
                       </label>
                     );
                   })}
                 </div>
-                <p className="text-xs text-gray-500">When you're most available to help teammates</p>
+                <p className="text-xs text-muted-foreground">When you're most available to help teammates</p>
               </div>
             </CardContent>
           </Card>

@@ -63,15 +63,15 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   nudgeType === 'ask'
-                    ? 'border-cyan-300 bg-cyan-50'
-                    : 'border-gray-200 hover:border-cyan-200 hover:bg-gray-50'
+                    ? 'border-cyan-500/50 dark:border-cyan-400/50 bg-cyan-500/10 dark:bg-cyan-400/10'
+                    : 'border-border hover:border-cyan-500/30 hover:bg-accent'
                 }`}
               >
                 <HelpCircle className={`w-6 h-6 mx-auto mb-2 ${
-                  nudgeType === 'ask' ? 'text-cyan-600' : 'text-gray-400'
+                  nudgeType === 'ask' ? 'text-cyan-600 dark:text-cyan-400' : 'text-muted-foreground'
                 }`} />
                 <p className={`text-sm font-medium ${
-                  nudgeType === 'ask' ? 'text-cyan-700' : 'text-gray-600'
+                  nudgeType === 'ask' ? 'text-cyan-700 dark:text-cyan-300' : 'text-muted-foreground'
                 }`}>
                   Ask for Help
                 </p>
@@ -84,15 +84,15 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   nudgeType === 'offer'
-                    ? 'border-teal-300 bg-teal-50'
-                    : 'border-gray-200 hover:border-teal-200 hover:bg-gray-50'
+                    ? 'border-primary/50 bg-primary/10'
+                    : 'border-border hover:border-primary/30 hover:bg-accent'
                 }`}
               >
                 <Lightbulb className={`w-6 h-6 mx-auto mb-2 ${
-                  nudgeType === 'offer' ? 'text-teal-600' : 'text-gray-400'
+                  nudgeType === 'offer' ? 'text-primary' : 'text-muted-foreground'
                 }`} />
                 <p className={`text-sm font-medium ${
-                  nudgeType === 'offer' ? 'text-teal-700' : 'text-gray-600'
+                  nudgeType === 'offer' ? 'text-primary' : 'text-muted-foreground'
                 }`}>
                   Offer Help
                 </p>
@@ -120,8 +120,8 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 </SelectContent>
               </Select>
             ) : (
-              <div className="p-4 bg-gray-50 rounded-xl border border-dashed text-center">
-                <p className="text-sm text-gray-500">
+              <div className="p-4 bg-muted/50 rounded-xl border border-dashed text-center">
+                <p className="text-sm text-muted-foreground">
                   {nudgeType === 'ask' 
                     ? "This member hasn't listed any expertise skills yet"
                     : "Add expertise skills in Settings to offer help"}
@@ -133,10 +133,10 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
           {/* Preview */}
           {selectedTopic && (
             <div className={`p-4 rounded-xl border-2 ${
-              nudgeType === 'ask' ? 'bg-cyan-50 border-cyan-200' : 'bg-teal-50 border-teal-200'
+              nudgeType === 'ask' ? 'bg-cyan-500/10 dark:bg-cyan-400/10 border-cyan-500/30 dark:border-cyan-400/30' : 'bg-primary/10 border-primary/30'
             }`}>
-              <p className="text-sm font-medium text-gray-700 mb-1">Message Preview:</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-sm font-medium text-foreground mb-1">Message Preview:</p>
+              <p className="text-sm text-foreground">
                 {nudgeType === 'ask' 
                   ? `"Can you help me with ${selectedTopic}?"`
                   : `"I can help you with ${selectedTopic}!"`
