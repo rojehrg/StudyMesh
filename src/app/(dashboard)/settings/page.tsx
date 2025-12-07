@@ -42,6 +42,15 @@ export default function SettingsPage() {
         .single();
 
       if (data) {
+        // Parse availability from JSONB - it stores { day: [timeSlots] }
+        const availability = data.availability || {};
+        const availableDays = Object.keys(availability).filter(day =>
+          Array.isArray(availability[day]) && availability[day].length > 0
+        );
+        // Extract time preferences from any day's slots
+        const allTimeSlots = Object.values(availability).flat() as string[];
+        const timePrefs = [...new Set(allTimeSlots)];
+
         setProfile({
           ...data,
           firstName: data.first_name || "",
@@ -52,6 +61,8 @@ export default function SettingsPage() {
           slackHandle: data.slack_handle || "",
           expertiseLevels: data.expertise_levels || {},
           growthLevels: data.growth_levels || {},
+          availableDays: availableDays,
+          timePreferences: timePrefs,
         });
       }
     } catch (error) {
@@ -66,6 +77,14 @@ export default function SettingsPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Build availability object from days and time preferences
+      const availableDays = profileData.availableDays || [];
+      const timePreferences = profileData.timePreferences || [];
+      const availability: Record<string, string[]> = {};
+      for (const day of availableDays) {
+        availability[day] = timePreferences.length > 0 ? timePreferences : ['Flexible'];
+      }
 
       const { error } = await supabase
         .from('profiles')
@@ -82,6 +101,7 @@ export default function SettingsPage() {
           preferred_group_size: profileData.preferred_group_size || 3,
           looking_to_help: profileData.lookingToHelp || false,
           slack_handle: profileData.slackHandle || null,
+          availability: availability,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id);
@@ -464,35 +484,72 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 <Label>General Availability</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
-                    <label key={day} className="flex items-center gap-2 cursor-pointer p-3 rounded-xl border hover:border-teal-300 hover:bg-teal-50/30 transition-all">
-                      <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500" />
-                      <span className="text-sm font-medium text-gray-700">{day}</span>
-                    </label>
-                  ))}
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+                    const isChecked = (profile.availableDays || []).includes(day);
+                    return (
+                      <label
+                        key={day}
+                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
+                          isChecked
+                            ? 'border-teal-400 bg-teal-50'
+                            : 'hover:border-teal-300 hover:bg-teal-50/30'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const days = profile.availableDays || [];
+                            const newDays = e.target.checked
+                              ? [...days, day]
+                              : days.filter((d: string) => d !== day);
+                            setProfile({ ...profile, availableDays: newDays });
+                          }}
+                          className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">{day}</span>
+                      </label>
+                    );
+                  })}
                 </div>
                 <p className="text-xs text-gray-500">Select days you're typically available for collaboration</p>
               </div>
 
               <div className="space-y-3">
-                <Label>Preferred Time Zones</Label>
+                <Label>Preferred Times</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer p-3 rounded-xl border hover:border-teal-300 hover:bg-teal-50/30 transition-all">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500" />
-                    <span className="text-sm font-medium text-gray-700">Morning (8AM-12PM)</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-3 rounded-xl border hover:border-teal-300 hover:bg-teal-50/30 transition-all">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500" />
-                    <span className="text-sm font-medium text-gray-700">Afternoon (12PM-5PM)</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-3 rounded-xl border hover:border-teal-300 hover:bg-teal-50/30 transition-all">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500" />
-                    <span className="text-sm font-medium text-gray-700">Evening (5PM-9PM)</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-3 rounded-xl border hover:border-teal-300 hover:bg-teal-50/30 transition-all">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500" />
-                    <span className="text-sm font-medium text-gray-700">Flexible</span>
-                  </label>
+                  {[
+                    { value: 'Morning', label: 'Morning (8AM-12PM)' },
+                    { value: 'Afternoon', label: 'Afternoon (12PM-5PM)' },
+                    { value: 'Evening', label: 'Evening (5PM-9PM)' },
+                    { value: 'Flexible', label: 'Flexible' },
+                  ].map(({ value, label }) => {
+                    const isChecked = (profile.timePreferences || []).includes(value);
+                    return (
+                      <label
+                        key={value}
+                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
+                          isChecked
+                            ? 'border-teal-400 bg-teal-50'
+                            : 'hover:border-teal-300 hover:bg-teal-50/30'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const times = profile.timePreferences || [];
+                            const newTimes = e.target.checked
+                              ? [...times, value]
+                              : times.filter((t: string) => t !== value);
+                            setProfile({ ...profile, timePreferences: newTimes });
+                          }}
+                          className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">{label}</span>
+                      </label>
+                    );
+                  })}
                 </div>
                 <p className="text-xs text-gray-500">When you're most available to help teammates</p>
               </div>

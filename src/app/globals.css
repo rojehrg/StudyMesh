@@ -11,26 +11,26 @@
     /* Cards & Surfaces */
     --card: 0 0% 100%;
     --card-foreground: 210 24% 6%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 210 24% 6%;
- 
+
     /* Primary - Teal (#0A8A7B) */
     --primary: 175 85% 29%;
     --primary-foreground: 0 0% 100%;
- 
+
     /* Secondary - Light Teal */
     --secondary: 175 60% 96%;
     --secondary-foreground: 175 85% 29%;
- 
+
     /* Muted */
     --muted: 210 20% 96%;
     --muted-foreground: 215 14% 46%;
- 
+
     /* Accent - Light Teal for hover states */
     --accent: 175 60% 96%;
     --accent-foreground: 175 85% 29%;
- 
+
     /* Destructive - Red */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -39,9 +39,61 @@
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 175 85% 29%;
- 
+
     /* Rounded corners */
     --radius: 0.75rem;
+
+    /* Chart colors */
+    --chart-1: 175 85% 29%;
+    --chart-2: 175 60% 45%;
+    --chart-3: 175 45% 60%;
+    --chart-4: 175 30% 75%;
+    --chart-5: 175 20% 85%;
+  }
+
+  .dark {
+    /* Backgrounds - Dark slate */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    /* Cards & Surfaces */
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary - Teal (brighter for dark mode) */
+    --primary: 175 85% 45%;
+    --primary-foreground: 222 47% 11%;
+
+    /* Secondary */
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 175 85% 45%;
+
+    /* Muted */
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Accent */
+    --accent: 217 33% 20%;
+    --accent-foreground: 175 85% 45%;
+
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders & Inputs */
+    --border: 217 33% 24%;
+    --input: 217 33% 24%;
+    --ring: 175 85% 45%;
+
+    /* Chart colors */
+    --chart-1: 175 85% 45%;
+    --chart-2: 175 60% 55%;
+    --chart-3: 175 45% 65%;
+    --chart-4: 175 30% 75%;
+    --chart-5: 175 20% 85%;
   }
 }
  

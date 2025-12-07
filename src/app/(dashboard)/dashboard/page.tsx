@@ -78,10 +78,10 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Welcome back{profile.major ? `, ${profile.major.split(' ')[0]}` : ''}!
           </h1>
-          <p className="text-gray-500 mt-1">Here's what's happening with your enablement</p>
+          <p className="text-muted-foreground text-sm sm:text-base mt-1">Here's what's happening with your enablement</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
@@ -103,12 +103,12 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Active Pods</CardTitle>
-            <Users className="h-5 w-5 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Pods</CardTitle>
+            <Users className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{podIds.length}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{podIds.length}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {podIds.length === 0 ? "Join your first pod" : "Enablement groups"}
             </p>
           </CardContent>
@@ -116,12 +116,12 @@ export default async function DashboardPage() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Matches Found</CardTitle>
-            <Sparkles className="h-5 w-5 text-cyan-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Matches Found</CardTitle>
+            <Sparkles className="h-5 w-5 text-cyan-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{matchCount}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{matchCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {matchCount === 0 ? "Add skills to find matches" : "Knowledge partners"}
             </p>
           </CardContent>
@@ -129,12 +129,12 @@ export default async function DashboardPage() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Skills Shared</CardTitle>
-            <TrendingUp className="h-5 w-5 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Skills Shared</CardTitle>
+            <TrendingUp className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{expertiseCount}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{expertiseCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {expertiseCount === 0 ? "Add your expertise" : "Can mentor others"}
             </p>
           </CardContent>
@@ -142,12 +142,12 @@ export default async function DashboardPage() {
 
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Notifications</CardTitle>
-            <Bell className="h-5 w-5 text-cyan-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
+            <Bell className="h-5 w-5 text-cyan-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{unreadNotifications}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-foreground">{unreadNotifications}</div>
+            <p className="text-xs text-muted-foreground mt-1">
               {unreadNotifications === 0 ? "All caught up" : "Unread nudges"}
             </p>
           </CardContent>

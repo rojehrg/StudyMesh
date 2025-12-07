@@ -273,8 +273,8 @@ export default function WorkingCirclesPage() {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Working Circles</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Working Circles</h1>
+        <p className="text-muted-foreground text-sm sm:text-base mt-1">
           Your potential knowledge-sharing partners across all pods
         </p>
       </div>

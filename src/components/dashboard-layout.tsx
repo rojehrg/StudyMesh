@@ -25,6 +25,9 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { NudgesDropdown } from "@/components/nudges-dropdown";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
+import { useGlobalShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 interface SidebarItemProps {
   icon: any;
@@ -43,8 +46,8 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       className={cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 overflow-hidden whitespace-nowrap group",
         isActive
-          ? "bg-teal-50 text-teal-700 border-teal-200 shadow-sm"
-          : "border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+          ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
+          : "border-transparent text-muted-foreground hover:bg-accent hover:text-foreground"
       )}
       title={isCollapsed ? label : ""}
     >
@@ -86,6 +89,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+
+  // Enable global keyboard shortcuts
+  useGlobalShortcuts();
 
   useEffect(() => {
     loadProfile();
@@ -150,7 +156,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div 
@@ -162,16 +168,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col",
+          "fixed inset-y-0 left-0 z-30 bg-card border-r border-border transition-all duration-300 ease-in-out flex flex-col",
           isCollapsed ? "w-20" : "w-64",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-100">
+        <div className="h-16 flex items-center px-4 border-b border-border">
           <Link href="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
             <span className={cn(
-              "text-teal-600 text-xl font-bold shrink-0 transition-all duration-300",
+              "text-primary text-xl font-bold shrink-0 transition-all duration-300",
               isCollapsed ? "w-12 text-center" : ""
             )}>
               M
@@ -181,8 +187,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
               className="whitespace-nowrap overflow-hidden"
             >
-              <span className="text-teal-600 text-xl font-bold">esh</span>
-              <span className="text-gray-900 text-xl font-bold">flow</span>
+              <span className="text-primary text-xl font-bold">esh</span>
+              <span className="text-foreground text-xl font-bold">flow</span>
             </motion.span>
           </Link>
         </div>
@@ -251,11 +257,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* User Profile */}
-        <div className="p-3 border-t border-gray-100">
-          <div className="flex items-center p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
-            <Avatar className="h-9 w-9 border-2 border-teal-100">
+        <div className="p-3 border-t border-border">
+          <div className="flex items-center p-2 rounded-xl hover:bg-accent transition-colors cursor-pointer">
+            <Avatar className="h-9 w-9 border-2 border-primary/20">
               <AvatarImage src="" />
-              <AvatarFallback className="bg-teal-100 text-teal-700 font-medium">
+              <AvatarFallback className="bg-primary/10 text-primary font-medium">
                 {profile?.first_name?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
@@ -265,13 +271,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
               className="ml-3 overflow-hidden"
             >
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {profile?.first_name && profile?.last_name
                   ? `${profile.first_name} ${profile.last_name}`
                   : "User"}
               </p>
               {lookingToHelp && (
-                <p className="text-xs text-teal-600 truncate flex items-center gap-1">
+                <p className="text-xs text-primary truncate flex items-center gap-1">
                   <Sparkles className="w-3 h-3" />
                   Available to help
                 </p>
@@ -286,7 +292,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 opacity: isCollapsed ? 0 : 1,
                 width: isCollapsed ? 0 : "auto"
               }}
-              className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg transition-colors active:scale-95"
+              className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95"
               title="Logout"
             >
               <LogOut className="w-4 h-4" />
@@ -301,14 +307,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         isCollapsed ? "md:ml-20" : "md:ml-64"
       )}>
         {/* Header */}
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 sticky top-0 z-30">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
-              <Menu className="w-6 h-6 text-gray-700" />
+              <Menu className="w-6 h-6 text-foreground" />
             </Button>
-            <span className="ml-3 font-bold text-lg md:hidden">Meshflow</span>
+            <span className="ml-3 font-bold text-lg md:hidden text-foreground">Meshflow</span>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <NudgesDropdown />
           </div>
         </header>
@@ -324,9 +331,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "hidden md:flex fixed top-1/2 -translate-y-1/2 z-40",
-          "bg-white border border-l-0 border-gray-200",
+          "bg-card border border-l-0 border-border",
           "rounded-r-lg p-1.5 shadow-lg hover:shadow-xl",
-          "text-gray-500 hover:text-teal-600 transition-all duration-300 active:scale-95",
+          "text-muted-foreground hover:text-primary transition-all duration-300 active:scale-95",
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
       >
@@ -335,6 +342,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           isCollapsed && "rotate-180"
         )} />
       </button>
+
+      {/* Keyboard Shortcuts Help Dialog */}
+      <KeyboardShortcutsHelp />
     </div>
   );
 }
