@@ -26,8 +26,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { NudgesDropdown } from "@/components/nudges-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
-import { useGlobalShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { OnboardingTour } from "@/components/onboarding-tour";
 
 interface SidebarItemProps {
@@ -90,9 +88,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-
-  // Enable global keyboard shortcuts
-  useGlobalShortcuts();
 
   useEffect(() => {
     loadProfile();
@@ -344,9 +339,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           isCollapsed && "rotate-180"
         )} />
       </button>
-
-      {/* Keyboard Shortcuts Help Dialog */}
-      <KeyboardShortcutsHelp />
 
       {/* Onboarding Tour for New Users */}
       <OnboardingTour />

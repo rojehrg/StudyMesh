@@ -26,20 +26,17 @@ const tourSteps: TourStep[] = [
   {
     icon: BookOpen,
     title: "Join or Create Pods",
-    description: "Pods are groups where team members connect. Join an existing pod with a code, or create one for your project or initiative.",
-    tip: "Press 'P' to quickly navigate to Pods"
+    description: "Pods are groups where team members connect. Join an existing pod with a code, or create one for your project or initiative."
   },
   {
     icon: Settings,
     title: "Set Up Your Profile",
-    description: "Add your expertise skills (what you're good at) and growth skills (what you want to learn). This helps us match you with the right teammates.",
-    tip: "Press 'S' for Settings"
+    description: "Add your expertise skills (what you're good at) and growth skills (what you want to learn). This helps us match you with the right teammates."
   },
   {
     icon: Users,
     title: "Find Your Working Circles",
-    description: "Working Circles shows you teammates who can help you grow, and those you can mentor. The matching algorithm considers skills, availability, and more.",
-    tip: "Press 'W' to view Working Circles"
+    description: "Working Circles shows you teammates who can help you grow, and those you can mentor. The matching algorithm considers skills, availability, and more."
   },
   {
     icon: Bell,
