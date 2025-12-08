@@ -268,40 +268,22 @@ export default function PodDetailPage() {
                 </div>
               </div>
 
-              {/* Strong Areas & Gaps */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {teamAnalysis.strongAreas.length > 0 && (
-                  <div className="p-3 bg-ctp-green/10 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="w-4 h-4 text-ctp-green" />
-                      <span className="text-sm font-medium text-ctp-green">Strong Areas</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {teamAnalysis.strongAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-ctp-green/20 text-ctp-green text-xs">
-                          {area}
-                        </Badge>
-                      ))}
-                    </div>
+              {/* Strong Areas */}
+              {teamAnalysis.strongAreas.length > 0 && (
+                <div className="p-3 bg-ctp-green/10 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-ctp-green" />
+                    <span className="text-sm font-medium text-ctp-green">Strong Areas</span>
                   </div>
-                )}
-
-                {teamAnalysis.gapAreas.length > 0 && (
-                  <div className="p-3 bg-ctp-yellow/10 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-4 h-4 text-ctp-yellow" />
-                      <span className="text-sm font-medium text-ctp-yellow">Gap Areas</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {teamAnalysis.gapAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-ctp-yellow/20 text-ctp-yellow text-xs">
-                          {area}
-                        </Badge>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1">
+                    {teamAnalysis.strongAreas.slice(0, 4).map(area => (
+                      <Badge key={area} variant="secondary" className="bg-ctp-green/20 text-ctp-green text-xs">
+                        {area}
+                      </Badge>
+                    ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Top Skills */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

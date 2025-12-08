@@ -21,17 +21,17 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "peach" 
   const ringSize = size === "sm" ? "w-12 h-12" : "w-14 h-14";
   const innerSize = size === "sm" ? "w-9 h-9" : "w-11 h-11";
 
+  const fillColors = color === "peach"
+    ? { filled: "#fab387", empty: "hsl(var(--muted))" }
+    : { filled: "#a6e3a1", empty: "hsl(var(--muted))" };
+
   const colorClasses = color === "peach"
     ? {
-        filled: "bg-ctp-peach",
-        empty: "bg-muted",
         text: "text-ctp-peach",
         hover: "hover:bg-ctp-peach/10 hover:border-ctp-peach/30",
         selected: "bg-ctp-peach/10 border-ctp-peach/50",
       }
     : {
-        filled: "bg-ctp-green",
-        empty: "bg-muted",
         text: "text-ctp-green",
         hover: "hover:bg-ctp-green/10 hover:border-ctp-green/30",
         selected: "bg-ctp-green/10 border-ctp-green/50",
@@ -65,10 +65,10 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "peach" 
               <path
                 key={quadrant}
                 d={`M 50 50 L ${x1} ${y1} A 45 45 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                className={cn(
-                  "transition-colors duration-200",
-                  isFilled ? colorClasses.filled : colorClasses.empty
-                )}
+                style={{
+                  fill: isFilled ? fillColors.filled : fillColors.empty,
+                  transition: "fill 0.2s ease"
+                }}
               />
             );
           })}
@@ -111,9 +111,9 @@ export function ProficiencyDisplay({ value, size = "sm", color = "peach" }: Omit
   const ringSize = size === "sm" ? "w-8 h-8" : "w-10 h-10";
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
-  const colorClasses = color === "peach"
-    ? { filled: "bg-ctp-peach", empty: "bg-muted", text: "text-ctp-peach" }
-    : { filled: "bg-ctp-green", empty: "bg-muted", text: "text-ctp-green" };
+  const fillColors = color === "peach"
+    ? { filled: "#fab387", empty: "hsl(var(--muted))" }
+    : { filled: "#a6e3a1", empty: "hsl(var(--muted))" };
 
   const filledQuadrants = Math.round(value / 25);
 
@@ -137,7 +137,7 @@ export function ProficiencyDisplay({ value, size = "sm", color = "peach" }: Omit
             <path
               key={quadrant}
               d={`M 50 50 L ${x1} ${y1} A 45 45 0 0 1 ${x2} ${y2} Z`}
-              className={isFilled ? colorClasses.filled : colorClasses.empty}
+              style={{ fill: isFilled ? fillColors.filled : fillColors.empty }}
             />
           );
         })}

@@ -54,7 +54,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
         <Icon className="w-5 h-5 shrink-0" />
         {badge ? (
           <span className={cn(
-            "absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
+            "absolute -top-1 -right-1 bg-ctp-peach text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
             !isCollapsed && "hidden"
           )}>
             {badge}
@@ -72,7 +72,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       </motion.span>
       
       {!isCollapsed && badge ? (
-        <span className="ml-auto bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+        <span className="ml-auto bg-ctp-peach/20 text-ctp-peach text-xs font-bold px-2 py-0.5 rounded-full">
           {badge}
         </span>
       ) : null}

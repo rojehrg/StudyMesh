@@ -217,13 +217,13 @@ export default function AboutPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/settings">
-            <Button className="bg-white text-ctp-peach hover:bg-ctp-peach/10">
+            <Button className="bg-white text-ctp-peach hover:bg-white/90 shadow-md">
               Update Your Profile
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
           <Link href="/groups">
-            <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
+            <Button className="bg-ctp-peach/80 text-white border-2 border-white hover:bg-ctp-peach/60 shadow-md">
               Find Matches
             </Button>
           </Link>

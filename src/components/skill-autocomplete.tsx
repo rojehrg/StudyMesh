@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SkillAutocompleteProps {
   value: string;
@@ -151,26 +152,63 @@ export function SkillAutocomplete({
         {showSuggestions && (
           <div
             ref={suggestionsRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+            className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
           >
-            <div className="p-1.5 text-[10px] uppercase tracking-wider text-gray-400 font-medium border-b bg-gray-50">
-              Existing skills in your team
+            <div className={cn(
+              "px-3 py-2 text-[10px] uppercase tracking-wider font-medium border-b border-border flex items-center gap-2",
+              type === "expertise"
+                ? "bg-ctp-peach/10 text-ctp-peach"
+                : "bg-ctp-green/10 text-ctp-green"
+            )}>
+              <Search className="w-3 h-3" />
+              {type === "expertise" ? "Existing Expertise Skills" : "Existing Growth Areas"}
             </div>
-            {suggestions.map((skill, index) => (
-              <button
-                key={skill}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-ctp-peach/10 transition-colors ${
-                  index === selectedIndex
-                    ? type === "expertise"
-                      ? "bg-ctp-peach/10 text-ctp-peach"
-                      : "bg-ctp-green/10 text-ctp-green"
-                    : "text-gray-700"
-                }`}
-                onClick={() => handleSuggestionClick(skill)}
-              >
-                {skill}
-              </button>
-            ))}
+            <div className="max-h-48 overflow-y-auto">
+              {suggestions.map((skill, index) => {
+                // Highlight matching text
+                const searchTerm = value.toLowerCase();
+                const skillLower = skill.toLowerCase();
+                const matchIndex = skillLower.indexOf(searchTerm);
+
+                let highlightedSkill;
+                if (matchIndex >= 0 && value.trim()) {
+                  const before = skill.slice(0, matchIndex);
+                  const match = skill.slice(matchIndex, matchIndex + value.length);
+                  const after = skill.slice(matchIndex + value.length);
+                  highlightedSkill = (
+                    <>
+                      {before}
+                      <span className={cn(
+                        "font-semibold",
+                        type === "expertise" ? "text-ctp-peach" : "text-ctp-green"
+                      )}>
+                        {match}
+                      </span>
+                      {after}
+                    </>
+                  );
+                } else {
+                  highlightedSkill = skill;
+                }
+
+                return (
+                  <button
+                    key={skill}
+                    className={cn(
+                      "w-full text-left px-3 py-2.5 text-sm transition-colors",
+                      index === selectedIndex
+                        ? type === "expertise"
+                          ? "bg-ctp-peach/15 text-foreground"
+                          : "bg-ctp-green/15 text-foreground"
+                        : "text-foreground hover:bg-accent"
+                    )}
+                    onClick={() => handleSuggestionClick(skill)}
+                  >
+                    {highlightedSkill}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
