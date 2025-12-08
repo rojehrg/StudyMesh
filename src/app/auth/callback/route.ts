@@ -37,6 +37,10 @@ export async function GET(request: Request) {
 
   const cookieStore = await cookies()
 
+  // We need to create the response first so we can set cookies on it
+  let redirectUrl = `${origin}${next}`
+  const cookiesToSet: Array<{ name: string; value: string; options: any }> = []
+
   const supabase = createServerClient(
     url,
     key,
@@ -45,14 +49,11 @@ export async function GET(request: Request) {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch (e) {
-            console.error('[OAuth Callback] Cookie set error:', e);
-          }
+        setAll(cookies) {
+          // Collect cookies to set on the response later
+          cookies.forEach((cookie) => {
+            cookiesToSet.push(cookie)
+          })
         },
       },
     }
@@ -63,7 +64,8 @@ export async function GET(request: Request) {
   console.log('[OAuth Callback] Exchange result:', {
     success: !exchangeError,
     hasSession: !!data?.session,
-    error: exchangeError?.message
+    error: exchangeError?.message,
+    cookiesToSet: cookiesToSet.length
   });
 
   if (exchangeError) {
@@ -71,7 +73,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(exchangeError.message)}`)
   }
 
-  // Success! Check if user needs onboarding
+  // Check if user needs onboarding
   if (data?.user) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -79,13 +81,21 @@ export async function GET(request: Request) {
       .eq('user_id', data.user.id)
       .single()
 
-    // If no profile exists, redirect to onboarding
     if (!profile) {
       console.log('[OAuth Callback] New user, redirecting to onboarding');
-      return NextResponse.redirect(`${origin}/onboarding`)
+      redirectUrl = `${origin}/onboarding`
     }
   }
 
-  console.log('[OAuth Callback] Success, redirecting to:', next);
-  return NextResponse.redirect(`${origin}${next}`)
+  // Create the redirect response and attach all cookies to it
+  console.log('[OAuth Callback] Redirecting to:', redirectUrl);
+  const response = NextResponse.redirect(redirectUrl)
+
+  // Set all the auth cookies on the response
+  cookiesToSet.forEach(({ name, value, options }) => {
+    console.log('[OAuth Callback] Setting cookie:', name);
+    response.cookies.set(name, value, options)
+  })
+
+  return response
 }
