@@ -2,36 +2,33 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { calculateMatches, calculateSimilarity } from "@/lib/logic/matching";
 import { NudgeDialog } from "@/components/nudge-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Search, Sparkles, Bell, Users, X, ChevronDown, Target, Building2, Clock, ArrowLeftRight, UserCheck } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, Search, Sparkles, Bell, Users, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 export default function WorkingCirclesPage() {
   const [loading, setLoading] = useState(true);
-  const [matches, setMatches] = useState<any[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentUserExpertise, setCurrentUserExpertise] = useState<string[]>([]);
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
-  const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
   const [openRequests, setOpenRequests] = useState<any[]>([]);
   const [requestSkill, setRequestSkill] = useState("");
   const [currentProfile, setCurrentProfile] = useState<any>(null);
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
-  const [similarUsers, setSimilarUsers] = useState<any[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
-    loadAllMatches();
+    loadPodMembers();
   }, []);
 
-  const loadAllMatches = async () => {
+  const loadPodMembers = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -44,7 +41,7 @@ export default function WorkingCirclesPage() {
         .single();
 
       if (!currentProfile) return;
-      
+
       setCurrentProfile(currentProfile);
       setCurrentUserExpertise(currentProfile.expertise_skills || []);
 
@@ -55,7 +52,7 @@ export default function WorkingCirclesPage() {
         .eq('user_id', user.id);
 
       if (!userPods || userPods.length === 0) {
-        setMatches([]);
+        setMembers([]);
         return;
       }
 
@@ -69,7 +66,7 @@ export default function WorkingCirclesPage() {
         .neq('user_id', user.id);
 
       if (!allPodMembers || allPodMembers.length === 0) {
-        setMatches([]);
+        setMembers([]);
         return;
       }
 
@@ -84,85 +81,37 @@ export default function WorkingCirclesPage() {
 
       if (!profiles) return;
 
-      // Calculate matches
-      const matchResults = profiles
-        .map(otherProfile => {
-          // Find which pods they share
-          const sharedPodIds = allPodMembers
-            .filter(m => m.user_id === otherProfile.user_id)
-            .map(m => m.pod_id);
+      // Get pod names for context
+      const { data: pods } = await supabase
+        .from('pods')
+        .select('id, pod_name')
+        .in('id', podIds);
 
-          const isSamePod = sharedPodIds.length > 0;
+      const podMap = new Map(pods?.map(p => [p.id, p.pod_name]) || []);
 
-          const result = calculateMatches(
-            {
-              expertiseSkills: currentProfile.expertise_skills || [],
-              growthSkills: currentProfile.growth_skills || [],
-              department: currentProfile.department,
-              availability: currentProfile.availability,
-            },
-            {
-              expertiseSkills: otherProfile.expertise_skills || [],
-              growthSkills: otherProfile.growth_skills || [],
-              department: otherProfile.department,
-              availability: otherProfile.availability,
-              updatedAt: otherProfile.updated_at, // For freshness decay
-              lookingToHelp: otherProfile.looking_to_help, // For active helper boost
-            },
-            isSamePod
-          );
+      // Build member list with their pods
+      const memberList = profiles.map(profile => {
+        const memberPodIds = allPodMembers
+          .filter(m => m.user_id === profile.user_id)
+          .map(m => m.pod_id);
 
-          return {
-            userId: otherProfile.user_id,
-            major: otherProfile.major,
-            department: otherProfile.department,
-            expertiseSkills: otherProfile.expertise_skills || [],
-            lookingToHelp: otherProfile.looking_to_help || false,
-            slackHandle: otherProfile.slack_handle || "",
-            score: result.score,
-            canHelp: result.skills.a_to_b,
-            canAskHelp: result.skills.b_to_a,
-            sharedPods: sharedPodIds.length,
-            breakdown: result.breakdown,
-            isReciprocal: result.isReciprocal,
-          };
-        })
-        .filter(m => m.score > 0)
-        .sort((a, b) => b.score - a.score);
+        const memberPodNames = memberPodIds
+          .map(id => podMap.get(id))
+          .filter(Boolean);
 
-      setMatches(matchResults);
+        return {
+          userId: profile.user_id,
+          major: profile.major,
+          department: profile.department,
+          expertiseSkills: profile.expertise_skills || [],
+          growthSkills: profile.growth_skills || [],
+          lookingToHelp: profile.looking_to_help || false,
+          slackHandle: profile.slack_handle || "",
+          pods: memberPodNames,
+        };
+      });
 
-      // Calculate "Similar to you" recommendations
-      const similarResults = profiles
-        .map(otherProfile => {
-          const similarity = calculateSimilarity(
-            {
-              expertiseSkills: currentProfile.expertise_skills || [],
-              growthSkills: currentProfile.growth_skills || [],
-              department: currentProfile.department,
-            },
-            {
-              expertiseSkills: otherProfile.expertise_skills || [],
-              growthSkills: otherProfile.growth_skills || [],
-              department: otherProfile.department,
-            }
-          );
-
-          return {
-            userId: otherProfile.user_id,
-            major: otherProfile.major,
-            department: otherProfile.department,
-            score: similarity.score,
-            sharedExpertise: similarity.sharedExpertise,
-            sharedGrowth: similarity.sharedGrowth,
-            sharedCategory: similarity.sharedCategory,
-          };
-        })
-        .filter(s => s.score >= 20)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5);
-
-      setSimilarUsers(similarResults);
+      setMembers(memberList);
 
       // Load open requests
       const { data: requests } = await supabase
@@ -171,14 +120,14 @@ export default function WorkingCirclesPage() {
         .order('created_at', { ascending: false });
       setOpenRequests(requests || []);
     } catch (error) {
-      console.error("Error loading matches:", error);
+      console.error("Error loading members:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const openNudgeDialog = (match: any) => {
-    setSelectedMatch(match);
+  const openNudgeDialog = (member: any) => {
+    setSelectedMember(member);
     setNudgeDialogOpen(true);
   };
 
@@ -189,7 +138,7 @@ export default function WorkingCirclesPage() {
 
       const { data: senderProfile } = await supabase
         .from('profiles')
-        .select('major, department')
+        .select('major')
         .eq('user_id', user.id)
         .single();
 
@@ -210,7 +159,7 @@ export default function WorkingCirclesPage() {
       if (error) throw error;
 
       // Optional Slack webhook
-      const slackHandle = selectedMatch?.slackHandle;
+      const slackHandle = selectedMember?.slackHandle;
       if (slackHandle) {
         fetch('/api/slack/nudge', {
           method: 'POST',
@@ -229,9 +178,7 @@ export default function WorkingCirclesPage() {
       });
     } catch (error) {
       console.error("Error sending nudge:", error);
-      toast.error("Failed to send nudge", {
-        description: "Please try again"
-      });
+      toast.error("Failed to send nudge");
       throw error;
     }
   };
@@ -249,46 +196,37 @@ export default function WorkingCirclesPage() {
       });
       if (error) throw error;
       setRequestSkill("");
-      toast.success("Request saved", { description: `We'll notify you when someone with ${skill} joins.` });
-      loadAllMatches(); // refresh
+      toast.success("Request saved", { description: `We'll notify you when someone can help with ${skill}.` });
+      loadPodMembers();
     } catch (error) {
       console.error("Error saving request:", error);
       toast.error("Failed to save request");
     }
   };
 
-  const notifyRequester = async (request: any) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const content = `Someone can help with ${request.skill}`;
-      const { error } = await supabase.from('notifications').insert({
-        recipient_id: request.user_id,
-        sender_id: user.id,
-        type: 'nudge',
-        content,
-        metadata: { topic: request.skill, request_id: request.id },
-        read: false,
-      });
-      if (error) throw error;
-      await supabase.from('open_requests').update({ status: 'notified' }).eq('id', request.id);
-      toast.success("Requester notified");
-      setOpenRequests(openRequests.map(r => r.id === request.id ? { ...r, status: 'notified' } : r));
-    } catch (error) {
-      console.error("Error notifying requester:", error);
-      toast.error("Failed to notify requester");
-    }
-  };
-
-  const filteredMatches = matches.filter(m =>
+  const filteredMembers = members.filter(m =>
     m.major?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.canHelp.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    m.canAskHelp.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase()))
+    m.expertiseSkills.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    m.growthSkills.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const requestsICanHelp = openRequests.filter(r => r.status === 'open' && currentProfile && r.user_id !== currentProfile.user_id &&
-    (currentProfile.expertise_skills || []).some((s: string) => s.toLowerCase().includes((r.skill || "").toLowerCase())));
+  // Simple matching: find people who have skills I want to learn
+  const canHelpMe = members.filter(m => {
+    const myGrowth = currentProfile?.growth_skills || [];
+    return m.expertiseSkills.some((skill: string) =>
+      myGrowth.some((g: string) => g.toLowerCase() === skill.toLowerCase())
+    );
+  });
+
+  // Simple matching: find people whose growth needs match my expertise
+  const iCanHelp = members.filter(m => {
+    const myExpertise = currentProfile?.expertise_skills || [];
+    return m.growthSkills.some((skill: string) =>
+      myExpertise.some((e: string) => e.toLowerCase() === skill.toLowerCase())
+    );
+  });
+
   const myRequests = openRequests.filter(r => currentProfile && r.user_id === currentProfile.user_id);
 
   if (loading) {
@@ -308,15 +246,86 @@ export default function WorkingCirclesPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-foreground">Working Circles</h1>
         <p className="text-muted-foreground text-sm sm:text-base mt-1">
-          Your potential knowledge-sharing partners across all pods
+          People from your pods
         </p>
       </div>
 
-      {matches.length > 0 && (
+      {/* Help Requests */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-ctp-peach" />
+            Need Help With Something?
+          </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Add skills you need help with - we'll match you with pod members who can help
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              placeholder="e.g. SQL, React hooks, presenting..."
+              value={requestSkill}
+              onChange={(e) => setRequestSkill(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
+              className="h-9 text-sm"
+            />
+            <Button onClick={saveOpenRequest} size="sm" className="bg-ctp-peach hover:bg-ctp-peach/80 h-9">
+              Add
+            </Button>
+          </div>
+          {myRequests.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {myRequests.map(r => (
+                <div key={r.id} className="flex items-center gap-1.5 bg-ctp-peach/10 text-ctp-peach px-3 py-1.5 rounded-full text-sm">
+                  <span>{r.skill}</span>
+                  <button
+                    onClick={async () => {
+                      await supabase.from('open_requests').delete().eq('id', r.id);
+                      setOpenRequests(openRequests.filter(req => req.id !== r.id));
+                      toast.success("Request removed");
+                    }}
+                    className="hover:text-ctp-red ml-1"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Quick Stats */}
+      {(canHelpMe.length > 0 || iCanHelp.length > 0) && (
+        <div className="grid grid-cols-2 gap-4">
+          {canHelpMe.length > 0 && (
+            <Card className="bg-ctp-green/5">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-ctp-green mb-1">Can help you</p>
+                <p className="text-2xl font-bold text-foreground">{canHelpMe.length}</p>
+                <p className="text-xs text-muted-foreground">people have skills you want to learn</p>
+              </CardContent>
+            </Card>
+          )}
+          {iCanHelp.length > 0 && (
+            <Card className="bg-ctp-peach/5">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-ctp-peach mb-1">You can help</p>
+                <p className="text-2xl font-bold text-foreground">{iCanHelp.length}</p>
+                <p className="text-xs text-muted-foreground">people want to learn your skills</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Search */}
+      {members.length > 0 && (
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, department, or skills..."
+            placeholder="Search by name, department, or skill..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -324,287 +333,82 @@ export default function WorkingCirclesPage() {
         </div>
       )}
 
-      {/* Help Requests Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* My Requests */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-ctp-peach" />
-              My Help Requests
-            </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              Jot down what you need help with
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex gap-2">
-              <Input
-                placeholder="e.g. SQL optimization, React hooks..."
-                value={requestSkill}
-                onChange={(e) => setRequestSkill(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
-                className="h-9 text-sm"
-              />
-              <Button onClick={saveOpenRequest} size="sm" className="bg-ctp-peach hover:bg-peach-400 h-9">
-                Add
-              </Button>
-            </div>
-            {myRequests.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic py-2">No requests yet. Add skills you need help with.</p>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {myRequests.map(r => (
-                  <div key={r.id} className={`p-2.5 rounded-lg flex items-center justify-between ${
-                    r.status === 'notified' ? 'bg-primary/10 shadow-md' : 'bg-muted/50 shadow-sm'
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
-                      <p className={`text-xs ${r.status === 'notified' ? 'text-primary' : 'text-muted-foreground'}`}>
-                        {r.status === 'open' ? 'Waiting for match...' : r.status === 'notified' ? 'Someone can help!' : r.status}
-                      </p>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        await supabase.from('open_requests').delete().eq('id', r.id);
-                        setOpenRequests(openRequests.filter(req => req.id !== r.id));
-                        toast.success("Request removed");
-                      }}
-                      className="text-muted-foreground hover:text-red-500 p-1 ml-2"
-                      title="Remove request"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Requests I Can Help */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Bell className="w-5 h-5 text-ctp-sky" />
-              You Can Help
-            </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              People need help with skills you have
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {requestsICanHelp.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic py-2">No matching requests right now.</p>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {requestsICanHelp.map(r => (
-                  <div key={r.id} className="p-2.5 rounded-lg bg-ctp-green/20 dark:bg-ctp-green/20 shadow-sm flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
-                      <p className="text-xs text-ctp-green dark:text-ctp-green">Someone needs your help</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => notifyRequester(r)}
-                      className="bg-ctp-green hover:bg-green-400 h-7 text-xs px-3"
-                    >
-                      Offer help
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Similar to You Section */}
-      {similarUsers.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-ctp-mauve" />
-              Similar to You
-            </CardTitle>
-            <CardDescription className="text-xs">
-              People with similar skills and interests - great for collaboration
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              {similarUsers.map((user) => (
-                <div
-                  key={user.userId}
-                  className="flex items-center gap-2 p-2 pr-3 rounded-lg bg-ctp-surface0 dark:bg-ctp-surface1 hover:bg-ctp-surface1 dark:hover:bg-ctp-surface2 shadow-sm transition-colors"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
-                      {(user.major || '?')[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{user.major || "Team Member"}</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {user.sharedExpertise.length > 0
-                        ? `Shares: ${user.sharedExpertise.slice(0, 2).join(', ')}`
-                        : user.sharedCategory.length > 0
-                        ? `Both in: ${user.sharedCategory.slice(0, 2).join(', ')}`
-                        : `${user.score}% similar`}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="bg-muted text-foreground text-[10px] ml-1">
-                    {user.score}%
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {filteredMatches.length > 0 ? (
+      {/* Members Grid */}
+      {filteredMembers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredMatches.map((match, index) => (
+          {filteredMembers.map((member, index) => (
             <motion.div
-              key={match.userId}
+              key={member.userId}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}
             >
               <Card className="hover:shadow-md transition-shadow h-full">
                 <CardContent className="p-4">
-                  {/* Header Row */}
+                  {/* Header */}
                   <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-9 w-9 shrink-0">
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
-                        {(match.major || '?')[0].toUpperCase()}
+                    <Avatar className="h-10 w-10 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {(member.major || '?')[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="font-medium text-foreground text-sm truncate">
-                          {match.major || "Team Member"}
+                        <p className="font-medium text-foreground truncate">
+                          {member.major || "Team Member"}
                         </p>
-                        {match.lookingToHelp && (
-                          <Sparkles className="w-3.5 h-3.5 text-ctp-peach shrink-0" />
+                        {member.lookingToHelp && (
+                          <Sparkles className="w-4 h-4 text-ctp-peach shrink-0" title="Looking to help" />
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{match.department}</p>
+                      <p className="text-xs text-muted-foreground truncate">{member.department}</p>
                     </div>
-                    {/* Reciprocal Badge */}
-                    {match.isReciprocal && (
-                      <span className="flex items-center gap-0.5 bg-ctp-yellow/20 text-ctp-yellow text-[10px] px-1.5 py-0.5 rounded-full" title="Two-way match: you can help each other">
-                        <ArrowLeftRight className="w-2.5 h-2.5" />
-                      </span>
-                    )}
-                    {/* Clickable Score Badge */}
-                    <button
-                      onClick={() => setExpandedCard(expandedCard === match.userId ? null : match.userId)}
-                      className="flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-1 rounded-full hover:bg-primary/20 transition-colors"
-                    >
-                      {match.score}%
-                      <ChevronDown className={`w-3 h-3 transition-transform ${expandedCard === match.userId ? 'rotate-180' : ''}`} />
-                    </button>
                   </div>
 
-                  {/* Expandable Score Breakdown */}
-                  <AnimatePresence initial={false}>
-                    {expandedCard === match.userId && match.breakdown && (
-                      <motion.div
-                        key="breakdown"
-                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                        animate={{ opacity: 1, height: 'auto', marginBottom: 12 }}
-                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                        transition={{
-                          duration: 0.2,
-                          ease: [0.4, 0, 0.2, 1],
-                          opacity: { duration: 0.15 }
-                        }}
-                        className="overflow-hidden"
-                      >
-                        <div className="p-2.5 bg-muted/50 rounded-lg shadow-sm">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
-                          <div className="space-y-1.5">
-                            {match.breakdown.skills > 0 && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Target className="w-3 h-3 text-primary" />
-                                  Skill Match
-                                </span>
-                                <span className="font-medium text-primary">+{match.breakdown.skills}</span>
-                              </div>
-                            )}
-                            {match.breakdown.samePod > 0 && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Users className="w-3 h-3 text-ctp-green" />
-                                  Same Pod
-                                </span>
-                                <span className="font-medium text-ctp-green dark:text-ctp-green">+{match.breakdown.samePod}</span>
-                              </div>
-                            )}
-                            {match.breakdown.crossDepartment > 0 && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Building2 className="w-3 h-3 text-muted-foreground" />
-                                  Cross-Department
-                                </span>
-                                <span className="font-medium text-foreground">+{match.breakdown.crossDepartment}</span>
-                              </div>
-                            )}
-                            {match.breakdown.availability > 0 && (
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Clock className="w-3 h-3 text-ctp-yellow" />
-                                  Availability
-                                </span>
-                                <span className="font-medium text-ctp-yellow">+{match.breakdown.availability}</span>
-                              </div>
-                            )}
-                            {match.isReciprocal && (
-                              <div className="flex items-center justify-between text-xs pt-1 mt-1">
-                                <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <ArrowLeftRight className="w-3 h-3 text-ctp-yellow" />
-                                  Two-Way Match
-                                </span>
-                                <span className="font-medium text-ctp-yellow">+5 bonus</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* Pod badges */}
+                  {member.pods.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {member.pods.slice(0, 2).map((pod: string) => (
+                        <Badge key={pod} variant="secondary" className="text-xs bg-muted">
+                          {pod}
+                        </Badge>
+                      ))}
+                      {member.pods.length > 2 && (
+                        <Badge variant="secondary" className="text-xs bg-muted">
+                          +{member.pods.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
 
-                  {/* Skills - Compact */}
+                  {/* Skills */}
                   <div className="space-y-2 mb-3">
-                    {match.canAskHelp.length > 0 && (
+                    {member.expertiseSkills.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-ctp-green dark:text-ctp-green font-medium mb-1">Can help you</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Knows</p>
                         <div className="flex flex-wrap gap-1">
-                          {match.canAskHelp.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-ctp-green/20 dark:bg-ctp-green/20 text-ctp-green dark:text-ctp-green text-xs px-2 py-0.5 rounded">
+                          {member.expertiseSkills.slice(0, 4).map((skill: string) => (
+                            <span key={skill} className="bg-ctp-peach/15 text-ctp-peach text-xs px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
-                          {match.canAskHelp.length > 3 && (
-                            <span className="text-xs text-muted-foreground">+{match.canAskHelp.length - 3}</span>
+                          {member.expertiseSkills.length > 4 && (
+                            <span className="text-xs text-muted-foreground">+{member.expertiseSkills.length - 4}</span>
                           )}
                         </div>
                       </div>
                     )}
-                    {match.canHelp.length > 0 && (
+                    {member.growthSkills.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-primary font-medium mb-1">You can help</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Wants to learn</p>
                         <div className="flex flex-wrap gap-1">
-                          {match.canHelp.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded">
+                          {member.growthSkills.slice(0, 3).map((skill: string) => (
+                            <span key={skill} className="bg-ctp-green/15 text-ctp-green text-xs px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
-                          {match.canHelp.length > 3 && (
-                            <span className="text-xs text-muted-foreground">+{match.canHelp.length - 3}</span>
+                          {member.growthSkills.length > 3 && (
+                            <span className="text-xs text-muted-foreground">+{member.growthSkills.length - 3}</span>
                           )}
                         </div>
                       </div>
@@ -613,7 +417,7 @@ export default function WorkingCirclesPage() {
 
                   {/* Action */}
                   <Button
-                    onClick={() => openNudgeDialog(match)}
+                    onClick={() => openNudgeDialog(member)}
                     variant="outline"
                     size="sm"
                     className="w-full h-8 text-xs hover:bg-primary/10 hover:border-primary/50"
@@ -626,7 +430,7 @@ export default function WorkingCirclesPage() {
             </motion.div>
           ))}
         </div>
-      ) : matches.length === 0 ? (
+      ) : members.length === 0 ? (
         <Card className="bg-primary/5 shadow-lg">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <motion.div
@@ -634,18 +438,17 @@ export default function WorkingCirclesPage() {
               animate={{ scale: 1, opacity: 1 }}
               className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-5"
             >
-              <Sparkles className="w-10 h-10 text-primary" />
+              <Users className="w-10 h-10 text-primary" />
             </motion.div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Welcome to Working Circles!</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Pod Members Yet</h3>
             <p className="text-muted-foreground max-w-md mb-6">
-              This is where you'll find teammates who can help you grow and people you can mentor.
-              Join a pod to start matching with colleagues.
+              Join a pod to see your teammates here and start collaborating.
             </p>
             <div className="flex gap-3">
               <Button variant="outline" asChild>
                 <a href="/classes/join">Join with Code</a>
               </Button>
-              <Button className="bg-ctp-peach hover:bg-peach-400" asChild>
+              <Button className="bg-ctp-peach hover:bg-ctp-peach/80" asChild>
                 <a href="/classes/create">Create a Pod</a>
               </Button>
             </div>
@@ -654,19 +457,19 @@ export default function WorkingCirclesPage() {
       ) : (
         <Card className="shadow-lg">
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">No matches found for "{searchQuery}"</p>
+            <p className="text-muted-foreground">No members found for "{searchQuery}"</p>
           </CardContent>
         </Card>
       )}
 
-      {selectedMatch && (
+      {selectedMember && (
         <NudgeDialog
           open={nudgeDialogOpen}
           onClose={() => setNudgeDialogOpen(false)}
           member={{
-            userId: selectedMatch.userId,
-            name: selectedMatch.major || "Team Member",
-            expertiseSkills: selectedMatch.expertiseSkills,
+            userId: selectedMember.userId,
+            name: selectedMember.major || "Team Member",
+            expertiseSkills: selectedMember.expertiseSkills,
           }}
           currentUserExpertise={currentUserExpertise}
           onNudge={handleNudge}
@@ -675,4 +478,3 @@ export default function WorkingCirclesPage() {
     </motion.div>
   );
 }
-

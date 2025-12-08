@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { calculateMatches } from "@/lib/logic/matching";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,7 +74,7 @@ export default function JoinPodPage() {
       // Get new user's profile
       const { data: newUserProfile } = await supabase
         .from('profiles')
-        .select('expertise_skills, growth_skills, department, availability')
+        .select('expertise_skills, growth_skills')
         .eq('user_id', newUserId)
         .single();
 
@@ -93,46 +92,35 @@ export default function JoinPodPage() {
       // Get their profiles
       const { data: memberProfiles } = await supabase
         .from('profiles')
-        .select('user_id, expertise_skills, growth_skills, department, availability')
+        .select('user_id, expertise_skills, growth_skills')
         .in('user_id', podMembers.map(m => m.user_id));
 
       if (!memberProfiles) return;
 
-      // Calculate matches and notify those with score >= 30
+      // Simple matching: notify members if new user has skills they want to learn
       const notifications = [];
-      const MIN_MATCH_SCORE = 30;
+      const newUserExpertise = (newUserProfile.expertise_skills || []).map((s: string) => s.toLowerCase());
 
       for (const memberProfile of memberProfiles) {
-        const result = calculateMatches(
-          {
-            expertiseSkills: memberProfile.expertise_skills || [],
-            growthSkills: memberProfile.growth_skills || [],
-            department: memberProfile.department,
-            availability: memberProfile.availability,
-          },
-          {
-            expertiseSkills: newUserProfile.expertise_skills || [],
-            growthSkills: newUserProfile.growth_skills || [],
-            department: newUserProfile.department,
-            availability: newUserProfile.availability,
-          },
-          true // same pod
+        const memberGrowth = (memberProfile.growth_skills || []).map((s: string) => s.toLowerCase());
+
+        // Find skills the new user has that this member wants to learn
+        const matchingSkills = newUserExpertise.filter((skill: string) =>
+          memberGrowth.some((g: string) => g === skill)
         );
 
-        if (result.score >= MIN_MATCH_SCORE) {
-          const skillsTheyCanLearn = result.skills.b_to_a; // new user can help them
-          const skillMatch = skillsTheyCanLearn.length > 0
-            ? ` They can help with: ${skillsTheyCanLearn.slice(0, 2).join(', ')}.`
-            : '';
+        if (matchingSkills.length > 0) {
+          const skillNames = (newUserProfile.expertise_skills || [])
+            .filter((s: string) => matchingSkills.includes(s.toLowerCase()))
+            .slice(0, 2);
 
           notifications.push({
             recipient_id: memberProfile.user_id,
             sender_id: newUserId,
             type: 'new_match',
-            content: `${newUserName} joined your pod with a ${result.score}% match!${skillMatch}`,
+            content: `${newUserName} joined your pod and knows ${skillNames.join(', ')}!`,
             metadata: {
-              match_score: result.score,
-              skills: result.skills,
+              skills: skillNames,
               pod_id: podId,
             },
             read: false,
@@ -253,34 +241,34 @@ export default function JoinPodPage() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl font-bold text-foreground mb-1">
                       {podPreview.pod_name}
                     </h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Building2 className="w-4 h-4" />
                       {podPreview.business_unit || "General"}
                     </div>
                   </div>
-                  <div className="bg-white px-3 py-1 rounded-lg border border-ctp-peach/40 font-mono text-sm font-medium text-ctp-peach">
+                  <div className="bg-card px-3 py-1 rounded-lg border border-ctp-peach/40 font-mono text-sm font-medium text-ctp-peach">
                     {podPreview.pod_code}
                   </div>
                 </div>
 
                 <div className="space-y-3 text-sm">
                   {podPreview.initiative_owner && (
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <User className="w-4 h-4 text-gray-400" />
+                    <div className="flex items-center gap-2 text-foreground">
+                      <User className="w-4 h-4 text-muted-foreground" />
                       <span className="font-medium">Owner:</span> {podPreview.initiative_owner}
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Users className="w-4 h-4 text-gray-400" />
+                  <div className="flex items-center gap-2 text-foreground">
+                    <Users className="w-4 h-4 text-muted-foreground" />
                     <span className="font-medium">Members:</span> {podPreview.memberCount}
                   </div>
                 </div>
 
                 {podPreview.alreadyMember ? (
-                  <div className="mt-6 bg-white border border-ctp-peach/30 rounded-lg p-3">
+                  <div className="mt-6 bg-card border border-ctp-peach/30 rounded-lg p-3">
                     <p className="text-sm text-ctp-peach font-medium">
                       ✅ You're already a member of this pod
                     </p>
@@ -289,7 +277,7 @@ export default function JoinPodPage() {
                   <Button
                     onClick={handleJoin}
                     disabled={loading}
-                    className="w-full mt-6 bg-ctp-peach hover:bg-ctp-peach/100"
+                    className="w-full mt-6 bg-ctp-peach hover:bg-ctp-peach/80"
                   >
                     {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Join This Pod
@@ -299,11 +287,11 @@ export default function JoinPodPage() {
             )}
           </div>
 
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-            <p className="text-sm text-gray-700 font-medium mb-2">
+          <div className="bg-muted/50 border border-border rounded-xl p-4">
+            <p className="text-sm text-foreground font-medium mb-2">
               💡 Don't have a code?
             </p>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               Ask your team lead or initiative owner for the pod code, or create your own pod to get started.
             </p>
             <Button variant="outline" asChild className="w-full">

@@ -31,17 +31,51 @@ export function SkillAutocomplete({
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
-  // Load all skills from the system on mount
+  // Load skills only from people in your pods
   useEffect(() => {
-    loadAllSkills();
+    loadPodMemberSkills();
   }, []);
 
-  const loadAllSkills = async () => {
+  const loadPodMemberSkills = async () => {
     setLoading(true);
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get pods the user is in
+      const { data: userPods } = await supabase
+        .from("pod_members")
+        .select("pod_id")
+        .eq("user_id", user.id);
+
+      if (!userPods || userPods.length === 0) {
+        setAllSkills([]);
+        return;
+      }
+
+      const podIds = userPods.map(p => p.pod_id);
+
+      // Get all members from those pods (excluding current user)
+      const { data: podMembers } = await supabase
+        .from("pod_members")
+        .select("user_id")
+        .in("pod_id", podIds)
+        .neq("user_id", user.id);
+
+      if (!podMembers || podMembers.length === 0) {
+        setAllSkills([]);
+        return;
+      }
+
+      // Get unique user IDs
+      const uniqueUserIds = [...new Set(podMembers.map(m => m.user_id))];
+
+      // Get profiles only for pod members
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("expertise_skills, growth_skills");
+        .select("expertise_skills, growth_skills")
+        .in("user_id", uniqueUserIds);
 
       if (!profiles) return;
 
@@ -161,7 +195,7 @@ export function SkillAutocomplete({
                 : "bg-ctp-green/10 text-ctp-green"
             )}>
               <Search className="w-3 h-3" />
-              {type === "expertise" ? "Existing Expertise Skills" : "Existing Growth Areas"}
+              Skills from your pods
             </div>
             <div className="max-h-48 overflow-y-auto">
               {suggestions.map((skill, index) => {

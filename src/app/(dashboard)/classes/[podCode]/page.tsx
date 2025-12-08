@@ -4,13 +4,12 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { analyzeTeamComposition, TeamAnalysis } from "@/lib/logic/matching";
 import { NudgeDialog } from "@/components/nudge-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, BarChart3, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, TrendingUp, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -28,8 +27,6 @@ export default function PodDetailPage() {
   const [currentUserExpertise, setCurrentUserExpertise] = useState<string[]>([]);
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
-  const [senderName, setSenderName] = useState<string>("A teammate");
-  const [teamAnalysis, setTeamAnalysis] = useState<TeamAnalysis | null>(null);
 
   useEffect(() => {
     loadPodData();
@@ -47,12 +44,11 @@ export default function PodDetailPage() {
       // Get current user's profile for expertise skills
       const { data: currentProfile } = await supabase
         .from('profiles')
-        .select('expertise_skills, major')
+        .select('expertise_skills')
         .eq('user_id', user.id)
         .single();
-      
+
       setCurrentUserExpertise(currentProfile?.expertise_skills || []);
-      setSenderName(currentProfile?.major || "A teammate");
 
       // Get pod details
       const { data: podData, error: podError } = await supabase
@@ -77,7 +73,7 @@ export default function PodDetailPage() {
 
       if (podMembers && podMembers.length > 0) {
         const userIds = podMembers.map(pm => pm.user_id);
-        
+
         const { data: profiles } = await supabase
           .from('profiles')
           .select('*')
@@ -90,8 +86,6 @@ export default function PodDetailPage() {
             joinedAt: pm.joined_at,
             name: profile?.major || "Team Member",
             department: profile?.department,
-            major: profile?.major,
-            bio: profile?.bio,
             expertiseSkills: profile?.expertise_skills || [],
             growthSkills: profile?.growth_skills || [],
             lookingToHelp: profile?.looking_to_help || false,
@@ -100,17 +94,6 @@ export default function PodDetailPage() {
         });
 
         setMembers(membersWithProfiles);
-
-        // Analyze team composition
-        if (profiles && profiles.length > 0) {
-          const analysisProfiles = profiles.map(p => ({
-            expertiseSkills: p.expertise_skills || [],
-            growthSkills: p.growth_skills || [],
-            department: p.department,
-          }));
-          const analysis = analyzeTeamComposition(analysisProfiles);
-          setTeamAnalysis(analysis);
-        }
       }
     } catch (error) {
       console.error("Error loading pod:", error);
@@ -186,6 +169,31 @@ export default function PodDetailPage() {
     }
   };
 
+  // Calculate simple skill stats
+  const getSkillStats = () => {
+    const expertiseCount: Record<string, number> = {};
+    const growthCount: Record<string, number> = {};
+
+    members.forEach(m => {
+      m.expertiseSkills.forEach((skill: string) => {
+        expertiseCount[skill] = (expertiseCount[skill] || 0) + 1;
+      });
+      m.growthSkills.forEach((skill: string) => {
+        growthCount[skill] = (growthCount[skill] || 0) + 1;
+      });
+    });
+
+    const topExpertise = Object.entries(expertiseCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    const topGrowth = Object.entries(growthCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    return { topExpertise, topGrowth };
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -195,6 +203,8 @@ export default function PodDetailPage() {
   }
 
   if (!pod) return null;
+
+  const { topExpertise, topGrowth } = getSkillStats();
 
   return (
     <>
@@ -212,7 +222,7 @@ export default function PodDetailPage() {
           </Button>
         </div>
 
-        {/* Pod Header - More Compact */}
+        {/* Pod Header */}
         <Card className="shadow-md">
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between">
@@ -226,9 +236,9 @@ export default function PodDetailPage() {
                 <div className="bg-primary/10 px-3 py-1.5 rounded-lg border-2 border-primary/30 font-mono text-base font-bold text-primary">
                   {pod.pod_code}
                 </div>
-                <Button 
-                  onClick={copyPodCode} 
-                  size="icon" 
+                <Button
+                  onClick={copyPodCode}
+                  size="icon"
                   variant="outline"
                   className="hover:bg-primary/10 h-9 w-9"
                 >
@@ -239,109 +249,53 @@ export default function PodDetailPage() {
           </CardHeader>
         </Card>
 
-        {/* Team Analysis Card */}
-        {teamAnalysis && members.length > 1 && (
-          <Card className="bg-ctp-mauve/5 shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                Team Skill Analysis
-              </CardTitle>
-              <CardDescription>
-                Skill coverage and recommendations for your pod
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Balance Score */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-foreground">Skill Balance</span>
-                    <span className="text-sm font-bold text-purple-700 dark:text-purple-400">{teamAnalysis.balanceScore}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-purple-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${teamAnalysis.balanceScore}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Strong Areas */}
-              {teamAnalysis.strongAreas.length > 0 && (
-                <div className="p-3 bg-ctp-green/10 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-4 h-4 text-ctp-green" />
-                    <span className="text-sm font-medium text-ctp-green">Strong Areas</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {teamAnalysis.strongAreas.slice(0, 4).map(area => (
-                      <Badge key={area} variant="secondary" className="bg-ctp-green/20 text-ctp-green text-xs">
-                        {area}
-                      </Badge>
+        {/* Simple Skill Overview */}
+        {members.length > 1 && (topExpertise.length > 0 || topGrowth.length > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {topExpertise.length > 0 && (
+              <Card className="bg-ctp-peach/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2 text-ctp-peach">
+                    <TrendingUp className="w-4 h-4" />
+                    Top Skills in Pod
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {topExpertise.map(([skill, count]) => (
+                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-peach/15 text-ctp-peach px-2.5 py-1 rounded-full text-sm">
+                        <span>{skill}</span>
+                        <span className="text-xs opacity-70">×{count}</span>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* Top Skills */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {teamAnalysis.topExpertise.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1">
-                      <TrendingUp className="w-3 h-3" />
-                      Top Team Expertise
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {teamAnalysis.topExpertise.slice(0, 4).map(item => (
-                        <span key={item.skill} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                          {item.skill} ({item.count})
-                        </span>
-                      ))}
-                    </div>
+                </CardContent>
+              </Card>
+            )}
+            {topGrowth.length > 0 && (
+              <Card className="bg-ctp-green/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2 text-ctp-green">
+                    <BookOpen className="w-4 h-4" />
+                    People Want to Learn
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {topGrowth.map(([skill, count]) => (
+                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-green/15 text-ctp-green px-2.5 py-1 rounded-full text-sm">
+                        <span>{skill}</span>
+                        <span className="text-xs opacity-70">×{count}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-
-                {teamAnalysis.topGrowthNeeds.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      Learning Goals
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {teamAnalysis.topGrowthNeeds.slice(0, 4).map(item => (
-                        <span key={item.skill} className="text-xs bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded">
-                          {item.skill} ({item.count})
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Recommendations - only show "Team needs mentors" type */}
-              {teamAnalysis.recommendations.filter(rec => rec.includes('Team needs mentors')).length > 0 && (
-                <div className="pt-2">
-                  <p className="text-xs uppercase tracking-wider text-ctp-mauve font-medium mb-2">Recommendations</p>
-                  <ul className="space-y-1">
-                    {teamAnalysis.recommendations
-                      .filter(rec => rec.includes('Team needs mentors'))
-                      .slice(0, 2)
-                      .map((rec, idx) => (
-                        <li key={idx} className="text-sm text-foreground flex items-start gap-2">
-                          <span className="text-ctp-mauve mt-0.5">•</span>
-                          {rec}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
-        {/* Members List - Compact Grid Layout */}
+        {/* Members List */}
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
@@ -353,95 +307,69 @@ export default function PodDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`grid gap-3 ${members.length > 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+            <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {members.map((member, index) => (
                 <motion.div
                   key={member.userId}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.03 }}
-                  whileHover={{ y: -2 }}
-                  className="p-3 rounded-xl hover:bg-primary/5 transition-all bg-card shadow-sm hover:shadow-md"
+                  className="p-4 rounded-xl bg-card shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-9 w-9 shrink-0">
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
-                        {(member.major || member.department || '?')[0].toUpperCase()}
+                  <div className="flex items-start gap-3 mb-3">
+                    <Avatar className="h-10 w-10 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {(member.name || '?')[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-semibold text-foreground text-sm truncate max-w-[120px]">
-                          {member.major || "Team Member"}
+                        <h4 className="font-semibold text-foreground truncate">
+                          {member.name}
                         </h4>
                         {member.userId === currentUserId && (
                           <Badge variant="secondary" className="bg-primary/20 text-primary text-[10px] px-1.5 py-0">You</Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && (
-                          <span title="Looking to Help">
-                            <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                          </span>
+                          <Sparkles className="w-4 h-4 text-ctp-peach" title="Looking to help" />
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{member.department || "No department"}</p>
-
-                      {/* Skills - Compact */}
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        {member.expertiseSkills.slice(0, 2).map((skill: string) => (
-                          <span key={skill} className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
-                            {skill}
-                          </span>
-                        ))}
-                        {member.expertiseSkills.length > 2 && (
-                          <span
-                            className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded cursor-help"
-                            title={member.expertiseSkills.slice(2).join(', ')}
-                          >
-                            +{member.expertiseSkills.length - 2}
-                          </span>
-                        )}
-                      </div>
                     </div>
                   </div>
 
+                  {/* Skills */}
+                  <div className="space-y-2 mb-3">
+                    {member.expertiseSkills.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {member.expertiseSkills.slice(0, 3).map((skill: string) => (
+                          <span key={skill} className="text-xs bg-ctp-peach/15 text-ctp-peach px-2 py-0.5 rounded">
+                            {skill}
+                          </span>
+                        ))}
+                        {member.expertiseSkills.length > 3 && (
+                          <span
+                            className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded cursor-help"
+                            title={member.expertiseSkills.slice(3).join(', ')}
+                          >
+                            +{member.expertiseSkills.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {member.userId !== currentUserId && (
-                    <div className="flex items-center gap-2 mt-2 pt-2">
-                      <Button
-                        onClick={() => openNudgeDialog(member)}
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 h-7 text-xs hover:bg-primary/10 hover:border-primary/50"
-                      >
-                        <Bell className="h-3 w-3 mr-1" />
-                        Nudge
-                      </Button>
-                      {member.slackHandle && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 px-2 text-primary hover:bg-primary/10"
-                          onClick={() => {
-                            const handle = member.slackHandle.trim();
-                            const isId = handle.startsWith("U") || handle.startsWith("W");
-                            const href = isId
-                              ? `https://slack.com/app_redirect?channel=${handle}`
-                              : undefined;
-                            if (href) {
-                              window.open(href, "_blank");
-                            } else {
-                              navigator.clipboard.writeText(handle.replace("@", ""));
-                              toast.success("Slack handle copied");
-                            }
-                          }}
-                          title="Message on Slack"
-                        >
-                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
-                          </svg>
-                        </Button>
-                      )}
-                    </div>
+                    <Button
+                      onClick={() => openNudgeDialog(member)}
+                      size="sm"
+                      variant="outline"
+                      className="w-full h-8 text-xs hover:bg-primary/10 hover:border-primary/50"
+                    >
+                      <Bell className="h-3 w-3 mr-1.5" />
+                      Nudge
+                    </Button>
                   )}
                 </motion.div>
               ))}
