@@ -332,7 +332,9 @@ export default function PodDetailPage() {
                           <Badge variant="secondary" className="bg-primary/20 text-primary text-[10px] px-1.5 py-0">You</Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && (
-                          <Sparkles className="w-4 h-4 text-ctp-peach" title="Looking to help" />
+                          <span title="Looking to help">
+                            <Sparkles className="w-4 h-4 text-ctp-peach" />
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{member.department || "No department"}</p>

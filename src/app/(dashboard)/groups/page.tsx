@@ -358,7 +358,9 @@ export default function WorkingCirclesPage() {
                           {member.major || "Team Member"}
                         </p>
                         {member.lookingToHelp && (
-                          <Sparkles className="w-4 h-4 text-ctp-peach shrink-0" title="Looking to help" />
+                          <span title="Looking to help">
+                            <Sparkles className="w-4 h-4 text-ctp-peach shrink-0" />
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{member.department}</p>
