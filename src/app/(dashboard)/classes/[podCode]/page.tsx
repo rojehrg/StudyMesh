@@ -213,7 +213,7 @@ export default function PodDetailPage() {
         </div>
 
         {/* Pod Header - More Compact */}
-        <Card className="shadow-md border-2 border-primary/20">
+        <Card className="shadow-md">
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between">
               <div>
@@ -241,7 +241,7 @@ export default function PodDetailPage() {
 
         {/* Team Analysis Card */}
         {teamAnalysis && members.length > 1 && (
-          <Card className="border-2 border-purple-500/20 dark:border-purple-400/20 bg-purple-500/5 dark:bg-purple-400/5">
+          <Card className="bg-ctp-mauve/5 shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -271,14 +271,14 @@ export default function PodDetailPage() {
               {/* Strong Areas & Gaps */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {teamAnalysis.strongAreas.length > 0 && (
-                  <div className="p-3 bg-green-500/10 dark:bg-green-400/10 border border-green-500/30 dark:border-green-400/30 rounded-lg">
+                  <div className="p-3 bg-ctp-green/10 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="text-sm font-medium text-green-700 dark:text-green-400">Strong Areas</span>
+                      <CheckCircle2 className="w-4 h-4 text-ctp-green" />
+                      <span className="text-sm font-medium text-ctp-green">Strong Areas</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.strongAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-green-500/20 dark:bg-green-400/20 text-green-700 dark:text-green-400 text-xs">
+                        <Badge key={area} variant="secondary" className="bg-ctp-green/20 text-ctp-green text-xs">
                           {area}
                         </Badge>
                       ))}
@@ -287,14 +287,14 @@ export default function PodDetailPage() {
                 )}
 
                 {teamAnalysis.gapAreas.length > 0 && (
-                  <div className="p-3 bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/30 dark:border-amber-400/30 rounded-lg">
+                  <div className="p-3 bg-ctp-yellow/10 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Gap Areas</span>
+                      <AlertCircle className="w-4 h-4 text-ctp-yellow" />
+                      <span className="text-sm font-medium text-ctp-yellow">Gap Areas</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {teamAnalysis.gapAreas.slice(0, 4).map(area => (
-                        <Badge key={area} variant="secondary" className="bg-amber-500/20 dark:bg-amber-400/20 text-amber-700 dark:text-amber-400 text-xs">
+                        <Badge key={area} variant="secondary" className="bg-ctp-yellow/20 text-ctp-yellow text-xs">
                           {area}
                         </Badge>
                       ))}
@@ -338,17 +338,20 @@ export default function PodDetailPage() {
                 )}
               </div>
 
-              {/* Recommendations */}
-              {teamAnalysis.recommendations.length > 0 && (
-                <div className="pt-2 border-t border-purple-500/20 dark:border-purple-400/20">
-                  <p className="text-xs uppercase tracking-wider text-purple-600 dark:text-purple-400 font-medium mb-2">Recommendations</p>
+              {/* Recommendations - only show "Team needs mentors" type */}
+              {teamAnalysis.recommendations.filter(rec => rec.includes('Team needs mentors')).length > 0 && (
+                <div className="pt-2">
+                  <p className="text-xs uppercase tracking-wider text-ctp-mauve font-medium mb-2">Recommendations</p>
                   <ul className="space-y-1">
-                    {teamAnalysis.recommendations.slice(0, 3).map((rec, idx) => (
-                      <li key={idx} className="text-sm text-foreground flex items-start gap-2">
-                        <span className="text-purple-500 mt-0.5">•</span>
-                        {rec}
-                      </li>
-                    ))}
+                    {teamAnalysis.recommendations
+                      .filter(rec => rec.includes('Team needs mentors'))
+                      .slice(0, 2)
+                      .map((rec, idx) => (
+                        <li key={idx} className="text-sm text-foreground flex items-start gap-2">
+                          <span className="text-ctp-mauve mt-0.5">•</span>
+                          {rec}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               )}
@@ -376,10 +379,10 @@ export default function PodDetailPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.03 }}
                   whileHover={{ y: -2 }}
-                  className="p-3 rounded-xl border-2 border-border hover:border-primary/30 hover:bg-primary/5 transition-all bg-card"
+                  className="p-3 rounded-xl hover:bg-primary/5 transition-all bg-card shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start gap-3">
-                    <Avatar className="h-9 w-9 border-2 border-primary/20 shrink-0">
+                    <Avatar className="h-9 w-9 shrink-0">
                       <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                         {(member.major || member.department || '?')[0].toUpperCase()}
                       </AvatarFallback>
@@ -409,7 +412,10 @@ export default function PodDetailPage() {
                           </span>
                         ))}
                         {member.expertiseSkills.length > 2 && (
-                          <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">
+                          <span
+                            className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded cursor-help"
+                            title={member.expertiseSkills.slice(2).join(', ')}
+                          >
                             +{member.expertiseSkills.length - 2}
                           </span>
                         )}
@@ -418,7 +424,7 @@ export default function PodDetailPage() {
                   </div>
 
                   {member.userId !== currentUserId && (
-                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
+                    <div className="flex items-center gap-2 mt-2 pt-2">
                       <Button
                         onClick={() => openNudgeDialog(member)}
                         size="sm"

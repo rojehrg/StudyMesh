@@ -35,9 +35,9 @@ export default function AboutPage() {
     >
       {/* Hero Section */}
       <motion.div variants={itemVariants} className="text-center py-8">
-        <div className="inline-flex items-center gap-2 bg-ctp-peach/10 dark:bg-ctp-peach/10 px-4 py-2 rounded-full border border-ctp-peach/30 dark:border-ctp-peach/20 mb-6">
-          <Sparkles className="w-4 h-4 text-ctp-peach dark:text-ctp-peach" />
-          <span className="text-ctp-peach dark:text-ctp-peach font-medium text-sm">About Meshflow</span>
+        <div className="inline-flex items-center gap-2 bg-ctp-peach/10 px-4 py-2 rounded-full mb-6">
+          <Sparkles className="w-4 h-4 text-ctp-peach" />
+          <span className="text-ctp-peach font-medium text-sm">About Meshflow</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           The Intelligent Enablement Platform
@@ -50,7 +50,7 @@ export default function AboutPage() {
       {/* Mission Card */}
       <motion.div
         variants={itemVariants}
-        className="bg-ctp-peach/10 dark:bg-ctp-peach/10 rounded-2xl p-8 border-2 border-ctp-peach/20 dark:border-ctp-peach/20"
+        className="bg-ctp-peach/10 rounded-2xl p-8 shadow-md"
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-ctp-peach rounded-xl flex items-center justify-center shrink-0">
@@ -72,10 +72,10 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -4 }}
-          className="bg-card rounded-2xl p-6 border-2 border-border shadow-sm"
+          className="bg-card rounded-2xl p-6 shadow-md"
         >
-          <div className="w-10 h-10 bg-red-100 dark:bg-red-950 rounded-lg flex items-center justify-center mb-4">
-            <Target className="w-5 h-5 text-red-600 dark:text-red-400" />
+          <div className="w-10 h-10 bg-ctp-red/20 rounded-lg flex items-center justify-center mb-4">
+            <Target className="w-5 h-5 text-ctp-red" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">The Problem</h3>
           <p className="text-muted-foreground leading-relaxed">
@@ -87,7 +87,7 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -4 }}
-          className="bg-ctp-peach/10 dark:bg-ctp-peach/10 rounded-2xl p-6 border-2 border-ctp-peach/20 dark:border-ctp-peach/20"
+          className="bg-ctp-peach/10 rounded-2xl p-6 shadow-md"
         >
           <div className="w-10 h-10 bg-ctp-peach rounded-lg flex items-center justify-center mb-4">
             <Zap className="w-5 h-5 text-white" />
@@ -110,10 +110,10 @@ export default function AboutPage() {
         <div className="space-y-4">
           <motion.div
             whileHover={{ x: 4 }}
-            className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
+            className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-peach/20 dark:bg-ctp-peach/10 rounded-lg flex items-center justify-center shrink-0">
-              <Brain className="w-5 h-5 text-ctp-peach dark:text-ctp-peach" />
+            <div className="w-10 h-10 bg-ctp-peach/20 rounded-lg flex items-center justify-center shrink-0">
+              <Brain className="w-5 h-5 text-ctp-peach" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Intelligent Matching</h4>
@@ -122,15 +122,15 @@ export default function AboutPage() {
                 complementary expertise, not rigid categories.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach dark:text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
-            className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
+            className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-green/20 dark:bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5 text-ctp-green dark:text-ctp-green" />
+            <div className="w-10 h-10 bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5 text-ctp-green" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Org-Scoped Privacy</h4>
@@ -139,15 +139,15 @@ export default function AboutPage() {
                 Complete security and privacy.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach dark:text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
-            className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
+            className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-peach/20 dark:bg-ctp-peach/10 rounded-lg flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-ctp-peach dark:text-ctp-peach" />
+            <div className="w-10 h-10 bg-ctp-peach/20 rounded-lg flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5 text-ctp-peach" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Performance-Driven</h4>
@@ -156,15 +156,15 @@ export default function AboutPage() {
                 outperform those that don't. Simple as that.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach dark:text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
-            className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
+            className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-green/20 dark:bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-ctp-green dark:text-ctp-green" />
+            <div className="w-10 h-10 bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-ctp-green" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Slack Integration</h4>
@@ -173,7 +173,7 @@ export default function AboutPage() {
                 miss a collaboration opportunity.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach dark:text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
           </motion.div>
         </div>
       </motion.div>
@@ -182,21 +182,21 @@ export default function AboutPage() {
       <motion.div variants={itemVariants}>
         <h2 className="text-2xl font-bold text-foreground mb-6">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-5 rounded-xl bg-muted/50 border border-border">
+          <div className="p-5 rounded-xl bg-card shadow-md">
             <div className="w-8 h-8 bg-ctp-peach rounded-lg flex items-center justify-center mb-3">
               <Target className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Skill Matching</h4>
             <p className="text-sm text-muted-foreground">Fuzzy matching connects similar skills automatically</p>
           </div>
-          <div className="p-5 rounded-xl bg-muted/50 border border-border">
-            <div className="w-8 h-8 bg-sage-500 rounded-lg flex items-center justify-center mb-3">
+          <div className="p-5 rounded-xl bg-card shadow-md">
+            <div className="w-8 h-8 bg-ctp-green rounded-lg flex items-center justify-center mb-3">
               <Users className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Pod Organization</h4>
             <p className="text-sm text-muted-foreground">Group by project, team, or initiative</p>
           </div>
-          <div className="p-5 rounded-xl bg-muted/50 border border-border">
+          <div className="p-5 rounded-xl bg-card shadow-md">
             <div className="w-8 h-8 bg-ctp-peach rounded-lg flex items-center justify-center mb-3">
               <Sparkles className="w-4 h-4 text-white" />
             </div>

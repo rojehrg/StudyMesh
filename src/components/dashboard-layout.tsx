@@ -320,8 +320,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page Content - Add top padding for fixed header */}
-        <main className="flex-1 p-6 md:p-8 overflow-x-hidden pt-20">
+        {/* Page Content - Add top margin for fixed header */}
+        <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-14 pt-6">
           {children}
         </main>
       </div>
