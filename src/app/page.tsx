@@ -30,7 +30,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center">
-              <span className="text-gray-900 font-semibold text-xl">Meshflow</span>
+              <span className="text-ctp-peach font-semibold text-xl">Mesh</span>
+              <span className="text-gray-900 font-semibold text-xl">flow</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link href="#features" className="text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors">

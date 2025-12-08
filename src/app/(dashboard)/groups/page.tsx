@@ -439,13 +439,13 @@ export default function WorkingCirclesPage() {
                   className="flex items-center gap-2 p-2 pr-3 rounded-lg bg-ctp-surface0 dark:bg-ctp-surface1 hover:bg-ctp-surface1 dark:hover:bg-ctp-surface2 shadow-sm transition-colors"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-ctp-surface1 dark:bg-ctp-surface2 text-ctp-text dark:text-ctp-text font-medium text-xs">
+                    <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
                       {(user.major || '?')[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{user.major || "Team Member"}</p>
-                    <p className="text-[10px] text-ctp-subtext0 dark:text-ctp-subtext0">
+                    <p className="text-[10px] text-muted-foreground">
                       {user.sharedExpertise.length > 0
                         ? `Shares: ${user.sharedExpertise.slice(0, 2).join(', ')}`
                         : user.sharedCategory.length > 0
@@ -453,7 +453,7 @@ export default function WorkingCirclesPage() {
                         : `${user.score}% similar`}
                     </p>
                   </div>
-                  <Badge variant="secondary" className="bg-ctp-surface1 dark:bg-ctp-surface2 text-ctp-text dark:text-ctp-text text-[10px] ml-1">
+                  <Badge variant="secondary" className="bg-muted text-foreground text-[10px] ml-1">
                     {user.score}%
                   </Badge>
                 </div>
@@ -547,10 +547,10 @@ export default function WorkingCirclesPage() {
                             {match.breakdown.crossDepartment > 0 && (
                               <div className="flex items-center justify-between text-xs">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Building2 className="w-3 h-3 text-ctp-subtext0" />
+                                  <Building2 className="w-3 h-3 text-muted-foreground" />
                                   Cross-Department
                                 </span>
-                                <span className="font-medium text-ctp-subtext1 dark:text-ctp-subtext0">+{match.breakdown.crossDepartment}</span>
+                                <span className="font-medium text-foreground">+{match.breakdown.crossDepartment}</span>
                               </div>
                             )}
                             {match.breakdown.availability > 0 && (

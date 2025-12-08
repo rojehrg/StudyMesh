@@ -236,13 +236,13 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-ctp-surface0 dark:bg-ctp-surface1 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-ctp-text dark:text-ctp-text">{activeHelpersCount || 0}</p>
-                  <p className="text-xs text-ctp-subtext1 dark:text-ctp-subtext0">Active Helpers</p>
+                <div className="p-3 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold text-foreground">{activeHelpersCount || 0}</p>
+                  <p className="text-xs text-muted-foreground">Active Helpers</p>
                 </div>
-                <div className="p-3 bg-ctp-green/20 dark:bg-ctp-green/20 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-ctp-green dark:text-ctp-green">{openRequests?.length || 0}</p>
-                  <p className="text-xs text-ctp-green dark:text-ctp-green">Open Requests</p>
+                <div className="p-3 bg-ctp-green/20 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-foreground">{openRequests?.length || 0}</p>
+                  <p className="text-xs text-muted-foreground">Open Requests</p>
                 </div>
               </div>
               {!profile.looking_to_help && (activeHelpersCount ?? 0) > 0 && (
@@ -396,7 +396,7 @@ export default async function DashboardPage() {
             </Link>
             <Link href="/about">
               <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-lavender/10 dark:hover:bg-ctp-lavender/10 transition-all cursor-pointer text-center">
-                <Users className="w-6 h-6 text-ctp-lavender dark:text-ctp-subtext0 mx-auto mb-2" />
+                <Users className="w-6 h-6 text-ctp-lavender mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Learn More</p>
               </div>
             </Link>

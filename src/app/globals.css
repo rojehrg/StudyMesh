@@ -80,13 +80,13 @@
     --muted: 234 13% 31%;
     --muted-foreground: 227 35% 80%;
 
-    /* Accent - Lavender */
-    --accent: 232 97% 85%;
-    --accent-foreground: 240 21% 15%;
+    /* Accent - Surface 2 (darker for better text contrast on hover) */
+    --accent: 233 12% 39%;
+    --accent-foreground: 226 64% 88%;
 
     /* Destructive - Red */
     --destructive: 343 81% 75%;
-    --destructive-foreground: 240 21% 15%;
+    --destructive-foreground: 226 64% 88%;
 
     /* Borders & Inputs - Surface 2 */
     --border: 233 12% 39%;
