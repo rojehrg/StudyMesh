@@ -200,7 +200,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-terra-400" />
       </div>
     );
   }
@@ -368,7 +368,7 @@ export default function SettingsPage() {
                 placeholder="Add a skill (e.g. Python, Sales)"
                 type="expertise"
               />
-              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl shadow-sm">
                 {profile.expertiseSkills.length === 0 && (
                   <span className="text-sm text-muted-foreground italic">No skills added yet...</span>
                 )}
@@ -377,14 +377,14 @@ export default function SettingsPage() {
                   // Normalize old values to quadrant values
                   const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl border px-4 py-3 shadow-sm">
+                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl px-4 py-3 shadow-sm">
                       <div className="flex-1">
                         <span className="text-sm font-medium text-foreground block mb-2">{skill}</span>
                         <ProficiencyRing
                           value={normalizedLevel}
                           onChange={(val) => setLevel('expertise', skill, val)}
                           size="sm"
-                          color="teal"
+                          color="terra"
                         />
                       </div>
                       <button onClick={() => removeSkill('expertise', skill)} className="text-muted-foreground hover:text-destructive p-1">
@@ -410,7 +410,7 @@ export default function SettingsPage() {
                 placeholder="Add a skill (e.g. Leadership, SQL)"
                 type="growth"
               />
-              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl border">
+              <div className="flex flex-col gap-3 min-h-[40px] p-3 bg-muted/50 rounded-xl shadow-sm">
                 {profile.growthSkills.length === 0 && (
                   <span className="text-sm text-muted-foreground italic">No skills added yet...</span>
                 )}
@@ -419,14 +419,14 @@ export default function SettingsPage() {
                   // Normalize old values to quadrant values
                   const normalizedLevel = level <= 25 ? 25 : level <= 50 ? 50 : level <= 75 ? 75 : 100;
                   return (
-                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl border px-4 py-3 shadow-sm">
+                    <div key={skill} className="flex items-center gap-3 bg-card rounded-xl px-4 py-3 shadow-sm">
                       <div className="flex-1">
                         <span className="text-sm font-medium text-foreground block mb-2">{skill}</span>
                         <ProficiencyRing
                           value={normalizedLevel}
                           onChange={(val) => setLevel('growth', skill, val)}
                           size="sm"
-                          color="cyan"
+                          color="sage"
                         />
                       </div>
                       <button onClick={() => removeSkill('growth', skill)} className="text-muted-foreground hover:text-destructive p-1">
@@ -448,7 +448,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Looking to Help Status */}
-              <div className="flex items-center justify-between p-4 bg-primary/10 border-2 border-primary/20 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-primary/10 shadow-md rounded-xl">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shrink-0">
                     <Sparkles className="w-5 h-5 text-primary-foreground" />
@@ -489,10 +489,10 @@ export default function SettingsPage() {
                     return (
                       <label
                         key={day}
-                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
+                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl transition-all ${
                           isChecked
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border hover:border-primary/50 hover:bg-accent'
+                            ? 'bg-primary/10 shadow-md'
+                            : 'bg-muted/30 shadow-sm hover:shadow-md hover:bg-accent'
                         }`}
                       >
                         <input
@@ -528,10 +528,10 @@ export default function SettingsPage() {
                     return (
                       <label
                         key={value}
-                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl border transition-all ${
+                        className={`flex items-center gap-2 cursor-pointer p-3 rounded-xl transition-all ${
                           isChecked
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border hover:border-primary/50 hover:bg-accent'
+                            ? 'bg-primary/10 shadow-md'
+                            : 'bg-muted/30 shadow-sm hover:shadow-md hover:bg-accent'
                         }`}
                       >
                         <input

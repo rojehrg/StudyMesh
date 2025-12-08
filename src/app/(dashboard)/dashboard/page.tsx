@@ -116,7 +116,7 @@ export default async function DashboardPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+          <Button className="bg-terra-400 hover:bg-terra-500" asChild>
             <Link href="/classes/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Pod
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Matches Found</CardTitle>
-            <Sparkles className="h-5 w-5 text-cyan-500" />
+            <Sparkles className="h-5 w-5 text-sage-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl sm:text-3xl font-bold text-foreground">{matchCount}</div>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
-            <Bell className="h-5 w-5 text-cyan-500" />
+            <Bell className="h-5 w-5 text-sand-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl sm:text-3xl font-bold text-foreground">{unreadNotifications}</div>
@@ -188,7 +188,7 @@ export default async function DashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="w-4 h-4 text-cyan-600" />
+                  <Target className="w-4 h-4 text-terra-400" />
                   Most Requested Skills
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-muted rounded-full h-2 overflow-hidden">
                           <div
-                            className="bg-cyan-500 h-full rounded-full"
+                            className="bg-terra-400 h-full rounded-full"
                             style={{ width: `${Math.min(100, (count / trendingSkills[0].count) * 100)}%` }}
                           />
                         </div>
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
                 {profile.expertise_skills?.some((s: string) =>
                   trendingSkills.some(t => s.toLowerCase().includes(t.skill) || t.skill.includes(s.toLowerCase()))
                 ) && (
-                  <p className="text-xs text-teal-600 mt-3 font-medium">
+                  <p className="text-xs text-terra-400 mt-3 font-medium">
                     You have skills people need!
                   </p>
                 )}
@@ -236,13 +236,13 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{activeHelpersCount || 0}</p>
-                  <p className="text-xs text-purple-600 dark:text-purple-400">Active Helpers</p>
+                <div className="p-3 bg-charcoal-100 dark:bg-charcoal-800 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-charcoal-700 dark:text-charcoal-300">{activeHelpersCount || 0}</p>
+                  <p className="text-xs text-charcoal-600 dark:text-charcoal-400">Active Helpers</p>
                 </div>
-                <div className="p-3 bg-teal-500/10 dark:bg-teal-500/20 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-teal-700 dark:text-teal-400">{openRequests?.length || 0}</p>
-                  <p className="text-xs text-teal-600 dark:text-teal-400">Open Requests</p>
+                <div className="p-3 bg-sage-100 dark:bg-sage-900 rounded-lg text-center">
+                  <p className="text-2xl font-bold text-sage-600 dark:text-sage-400">{openRequests?.length || 0}</p>
+                  <p className="text-xs text-sage-600 dark:text-sage-400">Open Requests</p>
                 </div>
               </div>
               {!profile.looking_to_help && (activeHelpersCount ?? 0) > 0 && (
@@ -257,17 +257,17 @@ export default async function DashboardPage() {
 
       {/* Profile Completion */}
       {completionPercent < 100 && (
-        <Card className="border-2 border-teal-200 dark:border-teal-800 bg-teal-50/30 dark:bg-teal-900/20">
+        <Card className="bg-terra-50/50 dark:bg-terra-900/20 shadow-lg">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-teal-600" />
+                  <Sparkles className="w-5 h-5 text-terra-400" />
                   Complete Your Profile
                 </CardTitle>
                 <CardDescription>Get the most out of Meshflow</CardDescription>
               </div>
-              <Badge className="bg-teal-600 text-white text-lg px-3 py-1">
+              <Badge className="bg-terra-400 text-white text-lg px-3 py-1">
                 {completionPercent}%
               </Badge>
             </div>
@@ -276,7 +276,7 @@ export default async function DashboardPage() {
             <div className="space-y-3">
               <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-teal-600 h-full rounded-full transition-all duration-500"
+                  className="bg-terra-400 h-full rounded-full transition-all duration-500"
                   style={{ width: `${completionPercent}%` }}
                 />
               </div>
@@ -288,7 +288,7 @@ export default async function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" asChild className="w-full mt-2 hover:bg-teal-50 hover:border-teal-300">
+              <Button variant="outline" asChild className="w-full mt-2 hover:bg-terra-50 hover:border-terra-300">
                 <Link href="/settings">
                   Complete Profile <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -303,7 +303,7 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-foreground">Your Pods</h2>
           {pods.length > 0 && (
-            <Link href="/classes" className="text-sm text-teal-600 hover:text-teal-700 font-medium">
+            <Link href="/classes" className="text-sm text-terra-400 hover:text-terra-500 font-medium">
               View all →
             </Link>
           )}
@@ -316,10 +316,10 @@ export default async function DashboardPage() {
                 <Card className="hover-lift cursor-pointer h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <CardTitle className="group-hover:text-teal-600 transition-colors line-clamp-1">
+                      <CardTitle className="group-hover:text-terra-400 transition-colors line-clamp-1">
                         {pod.pod_name}
                       </CardTitle>
-                      <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-200 shrink-0 ml-2">
+                      <Badge variant="secondary" className="bg-terra-50 text-terra-500 shadow-sm shrink-0 ml-2">
                         {pod.pod_code}
                       </Badge>
                     </div>
@@ -341,10 +341,10 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <Card className="border-dashed border-2">
+          <Card className="shadow-lg">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 bg-teal-500/10 dark:bg-teal-500/20 rounded-2xl flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-teal-600 dark:text-teal-400" />
+              <div className="w-16 h-16 bg-terra-100 dark:bg-terra-900/30 rounded-2xl flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-terra-400 dark:text-terra-400" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Ready to start enabling?</h3>
               <p className="text-muted-foreground mb-6 max-w-md">
@@ -357,7 +357,7 @@ export default async function DashboardPage() {
                     Join Pod
                   </Link>
                 </Button>
-                <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+                <Button className="bg-terra-400 hover:bg-terra-500" asChild>
                   <Link href="/classes/create">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Create Pod
@@ -377,26 +377,26 @@ export default async function DashboardPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Link href="/groups">
-              <div className="p-4 bg-card rounded-xl border hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/30 dark:hover:bg-teal-900/20 transition-all cursor-pointer text-center">
-                <Sparkles className="w-6 h-6 text-teal-600 dark:text-teal-400 mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-terra-50/50 dark:hover:bg-terra-900/20 transition-all cursor-pointer text-center">
+                <Sparkles className="w-6 h-6 text-terra-400 dark:text-terra-400 mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Find Matches</p>
               </div>
             </Link>
             <Link href="/settings?tab=skills">
-              <div className="p-4 bg-card rounded-xl border hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/30 dark:hover:bg-teal-900/20 transition-all cursor-pointer text-center">
-                <TrendingUp className="w-6 h-6 text-teal-600 dark:text-teal-400 mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-sage-50/50 dark:hover:bg-sage-900/20 transition-all cursor-pointer text-center">
+                <TrendingUp className="w-6 h-6 text-sage-500 dark:text-sage-400 mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Add Skills</p>
               </div>
             </Link>
             <Link href="/notifications">
-              <div className="p-4 bg-card rounded-xl border hover:border-cyan-300 dark:hover:border-cyan-700 hover:bg-cyan-50/30 dark:hover:bg-cyan-900/20 transition-all cursor-pointer text-center">
-                <Bell className="w-6 h-6 text-cyan-600 dark:text-cyan-400 mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-sand-100/50 dark:hover:bg-sand-900/20 transition-all cursor-pointer text-center">
+                <Bell className="w-6 h-6 text-sand-500 dark:text-sand-400 mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Notifications</p>
               </div>
             </Link>
             <Link href="/about">
-              <div className="p-4 bg-card rounded-xl border hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/30 dark:hover:bg-teal-900/20 transition-all cursor-pointer text-center">
-                <Users className="w-6 h-6 text-teal-600 dark:text-teal-400 mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-charcoal-50/50 dark:hover:bg-charcoal-800/20 transition-all cursor-pointer text-center">
+                <Users className="w-6 h-6 text-charcoal-500 dark:text-charcoal-400 mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Learn More</p>
               </div>
             </Link>

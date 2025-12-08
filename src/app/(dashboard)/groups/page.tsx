@@ -346,7 +346,7 @@ export default function WorkingCirclesPage() {
                 onKeyDown={(e) => e.key === 'Enter' && saveOpenRequest()}
                 className="h-9 text-sm"
               />
-              <Button onClick={saveOpenRequest} size="sm" className="bg-teal-600 hover:bg-teal-700 h-9">
+              <Button onClick={saveOpenRequest} size="sm" className="bg-terra-400 hover:bg-terra-500 h-9">
                 Add
               </Button>
             </div>
@@ -355,8 +355,8 @@ export default function WorkingCirclesPage() {
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {myRequests.map(r => (
-                  <div key={r.id} className={`p-2.5 rounded-lg border flex items-center justify-between ${
-                    r.status === 'notified' ? 'bg-primary/10 border-primary/30' : 'bg-muted/50 border-border'
+                  <div key={r.id} className={`p-2.5 rounded-lg flex items-center justify-between ${
+                    r.status === 'notified' ? 'bg-primary/10 shadow-md' : 'bg-muted/50 shadow-sm'
                   }`}>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
@@ -399,15 +399,15 @@ export default function WorkingCirclesPage() {
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {requestsICanHelp.map(r => (
-                  <div key={r.id} className="p-2.5 rounded-lg border border-cyan-500/30 dark:border-cyan-400/30 bg-cyan-500/10 dark:bg-cyan-400/10 flex items-center justify-between">
+                  <div key={r.id} className="p-2.5 rounded-lg bg-sage-100 dark:bg-sage-900/30 shadow-sm flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{r.skill}</p>
-                      <p className="text-xs text-cyan-600 dark:text-cyan-400">Someone needs your help</p>
+                      <p className="text-xs text-sage-600 dark:text-sage-400">Someone needs your help</p>
                     </div>
                     <Button
                       size="sm"
                       onClick={() => notifyRequester(r)}
-                      className="bg-cyan-600 hover:bg-cyan-700 h-7 text-xs px-3"
+                      className="bg-sage-500 hover:bg-sage-600 h-7 text-xs px-3"
                     >
                       Offer help
                     </Button>
@@ -436,16 +436,16 @@ export default function WorkingCirclesPage() {
               {similarUsers.map((user) => (
                 <div
                   key={user.userId}
-                  className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-purple-500/20 dark:border-purple-400/20 bg-purple-500/10 dark:bg-purple-400/10 hover:bg-purple-500/15 dark:hover:bg-purple-400/15 transition-colors"
+                  className="flex items-center gap-2 p-2 pr-3 rounded-lg bg-charcoal-100 dark:bg-charcoal-800/50 hover:bg-charcoal-200 dark:hover:bg-charcoal-800 shadow-sm transition-colors"
                 >
-                  <Avatar className="h-8 w-8 border border-purple-500/30 dark:border-purple-400/30">
-                    <AvatarFallback className="bg-purple-500/20 dark:bg-purple-400/20 text-purple-700 dark:text-purple-300 font-medium text-xs">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-charcoal-200 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 font-medium text-xs">
                       {(user.major || '?')[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{user.major || "Team Member"}</p>
-                    <p className="text-[10px] text-purple-600 dark:text-purple-400">
+                    <p className="text-[10px] text-charcoal-500 dark:text-charcoal-400">
                       {user.sharedExpertise.length > 0
                         ? `Shares: ${user.sharedExpertise.slice(0, 2).join(', ')}`
                         : user.sharedCategory.length > 0
@@ -453,7 +453,7 @@ export default function WorkingCirclesPage() {
                         : `${user.score}% similar`}
                     </p>
                   </div>
-                  <Badge variant="secondary" className="bg-purple-500/20 dark:bg-purple-400/20 text-purple-700 dark:text-purple-300 text-[10px] ml-1">
+                  <Badge variant="secondary" className="bg-charcoal-200 dark:bg-charcoal-700 text-charcoal-700 dark:text-charcoal-300 text-[10px] ml-1">
                     {user.score}%
                   </Badge>
                 </div>
@@ -476,7 +476,7 @@ export default function WorkingCirclesPage() {
                 <CardContent className="p-4">
                   {/* Header Row */}
                   <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-9 w-9 border border-primary/20 shrink-0">
+                    <Avatar className="h-9 w-9 shrink-0">
                       <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm">
                         {(match.major || '?')[0].toUpperCase()}
                       </AvatarFallback>
@@ -487,14 +487,14 @@ export default function WorkingCirclesPage() {
                           {match.major || "Team Member"}
                         </p>
                         {match.lookingToHelp && (
-                          <Sparkles className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+                          <Sparkles className="w-3.5 h-3.5 text-terra-400 shrink-0" />
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{match.department}</p>
                     </div>
                     {/* Reciprocal Badge */}
                     {match.isReciprocal && (
-                      <span className="flex items-center gap-0.5 bg-amber-50 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full" title="Two-way match: you can help each other">
+                      <span className="flex items-center gap-0.5 bg-sand-100 text-sand-600 text-[10px] px-1.5 py-0.5 rounded-full" title="Two-way match: you can help each other">
                         <ArrowLeftRight className="w-2.5 h-2.5" />
                       </span>
                     )}
@@ -523,7 +523,7 @@ export default function WorkingCirclesPage() {
                         }}
                         className="overflow-hidden"
                       >
-                        <div className="p-2.5 bg-muted/50 rounded-lg border border-border">
+                        <div className="p-2.5 bg-muted/50 rounded-lg shadow-sm">
                           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Score Breakdown</p>
                           <div className="space-y-1.5">
                             {match.breakdown.skills > 0 && (
@@ -538,37 +538,37 @@ export default function WorkingCirclesPage() {
                             {match.breakdown.samePod > 0 && (
                               <div className="flex items-center justify-between text-xs">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Users className="w-3 h-3 text-cyan-600" />
+                                  <Users className="w-3 h-3 text-sage-500" />
                                   Same Pod
                                 </span>
-                                <span className="font-medium text-cyan-600 dark:text-cyan-400">+{match.breakdown.samePod}</span>
+                                <span className="font-medium text-sage-600 dark:text-sage-400">+{match.breakdown.samePod}</span>
                               </div>
                             )}
                             {match.breakdown.crossDepartment > 0 && (
                               <div className="flex items-center justify-between text-xs">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Building2 className="w-3 h-3 text-purple-600" />
+                                  <Building2 className="w-3 h-3 text-charcoal-500" />
                                   Cross-Department
                                 </span>
-                                <span className="font-medium text-purple-700 dark:text-purple-400">+{match.breakdown.crossDepartment}</span>
+                                <span className="font-medium text-charcoal-600 dark:text-charcoal-400">+{match.breakdown.crossDepartment}</span>
                               </div>
                             )}
                             {match.breakdown.availability > 0 && (
                               <div className="flex items-center justify-between text-xs">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Clock className="w-3 h-3 text-amber-600" />
+                                  <Clock className="w-3 h-3 text-sand-500" />
                                   Availability
                                 </span>
-                                <span className="font-medium text-amber-700">+{match.breakdown.availability}</span>
+                                <span className="font-medium text-sand-600">+{match.breakdown.availability}</span>
                               </div>
                             )}
                             {match.isReciprocal && (
-                              <div className="flex items-center justify-between text-xs pt-1 border-t border-border mt-1">
+                              <div className="flex items-center justify-between text-xs pt-1 mt-1">
                                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                                  <ArrowLeftRight className="w-3 h-3 text-amber-500" />
+                                  <ArrowLeftRight className="w-3 h-3 text-sand-500" />
                                   Two-Way Match
                                 </span>
-                                <span className="font-medium text-amber-600">+5 bonus</span>
+                                <span className="font-medium text-sand-600">+5 bonus</span>
                               </div>
                             )}
                           </div>
@@ -581,10 +581,10 @@ export default function WorkingCirclesPage() {
                   <div className="space-y-2 mb-3">
                     {match.canAskHelp.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-medium mb-1">Can help you</p>
+                        <p className="text-[10px] uppercase tracking-wider text-sage-600 dark:text-sage-400 font-medium mb-1">Can help you</p>
                         <div className="flex flex-wrap gap-1">
                           {match.canAskHelp.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-cyan-500/10 dark:bg-cyan-400/10 text-cyan-700 dark:text-cyan-400 text-xs px-2 py-0.5 rounded">
+                            <span key={skill} className="bg-sage-100 dark:bg-sage-900/30 text-sage-700 dark:text-sage-400 text-xs px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
@@ -627,7 +627,7 @@ export default function WorkingCirclesPage() {
           ))}
         </div>
       ) : matches.length === 0 ? (
-        <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+        <Card className="bg-primary/5 shadow-lg">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -645,14 +645,14 @@ export default function WorkingCirclesPage() {
               <Button variant="outline" asChild>
                 <a href="/classes/join">Join with Code</a>
               </Button>
-              <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+              <Button className="bg-terra-400 hover:bg-terra-500" asChild>
                 <a href="/classes/create">Create a Pod</a>
               </Button>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-dashed">
+        <Card className="shadow-lg">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No matches found for "{searchQuery}"</p>
           </CardContent>

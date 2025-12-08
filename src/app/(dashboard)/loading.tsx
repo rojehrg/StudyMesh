@@ -4,7 +4,7 @@ export default function DashboardLoading() {
   return (
     <div className="flex items-center justify-center h-[60vh]">
       <div className="text-center">
-        <Loader2 className="w-10 h-10 animate-spin text-teal-600 mx-auto mb-3" />
+        <Loader2 className="w-10 h-10 animate-spin text-terra-400 mx-auto mb-3" />
         <p className="text-gray-500 text-sm">Loading...</p>
       </div>
     </div>

@@ -4,100 +4,102 @@
 
 @layer base {
   :root {
-    /* Backgrounds */
-    --background: 0 0% 98%;
-    --foreground: 210 24% 6%;
+    /* New Mediterranean/Earthy Palette */
+    /* Cream #F4F1DE, Terra Cotta #E07A5F, Charcoal Blue #3D405B, Sage #81B29A, Sand #F2CC8F */
 
-    /* Cards & Surfaces */
+    /* Backgrounds - Cream tinted */
+    --background: 47 38% 96%;
+    --foreground: 234 20% 30%;
+
+    /* Cards & Surfaces - Pure white for contrast */
     --card: 0 0% 100%;
-    --card-foreground: 210 24% 6%;
+    --card-foreground: 234 20% 30%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 24% 6%;
+    --popover-foreground: 234 20% 30%;
 
-    /* Primary - Teal (#0A8A7B) */
-    --primary: 175 85% 29%;
+    /* Primary - Terra Cotta (#E07A5F) */
+    --primary: 12 66% 63%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light Teal */
-    --secondary: 175 60% 96%;
-    --secondary-foreground: 175 85% 29%;
+    /* Secondary - Sage Green (#81B29A) */
+    --secondary: 152 30% 60%;
+    --secondary-foreground: 234 20% 25%;
 
-    /* Muted */
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 14% 46%;
+    /* Muted - Light cream/gray */
+    --muted: 47 25% 92%;
+    --muted-foreground: 234 10% 45%;
 
-    /* Accent - Light Teal for hover states */
-    --accent: 175 60% 96%;
-    --accent-foreground: 175 85% 29%;
+    /* Accent - Sand/Gold (#F2CC8F) */
+    --accent: 39 78% 75%;
+    --accent-foreground: 234 20% 25%;
 
     /* Destructive - Red */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 175 85% 29%;
+    --border: 47 20% 88%;
+    --input: 47 20% 88%;
+    --ring: 12 66% 63%;
 
     /* Rounded corners */
     --radius: 0.75rem;
 
-    /* Chart colors */
-    --chart-1: 175 85% 29%;
-    --chart-2: 175 60% 45%;
-    --chart-3: 175 45% 60%;
-    --chart-4: 175 30% 75%;
-    --chart-5: 175 20% 85%;
+    /* Chart colors - using the palette */
+    --chart-1: 12 66% 63%;
+    --chart-2: 152 30% 60%;
+    --chart-3: 39 78% 75%;
+    --chart-4: 234 20% 50%;
+    --chart-5: 47 38% 85%;
   }
 
   .dark {
-    /* Notion-inspired soft dark theme */
-    /* Background - warm dark gray (not pure black) */
-    --background: 220 13% 13%;
-    --foreground: 210 20% 94%;
+    /* Dark mode - Charcoal Blue based (#3D405B) */
+    --background: 234 20% 15%;
+    --foreground: 47 30% 92%;
 
-    /* Cards & Surfaces - slightly lighter than background */
-    --card: 220 13% 16%;
-    --card-foreground: 210 20% 94%;
+    /* Cards & Surfaces - slightly lighter */
+    --card: 234 20% 18%;
+    --card-foreground: 47 30% 92%;
 
-    --popover: 220 13% 18%;
-    --popover-foreground: 210 20% 94%;
+    --popover: 234 20% 20%;
+    --popover-foreground: 47 30% 92%;
 
-    /* Primary - Teal (softer for dark mode) */
-    --primary: 173 58% 48%;
-    --primary-foreground: 220 13% 10%;
+    /* Primary - Terra Cotta (slightly brighter for dark mode) */
+    --primary: 12 66% 58%;
+    --primary-foreground: 234 20% 12%;
 
-    /* Secondary - subtle elevation */
-    --secondary: 220 13% 20%;
-    --secondary-foreground: 210 20% 90%;
+    /* Secondary - Sage Green */
+    --secondary: 152 30% 45%;
+    --secondary-foreground: 47 30% 92%;
 
-    /* Muted - for subtle backgrounds */
-    --muted: 220 13% 20%;
-    --muted-foreground: 215 15% 60%;
+    /* Muted */
+    --muted: 234 18% 22%;
+    --muted-foreground: 47 15% 60%;
 
-    /* Accent - hover states */
-    --accent: 220 13% 22%;
-    --accent-foreground: 210 20% 94%;
+    /* Accent - Sand/Gold (muted for dark) */
+    --accent: 39 50% 55%;
+    --accent-foreground: 234 20% 15%;
 
     /* Destructive */
     --destructive: 0 62% 55%;
-    --destructive-foreground: 210 20% 94%;
+    --destructive-foreground: 47 30% 92%;
 
-    /* Borders & Inputs - subtle, not harsh */
-    --border: 220 13% 24%;
-    --input: 220 13% 22%;
-    --ring: 173 58% 48%;
+    /* Borders & Inputs */
+    --border: 234 18% 26%;
+    --input: 234 18% 24%;
+    --ring: 12 66% 58%;
 
     /* Chart colors */
-    --chart-1: 173 58% 48%;
-    --chart-2: 173 50% 55%;
-    --chart-3: 173 40% 62%;
-    --chart-4: 173 30% 70%;
-    --chart-5: 173 20% 78%;
+    --chart-1: 12 66% 58%;
+    --chart-2: 152 30% 50%;
+    --chart-3: 39 60% 60%;
+    --chart-4: 234 15% 55%;
+    --chart-5: 47 25% 70%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -107,7 +109,7 @@
   }
 }
 
-/* Animated Grid Background */
+/* Animated Grid Background - Updated to Terra Cotta */
 @keyframes grid-move {
   0% {
     background-position: 0 0;
@@ -120,9 +122,9 @@
 .animated-grid {
   position: fixed;
   inset: 0;
-  background-image: 
-    linear-gradient(rgba(20, 184, 166, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(20, 184, 166, 0.12) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(224, 122, 95, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 122, 95, 0.08) 1px, transparent 1px);
   background-size: 50px 50px;
   background-position: 0 0;
   animation: grid-move 30s linear infinite;
@@ -130,7 +132,7 @@
   pointer-events: none;
 }
 
-/* Floating Gradient Blobs */
+/* Floating Gradient Blobs - Updated colors */
 @keyframes blob-float {
   0%, 100% {
     transform: translate(0, 0) scale(1);
@@ -168,7 +170,7 @@
 .blob-1 {
   width: 600px;
   height: 600px;
-  background: #14b8a6;
+  background: #E07A5F;
   top: -15%;
   right: -10%;
   animation: blob-float 25s ease-in-out infinite;
@@ -177,7 +179,7 @@
 .blob-2 {
   width: 500px;
   height: 500px;
-  background: #06b6d4;
+  background: #81B29A;
   bottom: -10%;
   left: -10%;
   animation: blob-float-2 30s ease-in-out infinite;
@@ -187,7 +189,7 @@
 .blob-3 {
   width: 450px;
   height: 450px;
-  background: #0d9488;
+  background: #F2CC8F;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -195,25 +197,20 @@
   animation-delay: 10s;
 }
 
-/* Custom Patterns */
-@keyframes grid-move {
-  0% { background-position: 0 0; }
-  100% { background-position: 40px 40px; }
-}
-
+/* Custom Patterns - Updated to Terra Cotta */
 .bg-grid-pattern {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(10, 138, 123, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(10, 138, 123, 0.04) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(224, 122, 95, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(224, 122, 95, 0.04) 1px, transparent 1px);
   animation: grid-move 20s linear infinite;
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(rgba(10, 138, 123, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(224, 122, 95, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Custom Animations - No Gradients */
+/* Custom Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -241,5 +238,5 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px rgba(10, 138, 123, 0.15);
+  box-shadow: 0 12px 24px -6px rgba(224, 122, 95, 0.15);
 }

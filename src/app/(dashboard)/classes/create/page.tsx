@@ -97,7 +97,7 @@ export default function CreatePodPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-teal-600" />
+            <Sparkles className="w-6 h-6 text-terra-400" />
             Create Enablement Pod
           </CardTitle>
           <CardDescription>
@@ -156,11 +156,11 @@ export default function CreatePodPage() {
               />
             </div>
 
-            <div className="bg-teal-50 border border-teal-100 rounded-xl p-4">
-              <p className="text-sm text-teal-900 font-medium mb-1">
+            <div className="bg-terra-50 border border-terra-100 rounded-xl p-4">
+              <p className="text-sm text-terra-600 font-medium mb-1">
                 🎯 What happens next?
               </p>
-              <p className="text-sm text-teal-700">
+              <p className="text-sm text-terra-500">
                 After creating your pod, you'll get a unique share code. Your teammates can use this code to join and our matching algorithm will identify knowledge gaps automatically.
               </p>
             </div>
@@ -172,7 +172,7 @@ export default function CreatePodPage() {
               <Button 
                 type="submit" 
                 disabled={loading || !podName.trim()}
-                className="bg-teal-600 hover:bg-teal-700 flex-1"
+                className="bg-terra-400 hover:bg-terra-500 flex-1"
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Create Pod

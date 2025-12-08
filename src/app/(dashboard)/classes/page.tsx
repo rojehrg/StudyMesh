@@ -96,7 +96,7 @@ export default function ClassesPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+          <Button className="bg-terra-400 hover:bg-terra-500" asChild>
             <Link href="/classes/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Pod
@@ -131,7 +131,7 @@ export default function ClassesPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="group-hover:text-teal-600 transition-colors">
+                        <CardTitle className="group-hover:text-terra-400 transition-colors">
                           {pod.pod_name}
                         </CardTitle>
                         <CardDescription className="mt-2 flex items-center gap-1">
@@ -139,7 +139,7 @@ export default function ClassesPage() {
                           {pod.business_unit || "General"}
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary shadow-sm">
                         {pod.pod_code}
                       </Badge>
                     </div>
@@ -158,7 +158,7 @@ export default function ClassesPage() {
                       </div>
                     </div>
                     {pod.initiative_owner && (
-                      <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+                      <div className="mt-3 pt-3 text-xs text-muted-foreground">
                         Owner: {pod.initiative_owner}
                       </div>
                     )}
@@ -169,7 +169,7 @@ export default function ClassesPage() {
           ))}
         </div>
       ) : pods.length === 0 ? (
-        <Card className="border-dashed">
+        <Card className="shadow-lg">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
               <Users className="w-8 h-8 text-muted-foreground" />
@@ -182,14 +182,14 @@ export default function ClassesPage() {
               <Button variant="outline" asChild>
                 <Link href="/classes/join">Join Pod</Link>
               </Button>
-              <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+              <Button className="bg-terra-400 hover:bg-terra-500" asChild>
                 <Link href="/classes/create">Create Pod</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-dashed">
+        <Card className="shadow-lg">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No pods match your search</p>
           </CardContent>

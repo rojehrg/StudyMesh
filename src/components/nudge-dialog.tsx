@@ -63,15 +63,15 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   nudgeType === 'ask'
-                    ? 'border-cyan-500/50 dark:border-cyan-400/50 bg-cyan-500/10 dark:bg-cyan-400/10'
-                    : 'border-border hover:border-cyan-500/30 hover:bg-accent'
+                    ? 'border-sage-500/50 dark:border-sage-400/50 bg-sage-100 dark:bg-sage-900/30'
+                    : 'border-border hover:border-sage-500/30 hover:bg-accent'
                 }`}
               >
                 <HelpCircle className={`w-6 h-6 mx-auto mb-2 ${
-                  nudgeType === 'ask' ? 'text-cyan-600 dark:text-cyan-400' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-sage-500 dark:text-sage-400' : 'text-muted-foreground'
                 }`} />
                 <p className={`text-sm font-medium ${
-                  nudgeType === 'ask' ? 'text-cyan-700 dark:text-cyan-300' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-sage-600 dark:text-sage-300' : 'text-muted-foreground'
                 }`}>
                   Ask for Help
                 </p>
@@ -153,7 +153,7 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
           <Button 
             onClick={handleSubmit} 
             disabled={!selectedTopic || loading}
-            className={nudgeType === 'ask' ? 'bg-cyan-600 hover:bg-cyan-700' : 'bg-teal-600 hover:bg-teal-700'}
+            className={nudgeType === 'ask' ? 'bg-sage-500 hover:bg-sage-600' : 'bg-terra-400 hover:bg-terra-500'}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Send Nudge

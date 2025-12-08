@@ -55,18 +55,66 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // New Teal-based color system
-        teal: {
-          50: '#E0F5F3',
-          100: '#B3E6E0',
-          200: '#80D6CC',
-          300: '#4DC6B8',
-          400: '#26B9A9',
-          500: '#0A8A7B', // Primary
-          600: '#087B6D',
-          700: '#076B5F', // Primary Dark
-          800: '#055A50',
-          900: '#034A42',
+        // New Mediterranean color palette
+        terra: {
+          50: '#FDF5F3',
+          100: '#FAE8E4',
+          200: '#F5D0C7',
+          300: '#EDB0A1',
+          400: '#E07A5F', // Primary Terra Cotta
+          500: '#D4634A',
+          600: '#B84D38',
+          700: '#9A3F2E',
+          800: '#7D3526',
+          900: '#662D22',
+        },
+        sage: {
+          50: '#F4F9F6',
+          100: '#E5F0EA',
+          200: '#C9E0D5',
+          300: '#A3C9B5',
+          400: '#81B29A', // Primary Sage
+          500: '#5E9A7D',
+          600: '#4A7D64',
+          700: '#3D6652',
+          800: '#345343',
+          900: '#2C4438',
+        },
+        sand: {
+          50: '#FEFCF6',
+          100: '#FCF7E9',
+          200: '#F9EDCE',
+          300: '#F2CC8F', // Primary Sand
+          400: '#ECBA6A',
+          500: '#E3A344',
+          600: '#D08A2D',
+          700: '#AD6F26',
+          800: '#8B5826',
+          900: '#724923',
+        },
+        charcoal: {
+          50: '#F5F5F7',
+          100: '#E8E8EC',
+          200: '#D1D2D9',
+          300: '#A9ABB8',
+          400: '#7B7E91',
+          500: '#5C5F73',
+          600: '#4A4D5E',
+          700: '#3D405B', // Primary Charcoal Blue
+          800: '#34364C',
+          900: '#2D2F41',
+        },
+        cream: {
+          50: '#FDFCF9',
+          100: '#F9F7F0',
+          200: '#F4F1DE', // Primary Cream
+          300: '#ECE7C9',
+          400: '#E0D9AD',
+          500: '#D4CA91',
+          600: '#C4B76E',
+          700: '#A99B52',
+          800: '#8A7E45',
+          900: '#72683C',
         },
       },
       borderRadius: {
@@ -124,4 +172,3 @@ const config = {
 } satisfies Config
 
 export default config
-

@@ -6,7 +6,7 @@ interface ProficiencyRingProps {
   value: number; // 0, 25, 50, 75, or 100
   onChange: (value: number) => void;
   size?: "sm" | "md";
-  color?: "teal" | "cyan";
+  color?: "terra" | "sage";
 }
 
 const levels = [
@@ -16,25 +16,25 @@ const levels = [
   { value: 100, label: "Expert" },
 ];
 
-export function ProficiencyRing({ value, onChange, size = "md", color = "teal" }: ProficiencyRingProps) {
+export function ProficiencyRing({ value, onChange, size = "md", color = "terra" }: ProficiencyRingProps) {
   const currentLevel = levels.find(l => l.value === value) || levels[0];
   const ringSize = size === "sm" ? "w-12 h-12" : "w-14 h-14";
   const innerSize = size === "sm" ? "w-9 h-9" : "w-11 h-11";
 
-  const colorClasses = color === "teal"
+  const colorClasses = color === "terra"
     ? {
-        filled: "bg-teal-500",
+        filled: "bg-terra-400",
         empty: "bg-muted",
-        text: "text-teal-700 dark:text-teal-400",
-        hover: "hover:bg-teal-50 dark:hover:bg-teal-950 hover:border-teal-200 dark:hover:border-teal-700",
-        selected: "bg-teal-50 dark:bg-teal-950 border-teal-300 dark:border-teal-600",
+        text: "text-terra-500 dark:text-terra-400",
+        hover: "hover:bg-terra-50 dark:hover:bg-terra-900/30 hover:border-terra-200 dark:hover:border-terra-700",
+        selected: "bg-terra-50 dark:bg-terra-900/30 border-terra-300 dark:border-terra-600",
       }
     : {
-        filled: "bg-cyan-500",
+        filled: "bg-sage-400",
         empty: "bg-muted",
-        text: "text-cyan-700 dark:text-cyan-400",
-        hover: "hover:bg-cyan-50 dark:hover:bg-cyan-950 hover:border-cyan-200 dark:hover:border-cyan-700",
-        selected: "bg-cyan-50 dark:bg-cyan-950 border-cyan-300 dark:border-cyan-600",
+        text: "text-sage-600 dark:text-sage-400",
+        hover: "hover:bg-sage-50 dark:hover:bg-sage-900/30 hover:border-sage-200 dark:hover:border-sage-700",
+        selected: "bg-sage-50 dark:bg-sage-900/30 border-sage-300 dark:border-sage-600",
       };
 
   // Calculate which quadrants are filled (going clockwise from top-right)
@@ -107,13 +107,13 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "teal" }
 }
 
 // Simpler display-only version for showing in cards
-export function ProficiencyDisplay({ value, size = "sm", color = "teal" }: Omit<ProficiencyRingProps, "onChange">) {
+export function ProficiencyDisplay({ value, size = "sm", color = "terra" }: Omit<ProficiencyRingProps, "onChange">) {
   const ringSize = size === "sm" ? "w-8 h-8" : "w-10 h-10";
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
-  const colorClasses = color === "teal"
-    ? { filled: "bg-teal-500", empty: "bg-muted", text: "text-teal-700 dark:text-teal-400" }
-    : { filled: "bg-cyan-500", empty: "bg-muted", text: "text-cyan-700 dark:text-cyan-400" };
+  const colorClasses = color === "terra"
+    ? { filled: "bg-terra-400", empty: "bg-muted", text: "text-terra-500 dark:text-terra-400" }
+    : { filled: "bg-sage-400", empty: "bg-muted", text: "text-sage-600 dark:text-sage-400" };
 
   const filledQuadrants = Math.round(value / 25);
 

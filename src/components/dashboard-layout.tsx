@@ -43,10 +43,10 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       href={href}
       prefetch={true}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 overflow-hidden whitespace-nowrap group",
+        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 overflow-hidden whitespace-nowrap group",
         isActive
-          ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
-          : "border-transparent text-muted-foreground hover:bg-accent hover:text-foreground"
+          ? "bg-primary/10 text-primary shadow-sm"
+          : "text-muted-foreground hover:bg-accent hover:text-foreground"
       )}
       title={isCollapsed ? label : ""}
     >
@@ -165,13 +165,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 bg-card border-r border-border transition-all duration-300 ease-in-out flex flex-col",
+          "fixed inset-y-0 left-0 z-30 bg-card shadow-lg transition-all duration-300 ease-in-out flex flex-col",
           isCollapsed ? "w-20" : "w-64",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-4 border-b border-border">
+        <div className="h-16 flex items-center px-4">
           <Link href="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
             <span className={cn(
               "text-primary text-xl font-bold shrink-0 transition-all duration-300",
@@ -192,10 +192,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
         {/* Looking to Help Toggle */}
         <div className={cn(
-          "mx-3 mt-3 p-3 rounded-xl border-2 transition-all duration-300",
+          "mx-3 mt-3 p-3 rounded-xl transition-all duration-300",
           lookingToHelp
-            ? "bg-primary/10 border-primary/30"
-            : "bg-muted/50 border-border"
+            ? "bg-primary/10 shadow-md"
+            : "bg-muted/50 shadow-sm"
         )}>
           <div className="flex items-center gap-3">
             <div className={cn(
@@ -254,9 +254,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* User Profile */}
-        <div className="p-3 border-t border-border">
+        <div className="p-3">
           <div className="flex items-center p-2 rounded-xl hover:bg-accent transition-colors cursor-pointer">
-            <Avatar className="h-9 w-9 border-2 border-primary/20">
+            <Avatar className="h-9 w-9">
               <AvatarImage src="" />
               <AvatarFallback className="bg-primary/10 text-primary font-medium">
                 {profile?.first_name?.[0]?.toUpperCase() || "U"}
@@ -304,7 +304,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         isCollapsed ? "md:ml-20" : "md:ml-64"
       )}>
         {/* Header */}
-        <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="h-14 bg-card shadow-sm flex items-center justify-between px-4 sticky top-0 z-30">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
               <Menu className="w-6 h-6 text-foreground" />
@@ -328,7 +328,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "hidden md:flex fixed top-1/2 -translate-y-1/2 z-40",
-          "bg-card border border-l-0 border-border",
+          "bg-card",
           "rounded-r-lg p-1.5 shadow-lg hover:shadow-xl",
           "text-muted-foreground hover:text-primary transition-all duration-300 active:scale-95",
           isCollapsed ? "left-[5rem]" : "left-[16rem]"

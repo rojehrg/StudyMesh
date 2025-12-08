@@ -100,7 +100,7 @@ export default function SignupPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <div className="bg-teal-50 text-teal-700 text-sm p-3 rounded-md border border-teal-100">
+          <div className="bg-terra-50 text-terra-600 text-sm p-3 rounded-md">
             {error}
           </div>
         )}
@@ -164,7 +164,7 @@ export default function SignupPage() {
               disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700" disabled={loading}>
+          <Button type="submit" className="w-full bg-terra-400 hover:bg-terra-500" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create account
           </Button>
@@ -173,7 +173,7 @@ export default function SignupPage() {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-teal-600 hover:underline font-medium">
+          <Link href="/login" className="text-terra-400 hover:underline font-medium">
             Sign in
           </Link>
         </p>

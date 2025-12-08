@@ -35,9 +35,9 @@ export default function AboutPage() {
     >
       {/* Hero Section */}
       <motion.div variants={itemVariants} className="text-center py-8">
-        <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-teal-950 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800 mb-6">
-          <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-          <span className="text-teal-700 dark:text-teal-300 font-medium text-sm">About Meshflow</span>
+        <div className="inline-flex items-center gap-2 bg-terra-50 dark:bg-terra-900/30 px-4 py-2 rounded-full border border-terra-200 dark:border-terra-800 mb-6">
+          <Sparkles className="w-4 h-4 text-terra-400 dark:text-terra-400" />
+          <span className="text-terra-500 dark:text-terra-300 font-medium text-sm">About Meshflow</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           The Intelligent Enablement Platform
@@ -50,16 +50,16 @@ export default function AboutPage() {
       {/* Mission Card */}
       <motion.div
         variants={itemVariants}
-        className="bg-teal-50 dark:bg-teal-950 rounded-2xl p-8 border-2 border-teal-100 dark:border-teal-800"
+        className="bg-terra-50 dark:bg-terra-900/30 rounded-2xl p-8 border-2 border-terra-100 dark:border-terra-800"
       >
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 bg-terra-400 rounded-xl flex items-center justify-center shrink-0">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-3">Our Mission</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Meshflow helps teams <strong className="text-teal-700 dark:text-teal-400">outperform by filling knowledge gaps</strong>.
+              Meshflow helps teams <strong className="text-terra-500 dark:text-terra-400">outperform by filling knowledge gaps</strong>.
               The best teams aren't just skilled—they're connected. When expertise flows freely between
               teammates, blockers disappear, delivery accelerates, and everyone grows.
             </p>
@@ -87,9 +87,9 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -4 }}
-          className="bg-teal-50 dark:bg-teal-950 rounded-2xl p-6 border-2 border-teal-100 dark:border-teal-800"
+          className="bg-terra-50 dark:bg-terra-900/30 rounded-2xl p-6 border-2 border-terra-100 dark:border-terra-800"
         >
-          <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center mb-4">
+          <div className="w-10 h-10 bg-terra-400 rounded-lg flex items-center justify-center mb-4">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Our Solution</h3>
@@ -103,7 +103,7 @@ export default function AboutPage() {
       {/* How It's Different */}
       <motion.div variants={itemVariants} className="space-y-6">
         <div className="flex items-center gap-3 mb-2">
-          <Network className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+          <Network className="w-6 h-6 text-terra-400 dark:text-terra-400" />
           <h2 className="text-2xl font-bold text-foreground">How We're Different</h2>
         </div>
 
@@ -112,8 +112,8 @@ export default function AboutPage() {
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
           >
-            <div className="w-10 h-10 bg-teal-100 dark:bg-teal-950 rounded-lg flex items-center justify-center shrink-0">
-              <Brain className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+            <div className="w-10 h-10 bg-terra-100 dark:bg-terra-900/30 rounded-lg flex items-center justify-center shrink-0">
+              <Brain className="w-5 h-5 text-terra-400 dark:text-terra-400" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Intelligent Matching</h4>
@@ -122,15 +122,15 @@ export default function AboutPage() {
                 complementary expertise, not rigid categories.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-terra-400 dark:text-terra-400 shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
           >
-            <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-950 rounded-lg flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/30 rounded-lg flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5 text-sage-500 dark:text-sage-400" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Org-Scoped Privacy</h4>
@@ -139,15 +139,15 @@ export default function AboutPage() {
                 Complete security and privacy.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-terra-400 dark:text-terra-400 shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
           >
-            <div className="w-10 h-10 bg-teal-100 dark:bg-teal-950 rounded-lg flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+            <div className="w-10 h-10 bg-terra-100 dark:bg-terra-900/30 rounded-lg flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5 text-terra-400 dark:text-terra-400" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Performance-Driven</h4>
@@ -156,15 +156,15 @@ export default function AboutPage() {
                 outperform those that don't. Simple as that.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-terra-400 dark:text-terra-400 shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card border-2 border-border shadow-sm"
           >
-            <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-950 rounded-lg flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+            <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/30 rounded-lg flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-sage-500 dark:text-sage-400" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Slack Integration</h4>
@@ -173,7 +173,7 @@ export default function AboutPage() {
                 miss a collaboration opportunity.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-terra-400 dark:text-terra-400 shrink-0 mt-1" />
           </motion.div>
         </div>
       </motion.div>
@@ -183,21 +183,21 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-foreground mb-6">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-5 rounded-xl bg-muted/50 border border-border">
-            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-terra-400 rounded-lg flex items-center justify-center mb-3">
               <Target className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Skill Matching</h4>
             <p className="text-sm text-muted-foreground">Fuzzy matching connects similar skills automatically</p>
           </div>
           <div className="p-5 rounded-xl bg-muted/50 border border-border">
-            <div className="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-sage-500 rounded-lg flex items-center justify-center mb-3">
               <Users className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Pod Organization</h4>
             <p className="text-sm text-muted-foreground">Group by project, team, or initiative</p>
           </div>
           <div className="p-5 rounded-xl bg-muted/50 border border-border">
-            <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-terra-400 rounded-lg flex items-center justify-center mb-3">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Contextual Nudges</h4>
@@ -209,15 +209,15 @@ export default function AboutPage() {
       {/* CTA */}
       <motion.div
         variants={itemVariants}
-        className="bg-teal-600 dark:bg-teal-700 rounded-2xl p-8 text-center"
+        className="bg-terra-400 dark:bg-terra-500 rounded-2xl p-8 text-center"
       >
         <h2 className="text-2xl font-bold mb-3 text-white">Ready to collaborate?</h2>
-        <p className="text-teal-100 mb-6 max-w-md mx-auto">
+        <p className="text-terra-100 mb-6 max-w-md mx-auto">
           Start mapping your skills and connecting with teammates who can help you grow.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/settings">
-            <Button className="bg-white text-teal-700 hover:bg-teal-50">
+            <Button className="bg-white text-terra-500 hover:bg-terra-50">
               Update Your Profile
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

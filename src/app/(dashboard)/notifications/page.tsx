@@ -112,9 +112,9 @@ export default function NotificationsPage() {
       return <Send className="w-5 h-5 text-gray-500" />;
     }
     if (notification.type === 'new_match') {
-      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-amber-500' : 'text-gray-400'}`} />;
+      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-sand-500' : 'text-gray-400'}`} />;
     }
-    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-teal-600' : 'text-gray-400'}`} />;
+    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-terra-400' : 'text-gray-400'}`} />;
   };
 
   const getNotificationTitle = (notification: any, isSent: boolean) => {
@@ -129,10 +129,10 @@ export default function NotificationsPage() {
 
   const getNotificationBgClass = (notification: any) => {
     if (notification.type === 'new_match' && !notification.read) {
-      return 'border-l-4 border-l-amber-500 bg-amber-50/30';
+      return 'border-l-4 border-l-sand-400 bg-sand-100/50';
     }
     if (!notification.read) {
-      return 'border-l-4 border-l-teal-500 bg-teal-50/30';
+      return 'border-l-4 border-l-terra-400 bg-terra-50/30';
     }
     return '';
   };
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-terra-400" />
       </div>
     );
   }
@@ -199,9 +199,9 @@ export default function NotificationsPage() {
                   <div className="flex items-start gap-3 flex-1">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                       notification.type === 'new_match' && !notification.read && !isSent
-                        ? 'bg-amber-100'
+                        ? 'bg-sand-100'
                         : !notification.read && !isSent
-                        ? 'bg-teal-100'
+                        ? 'bg-terra-100'
                         : 'bg-gray-100'
                     }`}>
                       {getNotificationIcon(notification, isSent)}
@@ -214,8 +214,8 @@ export default function NotificationsPage() {
                         {!notification.read && !isSent && (
                           <Badge variant="secondary" className={`text-xs ${
                             notification.type === 'new_match'
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-teal-100 text-teal-700'
+                              ? 'bg-sand-100 text-sand-600'
+                              : 'bg-terra-100 text-terra-500'
                           }`}>
                             New
                           </Badge>
