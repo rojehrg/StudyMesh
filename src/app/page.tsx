@@ -24,34 +24,34 @@ const stagger = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-ctp-base overflow-hidden">
+    <div className="min-h-screen bg-white overflow-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-ctp-base/90 backdrop-blur-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center">
-              <span className="text-ctp-text font-semibold text-xl">Meshflow</span>
+              <span className="text-gray-900 font-semibold text-xl">Meshflow</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
-              <Link href="#features" className="text-ctp-subtext0 hover:text-ctp-text text-sm font-medium transition-colors">
+              <Link href="#features" className="text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors">
                 PRODUCT
               </Link>
-              <Link href="#how-it-works" className="text-ctp-subtext0 hover:text-ctp-text text-sm font-medium transition-colors">
+              <Link href="#how-it-works" className="text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors">
                 HOW IT WORKS
               </Link>
-              <Link href="#" className="text-ctp-subtext0 hover:text-ctp-text text-sm font-medium transition-colors">
+              <Link href="#" className="text-gray-500 hover:text-gray-900 text-sm font-medium transition-colors">
                 CONTACT
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/signup">
-              <Button className="bg-ctp-peach hover:bg-peach-400 text-ctp-base font-medium px-5 rounded-full">
+              <Button className="bg-ctp-peach hover:bg-peach-400 text-white font-medium px-5 rounded-full">
                 Get Meshflow
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="outline" className="font-medium px-5 rounded-full shadow-sm bg-ctp-surface0 text-ctp-text hover:bg-ctp-surface1 border-ctp-surface2">
+              <Button variant="outline" className="font-medium px-5 rounded-full shadow-sm bg-white text-gray-700 hover:bg-gray-50 border-gray-200">
                 Login
               </Button>
             </Link>
@@ -94,7 +94,7 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeIn} className="mb-6">
-              <span className="inline-block bg-ctp-surface0 text-ctp-text px-4 py-2 rounded-full text-sm font-medium shadow-sm">
+              <span className="inline-block bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium shadow-sm">
                 Your Team's Knowledge Hub
               </span>
             </motion.div>
@@ -102,7 +102,7 @@ export default function LandingPage() {
             {/* Headline */}
             <motion.h1
               variants={fadeIn}
-              className="text-5xl md:text-6xl font-bold text-ctp-text mb-2 leading-[1.1]"
+              className="text-5xl md:text-6xl font-bold text-gray-900 mb-2 leading-[1.1]"
             >
               Find Expertise.
             </motion.h1>
@@ -116,7 +116,7 @@ export default function LandingPage() {
             {/* Description */}
             <motion.p
               variants={fadeIn}
-              className="text-xl text-ctp-subtext1 mb-10 leading-relaxed max-w-lg"
+              className="text-xl text-gray-600 mb-10 leading-relaxed max-w-lg"
             >
               Connect teammates who can help each other grow—whether you're
               onboarding new hires or building a high-performing team. Meshflow
@@ -126,12 +126,12 @@ export default function LandingPage() {
             {/* CTAs */}
             <motion.div variants={fadeIn} className="flex flex-wrap gap-4">
               <Link href="/signup">
-                <Button size="lg" className="bg-ctp-peach hover:bg-peach-400 text-ctp-base rounded-full px-8 h-12 text-base font-medium">
+                <Button size="lg" className="bg-ctp-peach hover:bg-peach-400 text-white rounded-full px-8 h-12 text-base font-medium">
                   Get Started Free
                 </Button>
               </Link>
               <Link href="#features">
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium text-ctp-text hover:bg-ctp-surface1 bg-ctp-surface0 shadow-sm border-ctp-surface2">
+                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium text-gray-700 hover:bg-gray-50 bg-white shadow-sm border-gray-200">
                   For Teams
                 </Button>
               </Link>
@@ -141,7 +141,7 @@ export default function LandingPage() {
       </section>
 
       {/* Use Cases Section */}
-      <section id="features" className="py-24 px-6 bg-ctp-mantle">
+      <section id="features" className="py-24 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto">
           {/* Section Badge */}
           <motion.div
@@ -161,10 +161,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-ctp-text mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Choose Your Path
             </h2>
-            <p className="text-lg text-ctp-subtext0 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               From skill discovery to team collaboration, Meshflow helps you
               connect and grow—whether you're an individual or a team.
             </p>
@@ -178,15 +178,15 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-ctp-surface0 rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
+              className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
             >
               <span className="inline-block bg-ctp-yellow/20 text-ctp-yellow px-3 py-1 rounded-full text-xs font-medium shadow-sm mb-6">
                 Skill Matching
               </span>
-              <h3 className="text-xl font-bold text-ctp-text mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Find Your Perfect Match
               </h3>
-              <p className="text-ctp-subtext0 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed">
                 List your expertise and growth areas. Get matched with teammates
                 who complement your skills—learn from experts, mentor others,
                 and grow together.
@@ -199,7 +199,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-ctp-surface0 rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
+              className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
             >
               <span className="inline-block bg-ctp-mauve/20 text-ctp-mauve px-3 py-1 rounded-full text-xs font-medium shadow-sm mb-6">
                 Team Collaboration
@@ -207,7 +207,7 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold text-ctp-peach mb-4">
                 Connect Across Teams
               </h3>
-              <p className="text-ctp-subtext0 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed">
                 Create pods for projects or departments. Send nudges to connect
                 instantly. Break down silos and unlock your organization's
                 collective knowledge.
@@ -218,7 +218,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 px-6 bg-ctp-base">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -237,10 +237,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-ctp-text mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Everything You Need
             </h2>
-            <p className="text-lg text-ctp-subtext0 max-w-xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-xl mx-auto">
               Simple tools that make knowledge sharing feel natural.
             </p>
           </motion.div>
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-ctp-surface0 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow"
+                className="bg-gray-50 rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow"
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                   feature.color === "peach" ? "bg-ctp-peach/20" :
@@ -291,8 +291,8 @@ export default function LandingPage() {
                     feature.color === "mauve" ? "text-ctp-mauve" : "text-ctp-blue"
                   }`} />
                 </div>
-                <h3 className="text-lg font-semibold text-ctp-text mb-2">{feature.title}</h3>
-                <p className="text-ctp-subtext0 text-sm">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -300,7 +300,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 bg-ctp-mantle">
+      <section id="how-it-works" className="py-24 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -319,10 +319,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-ctp-text mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Get Started in Minutes
             </h2>
-            <p className="text-lg text-ctp-subtext0 max-w-xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-xl mx-auto">
               Three simple steps to unlock your team's potential.
             </p>
           </motion.div>
@@ -353,12 +353,12 @@ export default function LandingPage() {
                 transition={{ delay: index * 0.1 }}
                 className="flex gap-8 items-start"
               >
-                <div className="text-6xl font-bold text-ctp-surface2 shrink-0 w-24">
+                <div className="text-6xl font-bold text-gray-200 shrink-0 w-24">
                   {item.step}
                 </div>
                 <div className="pt-3">
-                  <h3 className="text-2xl font-bold text-ctp-text mb-3">{item.title}</h3>
-                  <p className="text-ctp-subtext0 text-lg leading-relaxed">{item.description}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">{item.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -367,41 +367,41 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-ctp-base">
+      <section className="py-24 px-6 bg-white">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-ctp-text mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Ready to unlock your team's potential?
           </h2>
-          <p className="text-xl text-ctp-subtext0 mb-10 max-w-xl mx-auto">
+          <p className="text-xl text-gray-600 mb-10 max-w-xl mx-auto">
             Join teams using Meshflow to build stronger, more connected organizations.
           </p>
           <Link href="/signup">
-            <Button size="lg" className="bg-ctp-peach hover:bg-peach-400 text-ctp-base rounded-full px-10 h-14 text-lg font-medium">
+            <Button size="lg" className="bg-ctp-peach hover:bg-peach-400 text-white rounded-full px-10 h-14 text-lg font-medium">
               Get Started Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <p className="text-sm text-ctp-overlay0 mt-6">No credit card required</p>
+          <p className="text-sm text-gray-400 mt-6">No credit card required</p>
         </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 bg-ctp-crust">
+      <footer className="py-8 px-6 bg-gray-900">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-ctp-text font-semibold">Meshflow</span>
-            <span className="text-ctp-overlay0 text-sm">© 2025</span>
+            <span className="text-white font-semibold">Meshflow</span>
+            <span className="text-gray-400 text-sm">© 2025</span>
           </div>
           <div className="flex gap-8 text-sm">
-            <Link href="/login" className="text-ctp-subtext0 hover:text-ctp-text transition-colors">
+            <Link href="/login" className="text-gray-400 hover:text-white transition-colors">
               Login
             </Link>
-            <Link href="/signup" className="text-ctp-subtext0 hover:text-ctp-text transition-colors">
+            <Link href="/signup" className="text-gray-400 hover:text-white transition-colors">
               Get Started
             </Link>
           </div>

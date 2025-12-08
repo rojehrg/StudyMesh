@@ -212,7 +212,7 @@ export default function AboutPage() {
         className="bg-ctp-peach dark:bg-ctp-peach/100 rounded-2xl p-8 text-center"
       >
         <h2 className="text-2xl font-bold mb-3 text-white">Ready to collaborate?</h2>
-        <p className="text-ctp-rosewater mb-6 max-w-md mx-auto">
+        <p className="text-white/80 mb-6 max-w-md mx-auto">
           Start mapping your skills and connecting with teammates who can help you grow.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
