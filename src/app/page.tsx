@@ -64,23 +64,26 @@ export default function LandingPage() {
 
       {/* Hero Section - Left aligned with graphic on right */}
       <section className="pt-32 pb-20 px-6 relative min-h-[90vh] flex items-center">
-        {/* Colorful wave graphic */}
+        {/* Colorful wave graphic - teal pastel shades */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none hidden lg:block">
           <svg viewBox="0 0 600 800" className="h-full w-full" preserveAspectRatio="xMinYMin slice">
+            {/* Light mint */}
             <path
               d="M300,0 Q450,200 350,400 T400,800 L600,800 L600,0 Z"
-              fill="#38BDF8"
-              opacity="0.9"
+              fill="#99F6E4"
+              opacity="0.8"
             />
+            {/* Soft teal */}
             <path
               d="M350,0 Q500,250 400,450 T450,800 L600,800 L600,0 Z"
-              fill="#FBBF24"
-              opacity="0.9"
+              fill="#5EEAD4"
+              opacity="0.8"
             />
+            {/* Light cyan */}
             <path
               d="M400,0 Q550,200 450,400 T500,800 L600,800 L600,0 Z"
-              fill="#F472B6"
-              opacity="0.9"
+              fill="#A5F3FC"
+              opacity="0.8"
             />
           </svg>
         </div>
@@ -131,7 +134,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="#features">
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium border-gray-300 text-teal-600 hover:bg-teal-50">
+                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium border-teal-200 text-teal-600 hover:bg-teal-50 bg-white">
                   For Teams
                 </Button>
               </Link>
