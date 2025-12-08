@@ -1,0 +1,57 @@
+# Cursor Rules for Meshflow/StudyMesh
+
+## Project Overview
+This is a Next.js 16 application (App Router) for intelligent B2B team enablement and matching. The project uses TypeScript, Tailwind CSS, Shadcn UI, Supabase, and Drizzle ORM.
+
+## Tech Stack
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS + Shadcn UI + Framer Motion
+- **Backend**: Supabase (Auth + Postgres)
+- **ORM**: Drizzle ORM
+- **Matching Logic**: Custom TypeScript fuzzy matching engine
+
+## Code Style & Conventions
+- Use TypeScript strict mode
+- Follow Next.js App Router conventions
+- Use functional components with React hooks
+- Prefer server components by default, use 'use client' only when needed
+- Use async/await for async operations
+- Follow Shadcn UI component patterns
+- Use Tailwind CSS for styling (no inline styles)
+- Use Framer Motion for animations
+
+## File Structure
+- `src/app/` - Next.js App Router pages and layouts
+- `src/components/` - Reusable React components
+- `src/lib/` - Utility functions, database, and business logic
+- `src/hooks/` - Custom React hooks
+- `drizzle/` - Database migrations
+
+## Key Patterns
+- Authentication: Supabase Auth with SSR
+- Database: Drizzle ORM with PostgreSQL (Supabase)
+- Matching: Fuzzy string matching for skill-based matching
+- UI: Shadcn UI components with Tailwind CSS
+- Animations: Framer Motion for smooth transitions
+
+## Best Practices
+- Always handle errors gracefully
+- Use TypeScript types strictly (avoid `any`)
+- Optimize for server-side rendering when possible
+- Use Supabase RLS (Row Level Security) for data protection
+- Follow Next.js 16 best practices for data fetching
+- Keep components small and focused
+- Use proper TypeScript types from Drizzle schema
+
+## When Writing Code
+- Write clean, maintainable, and well-typed code
+- Add proper error handling
+- Consider performance implications
+- Follow the existing code patterns in the project
+- Use meaningful variable and function names
+- Add comments for complex logic
+
+
+
+

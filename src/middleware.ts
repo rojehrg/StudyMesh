@@ -85,6 +85,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    // Skip auth callback route - let it handle its own redirects
+    '/((?!_next/static|_next/image|favicon.ico|auth/callback).*)',
   ],
 }

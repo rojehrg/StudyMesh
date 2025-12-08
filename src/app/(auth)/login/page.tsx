@@ -44,19 +44,35 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    // Use hardcoded URL to avoid origin mismatch issues during dev
-    const redirectUrl = process.env.NODE_ENV === 'production' 
-      ? `${location.origin}/auth/callback`
-      : 'http://localhost:3000/auth/callback';
+    setError(null);
 
-    console.log("Redirecting to:", redirectUrl);
+    try {
+      // Always use the current origin for the redirect
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log("[Google Login] Redirect URL:", redirectUrl);
 
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: redirectUrl,
-      },
-    });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account', // Always show account selector
+          },
+        },
+      });
+
+      if (error) {
+        console.error("[Google Login] Error:", error);
+        setError(error.message);
+        setLoading(false);
+      }
+      // If no error, browser will redirect to Google
+    } catch (err: any) {
+      console.error("[Google Login] Exception:", err);
+      setError("Failed to connect to Google. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
