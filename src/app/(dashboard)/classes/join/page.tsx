@@ -249,7 +249,7 @@ export default function JoinPodPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="border-2 border-terra-200 rounded-xl p-6 bg-terra-50"
+                className="border-2 border-ctp-peach/30 rounded-xl p-6 bg-ctp-peach/10"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -261,7 +261,7 @@ export default function JoinPodPage() {
                       {podPreview.business_unit || "General"}
                     </div>
                   </div>
-                  <div className="bg-white px-3 py-1 rounded-lg border border-terra-300 font-mono text-sm font-medium text-terra-500">
+                  <div className="bg-white px-3 py-1 rounded-lg border border-ctp-peach/40 font-mono text-sm font-medium text-ctp-peach">
                     {podPreview.pod_code}
                   </div>
                 </div>
@@ -280,8 +280,8 @@ export default function JoinPodPage() {
                 </div>
 
                 {podPreview.alreadyMember ? (
-                  <div className="mt-6 bg-white border border-terra-200 rounded-lg p-3">
-                    <p className="text-sm text-terra-500 font-medium">
+                  <div className="mt-6 bg-white border border-ctp-peach/30 rounded-lg p-3">
+                    <p className="text-sm text-ctp-peach font-medium">
                       ✅ You're already a member of this pod
                     </p>
                   </div>
@@ -289,7 +289,7 @@ export default function JoinPodPage() {
                   <Button
                     onClick={handleJoin}
                     disabled={loading}
-                    className="w-full mt-6 bg-terra-400 hover:bg-terra-500"
+                    className="w-full mt-6 bg-ctp-peach hover:bg-ctp-peach/100"
                   >
                     {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Join This Pod

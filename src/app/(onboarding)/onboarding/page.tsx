@@ -112,22 +112,22 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream-200 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-ctp-base flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div 
-              className="h-full bg-terra-400"
+              className="h-full bg-ctp-peach"
               initial={{ width: "0%" }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
           <div className="flex justify-between mt-2 text-sm text-gray-500 font-medium">
-            <span className={step >= 1 ? "text-terra-400" : ""}>About You</span>
-            <span className={step >= 2 ? "text-terra-400" : ""}>Skills</span>
-            <span className={step >= 3 ? "text-terra-400" : ""}>Bio</span>
+            <span className={step >= 1 ? "text-ctp-peach" : ""}>About You</span>
+            <span className={step >= 2 ? "text-ctp-peach" : ""}>Skills</span>
+            <span className={step >= 3 ? "text-ctp-peach" : ""}>Bio</span>
           </div>
         </div>
 
@@ -192,7 +192,7 @@ export default function OnboardingPage() {
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
-                    className="bg-terra-400 hover:bg-terra-500 h-11 px-6"
+                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -216,7 +216,7 @@ export default function OnboardingPage() {
                 <CardContent className="space-y-8">
                   {/* Expertise */}
                   <div className="space-y-3">
-                    <Label className="text-terra-500 font-semibold flex items-center gap-2">
+                    <Label className="text-ctp-peach font-semibold flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
@@ -226,14 +226,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Python, Sales)"
                       type="expertise"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-cream-200 rounded-lg border border-gray-100">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-ctp-base rounded-lg border border-gray-100">
                       {formData.expertiseSkills.length === 0 && (
                         <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
                       )}
                       {formData.expertiseSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-terra-100 text-terra-500 hover:bg-terra-200 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-ctp-peach/20 text-ctp-peach hover:bg-ctp-peach/30 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-terra-300 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-ctp-peach/40 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
 
                   {/* Growth */}
                   <div className="space-y-3">
-                    <Label className="text-sage-600 font-semibold flex items-center gap-2">
+                    <Label className="text-ctp-green font-semibold flex items-center gap-2">
                       <ArrowRight className="w-4 h-4" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
@@ -253,14 +253,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Leadership, SQL)"
                       type="growth"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-cream-200 rounded-lg border border-gray-100">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-ctp-base rounded-lg border border-gray-100">
                        {formData.growthSkills.length === 0 && (
                         <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
                       )}
                       {formData.growthSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-sage-100 text-sage-600 hover:bg-sage-200 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-ctp-green/20 text-ctp-green hover:bg-ctp-green/30 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-sage-300 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-ctp-green/40 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
@@ -273,7 +273,7 @@ export default function OnboardingPage() {
                   <Button 
                     onClick={() => setStep(3)} 
                     disabled={formData.expertiseSkills.length === 0}
-                    className="bg-terra-400 hover:bg-terra-500 h-11 px-6"
+                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -311,7 +311,7 @@ export default function OnboardingPage() {
                   <Button 
                     onClick={handleSubmit} 
                     disabled={loading} 
-                    className="bg-terra-400 hover:bg-terra-500 h-11 px-8 transition-all active:scale-95"
+                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-8 transition-all active:scale-95"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Complete Profile

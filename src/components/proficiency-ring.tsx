@@ -6,7 +6,7 @@ interface ProficiencyRingProps {
   value: number; // 0, 25, 50, 75, or 100
   onChange: (value: number) => void;
   size?: "sm" | "md";
-  color?: "terra" | "sage";
+  color?: "peach" | "green";
 }
 
 const levels = [
@@ -16,25 +16,25 @@ const levels = [
   { value: 100, label: "Expert" },
 ];
 
-export function ProficiencyRing({ value, onChange, size = "md", color = "terra" }: ProficiencyRingProps) {
+export function ProficiencyRing({ value, onChange, size = "md", color = "peach" }: ProficiencyRingProps) {
   const currentLevel = levels.find(l => l.value === value) || levels[0];
   const ringSize = size === "sm" ? "w-12 h-12" : "w-14 h-14";
   const innerSize = size === "sm" ? "w-9 h-9" : "w-11 h-11";
 
-  const colorClasses = color === "terra"
+  const colorClasses = color === "peach"
     ? {
-        filled: "bg-terra-400",
+        filled: "bg-ctp-peach",
         empty: "bg-muted",
-        text: "text-terra-500 dark:text-terra-400",
-        hover: "hover:bg-terra-50 dark:hover:bg-terra-900/30 hover:border-terra-200 dark:hover:border-terra-700",
-        selected: "bg-terra-50 dark:bg-terra-900/30 border-terra-300 dark:border-terra-600",
+        text: "text-ctp-peach",
+        hover: "hover:bg-ctp-peach/10 hover:border-ctp-peach/30",
+        selected: "bg-ctp-peach/10 border-ctp-peach/50",
       }
     : {
-        filled: "bg-sage-400",
+        filled: "bg-ctp-green",
         empty: "bg-muted",
-        text: "text-sage-600 dark:text-sage-400",
-        hover: "hover:bg-sage-50 dark:hover:bg-sage-900/30 hover:border-sage-200 dark:hover:border-sage-700",
-        selected: "bg-sage-50 dark:bg-sage-900/30 border-sage-300 dark:border-sage-600",
+        text: "text-ctp-green",
+        hover: "hover:bg-ctp-green/10 hover:border-ctp-green/30",
+        selected: "bg-ctp-green/10 border-ctp-green/50",
       };
 
   // Calculate which quadrants are filled (going clockwise from top-right)
@@ -107,13 +107,13 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "terra" 
 }
 
 // Simpler display-only version for showing in cards
-export function ProficiencyDisplay({ value, size = "sm", color = "terra" }: Omit<ProficiencyRingProps, "onChange">) {
+export function ProficiencyDisplay({ value, size = "sm", color = "peach" }: Omit<ProficiencyRingProps, "onChange">) {
   const ringSize = size === "sm" ? "w-8 h-8" : "w-10 h-10";
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
-  const colorClasses = color === "terra"
-    ? { filled: "bg-terra-400", empty: "bg-muted", text: "text-terra-500 dark:text-terra-400" }
-    : { filled: "bg-sage-400", empty: "bg-muted", text: "text-sage-600 dark:text-sage-400" };
+  const colorClasses = color === "peach"
+    ? { filled: "bg-ctp-peach", empty: "bg-muted", text: "text-ctp-peach" }
+    : { filled: "bg-ctp-green", empty: "bg-muted", text: "text-ctp-green" };
 
   const filledQuadrants = Math.round(value / 25);
 

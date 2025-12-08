@@ -159,11 +159,11 @@ export function SkillAutocomplete({
             {suggestions.map((skill, index) => (
               <button
                 key={skill}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-terra-50 transition-colors ${
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-ctp-peach/10 transition-colors ${
                   index === selectedIndex
                     ? type === "expertise"
-                      ? "bg-terra-50 text-terra-500"
-                      : "bg-sage-50 text-sage-600"
+                      ? "bg-ctp-peach/10 text-ctp-peach"
+                      : "bg-ctp-green/10 text-ctp-green"
                     : "text-gray-700"
                 }`}
                 onClick={() => handleSuggestionClick(skill)}

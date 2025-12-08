@@ -4,99 +4,101 @@
 
 @layer base {
   :root {
-    /* New Mediterranean/Earthy Palette */
-    /* Cream #F4F1DE, Terra Cotta #E07A5F, Charcoal Blue #3D405B, Sage #81B29A, Sand #F2CC8F */
+    /* Catppuccin Latte (Light Mode) */
+    /* Using lighter complementary colors for light mode */
 
-    /* Backgrounds - Cream tinted */
-    --background: 47 38% 96%;
-    --foreground: 234 20% 30%;
+    /* Backgrounds */
+    --background: 220 23% 95%;
+    --foreground: 234 16% 35%;
 
-    /* Cards & Surfaces - Pure white for contrast */
-    --card: 0 0% 100%;
-    --card-foreground: 234 20% 30%;
+    /* Cards & Surfaces */
+    --card: 220 22% 100%;
+    --card-foreground: 234 16% 35%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 234 20% 30%;
+    --popover: 220 22% 100%;
+    --popover-foreground: 234 16% 35%;
 
-    /* Primary - Terra Cotta (#E07A5F) */
-    --primary: 12 66% 63%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Peach */
+    --primary: 23 92% 75%;
+    --primary-foreground: 240 21% 15%;
 
-    /* Secondary - Sage Green (#81B29A) */
-    --secondary: 152 30% 60%;
-    --secondary-foreground: 234 20% 25%;
+    /* Secondary - Mauve */
+    --secondary: 267 84% 81%;
+    --secondary-foreground: 240 21% 15%;
 
-    /* Muted - Light cream/gray */
-    --muted: 47 25% 92%;
-    --muted-foreground: 234 10% 45%;
+    /* Muted */
+    --muted: 228 24% 92%;
+    --muted-foreground: 228 24% 45%;
 
-    /* Accent - Sand/Gold (#F2CC8F) */
-    --accent: 39 78% 75%;
-    --accent-foreground: 234 20% 25%;
+    /* Accent - Lavender */
+    --accent: 232 97% 85%;
+    --accent-foreground: 240 21% 15%;
 
     /* Destructive - Red */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 343 81% 75%;
+    --destructive-foreground: 240 21% 15%;
 
     /* Borders & Inputs */
-    --border: 47 20% 88%;
-    --input: 47 20% 88%;
-    --ring: 12 66% 63%;
+    --border: 228 17% 85%;
+    --input: 228 17% 85%;
+    --ring: 23 92% 75%;
 
     /* Rounded corners */
     --radius: 0.75rem;
 
-    /* Chart colors - using the palette */
-    --chart-1: 12 66% 63%;
-    --chart-2: 152 30% 60%;
-    --chart-3: 39 78% 75%;
-    --chart-4: 234 20% 50%;
-    --chart-5: 47 38% 85%;
+    /* Chart colors - Catppuccin accent colors */
+    --chart-1: 23 92% 75%;
+    --chart-2: 267 84% 81%;
+    --chart-3: 115 54% 76%;
+    --chart-4: 217 92% 76%;
+    --chart-5: 41 86% 83%;
   }
 
   .dark {
-    /* Dark mode - Charcoal Blue based (#3D405B) */
-    --background: 234 20% 15%;
-    --foreground: 0 0% 100%;
+    /* Catppuccin Mocha (Dark Mode) */
 
-    /* Cards & Surfaces - slightly lighter */
-    --card: 234 20% 18%;
-    --card-foreground: 0 0% 100%;
+    /* Backgrounds - Base */
+    --background: 240 21% 15%;
+    --foreground: 226 64% 88%;
 
-    --popover: 234 20% 20%;
-    --popover-foreground: 0 0% 100%;
+    /* Cards & Surfaces - Surface 0 */
+    --card: 237 16% 23%;
+    --card-foreground: 226 64% 88%;
 
-    /* Primary - Terra Cotta (slightly brighter for dark mode) */
-    --primary: 12 66% 58%;
-    --primary-foreground: 234 20% 12%;
+    --popover: 234 13% 31%;
+    --popover-foreground: 226 64% 88%;
 
-    /* Secondary - Sage Green */
-    --secondary: 152 30% 45%;
-    --secondary-foreground: 0 0% 100%;
+    /* Primary - Peach */
+    --primary: 23 92% 75%;
+    --primary-foreground: 240 21% 15%;
 
-    /* Muted */
-    --muted: 234 18% 22%;
-    --muted-foreground: 0 0% 70%;
+    /* Secondary - Mauve */
+    --secondary: 267 84% 81%;
+    --secondary-foreground: 240 21% 15%;
 
-    /* Accent - Sand/Gold (muted for dark) */
-    --accent: 39 50% 55%;
-    --accent-foreground: 234 20% 15%;
+    /* Muted - Surface 1 */
+    --muted: 234 13% 31%;
+    --muted-foreground: 227 35% 80%;
 
-    /* Destructive */
-    --destructive: 0 62% 55%;
-    --destructive-foreground: 0 0% 100%;
+    /* Accent - Lavender */
+    --accent: 232 97% 85%;
+    --accent-foreground: 240 21% 15%;
 
-    /* Borders & Inputs */
-    --border: 234 18% 26%;
-    --input: 234 18% 24%;
-    --ring: 12 66% 58%;
+    /* Destructive - Red */
+    --destructive: 343 81% 75%;
+    --destructive-foreground: 240 21% 15%;
+
+    /* Borders & Inputs - Surface 2 */
+    --border: 233 12% 39%;
+    --input: 233 12% 39%;
+    --ring: 23 92% 75%;
 
     /* Chart colors */
-    --chart-1: 12 66% 58%;
-    --chart-2: 152 30% 50%;
-    --chart-3: 39 60% 60%;
-    --chart-4: 234 15% 55%;
-    --chart-5: 47 25% 70%;
+    --chart-1: 23 92% 75%;
+    --chart-2: 267 84% 81%;
+    --chart-3: 115 54% 76%;
+    --chart-4: 217 92% 76%;
+    --chart-5: 41 86% 83%;
   }
 }
 
@@ -109,7 +111,7 @@
   }
 }
 
-/* Animated Grid Background - Updated to Terra Cotta */
+/* Animated Grid Background - Catppuccin Peach */
 @keyframes grid-move {
   0% {
     background-position: 0 0;
@@ -123,8 +125,8 @@
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(224, 122, 95, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(224, 122, 95, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(250, 179, 135, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250, 179, 135, 0.08) 1px, transparent 1px);
   background-size: 50px 50px;
   background-position: 0 0;
   animation: grid-move 30s linear infinite;
@@ -132,7 +134,7 @@
   pointer-events: none;
 }
 
-/* Floating Gradient Blobs - Updated colors */
+/* Floating Gradient Blobs - Catppuccin colors */
 @keyframes blob-float {
   0%, 100% {
     transform: translate(0, 0) scale(1);
@@ -170,7 +172,7 @@
 .blob-1 {
   width: 600px;
   height: 600px;
-  background: #E07A5F;
+  background: #fab387; /* Peach */
   top: -15%;
   right: -10%;
   animation: blob-float 25s ease-in-out infinite;
@@ -179,7 +181,7 @@
 .blob-2 {
   width: 500px;
   height: 500px;
-  background: #81B29A;
+  background: #cba6f7; /* Mauve */
   bottom: -10%;
   left: -10%;
   animation: blob-float-2 30s ease-in-out infinite;
@@ -189,7 +191,7 @@
 .blob-3 {
   width: 450px;
   height: 450px;
-  background: #F2CC8F;
+  background: #89b4fa; /* Blue */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -197,16 +199,16 @@
   animation-delay: 10s;
 }
 
-/* Custom Patterns - Updated to Terra Cotta */
+/* Custom Patterns - Catppuccin Peach */
 .bg-grid-pattern {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(224, 122, 95, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(224, 122, 95, 0.04) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(250, 179, 135, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(250, 179, 135, 0.04) 1px, transparent 1px);
   animation: grid-move 20s linear infinite;
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(rgba(224, 122, 95, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(250, 179, 135, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -238,5 +240,5 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px rgba(224, 122, 95, 0.15);
+  box-shadow: 0 12px 24px -6px rgba(250, 179, 135, 0.15);
 }

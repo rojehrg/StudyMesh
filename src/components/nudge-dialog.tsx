@@ -63,15 +63,15 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   nudgeType === 'ask'
-                    ? 'border-sage-500/50 dark:border-sage-400/50 bg-sage-100 dark:bg-sage-900/30'
-                    : 'border-border hover:border-sage-500/30 hover:bg-accent'
+                    ? 'border-ctp-green/50 dark:border-ctp-green/50 bg-ctp-green/20 dark:bg-ctp-green/20'
+                    : 'border-border hover:border-ctp-green/30 hover:bg-accent'
                 }`}
               >
                 <HelpCircle className={`w-6 h-6 mx-auto mb-2 ${
-                  nudgeType === 'ask' ? 'text-sage-500 dark:text-sage-400' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-ctp-green dark:text-ctp-green' : 'text-muted-foreground'
                 }`} />
                 <p className={`text-sm font-medium ${
-                  nudgeType === 'ask' ? 'text-sage-600 dark:text-sage-300' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-ctp-green dark:text-ctp-green' : 'text-muted-foreground'
                 }`}>
                   Ask for Help
                 </p>
@@ -133,7 +133,7 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
           {/* Preview */}
           {selectedTopic && (
             <div className={`p-4 rounded-xl border-2 ${
-              nudgeType === 'ask' ? 'bg-cyan-500/10 dark:bg-cyan-400/10 border-cyan-500/30 dark:border-cyan-400/30' : 'bg-primary/10 border-primary/30'
+              nudgeType === 'ask' ? 'bg-ctp-sky/10 dark:bg-ctp-sky/10 border-ctp-sky/30 dark:border-ctp-sky/30' : 'bg-primary/10 border-primary/30'
             }`}>
               <p className="text-sm font-medium text-foreground mb-1">Message Preview:</p>
               <p className="text-sm text-foreground">
@@ -153,7 +153,7 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
           <Button 
             onClick={handleSubmit} 
             disabled={!selectedTopic || loading}
-            className={nudgeType === 'ask' ? 'bg-sage-500 hover:bg-sage-600' : 'bg-terra-400 hover:bg-terra-500'}
+            className={nudgeType === 'ask' ? 'bg-ctp-green hover:bg-green-400' : 'bg-ctp-peach hover:bg-peach-400'}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Send Nudge

@@ -200,7 +200,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-terra-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-ctp-peach" />
       </div>
     );
   }
@@ -384,7 +384,7 @@ export default function SettingsPage() {
                           value={normalizedLevel}
                           onChange={(val) => setLevel('expertise', skill, val)}
                           size="sm"
-                          color="terra"
+                          color="peach"
                         />
                       </div>
                       <button onClick={() => removeSkill('expertise', skill)} className="text-muted-foreground hover:text-destructive p-1">
@@ -426,7 +426,7 @@ export default function SettingsPage() {
                           value={normalizedLevel}
                           onChange={(val) => setLevel('growth', skill, val)}
                           size="sm"
-                          color="sage"
+                          color="green"
                         />
                       </div>
                       <button onClick={() => removeSkill('growth', skill)} className="text-muted-foreground hover:text-destructive p-1">

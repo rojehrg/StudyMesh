@@ -155,7 +155,7 @@ export default function LoginPage() {
               disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full bg-terra-400 hover:bg-terra-500" disabled={loading}>
+          <Button type="submit" className="w-full bg-ctp-peach hover:bg-peach-400 text-ctp-base" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
           </Button>
@@ -164,7 +164,7 @@ export default function LoginPage() {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-terra-400 hover:underline font-medium">
+          <Link href="/signup" className="text-ctp-peach hover:underline font-medium">
             Sign up
           </Link>
         </p>

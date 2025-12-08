@@ -96,7 +96,7 @@ export default function ClassesPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-terra-400 hover:bg-terra-500" asChild>
+          <Button className="bg-ctp-peach hover:bg-peach-400" asChild>
             <Link href="/classes/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Pod
@@ -131,7 +131,7 @@ export default function ClassesPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="group-hover:text-terra-400 transition-colors">
+                        <CardTitle className="group-hover:text-ctp-peach transition-colors">
                           {pod.pod_name}
                         </CardTitle>
                         <CardDescription className="mt-2 flex items-center gap-1">
@@ -182,7 +182,7 @@ export default function ClassesPage() {
               <Button variant="outline" asChild>
                 <Link href="/classes/join">Join Pod</Link>
               </Button>
-              <Button className="bg-terra-400 hover:bg-terra-500" asChild>
+              <Button className="bg-ctp-peach hover:bg-peach-400" asChild>
                 <Link href="/classes/create">Create Pod</Link>
               </Button>
             </div>
