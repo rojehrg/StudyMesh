@@ -57,14 +57,14 @@
   .dark {
     /* Dark mode - Charcoal Blue based (#3D405B) */
     --background: 234 20% 15%;
-    --foreground: 47 30% 92%;
+    --foreground: 0 0% 100%;
 
     /* Cards & Surfaces - slightly lighter */
     --card: 234 20% 18%;
-    --card-foreground: 47 30% 92%;
+    --card-foreground: 0 0% 100%;
 
     --popover: 234 20% 20%;
-    --popover-foreground: 47 30% 92%;
+    --popover-foreground: 0 0% 100%;
 
     /* Primary - Terra Cotta (slightly brighter for dark mode) */
     --primary: 12 66% 58%;
@@ -72,11 +72,11 @@
 
     /* Secondary - Sage Green */
     --secondary: 152 30% 45%;
-    --secondary-foreground: 47 30% 92%;
+    --secondary-foreground: 0 0% 100%;
 
     /* Muted */
     --muted: 234 18% 22%;
-    --muted-foreground: 47 15% 60%;
+    --muted-foreground: 0 0% 70%;
 
     /* Accent - Sand/Gold (muted for dark) */
     --accent: 39 50% 55%;
@@ -84,7 +84,7 @@
 
     /* Destructive */
     --destructive: 0 62% 55%;
-    --destructive-foreground: 47 30% 92%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
     --border: 234 18% 26%;
