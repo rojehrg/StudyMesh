@@ -181,10 +181,10 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
             >
-              <span className="inline-block bg-ctp-yellow/20 text-ctp-yellow px-3 py-1 rounded-full text-xs font-medium shadow-sm mb-6">
+              <span className="inline-block bg-ctp-yellow/20 text-ctp-yellow px-4 py-1.5 rounded-full text-sm font-semibold border border-ctp-yellow/30 mb-6">
                 Skill Matching
               </span>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Find Your Perfect Match
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -202,10 +202,10 @@ export default function LandingPage() {
               transition={{ delay: 0.2 }}
               className="bg-white rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
             >
-              <span className="inline-block bg-ctp-mauve/20 text-ctp-mauve px-3 py-1 rounded-full text-xs font-medium shadow-sm mb-6">
+              <span className="inline-block bg-ctp-mauve/20 text-ctp-mauve px-4 py-1.5 rounded-full text-sm font-semibold border border-ctp-mauve/30 mb-6">
                 Team Collaboration
               </span>
-              <h3 className="text-xl font-bold text-ctp-peach mb-4">
+              <h3 className="text-2xl font-bold text-ctp-peach mb-4">
                 Connect Across Teams
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -301,15 +301,23 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+      <section id="how-it-works" className="py-24 px-6 relative overflow-hidden">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-ctp-lavender/10 via-ctp-peach/5 to-ctp-mauve/10" />
+        {/* Animated Grid Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(203, 166, 247, 0.3) 1px, transparent 0)`,
+          backgroundSize: '32px 32px'
+        }} />
+
+        <div className="max-w-4xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-6"
           >
-            <span className="inline-block bg-ctp-lavender/20 text-ctp-lavender px-4 py-2 rounded-full text-sm font-medium shadow-sm">
+            <span className="inline-block bg-ctp-lavender/20 text-ctp-lavender px-4 py-2 rounded-full text-sm font-semibold border border-ctp-lavender/30">
               How It Works
             </span>
           </motion.div>
@@ -328,39 +336,67 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="space-y-12">
+          <div className="space-y-8">
             {[
               {
                 step: "01",
                 title: "Add Your Skills",
                 description: "List what you're good at and what you want to learn. It only takes 2 minutes to set up your profile.",
+                color: "peach",
+                icon: Target,
               },
               {
                 step: "02",
                 title: "Discover Matches",
                 description: "Meshflow automatically finds teammates who can help you grow—and those you can mentor.",
+                color: "mauve",
+                icon: Users,
               },
               {
                 step: "03",
                 title: "Start Connecting",
                 description: "Send a nudge, start a conversation, share knowledge. Watch your team thrive together.",
+                color: "green",
+                icon: MessageCircle,
               },
             ].map((item, index) => (
               <motion.div
                 key={item.step}
-                initial={{ opacity: 0, x: -30 }}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="flex gap-8 items-start"
+                transition={{ delay: index * 0.15, duration: 0.5 }}
+                whileHover={{ scale: 1.02, x: 8 }}
+                className={`flex gap-6 items-center p-6 rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300`}
               >
-                <div className="text-6xl font-bold text-gray-200 shrink-0 w-24">
-                  {item.step}
+                {/* Step Number with Icon */}
+                <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shrink-0 relative ${
+                  item.color === "peach" ? "bg-gradient-to-br from-ctp-peach to-ctp-peach/70" :
+                  item.color === "mauve" ? "bg-gradient-to-br from-ctp-mauve to-ctp-mauve/70" :
+                  "bg-gradient-to-br from-ctp-green to-ctp-green/70"
+                }`}>
+                  <item.icon className="w-8 h-8 text-white" />
+                  <span className="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center text-xs font-bold text-gray-700 shadow-md border border-gray-100">
+                    {item.step}
+                  </span>
                 </div>
-                <div className="pt-3">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">{item.description}</p>
+
+                {/* Content */}
+                <div className="flex-1">
+                  <h3 className={`text-xl md:text-2xl font-bold mb-2 ${
+                    item.color === "peach" ? "text-ctp-peach" :
+                    item.color === "mauve" ? "text-ctp-mauve" :
+                    "text-ctp-green"
+                  }`}>{item.title}</h3>
+                  <p className="text-gray-600 text-base md:text-lg leading-relaxed">{item.description}</p>
                 </div>
+
+                {/* Arrow indicator */}
+                <ArrowRight className={`w-6 h-6 shrink-0 hidden md:block ${
+                  item.color === "peach" ? "text-ctp-peach/50" :
+                  item.color === "mauve" ? "text-ctp-mauve/50" :
+                  "text-ctp-green/50"
+                }`} />
               </motion.div>
             ))}
           </div>

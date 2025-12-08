@@ -303,8 +303,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         "flex-1 flex flex-col min-h-screen transition-all duration-300",
         isCollapsed ? "md:ml-20" : "md:ml-64"
       )}>
-        {/* Header */}
-        <header className="h-14 bg-card shadow-sm flex items-center justify-between px-4 sticky top-0 z-30">
+        {/* Header - Fixed positioning */}
+        <header className={cn(
+          "h-14 bg-card/95 backdrop-blur-sm shadow-sm flex items-center justify-between px-4 fixed top-0 right-0 z-30 border-b border-border/50",
+          isCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
+        )}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
               <Menu className="w-6 h-6 text-foreground" />
@@ -317,8 +320,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6 md:p-8 overflow-x-hidden">
+        {/* Page Content - Add top padding for fixed header */}
+        <main className="flex-1 p-6 md:p-8 overflow-x-hidden pt-20">
           {children}
         </main>
       </div>

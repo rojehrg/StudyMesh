@@ -187,11 +187,11 @@ export default async function DashboardPage() {
           {trendingSkills.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="w-4 h-4 text-ctp-peach" />
+                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Target className="w-5 h-5 text-ctp-peach" />
                   Most Requested Skills
                 </CardTitle>
-                <CardDescription className="text-xs">
+                <CardDescription className="text-sm text-muted-foreground">
                   Skills teammates are looking for help with
                 </CardDescription>
               </CardHeader>
@@ -226,11 +226,11 @@ export default async function DashboardPage() {
           {/* Community Stats */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-ctp-mauve" />
+              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-ctp-mauve" />
                 Community Insights
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-sm text-muted-foreground">
                 What's happening in Meshflow
               </CardDescription>
             </CardHeader>
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
 
       {/* Profile Completion */}
       {completionPercent < 100 && (
-        <Card className="bg-ctp-peach/10/50 dark:bg-ctp-peach/20/20 shadow-lg">
+        <Card className="bg-ctp-peach/10 shadow-lg border-ctp-peach/20">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -343,7 +343,7 @@ export default async function DashboardPage() {
         ) : (
           <Card className="shadow-lg">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 bg-ctp-peach/20 dark:bg-ctp-peach/20/30 rounded-2xl flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-ctp-peach/20 rounded-2xl flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-ctp-peach dark:text-ctp-peach" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Ready to start enabling?</h3>
@@ -377,26 +377,26 @@ export default async function DashboardPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Link href="/groups">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-peach/10/50 dark:hover:bg-ctp-peach/20/20 transition-all cursor-pointer text-center">
-                <Sparkles className="w-6 h-6 text-ctp-peach dark:text-ctp-peach mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-peach/15 transition-all cursor-pointer text-center group">
+                <Sparkles className="w-6 h-6 text-ctp-peach mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Find Matches</p>
               </div>
             </Link>
             <Link href="/settings?tab=skills">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-green/10 dark:hover:bg-ctp-green/10 transition-all cursor-pointer text-center">
-                <TrendingUp className="w-6 h-6 text-ctp-green dark:text-ctp-green mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-green/15 transition-all cursor-pointer text-center group">
+                <TrendingUp className="w-6 h-6 text-ctp-green mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Add Skills</p>
               </div>
             </Link>
             <Link href="/notifications">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-yellow/10 dark:hover:bg-ctp-yellow/10 transition-all cursor-pointer text-center">
-                <Bell className="w-6 h-6 text-ctp-yellow dark:text-ctp-yellow mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-yellow/15 transition-all cursor-pointer text-center group">
+                <Bell className="w-6 h-6 text-ctp-yellow mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Notifications</p>
               </div>
             </Link>
             <Link href="/about">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-lavender/10 dark:hover:bg-ctp-lavender/10 transition-all cursor-pointer text-center">
-                <Users className="w-6 h-6 text-ctp-lavender mx-auto mb-2" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-lavender/15 transition-all cursor-pointer text-center group">
+                <Users className="w-6 h-6 text-ctp-lavender mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Learn More</p>
               </div>
             </Link>

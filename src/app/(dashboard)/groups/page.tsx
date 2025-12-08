@@ -329,11 +329,11 @@ export default function WorkingCirclesPage() {
         {/* My Requests */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
+            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-ctp-peach" />
               My Help Requests
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-sm text-muted-foreground">
               Jot down what you need help with
             </CardDescription>
           </CardHeader>
@@ -385,11 +385,11 @@ export default function WorkingCirclesPage() {
         {/* Requests I Can Help */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Bell className="w-4 h-4 text-ctp-sky" />
+            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Bell className="w-5 h-5 text-ctp-sky" />
               You Can Help
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-sm text-muted-foreground">
               People need help with skills you have
             </CardDescription>
           </CardHeader>
