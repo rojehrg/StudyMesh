@@ -2,475 +2,334 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, Zap, TrendingUp, Sparkles, MessageCircle, Target, CheckCircle2, Play } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { ArrowRight, Users, MessageCircle, Target, Sparkles, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
+// Smooth fade-in animation (Rooh-style: 0.8s with cubic-bezier)
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
+    y: 0,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
+      duration: 0.8,
+      ease: [0.4, 0, 0.2, 1] as const,
     },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+const staggerContainer = {
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
   },
 };
 
 export default function LandingPage() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 50]);
-
   return (
-    <div className="min-h-screen bg-white font-sans">
-      {/* Navigation */}
+    <div className="min-h-screen bg-white">
+      {/* Navigation - Clean & Minimal */}
       <motion.nav
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md"
       >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <span className="text-teal-600 font-bold text-xl">Mesh</span>
-            <span className="text-gray-900 font-bold text-xl">flow</span>
+          <Link href="/" className="flex items-center gap-0.5">
+            <span className="text-teal-600 font-semibold text-xl tracking-tight">Mesh</span>
+            <span className="text-gray-900 font-semibold text-xl tracking-tight">flow</span>
           </Link>
+
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="#features" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
+              Features
+            </Link>
+            <Link href="#how-it-works" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">
+              How it works
+            </Link>
+          </div>
+
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                Sign In
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 font-medium">
+                Log in
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg">
-                Get Started
+              <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4">
+                Get Meshflow
               </Button>
             </Link>
           </div>
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
-      <section ref={heroRef} className="pt-28 pb-20 px-6">
+      {/* Hero Section - Bold & Clean */}
+      <section className="pt-32 pb-24 px-6">
         <motion.div
-          style={{ opacity: heroOpacity, y: heroY }}
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
           className="max-w-4xl mx-auto text-center"
         >
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+          <motion.h1
+            variants={fadeInUp}
+            className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-[1.1] tracking-tight"
           >
-            <motion.div variants={itemVariants} className="mb-6">
-              <span className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-3 py-1.5 rounded-full text-sm font-medium">
-                <Sparkles className="w-3.5 h-3.5" />
-                Team Knowledge Platform
-              </span>
-            </motion.div>
+            Find expertise.
+            <br />
+            <span className="text-teal-600">Share knowledge.</span>
+          </motion.h1>
 
-            <motion.h1
-              variants={itemVariants}
-              className="text-5xl md:text-6xl font-bold text-gray-900 mb-5 leading-[1.1] tracking-tight"
-            >
-              Stop searching.
-              <br />
-              <span className="text-teal-600">Start connecting.</span>
-            </motion.h1>
-
-            <motion.p
-              variants={itemVariants}
-              className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
-            >
-              Meshflow surfaces hidden expertise across your team, so the right people connect at the right time.
-            </motion.p>
-
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row items-center justify-center gap-3"
-            >
-              <Link href="/signup">
-                <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-6 h-12 text-base shadow-sm">
-                  Start free
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="#how-it-works">
-                <Button variant="outline" size="lg" className="rounded-lg px-6 h-12 text-base border-gray-200">
-                  <Play className="mr-2 h-4 w-4" />
-                  See how it works
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Stats Row */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+          <motion.p
+            variants={fadeInUp}
+            className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed font-light"
           >
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="text-3xl font-bold text-gray-900">3.2x</div>
-              <div className="text-sm text-gray-500 mt-1">Faster resolution</div>
-            </motion.div>
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="text-3xl font-bold text-gray-900">87%</div>
-              <div className="text-sm text-gray-500 mt-1">More engagement</div>
-            </motion.div>
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="text-3xl font-bold text-gray-900">92%</div>
-              <div className="text-sm text-gray-500 mt-1">Knowledge retained</div>
-            </motion.div>
+            Connect teammates who can help each other grow.
+            Meshflow surfaces hidden skills across your team.
+          </motion.p>
+
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Link href="/signup">
+              <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white rounded-full px-8 h-14 text-base font-medium shadow-lg shadow-teal-600/20 hover:shadow-xl hover:shadow-teal-600/30 transition-all">
+                Get Started Free
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="#how-it-works">
+              <Button variant="ghost" size="lg" className="text-gray-600 hover:text-gray-900 rounded-full px-6 h-14 text-base font-medium">
+                See how it works
+                <ChevronRight className="ml-1 h-5 w-5" />
+              </Button>
+            </Link>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Visual Demo Section */}
-      <section className="py-16 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden"
-          >
-            {/* Browser Chrome */}
-            <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-              </div>
-              <div className="flex-1 flex justify-center">
-                <div className="bg-white rounded px-4 py-1 text-xs text-gray-500 border">
-                  app.meshflow.io
-                </div>
-              </div>
+      {/* Social Proof - Subtle */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="py-12 px-6 border-y border-gray-100"
+      >
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-sm text-gray-400 mb-8 uppercase tracking-wider font-medium">
+            Built for teams that move fast
+          </p>
+          <div className="grid grid-cols-3 gap-12 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-gray-900 mb-1">3x</div>
+              <div className="text-sm text-gray-500">Faster onboarding</div>
             </div>
-
-            {/* App Preview */}
-            <div className="p-8 bg-gradient-to-br from-gray-50 to-white">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Match Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Best Match</span>
-                    <span className="bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-1 rounded-full">92%</span>
-                  </div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-semibold">
-                      SJ
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">Sarah Johnson</p>
-                      <p className="text-sm text-gray-500">Engineering</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Can help you with:</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      <span className="bg-cyan-50 text-cyan-700 text-xs px-2 py-1 rounded-md">Python</span>
-                      <span className="bg-cyan-50 text-cyan-700 text-xs px-2 py-1 rounded-md">SQL</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Nudge Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm"
-                >
-                  <div className="flex items-center gap-2 mb-4">
-                    <MessageCircle className="w-4 h-4 text-teal-600" />
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Nudge</span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="bg-teal-50 border border-teal-100 rounded-lg p-3">
-                      <p className="text-sm text-teal-900">Hey! I can help you with SQL queries.</p>
-                      <p className="text-xs text-teal-600 mt-1">From Sarah • 2m ago</p>
-                    </div>
-                    <div className="bg-gray-50 border border-gray-100 rounded-lg p-3">
-                      <p className="text-sm text-gray-700">Need help with Python?</p>
-                      <p className="text-xs text-gray-500 mt-1">From Mike • 5m ago</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-gray-900 mb-1">87%</div>
+              <div className="text-sm text-gray-500">More connections</div>
             </div>
-          </motion.div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-gray-900 mb-1">2min</div>
+              <div className="text-sm text-gray-500">Setup time</div>
+            </div>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6">
+      {/* Features - Card Grid */}
+      <section id="features" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-14"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-              Everything your team needs
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Everything you need
             </h2>
-            <p className="text-lg text-gray-600 max-w-xl mx-auto">
-              Simple tools that make knowledge sharing natural.
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Simple tools that make knowledge sharing feel natural.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Feature Card 1 */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="group p-8 rounded-2xl border border-gray-100 hover:border-gray-200 bg-white hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
-                <Target className="w-5 h-5 text-teal-600" />
+              <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-teal-100 transition-colors">
+                <Target className="w-6 h-6 text-teal-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Smart Matching</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Our algorithm connects teammates based on expertise and growth areas automatically.
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Smart Matching</h3>
+              <p className="text-gray-500 leading-relaxed">
+                Our algorithm pairs teammates based on complementary skills. You teach what you know, learn what you need.
               </p>
             </motion.div>
 
-            {/* Feature 2 */}
+            {/* Feature Card 2 */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="group p-8 rounded-2xl border border-gray-100 hover:border-gray-200 bg-white hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
-                <MessageCircle className="w-5 h-5 text-cyan-600" />
+              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-cyan-100 transition-colors">
+                <MessageCircle className="w-6 h-6 text-cyan-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Quick Nudges</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Send skill-specific requests or offers. Connects to Slack for instant notifications.
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Quick Nudges</h3>
+              <p className="text-gray-500 leading-relaxed">
+                Send contextual requests to connect. Ask for help or offer your expertise—right from the dashboard.
               </p>
             </motion.div>
 
-            {/* Feature 3 */}
+            {/* Feature Card 3 */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="group p-8 rounded-2xl border border-gray-100 hover:border-gray-200 bg-white hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-5 h-5 text-teal-600" />
+              <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-teal-100 transition-colors">
+                <Users className="w-6 h-6 text-teal-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Pods</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Organize by project, department, or initiative. Keep knowledge sharing focused.
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Team Pods</h3>
+              <p className="text-gray-500 leading-relaxed">
+                Organize by project, department, or initiative. Share a code and teammates join instantly.
               </p>
             </motion.div>
 
-            {/* Feature 4 */}
+            {/* Feature Card 4 */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="group p-8 rounded-2xl border border-gray-100 hover:border-gray-200 bg-white hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
-                <Sparkles className="w-5 h-5 text-cyan-600" />
+              <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-5 group-hover:bg-cyan-100 transition-colors">
+                <Sparkles className="w-6 h-6 text-cyan-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Help Status</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Toggle when you're available to mentor. Be discoverable when you have bandwidth.
-              </p>
-            </motion.div>
-
-            {/* Feature 5 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
-            >
-              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-5 h-5 text-teal-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Skill Mapping</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                See what your team knows and what they want to learn. Find gaps at a glance.
-              </p>
-            </motion.div>
-
-            {/* Feature 6 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-teal-200 hover:shadow-md transition-all"
-            >
-              <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-5 h-5 text-cyan-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Help Requests</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Post what you need help with. Get notified when someone with that skill joins.
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Help Status</h3>
+              <p className="text-gray-500 leading-relaxed">
+                Toggle when you're available to mentor. Be visible to teammates when you have bandwidth to help.
               </p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-6 bg-gray-50">
+      {/* How It Works - Clean Steps */}
+      <section id="how-it-works" className="py-24 px-6 bg-gray-50">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-14"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               How it works
             </h2>
-            <p className="text-lg text-gray-600">
-              Three steps to better team collaboration
+            <p className="text-lg text-gray-500">
+              Get your team connected in three simple steps.
             </p>
           </motion.div>
 
-          <div className="space-y-6">
-            {/* Step 1 */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex gap-5 items-start bg-white p-6 rounded-xl border border-gray-200"
-            >
-              <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shrink-0 text-white font-bold">
-                1
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Map your skills</h3>
-                <p className="text-gray-600">
-                  Everyone adds what they know and what they want to learn. Takes 2 minutes.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Step 2 */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="flex gap-5 items-start bg-white p-6 rounded-xl border border-gray-200"
-            >
-              <div className="w-10 h-10 bg-cyan-600 rounded-lg flex items-center justify-center shrink-0 text-white font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Find matches</h3>
-                <p className="text-gray-600">
-                  See who can help you grow and who you can mentor. Automatic matching.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Step 3 */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="flex gap-5 items-start bg-white p-6 rounded-xl border border-gray-200"
-            >
-              <div className="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center shrink-0 text-white font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Connect & grow</h3>
-                <p className="text-gray-600">
-                  Send nudges, offer help, learn from each other. Watch your team thrive.
-                </p>
-              </div>
-            </motion.div>
+          <div className="space-y-8">
+            {[
+              {
+                step: "01",
+                title: "Add your skills",
+                description: "List what you're good at and what you want to learn. Takes about 2 minutes.",
+              },
+              {
+                step: "02",
+                title: "See your matches",
+                description: "Meshflow finds teammates who can help you grow—and those you can mentor.",
+              },
+              {
+                step: "03",
+                title: "Start connecting",
+                description: "Send a nudge, start a conversation, share knowledge. Watch your team thrive.",
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="flex gap-6 items-start"
+              >
+                <div className="text-5xl font-bold text-gray-200 shrink-0 w-16">
+                  {item.step}
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-500 leading-relaxed">{item.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-2xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Ready to unlock your team's potential?
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Join teams using Meshflow to build stronger, more collaborative organizations.
-            </p>
-            <Link href="/signup">
-              <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-8 h-12 text-base shadow-sm">
-                Get started free
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <p className="text-sm text-gray-500 mt-4">No credit card required</p>
-          </motion.div>
-        </div>
+      {/* CTA Section - Clean & Bold */}
+      <section className="py-24 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            Ready to unlock your team's potential?
+          </h2>
+          <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
+            Join teams using Meshflow to build stronger, more connected organizations.
+          </p>
+          <Link href="/signup">
+            <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white rounded-full px-10 h-14 text-lg font-medium shadow-lg shadow-teal-600/20 hover:shadow-xl hover:shadow-teal-600/30 transition-all">
+              Get started free
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <p className="text-sm text-gray-400 mt-6">No credit card required</p>
+        </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-teal-600 font-bold text-lg">Mesh</span>
-              <span className="text-gray-900 font-bold text-lg">flow</span>
-              <span className="text-sm text-gray-500 ml-2">© 2025</span>
-            </div>
-            <div className="flex gap-6 text-sm">
-              <Link href="/login" className="text-gray-600 hover:text-gray-900">
-                Sign In
-              </Link>
-              <Link href="/signup" className="text-gray-600 hover:text-gray-900">
-                Get Started
-              </Link>
-            </div>
+      {/* Footer - Minimal */}
+      <footer className="border-t border-gray-100 py-8 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-1">
+            <span className="text-teal-600 font-semibold text-lg">Mesh</span>
+            <span className="text-gray-900 font-semibold text-lg">flow</span>
+            <span className="text-gray-400 text-sm ml-3">© 2025</span>
+          </div>
+          <div className="flex gap-8 text-sm">
+            <Link href="/login" className="text-gray-500 hover:text-gray-900 transition-colors">
+              Log in
+            </Link>
+            <Link href="/signup" className="text-gray-500 hover:text-gray-900 transition-colors">
+              Get Started
+            </Link>
           </div>
         </div>
       </footer>

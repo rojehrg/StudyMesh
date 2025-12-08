@@ -60,7 +60,7 @@ export default function SignupPage() {
       const redirectUrl = `${window.location.origin}/auth/callback`;
       console.log("[Google Signup] Redirect URL:", redirectUrl);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
@@ -75,6 +75,13 @@ export default function SignupPage() {
         console.error("[Google Signup] Error:", error);
         setError(error.message);
         setLoading(false);
+        return;
+      }
+
+      // If we get a URL back, redirect to it manually
+      if (data?.url) {
+        console.log("[Google Signup] Redirecting to:", data.url);
+        window.location.href = data.url;
       }
     } catch (err: any) {
       console.error("[Google Signup] Exception:", err);

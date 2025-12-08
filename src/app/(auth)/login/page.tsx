@@ -51,13 +51,13 @@ export default function LoginPage() {
       const redirectUrl = `${window.location.origin}/auth/callback`;
       console.log("[Google Login] Redirect URL:", redirectUrl);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account', // Always show account selector
+            prompt: 'select_account',
           },
         },
       });
@@ -66,8 +66,14 @@ export default function LoginPage() {
         console.error("[Google Login] Error:", error);
         setError(error.message);
         setLoading(false);
+        return;
       }
-      // If no error, browser will redirect to Google
+
+      // If we get a URL back, redirect to it manually
+      if (data?.url) {
+        console.log("[Google Login] Redirecting to:", data.url);
+        window.location.href = data.url;
+      }
     } catch (err: any) {
       console.error("[Google Login] Exception:", err);
       setError("Failed to connect to Google. Please try again.");
