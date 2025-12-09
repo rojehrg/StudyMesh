@@ -145,7 +145,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
-    { icon: Users, label: "Working Circles", href: "/groups" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: LogIn, label: "Join Pod", href: "/classes/join" },
     { icon: Settings, label: "Settings", href: "/settings" },

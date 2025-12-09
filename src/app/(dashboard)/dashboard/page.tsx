@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { HelpRequests } from "@/components/help-requests";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -179,6 +180,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Help Requests */}
+      <HelpRequests />
 
       {/* Analytics Section */}
       {(trendingSkills.length > 0 || (activeHelpersCount ?? 0) > 0) && (
@@ -372,32 +376,32 @@ export default async function DashboardPage() {
       {/* Quick Actions */}
       <Card className="bg-muted/50">
         <CardHeader>
-          <CardTitle className="text-lg">Quick Actions</CardTitle>
+          <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link href="/groups">
+            <Link href="/classes">
               <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-peach/15 transition-all cursor-pointer text-center group">
-                <Sparkles className="w-6 h-6 text-ctp-peach mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Find Matches</p>
+                <Users className="w-6 h-6 text-ctp-peach mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                <p className="text-sm font-medium text-foreground">Browse Pods</p>
               </div>
             </Link>
-            <Link href="/settings?tab=skills">
+            <Link href="/settings">
               <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-green/15 transition-all cursor-pointer text-center group">
                 <TrendingUp className="w-6 h-6 text-ctp-green mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Add Skills</p>
               </div>
             </Link>
-            <Link href="/notifications">
+            <Link href="/classes/join">
               <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-yellow/15 transition-all cursor-pointer text-center group">
-                <Bell className="w-6 h-6 text-ctp-yellow mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Notifications</p>
+                <LogIn className="w-6 h-6 text-ctp-yellow mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                <p className="text-sm font-medium text-foreground">Join Pod</p>
               </div>
             </Link>
-            <Link href="/about">
+            <Link href="/classes/create">
               <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-lavender/15 transition-all cursor-pointer text-center group">
-                <Users className="w-6 h-6 text-ctp-lavender mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Learn More</p>
+                <PlusCircle className="w-6 h-6 text-ctp-lavender mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                <p className="text-sm font-medium text-foreground">Create Pod</p>
               </div>
             </Link>
           </div>
