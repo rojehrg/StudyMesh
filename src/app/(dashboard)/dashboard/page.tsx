@@ -117,7 +117,7 @@ export default async function DashboardPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-ctp-peach hover:bg-peach-400 text-ctp-base" asChild>
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
             <Link href="/classes/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Pod
@@ -361,7 +361,7 @@ export default async function DashboardPage() {
                     Join Pod
                   </Link>
                 </Button>
-                <Button className="bg-ctp-peach hover:bg-peach-400 text-ctp-base" asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
                   <Link href="/classes/create">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Create Pod

@@ -91,7 +91,7 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md">
+          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
             {error}
           </div>
         )}
@@ -155,7 +155,7 @@ export default function LoginPage() {
               disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full bg-ctp-peach hover:bg-peach-400 text-ctp-base" disabled={loading}>
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
           </Button>
@@ -164,7 +164,7 @@ export default function LoginPage() {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-ctp-peach hover:underline font-medium">
+          <Link href="/signup" className="text-primary hover:underline font-medium">
             Sign up
           </Link>
         </p>

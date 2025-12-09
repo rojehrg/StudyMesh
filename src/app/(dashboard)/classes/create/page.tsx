@@ -108,7 +108,7 @@ export default function CreatePodPage() {
           <form onSubmit={handleCreate} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="podName">
-                Pod Name <span className="text-red-500">*</span>
+                Pod Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="podName"
@@ -140,7 +140,7 @@ export default function CreatePodPage() {
                 onChange={(e) => setInitiativeOwner(e.target.value)}
                 disabled={loading}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Who's leading this initiative?
               </p>
             </div>
@@ -169,10 +169,10 @@ export default function CreatePodPage() {
               <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading} className="flex-1">
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading || !podName.trim()}
-                className="bg-ctp-peach hover:bg-ctp-peach/100 flex-1"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1"
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Create Pod

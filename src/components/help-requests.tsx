@@ -95,7 +95,7 @@ export function HelpRequests() {
             onKeyDown={(e) => e.key === 'Enter' && addRequest()}
             className="h-10"
           />
-          <Button onClick={addRequest} className="bg-ctp-peach hover:bg-ctp-peach/80 h-10 px-4">
+          <Button onClick={addRequest} className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-4">
             Add
           </Button>
         </div>

@@ -73,7 +73,7 @@ export default function NotificationsPage() {
         .update({ read: true })
         .eq('id', id);
 
-      setNotifications(notifications.map(n => 
+      setNotifications(notifications.map(n =>
         n.id === id ? { ...n, read: true } : n
       ));
     } catch (error) {
@@ -109,30 +109,30 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (notification: any, isSent: boolean) => {
     if (isSent) {
-      return <Send className="w-5 h-5 text-gray-500" />;
+      return <Send className="w-5 h-5 text-muted-foreground" />;
     }
     if (notification.type === 'new_match') {
-      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-ctp-yellow' : 'text-gray-400'}`} />;
+      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-ctp-yellow' : 'text-muted-foreground'}`} />;
     }
-    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-ctp-peach' : 'text-gray-400'}`} />;
+    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-ctp-peach' : 'text-muted-foreground'}`} />;
   };
 
   const getNotificationTitle = (notification: any, isSent: boolean) => {
     if (notification.type === 'new_match') {
-      return '✨ New Match Found';
+      return 'New Match Found';
     }
     if (notification.type === 'nudge') {
-      return isSent ? '👋 Nudge Sent' : '👋 Nudge Received';
+      return isSent ? 'Nudge Sent' : 'Nudge Received';
     }
     return 'Notification';
   };
 
   const getNotificationBgClass = (notification: any) => {
     if (notification.type === 'new_match' && !notification.read) {
-      return 'border-l-4 border-l-ctp-yellow bg-ctp-yellow/20';
+      return 'border-l-4 border-l-ctp-yellow bg-ctp-yellow/10';
     }
     if (!notification.read) {
-      return 'border-l-4 border-l-ctp-peach bg-ctp-peach/20';
+      return 'border-l-4 border-l-ctp-peach bg-ctp-peach/10';
     }
     return '';
   };
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-ctp-peach" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -167,11 +167,11 @@ export default function NotificationsPage() {
       return (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-3">
-              <Bell className="w-6 h-6 text-gray-300" />
+            <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-3">
+              <Bell className="w-6 h-6 text-muted-foreground" />
             </div>
-            <h3 className="text-base font-medium text-gray-900 mb-1">{isSent ? "No sent nudges" : "No notifications yet"}</h3>
-            <p className="text-gray-500 text-sm max-w-sm">
+            <h3 className="text-base font-medium text-foreground mb-1">{isSent ? "No sent nudges" : "No notifications yet"}</h3>
+            <p className="text-muted-foreground text-sm max-w-sm">
               {isSent ? "You haven't nudged anyone yet." : "When teammates nudge you or you get matched in pods, you'll see notifications here."}
             </p>
           </CardContent>
@@ -202,7 +202,7 @@ export default function NotificationsPage() {
                         ? 'bg-ctp-yellow/20'
                         : !notification.read && !isSent
                         ? 'bg-ctp-peach/20'
-                        : 'bg-gray-100'
+                        : 'bg-muted'
                     }`}>
                       {getNotificationIcon(notification, isSent)}
                     </div>
@@ -221,11 +221,11 @@ export default function NotificationsPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm text-foreground">
                         {notification.content}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-muted-foreground">
                           {getTimeAgo(notification.created_at)}
                         </p>
                         {notification.metadata?.pod_code && (
@@ -244,7 +244,7 @@ export default function NotificationsPage() {
                     )}
                     {!isSent && (
                       <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}>
-                        <X className="h-4 w-4 text-gray-400" />
+                        <X className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     )}
                   </div>
@@ -265,9 +265,9 @@ export default function NotificationsPage() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Nudges & Notifications</h1>
+          <h1 className="text-2xl font-bold text-foreground">Nudges & Notifications</h1>
           {unreadCount > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {unreadCount} unread {unreadCount === 1 ? 'item' : 'items'}
             </p>
           )}
@@ -295,4 +295,3 @@ export default function NotificationsPage() {
     </motion.div>
   );
 }
-

@@ -209,21 +209,21 @@ export default function AboutPage() {
       {/* CTA */}
       <motion.div
         variants={itemVariants}
-        className="bg-ctp-peach dark:bg-ctp-peach/100 rounded-2xl p-8 text-center"
+        className="bg-primary rounded-2xl p-8 text-center"
       >
-        <h2 className="text-2xl font-bold mb-3 text-white">Ready to collaborate?</h2>
-        <p className="text-white/80 mb-6 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold mb-3 text-primary-foreground">Ready to collaborate?</h2>
+        <p className="text-primary-foreground/80 mb-6 max-w-md mx-auto">
           Start mapping your skills and connecting with teammates who can help you grow.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/settings">
-            <Button className="bg-white text-ctp-peach hover:bg-white/90 shadow-md">
+            <Button className="bg-card text-primary hover:bg-card/90 shadow-md">
               Update Your Profile
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
           <Link href="/groups">
-            <Button className="bg-ctp-peach/80 text-white border-2 border-white hover:bg-ctp-peach/60 shadow-md">
+            <Button className="bg-primary-foreground/20 text-primary-foreground border-2 border-primary-foreground hover:bg-primary-foreground/30 shadow-md">
               Find Matches
             </Button>
           </Link>

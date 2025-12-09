@@ -22,8 +22,8 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "peach" 
   const innerSize = size === "sm" ? "w-9 h-9" : "w-11 h-11";
 
   const fillColors = color === "peach"
-    ? { filled: "#fab387", empty: "hsl(var(--muted))" }
-    : { filled: "#a6e3a1", empty: "hsl(var(--muted))" };
+    ? { filled: "hsl(var(--ctp-peach))", empty: "hsl(var(--muted))" }
+    : { filled: "hsl(var(--ctp-green))", empty: "hsl(var(--muted))" };
 
   const colorClasses = color === "peach"
     ? {
@@ -112,8 +112,8 @@ export function ProficiencyDisplay({ value, size = "sm", color = "peach" }: Omit
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
   const fillColors = color === "peach"
-    ? { filled: "#fab387", empty: "hsl(var(--muted))" }
-    : { filled: "#a6e3a1", empty: "hsl(var(--muted))" };
+    ? { filled: "hsl(var(--ctp-peach))", empty: "hsl(var(--muted))" }
+    : { filled: "hsl(var(--ctp-green))", empty: "hsl(var(--muted))" };
 
   const filledQuadrants = Math.round(value / 25);
 

@@ -112,22 +112,22 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ctp-base flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-ctp-peach"
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-primary"
               initial={{ width: "0%" }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-sm text-gray-500 font-medium">
-            <span className={step >= 1 ? "text-ctp-peach" : ""}>About You</span>
-            <span className={step >= 2 ? "text-ctp-peach" : ""}>Skills</span>
-            <span className={step >= 3 ? "text-ctp-peach" : ""}>Bio</span>
+          <div className="flex justify-between mt-2 text-sm text-muted-foreground font-medium">
+            <span className={step >= 1 ? "text-primary" : ""}>About You</span>
+            <span className={step >= 2 ? "text-primary" : ""}>Skills</span>
+            <span className={step >= 3 ? "text-primary" : ""}>Bio</span>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-0">
+              <Card className="shadow-lg border-border">
                 <CardHeader>
                   <CardTitle className="text-2xl">Tell us about yourself</CardTitle>
                   <CardDescription>This helps us match you with the right pods.</CardDescription>
@@ -192,7 +192,7 @@ export default function OnboardingPage() {
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
-                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-0">
+              <Card className="shadow-lg border-border">
                 <CardHeader>
                   <CardTitle className="text-2xl">Your Capabilities</CardTitle>
                   <CardDescription>What can you teach? What do you want to learn?</CardDescription>
@@ -226,9 +226,9 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Python, Sales)"
                       type="expertise"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-ctp-base rounded-lg border border-gray-100">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted/50 rounded-lg border border-border">
                       {formData.expertiseSkills.length === 0 && (
-                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.expertiseSkills.map(skill => (
                         <Badge key={skill} variant="secondary" className="bg-ctp-peach/20 text-ctp-peach hover:bg-ctp-peach/30 pl-3 pr-1 py-1.5 text-sm">
@@ -253,9 +253,9 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Leadership, SQL)"
                       type="growth"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-ctp-base rounded-lg border border-gray-100">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted/50 rounded-lg border border-border">
                        {formData.growthSkills.length === 0 && (
-                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.growthSkills.map(skill => (
                         <Badge key={skill} variant="secondary" className="bg-ctp-green/20 text-ctp-green hover:bg-ctp-green/30 pl-3 pr-1 py-1.5 text-sm">
@@ -270,10 +270,10 @@ export default function OnboardingPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
                   <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
-                  <Button 
-                    onClick={() => setStep(3)} 
+                  <Button
+                    onClick={() => setStep(3)}
                     disabled={formData.expertiseSkills.length === 0}
-                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -289,7 +289,7 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-0">
+              <Card className="shadow-lg border-border">
                 <CardHeader>
                   <CardTitle className="text-2xl">Final Polish</CardTitle>
                   <CardDescription>How can teammates partner with you?</CardDescription>
@@ -297,7 +297,7 @@ export default function OnboardingPage() {
                 <CardContent>
                   <div className="space-y-2">
                     <Label htmlFor="bio">Bio / Working Style</Label>
-                    <Textarea 
+                    <Textarea
                       id="bio"
                       className="min-h-[150px] text-base resize-none"
                       placeholder="I'm usually available in the mornings. I prefer async reviews but happy to jump on a call for complex blockers."
@@ -308,10 +308,10 @@ export default function OnboardingPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
                   <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={loading} 
-                    className="bg-ctp-peach hover:bg-peach-400 text-ctp-base h-11 px-8 transition-all active:scale-95"
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 transition-all active:scale-95"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Complete Profile
