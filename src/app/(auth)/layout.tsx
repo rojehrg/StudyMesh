@@ -9,7 +9,7 @@ export default function AuthLayout({
     <div className="min-h-screen bg-background flex flex-col">
       <nav className="p-6">
         <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-          <span className="text-ctp-peach font-bold text-xl">Mesh</span>
+          <span className="text-accent font-bold text-xl">Mesh</span>
           <span className="text-foreground font-bold text-xl">flow</span>
         </Link>
       </nav>

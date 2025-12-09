@@ -4,168 +4,107 @@
 
 @layer base {
   :root {
-    /* Catppuccin Latte (Light Mode) */
+    /* Light Mode - Clean 5-color palette */
 
-    /* Backgrounds */
-    --background: 220 23% 95%;
-    --foreground: 234 16% 35%;
+    /* Background - Cream */
+    --background: 30 100% 96%;
+    --foreground: 24 35% 18%;
 
-    /* Cards & Surfaces */
-    --card: 220 22% 100%;
-    --card-foreground: 234 16% 35%;
+    /* Cards & Surfaces - White with warmth */
+    --card: 0 0% 100%;
+    --card-foreground: 24 35% 18%;
 
-    --popover: 220 22% 100%;
-    --popover-foreground: 234 16% 35%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 35% 18%;
 
-    /* Primary - Mauve (purple) for light mode */
-    --primary: 266 85% 58%;
+    /* Primary - Midnight Blue */
+    --primary: 215 50% 17%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Pink */
-    --secondary: 316 73% 69%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Warm Sand */
+    --secondary: 37 47% 80%;
+    --secondary-foreground: 24 35% 18%;
 
-    /* Muted */
-    --muted: 228 24% 92%;
-    --muted-foreground: 234 12% 41%;
+    /* Accent - Coral */
+    --accent: 351 94% 71%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Accent - Lavender */
-    --accent: 232 97% 85%;
-    --accent-foreground: 234 16% 35%;
+    /* Muted - Light warm gray */
+    --muted: 30 20% 92%;
+    --muted-foreground: 24 20% 40%;
 
-    /* Destructive - Red */
-    --destructive: 347 87% 44%;
+    /* Destructive */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 228 12% 85%;
-    --input: 228 12% 85%;
-    --ring: 266 85% 58%;
+    --border: 30 20% 85%;
+    --input: 30 20% 85%;
+    --ring: 215 50% 17%;
 
     /* Rounded corners */
     --radius: 0.75rem;
 
-    /* Chart colors - Catppuccin accent colors */
-    --chart-1: 23 100% 52%;
-    --chart-2: 266 85% 58%;
-    --chart-3: 109 58% 40%;
-    --chart-4: 220 91% 54%;
-    --chart-5: 41 90% 49%;
+    /* Chart colors */
+    --chart-1: 215 50% 17%;
+    --chart-2: 351 94% 71%;
+    --chart-3: 37 47% 80%;
+    --chart-4: 24 35% 18%;
+    --chart-5: 30 100% 96%;
 
-    /* Catppuccin Latte Full Palette */
-    --ctp-rosewater: 11 59% 67%;
-    --ctp-flamingo: 0 60% 67%;
-    --ctp-pink: 316 73% 69%;
-    --ctp-mauve: 266 85% 58%;
-    --ctp-red: 347 87% 44%;
-    --ctp-maroon: 355 76% 59%;
-    --ctp-peach: 23 100% 52%;
-    --ctp-yellow: 41 90% 49%;
-    --ctp-green: 109 58% 40%;
-    --ctp-teal: 183 74% 35%;
-    --ctp-sky: 197 97% 46%;
-    --ctp-sapphire: 189 70% 42%;
-    --ctp-blue: 220 91% 54%;
-    --ctp-lavender: 232 97% 72%;
-    --ctp-text: 234 16% 35%;
-    --ctp-subtext1: 233 13% 41%;
-    --ctp-subtext0: 232 10% 47%;
-    --ctp-overlay2: 231 10% 53%;
-    --ctp-overlay1: 231 10% 59%;
-    --ctp-overlay0: 228 11% 65%;
-    --ctp-surface2: 227 12% 71%;
-    --ctp-surface1: 225 14% 77%;
-    --ctp-surface0: 223 16% 83%;
-    --ctp-base: 220 23% 95%;
-    --ctp-mantle: 220 22% 92%;
-    --ctp-crust: 220 21% 89%;
-
-    /* Theme-aware blob colors */
-    --blob-peach: 250, 179, 135;
-    --blob-mauve: 136, 57, 239;
-    --blob-blue: 30, 102, 245;
-    --grid-color: 250, 179, 135;
+    /* Custom palette colors */
+    --midnight: 215 50% 17%;
+    --sand: 37 47% 80%;
+    --coral: 351 94% 71%;
+    --cream: 30 100% 96%;
+    --espresso: 24 35% 18%;
   }
 
   .dark {
-    /* Catppuccin Mocha (Dark Mode) */
+    /* Dark Mode - Inverted palette */
 
-    /* Backgrounds - Base */
-    --background: 240 21% 15%;
-    --foreground: 226 64% 88%;
+    /* Background - Deep midnight */
+    --background: 215 50% 10%;
+    --foreground: 30 30% 90%;
 
-    /* Cards & Surfaces - Surface 0 */
-    --card: 237 16% 23%;
-    --card-foreground: 226 64% 88%;
+    /* Cards & Surfaces */
+    --card: 215 45% 15%;
+    --card-foreground: 30 30% 90%;
 
-    --popover: 234 13% 31%;
-    --popover-foreground: 226 64% 88%;
+    --popover: 215 45% 18%;
+    --popover-foreground: 30 30% 90%;
 
-    /* Primary - Peach */
-    --primary: 23 92% 75%;
-    --primary-foreground: 240 21% 15%;
+    /* Primary - Coral (inverted for dark mode pop) */
+    --primary: 351 94% 71%;
+    --primary-foreground: 215 50% 10%;
 
-    /* Secondary - Mauve */
-    --secondary: 267 84% 81%;
-    --secondary-foreground: 240 21% 15%;
+    /* Secondary - Warm Sand (muted) */
+    --secondary: 37 30% 30%;
+    --secondary-foreground: 30 30% 90%;
 
-    /* Muted - Surface 1 */
-    --muted: 234 13% 31%;
-    --muted-foreground: 227 35% 80%;
+    /* Accent - Light Cream */
+    --accent: 30 50% 85%;
+    --accent-foreground: 215 50% 10%;
 
-    /* Accent - Surface 2 */
-    --accent: 233 12% 39%;
-    --accent-foreground: 226 64% 88%;
+    /* Muted */
+    --muted: 215 40% 20%;
+    --muted-foreground: 30 20% 60%;
 
-    /* Destructive - Red */
-    --destructive: 343 81% 75%;
-    --destructive-foreground: 240 21% 15%;
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs - Surface 2 */
-    --border: 233 12% 39%;
-    --input: 233 12% 39%;
-    --ring: 23 92% 75%;
+    /* Borders & Inputs */
+    --border: 215 40% 25%;
+    --input: 215 40% 25%;
+    --ring: 351 94% 71%;
 
-    /* Chart colors */
-    --chart-1: 23 92% 75%;
-    --chart-2: 267 84% 81%;
-    --chart-3: 115 54% 76%;
-    --chart-4: 217 92% 76%;
-    --chart-5: 41 86% 83%;
-
-    /* Catppuccin Mocha Full Palette */
-    --ctp-rosewater: 10 56% 91%;
-    --ctp-flamingo: 0 59% 88%;
-    --ctp-pink: 316 72% 86%;
-    --ctp-mauve: 267 84% 81%;
-    --ctp-red: 343 81% 75%;
-    --ctp-maroon: 350 65% 77%;
-    --ctp-peach: 23 92% 75%;
-    --ctp-yellow: 41 86% 83%;
-    --ctp-green: 115 54% 76%;
-    --ctp-teal: 170 57% 73%;
-    --ctp-sky: 189 71% 73%;
-    --ctp-sapphire: 199 76% 69%;
-    --ctp-blue: 217 92% 76%;
-    --ctp-lavender: 232 97% 85%;
-    --ctp-text: 226 64% 88%;
-    --ctp-subtext1: 227 35% 80%;
-    --ctp-subtext0: 228 24% 72%;
-    --ctp-overlay2: 228 17% 64%;
-    --ctp-overlay1: 230 13% 55%;
-    --ctp-overlay0: 231 11% 47%;
-    --ctp-surface2: 233 12% 39%;
-    --ctp-surface1: 234 13% 31%;
-    --ctp-surface0: 237 16% 23%;
-    --ctp-base: 240 21% 15%;
-    --ctp-mantle: 240 21% 12%;
-    --ctp-crust: 240 23% 9%;
-
-    /* Theme-aware blob colors */
-    --blob-peach: 250, 179, 135;
-    --blob-mauve: 203, 166, 247;
-    --blob-blue: 137, 180, 250;
-    --grid-color: 250, 179, 135;
+    /* Custom palette colors for dark mode */
+    --midnight: 215 50% 80%;
+    --sand: 37 47% 70%;
+    --coral: 351 94% 71%;
+    --cream: 30 30% 90%;
+    --espresso: 30 30% 85%;
   }
 }
 
@@ -176,107 +115,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Animated Grid Background - Theme-aware */
-@keyframes grid-move {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 40px;
-  }
-}
-
-.animated-grid {
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(var(--grid-color), 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--grid-color), 0.08) 1px, transparent 1px);
-  background-size: 50px 50px;
-  background-position: 0 0;
-  animation: grid-move 30s linear infinite;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Floating Gradient Blobs - Theme-aware */
-@keyframes blob-float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(60px, -80px) scale(1.12);
-  }
-  66% {
-    transform: translate(-50px, 40px) scale(0.95);
-  }
-}
-
-@keyframes blob-float-2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(-70px, 60px) scale(0.95);
-  }
-  66% {
-    transform: translate(50px, -50px) scale(1.12);
-  }
-}
-
-.blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
-  z-index: 0;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.blob-1 {
-  width: 600px;
-  height: 600px;
-  background: rgb(var(--blob-peach));
-  top: -15%;
-  right: -10%;
-  animation: blob-float 25s ease-in-out infinite;
-}
-
-.blob-2 {
-  width: 500px;
-  height: 500px;
-  background: rgb(var(--blob-mauve));
-  bottom: -10%;
-  left: -10%;
-  animation: blob-float-2 30s ease-in-out infinite;
-  animation-delay: 5s;
-}
-
-.blob-3 {
-  width: 450px;
-  height: 450px;
-  background: rgb(var(--blob-blue));
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: blob-float 20s ease-in-out infinite;
-  animation-delay: 10s;
-}
-
-/* Custom Patterns - Theme-aware */
-.bg-grid-pattern {
-  background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(var(--grid-color), 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(var(--grid-color), 0.04) 1px, transparent 1px);
-  animation: grid-move 20s linear infinite;
-}
-
-.bg-dot-pattern {
-  background-image: radial-gradient(rgba(var(--grid-color), 0.12) 1px, transparent 1px);
-  background-size: 24px 24px;
 }
 
 /* Custom Animations */
@@ -307,32 +145,32 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px hsl(var(--ctp-peach) / 0.15);
+  box-shadow: 0 12px 24px -6px hsl(var(--primary) / 0.15);
 }
 
-/* Scrollbar styling - Theme-aware */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--ctp-mantle));
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--ctp-surface2));
+  background: hsl(var(--border));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--ctp-overlay0));
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
-/* Selection styling - Theme-aware */
+/* Selection styling */
 ::selection {
-  background: hsl(var(--ctp-mauve) / 0.3);
-  color: hsl(var(--ctp-text));
+  background: hsl(var(--coral) / 0.3);
+  color: hsl(var(--espresso));
 }
 
 /* Focus visible styling */
@@ -341,48 +179,21 @@
   outline-offset: 2px;
 }
 
-/* Catppuccin accent utility classes */
-.text-ctp-rosewater { color: hsl(var(--ctp-rosewater)); }
-.text-ctp-flamingo { color: hsl(var(--ctp-flamingo)); }
-.text-ctp-pink { color: hsl(var(--ctp-pink)); }
-.text-ctp-mauve { color: hsl(var(--ctp-mauve)); }
-.text-ctp-red { color: hsl(var(--ctp-red)); }
-.text-ctp-maroon { color: hsl(var(--ctp-maroon)); }
-.text-ctp-peach { color: hsl(var(--ctp-peach)); }
-.text-ctp-yellow { color: hsl(var(--ctp-yellow)); }
-.text-ctp-green { color: hsl(var(--ctp-green)); }
-.text-ctp-teal { color: hsl(var(--ctp-teal)); }
-.text-ctp-sky { color: hsl(var(--ctp-sky)); }
-.text-ctp-sapphire { color: hsl(var(--ctp-sapphire)); }
-.text-ctp-blue { color: hsl(var(--ctp-blue)); }
-.text-ctp-lavender { color: hsl(var(--ctp-lavender)); }
+/* Custom color utilities */
+.text-midnight { color: hsl(var(--midnight)); }
+.text-sand { color: hsl(var(--sand)); }
+.text-coral { color: hsl(var(--coral)); }
+.text-cream { color: hsl(var(--cream)); }
+.text-espresso { color: hsl(var(--espresso)); }
 
-.bg-ctp-rosewater { background-color: hsl(var(--ctp-rosewater)); }
-.bg-ctp-flamingo { background-color: hsl(var(--ctp-flamingo)); }
-.bg-ctp-pink { background-color: hsl(var(--ctp-pink)); }
-.bg-ctp-mauve { background-color: hsl(var(--ctp-mauve)); }
-.bg-ctp-red { background-color: hsl(var(--ctp-red)); }
-.bg-ctp-maroon { background-color: hsl(var(--ctp-maroon)); }
-.bg-ctp-peach { background-color: hsl(var(--ctp-peach)); }
-.bg-ctp-yellow { background-color: hsl(var(--ctp-yellow)); }
-.bg-ctp-green { background-color: hsl(var(--ctp-green)); }
-.bg-ctp-teal { background-color: hsl(var(--ctp-teal)); }
-.bg-ctp-sky { background-color: hsl(var(--ctp-sky)); }
-.bg-ctp-sapphire { background-color: hsl(var(--ctp-sapphire)); }
-.bg-ctp-blue { background-color: hsl(var(--ctp-blue)); }
-.bg-ctp-lavender { background-color: hsl(var(--ctp-lavender)); }
+.bg-midnight { background-color: hsl(var(--midnight)); }
+.bg-sand { background-color: hsl(var(--sand)); }
+.bg-coral { background-color: hsl(var(--coral)); }
+.bg-cream { background-color: hsl(var(--cream)); }
+.bg-espresso { background-color: hsl(var(--espresso)); }
 
-.border-ctp-rosewater { border-color: hsl(var(--ctp-rosewater)); }
-.border-ctp-flamingo { border-color: hsl(var(--ctp-flamingo)); }
-.border-ctp-pink { border-color: hsl(var(--ctp-pink)); }
-.border-ctp-mauve { border-color: hsl(var(--ctp-mauve)); }
-.border-ctp-red { border-color: hsl(var(--ctp-red)); }
-.border-ctp-maroon { border-color: hsl(var(--ctp-maroon)); }
-.border-ctp-peach { border-color: hsl(var(--ctp-peach)); }
-.border-ctp-yellow { border-color: hsl(var(--ctp-yellow)); }
-.border-ctp-green { border-color: hsl(var(--ctp-green)); }
-.border-ctp-teal { border-color: hsl(var(--ctp-teal)); }
-.border-ctp-sky { border-color: hsl(var(--ctp-sky)); }
-.border-ctp-sapphire { border-color: hsl(var(--ctp-sapphire)); }
-.border-ctp-blue { border-color: hsl(var(--ctp-blue)); }
-.border-ctp-lavender { border-color: hsl(var(--ctp-lavender)); }
+.border-midnight { border-color: hsl(var(--midnight)); }
+.border-sand { border-color: hsl(var(--sand)); }
+.border-coral { border-color: hsl(var(--coral)); }
+.border-cream { border-color: hsl(var(--cream)); }
+.border-espresso { border-color: hsl(var(--espresso)); }

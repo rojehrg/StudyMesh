@@ -144,7 +144,7 @@ export default async function DashboardPage() {
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Matches Found</CardTitle>
-            <Sparkles className="h-5 w-5 text-ctp-green" />
+            <Sparkles className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{matchCount}</div>
@@ -170,7 +170,7 @@ export default async function DashboardPage() {
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
-            <Bell className="h-5 w-5 text-ctp-yellow" />
+            <Bell className="h-5 w-5 text-accent" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground">{unreadNotifications}</div>
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-                  <Target className="w-5 h-5 text-ctp-peach" />
+                  <Target className="w-5 h-5 text-accent" />
                   Most Requested Skills
                 </CardTitle>
                 <CardDescription>
@@ -207,7 +207,7 @@ export default async function DashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-muted rounded-full h-2 overflow-hidden">
                           <div
-                            className="bg-ctp-peach h-full rounded-full"
+                            className="bg-accent h-full rounded-full"
                             style={{ width: `${Math.min(100, (count / trendingSkills[0].count) * 100)}%` }}
                           />
                         </div>
@@ -219,7 +219,7 @@ export default async function DashboardPage() {
                 {profile.expertise_skills?.some((s: string) =>
                   trendingSkills.some(t => s.toLowerCase().includes(t.skill) || t.skill.includes(s.toLowerCase()))
                 ) && (
-                  <p className="text-sm text-ctp-peach mt-4 font-medium">
+                  <p className="text-sm text-accent mt-4 font-medium">
                     You have skills people need!
                   </p>
                 )}
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-ctp-mauve" />
+                <BarChart3 className="w-5 h-5 text-primary" />
                 Community Insights
               </CardTitle>
               <CardDescription>
@@ -244,7 +244,7 @@ export default async function DashboardPage() {
                   <p className="text-2xl font-bold text-foreground">{activeHelpersCount || 0}</p>
                   <p className="text-sm text-muted-foreground">Active Helpers</p>
                 </div>
-                <div className="p-4 bg-ctp-green/20 rounded-lg text-center">
+                <div className="p-4 bg-primary/20 rounded-lg text-center">
                   <p className="text-2xl font-bold text-foreground">{openRequests?.length || 0}</p>
                   <p className="text-sm text-muted-foreground">Open Requests</p>
                 </div>
@@ -261,17 +261,17 @@ export default async function DashboardPage() {
 
       {/* Profile Completion */}
       {completionPercent < 100 && (
-        <Card className="bg-ctp-peach/10 shadow-lg border-ctp-peach/20">
+        <Card className="bg-accent/10 shadow-lg border-accent/20">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-ctp-peach" />
+                  <Sparkles className="w-5 h-5 text-accent" />
                   Complete Your Profile
                 </CardTitle>
                 <CardDescription>Get the most out of Meshflow</CardDescription>
               </div>
-              <Badge className="bg-ctp-peach text-white text-lg px-3 py-1">
+              <Badge className="bg-accent text-white text-lg px-3 py-1">
                 {completionPercent}%
               </Badge>
             </div>
@@ -280,7 +280,7 @@ export default async function DashboardPage() {
             <div className="space-y-4">
               <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                 <div
-                  className="bg-ctp-peach h-full rounded-full transition-all duration-500"
+                  className="bg-accent h-full rounded-full transition-all duration-500"
                   style={{ width: `${completionPercent}%` }}
                 />
               </div>
@@ -292,7 +292,7 @@ export default async function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" asChild className="w-full hover:bg-ctp-peach/10 hover:border-ctp-peach/50">
+              <Button variant="outline" asChild className="w-full hover:bg-accent/10 hover:border-accent/50">
                 <Link href="/settings">
                   Complete Profile <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -320,10 +320,10 @@ export default async function DashboardPage() {
                 <Card className="hover-lift cursor-pointer h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <CardTitle className="group-hover:text-ctp-peach transition-colors line-clamp-1">
+                      <CardTitle className="group-hover:text-accent transition-colors line-clamp-1">
                         {pod.pod_name}
                       </CardTitle>
-                      <Badge variant="secondary" className="bg-ctp-peach/10 text-ctp-peach shadow-sm shrink-0 ml-2">
+                      <Badge variant="secondary" className="bg-accent/10 text-accent shadow-sm shrink-0 ml-2">
                         {pod.pod_code}
                       </Badge>
                     </div>
@@ -347,8 +347,8 @@ export default async function DashboardPage() {
         ) : (
           <Card className="shadow-lg">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 bg-ctp-peach/20 rounded-2xl flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-ctp-peach dark:text-ctp-peach" />
+              <div className="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-accent dark:text-accent" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Ready to start enabling?</h3>
               <p className="text-muted-foreground mb-6 max-w-md">
@@ -381,26 +381,26 @@ export default async function DashboardPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Link href="/classes">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-peach/15 transition-all cursor-pointer text-center group">
-                <Users className="w-6 h-6 text-ctp-peach mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-accent/15 transition-all cursor-pointer text-center group">
+                <Users className="w-6 h-6 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Browse Pods</p>
               </div>
             </Link>
             <Link href="/settings">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-green/15 transition-all cursor-pointer text-center group">
-                <TrendingUp className="w-6 h-6 text-ctp-green mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-primary/15 transition-all cursor-pointer text-center group">
+                <TrendingUp className="w-6 h-6 text-primary mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Add Skills</p>
               </div>
             </Link>
             <Link href="/classes/join">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-yellow/15 transition-all cursor-pointer text-center group">
-                <LogIn className="w-6 h-6 text-ctp-yellow mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-accent/15 transition-all cursor-pointer text-center group">
+                <LogIn className="w-6 h-6 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Join Pod</p>
               </div>
             </Link>
             <Link href="/classes/create">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-ctp-lavender/15 transition-all cursor-pointer text-center group">
-                <PlusCircle className="w-6 h-6 text-ctp-lavender mx-auto mb-2 group-hover:scale-110 transition-transform" />
+              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-secondary/15 transition-all cursor-pointer text-center group">
+                <PlusCircle className="w-6 h-6 text-secondary mx-auto mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-sm font-medium text-foreground">Create Pod</p>
               </div>
             </Link>

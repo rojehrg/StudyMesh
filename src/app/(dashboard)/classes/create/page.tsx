@@ -97,7 +97,7 @@ export default function CreatePodPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-ctp-peach" />
+            <Sparkles className="w-6 h-6 text-accent" />
             Create Enablement Pod
           </CardTitle>
           <CardDescription>
@@ -156,11 +156,11 @@ export default function CreatePodPage() {
               />
             </div>
 
-            <div className="bg-ctp-peach/10 border border-ctp-peach/20 rounded-xl p-4">
-              <p className="text-sm text-ctp-peach font-medium mb-1">
+            <div className="bg-accent/10 border border-accent/20 rounded-xl p-4">
+              <p className="text-sm text-accent font-medium mb-1">
                 🎯 What happens next?
               </p>
-              <p className="text-sm text-ctp-peach">
+              <p className="text-sm text-accent">
                 After creating your pod, you'll get a unique share code. Your teammates can use this code to join and our matching algorithm will identify knowledge gaps automatically.
               </p>
             </div>

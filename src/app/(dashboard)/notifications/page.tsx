@@ -112,9 +112,9 @@ export default function NotificationsPage() {
       return <Send className="w-5 h-5 text-muted-foreground" />;
     }
     if (notification.type === 'new_match') {
-      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-ctp-yellow' : 'text-muted-foreground'}`} />;
+      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} />;
     }
-    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-ctp-peach' : 'text-muted-foreground'}`} />;
+    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} />;
   };
 
   const getNotificationTitle = (notification: any, isSent: boolean) => {
@@ -129,10 +129,10 @@ export default function NotificationsPage() {
 
   const getNotificationBgClass = (notification: any) => {
     if (notification.type === 'new_match' && !notification.read) {
-      return 'border-l-4 border-l-ctp-yellow bg-ctp-yellow/10';
+      return 'border-l-4 border-l-ctp-yellow bg-accent/10';
     }
     if (!notification.read) {
-      return 'border-l-4 border-l-ctp-peach bg-ctp-peach/10';
+      return 'border-l-4 border-l-ctp-peach bg-accent/10';
     }
     return '';
   };
@@ -199,9 +199,9 @@ export default function NotificationsPage() {
                   <div className="flex items-start gap-3 flex-1">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                       notification.type === 'new_match' && !notification.read && !isSent
-                        ? 'bg-ctp-yellow/20'
+                        ? 'bg-accent/20'
                         : !notification.read && !isSent
-                        ? 'bg-ctp-peach/20'
+                        ? 'bg-accent/20'
                         : 'bg-muted'
                     }`}>
                       {getNotificationIcon(notification, isSent)}
@@ -214,8 +214,8 @@ export default function NotificationsPage() {
                         {!notification.read && !isSent && (
                           <Badge variant="secondary" className={`text-xs ${
                             notification.type === 'new_match'
-                              ? 'bg-ctp-yellow/20 text-ctp-yellow'
-                              : 'bg-ctp-peach/20 text-ctp-peach'
+                              ? 'bg-accent/20 text-accent'
+                              : 'bg-accent/20 text-accent'
                           }`}>
                             New
                           </Badge>

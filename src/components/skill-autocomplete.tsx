@@ -191,8 +191,8 @@ export function SkillAutocomplete({
             <div className={cn(
               "px-3 py-2 text-[10px] uppercase tracking-wider font-medium border-b border-border flex items-center gap-2",
               type === "expertise"
-                ? "bg-ctp-peach/10 text-ctp-peach"
-                : "bg-ctp-green/10 text-ctp-green"
+                ? "bg-accent/10 text-accent"
+                : "bg-primary/10 text-primary"
             )}>
               <Search className="w-3 h-3" />
               Skills from your pods
@@ -214,7 +214,7 @@ export function SkillAutocomplete({
                       {before}
                       <span className={cn(
                         "font-semibold",
-                        type === "expertise" ? "text-ctp-peach" : "text-ctp-green"
+                        type === "expertise" ? "text-accent" : "text-primary"
                       )}>
                         {match}
                       </span>
@@ -232,8 +232,8 @@ export function SkillAutocomplete({
                       "w-full text-left px-3 py-2.5 text-sm transition-colors",
                       index === selectedIndex
                         ? type === "expertise"
-                          ? "bg-ctp-peach/15 text-foreground"
-                          : "bg-ctp-green/15 text-foreground"
+                          ? "bg-accent/15 text-foreground"
+                          : "bg-primary/15 text-foreground"
                         : "text-foreground hover:bg-accent"
                     )}
                     onClick={() => handleSuggestionClick(skill)}

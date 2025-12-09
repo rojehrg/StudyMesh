@@ -148,7 +148,7 @@ export function NudgesDropdown() {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-5 h-5 text-foreground" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-ctp-peach text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -181,7 +181,7 @@ export function NudgesDropdown() {
             >
               Received
               {unreadCount > 0 && (
-                <span className="ml-1 bg-ctp-peach/10 text-ctp-peach px-1.5 py-0.5 rounded-full text-[10px]">
+                <span className="ml-1 bg-accent/10 text-accent px-1.5 py-0.5 rounded-full text-[10px]">
                   {unreadCount}
                 </span>
               )}

@@ -100,7 +100,7 @@ export default function SignupPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <div className="bg-ctp-peach/10 text-ctp-peach text-sm p-3 rounded-md">
+          <div className="bg-accent/10 text-accent text-sm p-3 rounded-md">
             {error}
           </div>
         )}

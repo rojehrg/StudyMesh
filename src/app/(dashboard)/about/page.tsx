@@ -35,9 +35,9 @@ export default function AboutPage() {
     >
       {/* Hero Section */}
       <motion.div variants={itemVariants} className="text-center py-8">
-        <div className="inline-flex items-center gap-2 bg-ctp-peach/10 px-4 py-2 rounded-full mb-6">
-          <Sparkles className="w-4 h-4 text-ctp-peach" />
-          <span className="text-ctp-peach font-medium text-sm">About Meshflow</span>
+        <div className="inline-flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full mb-6">
+          <Sparkles className="w-4 h-4 text-accent" />
+          <span className="text-accent font-medium text-sm">About Meshflow</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           The Intelligent Enablement Platform
@@ -50,16 +50,16 @@ export default function AboutPage() {
       {/* Mission Card */}
       <motion.div
         variants={itemVariants}
-        className="bg-ctp-peach/10 rounded-2xl p-8 shadow-md"
+        className="bg-accent/10 rounded-2xl p-8 shadow-md"
       >
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-ctp-peach rounded-xl flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shrink-0">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-3">Our Mission</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Meshflow helps teams <strong className="text-ctp-peach dark:text-ctp-peach">outperform by filling knowledge gaps</strong>.
+              Meshflow helps teams <strong className="text-accent dark:text-accent">outperform by filling knowledge gaps</strong>.
               The best teams aren't just skilled—they're connected. When expertise flows freely between
               teammates, blockers disappear, delivery accelerates, and everyone grows.
             </p>
@@ -74,8 +74,8 @@ export default function AboutPage() {
           whileHover={{ y: -4 }}
           className="bg-card rounded-2xl p-6 shadow-md"
         >
-          <div className="w-10 h-10 bg-ctp-red/20 rounded-lg flex items-center justify-center mb-4">
-            <Target className="w-5 h-5 text-ctp-red" />
+          <div className="w-10 h-10 bg-destructive/20 rounded-lg flex items-center justify-center mb-4">
+            <Target className="w-5 h-5 text-destructive" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">The Problem</h3>
           <p className="text-muted-foreground leading-relaxed">
@@ -87,9 +87,9 @@ export default function AboutPage() {
         <motion.div
           variants={itemVariants}
           whileHover={{ y: -4 }}
-          className="bg-ctp-peach/10 rounded-2xl p-6 shadow-md"
+          className="bg-accent/10 rounded-2xl p-6 shadow-md"
         >
-          <div className="w-10 h-10 bg-ctp-peach rounded-lg flex items-center justify-center mb-4">
+          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center mb-4">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Our Solution</h3>
@@ -103,7 +103,7 @@ export default function AboutPage() {
       {/* How It's Different */}
       <motion.div variants={itemVariants} className="space-y-6">
         <div className="flex items-center gap-3 mb-2">
-          <Network className="w-6 h-6 text-ctp-peach dark:text-ctp-peach" />
+          <Network className="w-6 h-6 text-accent dark:text-accent" />
           <h2 className="text-2xl font-bold text-foreground">How We're Different</h2>
         </div>
 
@@ -112,8 +112,8 @@ export default function AboutPage() {
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-peach/20 rounded-lg flex items-center justify-center shrink-0">
-              <Brain className="w-5 h-5 text-ctp-peach" />
+            <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center shrink-0">
+              <Brain className="w-5 h-5 text-accent" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Intelligent Matching</h4>
@@ -122,15 +122,15 @@ export default function AboutPage() {
                 complementary expertise, not rigid categories.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5 text-ctp-green" />
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Org-Scoped Privacy</h4>
@@ -139,15 +139,15 @@ export default function AboutPage() {
                 Complete security and privacy.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-peach/20 rounded-lg flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-ctp-peach" />
+            <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center shrink-0">
+              <TrendingUp className="w-5 h-5 text-accent" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Performance-Driven</h4>
@@ -156,15 +156,15 @@ export default function AboutPage() {
                 outperform those that don't. Simple as that.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-1" />
           </motion.div>
 
           <motion.div
             whileHover={{ x: 4 }}
             className="flex items-start gap-4 p-5 rounded-xl bg-card shadow-md"
           >
-            <div className="w-10 h-10 bg-ctp-green/20 rounded-lg flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-ctp-green" />
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center shrink-0">
+              <MessageCircle className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h4 className="font-bold text-foreground mb-1">Slack Integration</h4>
@@ -173,7 +173,7 @@ export default function AboutPage() {
                 miss a collaboration opportunity.
               </p>
             </div>
-            <CheckCircle2 className="w-5 h-5 text-ctp-peach shrink-0 mt-1" />
+            <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-1" />
           </motion.div>
         </div>
       </motion.div>
@@ -183,21 +183,21 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-foreground mb-6">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-5 rounded-xl bg-card shadow-md">
-            <div className="w-8 h-8 bg-ctp-peach rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center mb-3">
               <Target className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Skill Matching</h4>
             <p className="text-sm text-muted-foreground">Fuzzy matching connects similar skills automatically</p>
           </div>
           <div className="p-5 rounded-xl bg-card shadow-md">
-            <div className="w-8 h-8 bg-ctp-green rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mb-3">
               <Users className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Pod Organization</h4>
             <p className="text-sm text-muted-foreground">Group by project, team, or initiative</p>
           </div>
           <div className="p-5 rounded-xl bg-card shadow-md">
-            <div className="w-8 h-8 bg-ctp-peach rounded-lg flex items-center justify-center mb-3">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center mb-3">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Contextual Nudges</h4>

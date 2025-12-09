@@ -79,7 +79,7 @@ export function HelpRequests() {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-ctp-peach" />
+          <Sparkles className="w-5 h-5 text-accent" />
           Need Help With Something?
         </CardTitle>
         <CardDescription>
@@ -106,8 +106,8 @@ export function HelpRequests() {
                 key={r.id}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm ${
                   r.status === 'notified'
-                    ? 'bg-ctp-green/15 text-ctp-green'
-                    : 'bg-ctp-peach/15 text-ctp-peach'
+                    ? 'bg-primary/15 text-primary'
+                    : 'bg-accent/15 text-accent'
                 }`}
               >
                 <span>{r.skill}</span>

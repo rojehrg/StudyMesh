@@ -253,9 +253,9 @@ export default function PodDetailPage() {
         {members.length > 1 && (topExpertise.length > 0 || topGrowth.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {topExpertise.length > 0 && (
-              <Card className="bg-ctp-peach/5">
+              <Card className="bg-accent/5">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-ctp-peach">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-accent">
                     <TrendingUp className="w-4 h-4" />
                     Top Skills in Pod
                   </CardTitle>
@@ -263,7 +263,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topExpertise.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-peach/15 text-ctp-peach px-3 py-1.5 rounded-full text-sm font-medium">
+                      <div key={skill} className="flex items-center gap-1.5 bg-accent/15 text-accent px-3 py-1.5 rounded-full text-sm font-medium">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </div>
@@ -273,9 +273,9 @@ export default function PodDetailPage() {
               </Card>
             )}
             {topGrowth.length > 0 && (
-              <Card className="bg-ctp-green/5">
+              <Card className="bg-primary/5">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-ctp-green">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
                     <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
@@ -283,7 +283,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topGrowth.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-green/15 text-ctp-green px-3 py-1.5 rounded-full text-sm font-medium">
+                      <div key={skill} className="flex items-center gap-1.5 bg-primary/15 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </div>
@@ -333,7 +333,7 @@ export default function PodDetailPage() {
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && (
                           <span title="Looking to help">
-                            <Sparkles className="w-4 h-4 text-ctp-peach" />
+                            <Sparkles className="w-4 h-4 text-accent" />
                           </span>
                         )}
                       </div>
@@ -346,7 +346,7 @@ export default function PodDetailPage() {
                     {member.expertiseSkills.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {member.expertiseSkills.slice(0, 3).map((skill: string) => (
-                          <span key={skill} className="text-sm bg-ctp-peach/15 text-ctp-peach px-2.5 py-0.5 rounded">
+                          <span key={skill} className="text-sm bg-accent/15 text-accent px-2.5 py-0.5 rounded">
                             {skill}
                           </span>
                         ))}

@@ -216,7 +216,7 @@ export default function OnboardingPage() {
                 <CardContent className="space-y-8">
                   {/* Expertise */}
                   <div className="space-y-3">
-                    <Label className="text-ctp-peach font-semibold flex items-center gap-2">
+                    <Label className="text-accent font-semibold flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
@@ -231,9 +231,9 @@ export default function OnboardingPage() {
                         <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.expertiseSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-ctp-peach/20 text-ctp-peach hover:bg-ctp-peach/30 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-accent/20 text-accent hover:bg-accent/30 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-ctp-peach/40 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-accent/40 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
 
                   {/* Growth */}
                   <div className="space-y-3">
-                    <Label className="text-ctp-green font-semibold flex items-center gap-2">
+                    <Label className="text-primary font-semibold flex items-center gap-2">
                       <ArrowRight className="w-4 h-4" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
@@ -258,9 +258,9 @@ export default function OnboardingPage() {
                         <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.growthSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-ctp-green/20 text-ctp-green hover:bg-ctp-green/30 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/30 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-ctp-green/40 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-primary/40 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>

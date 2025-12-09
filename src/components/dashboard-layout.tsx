@@ -54,7 +54,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
         <Icon className="w-5 h-5 shrink-0" />
         {badge ? (
           <span className={cn(
-            "absolute -top-1 -right-1 bg-ctp-peach text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
+            "absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
             !isCollapsed && "hidden"
           )}>
             {badge}
@@ -72,7 +72,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       </motion.span>
       
       {!isCollapsed && badge ? (
-        <span className="ml-auto bg-ctp-peach/20 text-ctp-peach text-xs font-bold px-2 py-0.5 rounded-full">
+        <span className="ml-auto bg-accent/20 text-accent text-xs font-bold px-2 py-0.5 rounded-full">
           {badge}
         </span>
       ) : null}
@@ -169,24 +169,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        {/* Logo - Multi-color Mesh */}
+        {/* Logo */}
         <div className="h-16 flex items-center px-4">
           <Link href="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
             <span className={cn(
-              "text-xl font-bold shrink-0 transition-all duration-300",
+              "text-xl font-bold shrink-0 transition-all duration-300 text-primary",
               isCollapsed ? "w-12 text-center" : ""
             )}>
-              <span className="text-ctp-mauve">M</span>
+              M
             </span>
             <motion.span
               initial={false}
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
               className="whitespace-nowrap overflow-hidden text-xl font-bold"
             >
-              <span className="text-ctp-pink">e</span>
-              <span className="text-ctp-peach">s</span>
-              <span className="text-ctp-yellow">h</span>
-              <span className="text-foreground">flow</span>
+              <span className="text-primary">esh</span>
+              <span className="text-accent">flow</span>
             </motion.span>
           </Link>
         </div>

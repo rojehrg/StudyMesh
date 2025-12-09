@@ -237,7 +237,7 @@ export default function JoinPodPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="border-2 border-ctp-peach/30 rounded-xl p-6 bg-ctp-peach/10"
+                className="border-2 border-accent/30 rounded-xl p-6 bg-accent/10"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -249,7 +249,7 @@ export default function JoinPodPage() {
                       {podPreview.business_unit || "General"}
                     </div>
                   </div>
-                  <div className="bg-card px-3 py-1 rounded-lg border border-ctp-peach/40 font-mono text-sm font-medium text-ctp-peach">
+                  <div className="bg-card px-3 py-1 rounded-lg border border-accent/40 font-mono text-sm font-medium text-accent">
                     {podPreview.pod_code}
                   </div>
                 </div>
@@ -268,8 +268,8 @@ export default function JoinPodPage() {
                 </div>
 
                 {podPreview.alreadyMember ? (
-                  <div className="mt-6 bg-card border border-ctp-peach/30 rounded-lg p-3">
-                    <p className="text-sm text-ctp-peach font-medium">
+                  <div className="mt-6 bg-card border border-accent/30 rounded-lg p-3">
+                    <p className="text-sm text-accent font-medium">
                       ✅ You're already a member of this pod
                     </p>
                   </div>
@@ -277,7 +277,7 @@ export default function JoinPodPage() {
                   <Button
                     onClick={handleJoin}
                     disabled={loading}
-                    className="w-full mt-6 bg-ctp-peach hover:bg-ctp-peach/80"
+                    className="w-full mt-6 bg-accent hover:bg-accent/80"
                   >
                     {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Join This Pod

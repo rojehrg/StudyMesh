@@ -22,19 +22,19 @@ export function ProficiencyRing({ value, onChange, size = "md", color = "peach" 
   const innerSize = size === "sm" ? "w-9 h-9" : "w-11 h-11";
 
   const fillColors = color === "peach"
-    ? { filled: "hsl(var(--ctp-peach))", empty: "hsl(var(--muted))" }
-    : { filled: "hsl(var(--ctp-green))", empty: "hsl(var(--muted))" };
+    ? { filled: "hsl(var(--accent))", empty: "hsl(var(--muted))" }
+    : { filled: "hsl(var(--primary))", empty: "hsl(var(--muted))" };
 
   const colorClasses = color === "peach"
     ? {
-        text: "text-ctp-peach",
-        hover: "hover:bg-ctp-peach/10 hover:border-ctp-peach/30",
-        selected: "bg-ctp-peach/10 border-ctp-peach/50",
+        text: "text-accent",
+        hover: "hover:bg-accent/10 hover:border-accent/30",
+        selected: "bg-accent/10 border-accent/50",
       }
     : {
-        text: "text-ctp-green",
-        hover: "hover:bg-ctp-green/10 hover:border-ctp-green/30",
-        selected: "bg-ctp-green/10 border-ctp-green/50",
+        text: "text-primary",
+        hover: "hover:bg-primary/10 hover:border-primary/30",
+        selected: "bg-primary/10 border-primary/50",
       };
 
   // Calculate which quadrants are filled (going clockwise from top-right)
@@ -112,8 +112,8 @@ export function ProficiencyDisplay({ value, size = "sm", color = "peach" }: Omit
   const innerSize = size === "sm" ? "w-5 h-5" : "w-7 h-7";
 
   const fillColors = color === "peach"
-    ? { filled: "hsl(var(--ctp-peach))", empty: "hsl(var(--muted))" }
-    : { filled: "hsl(var(--ctp-green))", empty: "hsl(var(--muted))" };
+    ? { filled: "hsl(var(--accent))", empty: "hsl(var(--muted))" }
+    : { filled: "hsl(var(--primary))", empty: "hsl(var(--muted))" };
 
   const filledQuadrants = Math.round(value / 25);
 

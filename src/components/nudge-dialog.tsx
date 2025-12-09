@@ -63,15 +63,15 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
                 }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   nudgeType === 'ask'
-                    ? 'border-ctp-green/50 dark:border-ctp-green/50 bg-ctp-green/20 dark:bg-ctp-green/20'
-                    : 'border-border hover:border-ctp-green/30 hover:bg-accent'
+                    ? 'border-primary/50 dark:border-primary/50 bg-primary/20 dark:bg-primary/20'
+                    : 'border-border hover:border-primary/30 hover:bg-accent'
                 }`}
               >
                 <HelpCircle className={`w-6 h-6 mx-auto mb-2 ${
-                  nudgeType === 'ask' ? 'text-ctp-green dark:text-ctp-green' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-primary dark:text-primary' : 'text-muted-foreground'
                 }`} />
                 <p className={`text-sm font-medium ${
-                  nudgeType === 'ask' ? 'text-ctp-green dark:text-ctp-green' : 'text-muted-foreground'
+                  nudgeType === 'ask' ? 'text-primary dark:text-primary' : 'text-muted-foreground'
                 }`}>
                   Ask for Help
                 </p>
@@ -153,7 +153,7 @@ export function NudgeDialog({ open, onClose, member, currentUserExpertise, onNud
           <Button 
             onClick={handleSubmit} 
             disabled={!selectedTopic || loading}
-            className={nudgeType === 'ask' ? 'bg-ctp-green hover:bg-green-400' : 'bg-ctp-peach hover:bg-peach-400'}
+            className={nudgeType === 'ask' ? 'bg-primary hover:bg-green-400' : 'bg-accent hover:bg-peach-400'}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Send Nudge
