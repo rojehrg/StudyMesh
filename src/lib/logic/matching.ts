@@ -1,5 +1,18 @@
 import stringSimilarity from "string-similarity";
 
+// Memoization cache for skill similarity calculations
+// This significantly improves performance for repeated skill comparisons
+const similarityCache = new Map<string, boolean>();
+const canonicalCache = new Map<string, string>();
+const categoryCache = new Map<string, string | undefined>();
+
+// Clear caches periodically (for long-running processes)
+export function clearMatchingCaches() {
+  similarityCache.clear();
+  canonicalCache.clear();
+  categoryCache.clear();
+}
+
 // Skill synonyms/aliases for better matching
 // Maps common variations to a canonical form
 const SKILL_SYNONYMS: Record<string, string[]> = {
@@ -155,38 +168,70 @@ function normalizeSkills(skills: string[]): string[] {
   return skills.filter(Boolean).map(s => s.trim().toLowerCase());
 }
 
-// Get canonical form of a skill (resolves aliases)
+// Get canonical form of a skill (resolves aliases) - memoized
 function getCanonicalSkill(skill: string): string {
   const normalized = skill.trim().toLowerCase();
-  return SKILL_CANONICAL.get(normalized) || normalized;
+
+  // Check cache first
+  const cached = canonicalCache.get(normalized);
+  if (cached !== undefined) return cached;
+
+  const result = SKILL_CANONICAL.get(normalized) || normalized;
+  canonicalCache.set(normalized, result);
+  return result;
 }
 
-// Get skill category if exists
+// Get skill category if exists - memoized
 function getSkillCategory(skill: string): string | undefined {
+  const normalized = skill.trim().toLowerCase();
+
+  // Check cache first
+  const cached = categoryCache.get(normalized);
+  if (cached !== undefined) return cached;
+
   const canonical = getCanonicalSkill(skill);
-  return SKILL_TO_CATEGORY.get(canonical);
+  const result = SKILL_TO_CATEGORY.get(canonical);
+  categoryCache.set(normalized, result);
+  return result;
 }
 
 function areSkillsSimilar(skill1: string, skill2: string, threshold = 0.7): boolean {
   const s1 = skill1.trim().toLowerCase();
   const s2 = skill2.trim().toLowerCase();
 
+  // Check cache first (use sorted key for consistency)
+  const cacheKey = s1 < s2 ? `${s1}|${s2}|${threshold}` : `${s2}|${s1}|${threshold}`;
+  const cached = similarityCache.get(cacheKey);
+  if (cached !== undefined) return cached;
+
+  let result = false;
+
   // Direct match
-  if (s1 === s2) return true;
+  if (s1 === s2) {
+    result = true;
+  } else {
+    // Check canonical forms (handles synonyms like JS = JavaScript)
+    const canonical1 = getCanonicalSkill(s1);
+    const canonical2 = getCanonicalSkill(s2);
+    if (canonical1 === canonical2) {
+      result = true;
+    } else if (s1.length > 4 && s2.length > 4) {
+      // Substring check for things like "Tax Recon" in "Tax Reconciliation"
+      if (s1.includes(s2) || s2.includes(s1)) {
+        result = true;
+      }
+    }
 
-  // Check canonical forms (handles synonyms like JS = JavaScript)
-  const canonical1 = getCanonicalSkill(s1);
-  const canonical2 = getCanonicalSkill(s2);
-  if (canonical1 === canonical2) return true;
-
-  // Substring check for things like "Tax Recon" in "Tax Reconciliation"
-  if (s1.length > 4 && s2.length > 4) {
-    if (s1.includes(s2) || s2.includes(s1)) return true;
+    // Fuzzy match (only if not already matched)
+    if (!result) {
+      const similarity = stringSimilarity.compareTwoStrings(s1, s2);
+      result = similarity > threshold;
+    }
   }
 
-  // Fuzzy match
-  const similarity = stringSimilarity.compareTwoStrings(s1, s2);
-  return similarity > threshold;
+  // Cache the result
+  similarityCache.set(cacheKey, result);
+  return result;
 }
 
 // Check if skills are in the same category (for broader matching)

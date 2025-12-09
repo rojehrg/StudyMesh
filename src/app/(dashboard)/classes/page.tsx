@@ -25,7 +25,8 @@ export default function ClassesPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get all pods where user is a member
+      // Get all pods where user is a member, with member counts in one query
+      // Using a subquery approach to avoid N+1
       const { data: podMembers } = await supabase
         .from('pod_members')
         .select('pod_id')
@@ -38,24 +39,21 @@ export default function ClassesPage() {
 
       const podIds = podMembers.map(pm => pm.pod_id);
 
-      // Get pod details
+      // Single query to get pods with member counts using join
       const { data: podsData } = await supabase
         .from('pods')
-        .select('*')
+        .select(`
+          *,
+          pod_members(count)
+        `)
         .in('id', podIds)
         .order('created_at', { ascending: false });
 
-      // Get member counts for each pod
-      const podsWithCounts = await Promise.all(
-        (podsData || []).map(async (pod) => {
-          const { count } = await supabase
-            .from('pod_members')
-            .select('*', { count: 'exact', head: true })
-            .eq('pod_id', pod.id);
-
-          return { ...pod, memberCount: count || 0 };
-        })
-      );
+      // Transform the data to include memberCount
+      const podsWithCounts = (podsData || []).map(pod => ({
+        ...pod,
+        memberCount: pod.pod_members?.[0]?.count || 0,
+      }));
 
       setPods(podsWithCounts);
     } catch (error) {
