@@ -17,12 +17,12 @@
     --popover: 220 22% 100%;
     --popover-foreground: 234 16% 35%;
 
-    /* Primary - Peach */
-    --primary: 23 100% 52%;
+    /* Primary - Mauve (purple) for light mode */
+    --primary: 266 85% 58%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Mauve */
-    --secondary: 266 85% 58%;
+    /* Secondary - Pink */
+    --secondary: 316 73% 69%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted */
@@ -40,7 +40,7 @@
     /* Borders & Inputs */
     --border: 228 12% 85%;
     --input: 228 12% 85%;
-    --ring: 23 100% 52%;
+    --ring: 266 85% 58%;
 
     /* Rounded corners */
     --radius: 0.75rem;

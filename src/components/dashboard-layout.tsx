@@ -169,22 +169,24 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        {/* Logo */}
+        {/* Logo - Multi-color Mesh */}
         <div className="h-16 flex items-center px-4">
           <Link href="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
             <span className={cn(
-              "text-primary text-xl font-bold shrink-0 transition-all duration-300",
+              "text-xl font-bold shrink-0 transition-all duration-300",
               isCollapsed ? "w-12 text-center" : ""
             )}>
-              M
+              <span className="text-ctp-mauve">M</span>
             </span>
             <motion.span
               initial={false}
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
-              className="whitespace-nowrap overflow-hidden"
+              className="whitespace-nowrap overflow-hidden text-xl font-bold"
             >
-              <span className="text-primary text-xl font-bold">esh</span>
-              <span className="text-foreground text-xl font-bold">flow</span>
+              <span className="text-ctp-pink">e</span>
+              <span className="text-ctp-peach">s</span>
+              <span className="text-ctp-yellow">h</span>
+              <span className="text-foreground">flow</span>
             </motion.span>
           </Link>
         </div>
