@@ -104,10 +104,10 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground">
             Welcome back{profile.major ? `, ${profile.major.split(' ')[0]}` : ''}!
           </h1>
-          <p className="text-muted-foreground text-sm sm:text-base mt-1">Here's what's happening with your enablement</p>
+          <p className="text-muted-foreground mt-1">Here's what's happening with your enablement</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
@@ -126,15 +126,15 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover-lift">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Pods</CardTitle>
             <Users className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{podIds.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-foreground">{podIds.length}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {podIds.length === 0 ? "Join your first pod" : "Enablement groups"}
             </p>
           </CardContent>
@@ -146,8 +146,8 @@ export default async function DashboardPage() {
             <Sparkles className="h-5 w-5 text-ctp-green" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{matchCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-foreground">{matchCount}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {matchCount === 0 ? "Add skills to find matches" : "Knowledge partners"}
             </p>
           </CardContent>
@@ -159,8 +159,8 @@ export default async function DashboardPage() {
             <TrendingUp className="h-5 w-5 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{expertiseCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-foreground">{expertiseCount}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {expertiseCount === 0 ? "Add your expertise" : "Can mentor others"}
             </p>
           </CardContent>
@@ -172,8 +172,8 @@ export default async function DashboardPage() {
             <Bell className="h-5 w-5 text-ctp-yellow" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">{unreadNotifications}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-foreground">{unreadNotifications}</div>
+            <p className="text-sm text-muted-foreground mt-1">
               {unreadNotifications === 0 ? "All caught up" : "Unread nudges"}
             </p>
           </CardContent>
@@ -182,21 +182,21 @@ export default async function DashboardPage() {
 
       {/* Analytics Section */}
       {(trendingSkills.length > 0 || (activeHelpersCount ?? 0) > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Trending Skills */}
           {trendingSkills.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
                   <Target className="w-5 h-5 text-ctp-peach" />
                   Most Requested Skills
                 </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
+                <CardDescription>
                   Skills teammates are looking for help with
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {trendingSkills.map(({ skill, count }) => (
                     <div key={skill} className="flex items-center justify-between">
                       <span className="text-sm font-medium text-foreground capitalize">{skill}</span>
@@ -207,7 +207,7 @@ export default async function DashboardPage() {
                             style={{ width: `${Math.min(100, (count / trendingSkills[0].count) * 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-muted-foreground w-6 text-right">{count}</span>
+                        <span className="text-sm text-muted-foreground w-6 text-right">{count}</span>
                       </div>
                     </div>
                   ))}
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
                 {profile.expertise_skills?.some((s: string) =>
                   trendingSkills.some(t => s.toLowerCase().includes(t.skill) || t.skill.includes(s.toLowerCase()))
                 ) && (
-                  <p className="text-xs text-ctp-peach mt-3 font-medium">
+                  <p className="text-sm text-ctp-peach mt-4 font-medium">
                     You have skills people need!
                   </p>
                 )}
@@ -226,27 +226,27 @@ export default async function DashboardPage() {
           {/* Community Stats */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+              <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-ctp-mauve" />
                 Community Insights
               </CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">
+              <CardDescription>
                 What's happening in Meshflow
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-muted rounded-lg text-center">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold text-foreground">{activeHelpersCount || 0}</p>
-                  <p className="text-xs text-muted-foreground">Active Helpers</p>
+                  <p className="text-sm text-muted-foreground">Active Helpers</p>
                 </div>
-                <div className="p-3 bg-ctp-green/20 rounded-lg text-center">
+                <div className="p-4 bg-ctp-green/20 rounded-lg text-center">
                   <p className="text-2xl font-bold text-foreground">{openRequests?.length || 0}</p>
-                  <p className="text-xs text-muted-foreground">Open Requests</p>
+                  <p className="text-sm text-muted-foreground">Open Requests</p>
                 </div>
               </div>
               {!profile.looking_to_help && (activeHelpersCount ?? 0) > 0 && (
-                <p className="text-xs text-muted-foreground mt-3 text-center">
+                <p className="text-sm text-muted-foreground mt-4 text-center">
                   Toggle "Looking to Help" in sidebar to join active helpers
                 </p>
               )}
@@ -261,7 +261,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-ctp-peach" />
                   Complete Your Profile
                 </CardTitle>
@@ -273,14 +273,14 @@ export default async function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+            <div className="space-y-4">
+              <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                 <div
                   className="bg-ctp-peach h-full rounded-full transition-all duration-500"
                   style={{ width: `${completionPercent}%` }}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {completionSteps.filter(s => !s.done).slice(0, 4).map((step, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm text-foreground">
                     <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
@@ -288,7 +288,7 @@ export default async function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" asChild className="w-full mt-2 hover:bg-ctp-peach/10 hover:border-ctp-peach/50">
+              <Button variant="outline" asChild className="w-full hover:bg-ctp-peach/10 hover:border-ctp-peach/50">
                 <Link href="/settings">
                   Complete Profile <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -301,9 +301,9 @@ export default async function DashboardPage() {
       {/* Recent Pods or Empty State */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-foreground">Your Pods</h2>
+          <h2 className="text-lg font-semibold text-foreground">Your Pods</h2>
           {pods.length > 0 && (
-            <Link href="/classes" className="text-sm text-ctp-peach hover:text-ctp-peach font-medium">
+            <Link href="/classes" className="text-sm text-primary hover:underline font-medium">
               View all →
             </Link>
           )}

@@ -244,8 +244,8 @@ export default function WorkingCirclesPage() {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Working Circles</h1>
-        <p className="text-muted-foreground text-sm sm:text-base mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Working Circles</h1>
+        <p className="text-muted-foreground mt-1">
           People from your pods
         </p>
       </div>
@@ -253,11 +253,11 @@ export default function WorkingCirclesPage() {
       {/* Help Requests */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-ctp-peach" />
             Need Help With Something?
           </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
+          <CardDescription>
             Add skills you need help with - we'll match you with pod members who can help
           </CardDescription>
         </CardHeader>
@@ -303,8 +303,8 @@ export default function WorkingCirclesPage() {
             <Card className="bg-ctp-green/5">
               <CardContent className="p-4">
                 <p className="text-sm font-medium text-ctp-green mb-1">Can help you</p>
-                <p className="text-2xl font-bold text-foreground">{canHelpMe.length}</p>
-                <p className="text-xs text-muted-foreground">people have skills you want to learn</p>
+                <p className="text-3xl font-bold text-foreground">{canHelpMe.length}</p>
+                <p className="text-sm text-muted-foreground">people have skills you want to learn</p>
               </CardContent>
             </Card>
           )}
@@ -312,8 +312,8 @@ export default function WorkingCirclesPage() {
             <Card className="bg-ctp-peach/5">
               <CardContent className="p-4">
                 <p className="text-sm font-medium text-ctp-peach mb-1">You can help</p>
-                <p className="text-2xl font-bold text-foreground">{iCanHelp.length}</p>
-                <p className="text-xs text-muted-foreground">people want to learn your skills</p>
+                <p className="text-3xl font-bold text-foreground">{iCanHelp.length}</p>
+                <p className="text-sm text-muted-foreground">people want to learn your skills</p>
               </CardContent>
             </Card>
           )}
@@ -387,30 +387,30 @@ export default function WorkingCirclesPage() {
                   <div className="space-y-2 mb-3">
                     {member.expertiseSkills.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Knows</p>
-                        <div className="flex flex-wrap gap-1">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1.5">Knows</p>
+                        <div className="flex flex-wrap gap-1.5">
                           {member.expertiseSkills.slice(0, 4).map((skill: string) => (
-                            <span key={skill} className="bg-ctp-peach/15 text-ctp-peach text-xs px-2 py-0.5 rounded">
+                            <span key={skill} className="bg-ctp-peach/15 text-ctp-peach text-sm px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
                           {member.expertiseSkills.length > 4 && (
-                            <span className="text-xs text-muted-foreground">+{member.expertiseSkills.length - 4}</span>
+                            <span className="text-sm text-muted-foreground">+{member.expertiseSkills.length - 4}</span>
                           )}
                         </div>
                       </div>
                     )}
                     {member.growthSkills.length > 0 && (
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">Wants to learn</p>
-                        <div className="flex flex-wrap gap-1">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1.5">Wants to learn</p>
+                        <div className="flex flex-wrap gap-1.5">
                           {member.growthSkills.slice(0, 3).map((skill: string) => (
-                            <span key={skill} className="bg-ctp-green/15 text-ctp-green text-xs px-2 py-0.5 rounded">
+                            <span key={skill} className="bg-ctp-green/15 text-ctp-green text-sm px-2 py-0.5 rounded">
                               {skill}
                             </span>
                           ))}
                           {member.growthSkills.length > 3 && (
-                            <span className="text-xs text-muted-foreground">+{member.growthSkills.length - 3}</span>
+                            <span className="text-sm text-muted-foreground">+{member.growthSkills.length - 3}</span>
                           )}
                         </div>
                       </div>

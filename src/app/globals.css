@@ -4,54 +4,53 @@
 
 @layer base {
   :root {
-    /* Catppuccin Latte (Light Mode) */
-    /* Using lighter complementary colors for light mode */
+    /* Catppuccin Latte (Light Mode) - High Contrast */
 
     /* Backgrounds */
     --background: 220 23% 95%;
-    --foreground: 234 16% 35%;
+    --foreground: 234 25% 18%;
 
     /* Cards & Surfaces */
     --card: 220 22% 100%;
-    --card-foreground: 234 16% 35%;
+    --card-foreground: 234 25% 18%;
 
     --popover: 220 22% 100%;
-    --popover-foreground: 234 16% 35%;
+    --popover-foreground: 234 25% 18%;
 
-    /* Primary - Peach */
-    --primary: 23 92% 75%;
-    --primary-foreground: 240 21% 15%;
+    /* Primary - Peach (darker for light mode) */
+    --primary: 23 80% 50%;
+    --primary-foreground: 0 0% 100%;
 
     /* Secondary - Mauve */
-    --secondary: 267 84% 81%;
-    --secondary-foreground: 240 21% 15%;
+    --secondary: 267 70% 65%;
+    --secondary-foreground: 0 0% 100%;
 
     /* Muted */
     --muted: 228 24% 92%;
-    --muted-foreground: 228 24% 45%;
+    --muted-foreground: 228 20% 38%;
 
     /* Accent - Lavender */
-    --accent: 232 97% 85%;
-    --accent-foreground: 240 21% 15%;
+    --accent: 232 80% 90%;
+    --accent-foreground: 234 25% 18%;
 
     /* Destructive - Red */
-    --destructive: 343 81% 75%;
-    --destructive-foreground: 240 21% 15%;
+    --destructive: 343 81% 50%;
+    --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 228 17% 85%;
-    --input: 228 17% 85%;
-    --ring: 23 92% 75%;
+    --border: 228 20% 80%;
+    --input: 228 20% 80%;
+    --ring: 23 80% 50%;
 
     /* Rounded corners */
     --radius: 0.75rem;
 
     /* Chart colors - Catppuccin accent colors */
-    --chart-1: 23 92% 75%;
-    --chart-2: 267 84% 81%;
-    --chart-3: 115 54% 76%;
-    --chart-4: 217 92% 76%;
-    --chart-5: 41 86% 83%;
+    --chart-1: 23 80% 55%;
+    --chart-2: 267 70% 60%;
+    --chart-3: 115 50% 45%;
+    --chart-4: 217 80% 55%;
+    --chart-5: 41 80% 50%;
   }
 
   .dark {

@@ -255,7 +255,7 @@ export default function PodDetailPage() {
             {topExpertise.length > 0 && (
               <Card className="bg-ctp-peach/5">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-ctp-peach">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-ctp-peach">
                     <TrendingUp className="w-4 h-4" />
                     Top Skills in Pod
                   </CardTitle>
@@ -263,7 +263,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topExpertise.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-peach/15 text-ctp-peach px-2.5 py-1 rounded-full text-sm">
+                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-peach/15 text-ctp-peach px-3 py-1.5 rounded-full text-sm font-medium">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </div>
@@ -275,7 +275,7 @@ export default function PodDetailPage() {
             {topGrowth.length > 0 && (
               <Card className="bg-ctp-green/5">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-ctp-green">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-ctp-green">
                     <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
@@ -283,7 +283,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topGrowth.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-green/15 text-ctp-green px-2.5 py-1 rounded-full text-sm">
+                      <div key={skill} className="flex items-center gap-1.5 bg-ctp-green/15 text-ctp-green px-3 py-1.5 rounded-full text-sm font-medium">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </div>
@@ -299,7 +299,7 @@ export default function PodDetailPage() {
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 Pod Members
               </CardTitle>
@@ -307,7 +307,7 @@ export default function PodDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {members.map((member, index) => (
                 <motion.div
                   key={member.userId}
@@ -329,7 +329,7 @@ export default function PodDetailPage() {
                           {member.name}
                         </h4>
                         {member.userId === currentUserId && (
-                          <Badge variant="secondary" className="bg-primary/20 text-primary text-[10px] px-1.5 py-0">You</Badge>
+                          <Badge variant="secondary" className="bg-primary/20 text-primary text-xs px-1.5">You</Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && (
                           <span title="Looking to help">
@@ -337,22 +337,22 @@ export default function PodDetailPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{member.department || "No department"}</p>
+                      <p className="text-sm text-muted-foreground truncate">{member.department || "No department"}</p>
                     </div>
                   </div>
 
                   {/* Skills */}
                   <div className="space-y-2 mb-3">
                     {member.expertiseSkills.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1.5">
                         {member.expertiseSkills.slice(0, 3).map((skill: string) => (
-                          <span key={skill} className="text-xs bg-ctp-peach/15 text-ctp-peach px-2 py-0.5 rounded">
+                          <span key={skill} className="text-sm bg-ctp-peach/15 text-ctp-peach px-2.5 py-0.5 rounded">
                             {skill}
                           </span>
                         ))}
                         {member.expertiseSkills.length > 3 && (
                           <span
-                            className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded cursor-help"
+                            className="text-sm bg-muted text-muted-foreground px-2.5 py-0.5 rounded cursor-help"
                             title={member.expertiseSkills.slice(3).join(', ')}
                           >
                             +{member.expertiseSkills.length - 3}
@@ -367,9 +367,9 @@ export default function PodDetailPage() {
                       onClick={() => openNudgeDialog(member)}
                       size="sm"
                       variant="outline"
-                      className="w-full h-8 text-xs hover:bg-primary/10 hover:border-primary/50"
+                      className="w-full hover:bg-primary/10 hover:border-primary/50"
                     >
-                      <Bell className="h-3 w-3 mr-1.5" />
+                      <Bell className="h-4 w-4 mr-1.5" />
                       Nudge
                     </Button>
                   )}
