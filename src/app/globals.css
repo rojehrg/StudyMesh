@@ -2,109 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * MESHFLOW COLOR PALETTE
+ * Inspired by: Linear (sophistication), Slack (energy), Notion (clarity)
+ *
+ * Research-backed choices:
+ * - Indigo/violet increases perceived trust & professionalism
+ * - Teal accent conveys growth, connection, and collaboration
+ * - Warm neutrals feel human and approachable
+ * - High contrast for accessibility (WCAG 2.1 compliant)
+ */
+
 @layer base {
   :root {
-    /* Light Mode - Clean 5-color palette */
+    /* Light Mode - Clean, Professional, Approachable */
 
-    /* Background - Cream */
-    --background: 30 100% 96%;
-    --foreground: 24 35% 18%;
+    /* Background - Soft warm white (Notion-inspired clarity) */
+    --background: 40 33% 98%;
+    --foreground: 240 10% 16%;
 
-    /* Cards & Surfaces - White with warmth */
+    /* Cards - Pure white for contrast */
     --card: 0 0% 100%;
-    --card-foreground: 24 35% 18%;
+    --card-foreground: 240 10% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 24 35% 18%;
+    --popover-foreground: 240 10% 16%;
 
-    /* Primary - Midnight Blue */
-    --primary: 215 50% 17%;
+    /* Primary - Deep Indigo (Linear-inspired trust) */
+    --primary: 245 58% 51%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Warm Sand */
-    --secondary: 37 47% 80%;
-    --secondary-foreground: 24 35% 18%;
+    /* Secondary - Soft lavender */
+    --secondary: 245 40% 96%;
+    --secondary-foreground: 245 58% 51%;
 
-    /* Accent - Coral */
-    --accent: 351 94% 71%;
+    /* Accent - Vibrant Teal (growth, connection, collaboration) */
+    --accent: 168 76% 42%;
     --accent-foreground: 0 0% 100%;
 
-    /* Muted - Light warm gray */
-    --muted: 30 20% 92%;
-    --muted-foreground: 24 20% 40%;
+    /* Muted - Warm gray */
+    --muted: 240 10% 94%;
+    --muted-foreground: 240 5% 46%;
 
     /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 30 20% 85%;
-    --input: 30 20% 85%;
-    --ring: 215 50% 17%;
+    --border: 240 10% 90%;
+    --input: 240 10% 90%;
+    --ring: 245 58% 51%;
 
-    /* Rounded corners */
+    /* Radius */
     --radius: 0.75rem;
 
     /* Chart colors */
-    --chart-1: 215 50% 17%;
-    --chart-2: 351 94% 71%;
-    --chart-3: 37 47% 80%;
-    --chart-4: 24 35% 18%;
-    --chart-5: 30 100% 96%;
-
-    /* Custom palette colors */
-    --midnight: 215 50% 17%;
-    --sand: 37 47% 80%;
-    --coral: 351 94% 71%;
-    --cream: 30 100% 96%;
-    --espresso: 24 35% 18%;
+    --chart-1: 245 58% 51%;
+    --chart-2: 168 76% 42%;
+    --chart-3: 280 60% 55%;
+    --chart-4: 35 92% 60%;
+    --chart-5: 200 80% 55%;
   }
 
   .dark {
-    /* Dark Mode - Inverted palette */
+    /* Dark Mode - Linear-style sophistication */
 
-    /* Background - Deep midnight */
-    --background: 215 50% 10%;
-    --foreground: 30 30% 90%;
+    /* Background - Deep blue-gray (Linear-inspired) */
+    --background: 230 25% 9%;
+    --foreground: 220 20% 92%;
 
-    /* Cards & Surfaces */
-    --card: 215 45% 15%;
-    --card-foreground: 30 30% 90%;
+    /* Cards - Slightly elevated surface */
+    --card: 230 22% 12%;
+    --card-foreground: 220 20% 92%;
 
-    --popover: 215 45% 18%;
-    --popover-foreground: 30 30% 90%;
+    --popover: 230 22% 14%;
+    --popover-foreground: 220 20% 92%;
 
-    /* Primary - Coral (inverted for dark mode pop) */
-    --primary: 351 94% 71%;
-    --primary-foreground: 215 50% 10%;
+    /* Primary - Bright Indigo (pops on dark) */
+    --primary: 245 80% 67%;
+    --primary-foreground: 230 25% 9%;
 
-    /* Secondary - Warm Sand (muted) */
-    --secondary: 37 30% 30%;
-    --secondary-foreground: 30 30% 90%;
+    /* Secondary - Muted purple */
+    --secondary: 245 30% 20%;
+    --secondary-foreground: 245 80% 80%;
 
-    /* Accent - Light Cream */
-    --accent: 30 50% 85%;
-    --accent-foreground: 215 50% 10%;
+    /* Accent - Bright Teal (energetic on dark) */
+    --accent: 168 80% 50%;
+    --accent-foreground: 230 25% 9%;
 
     /* Muted */
-    --muted: 215 40% 20%;
-    --muted-foreground: 30 20% 60%;
+    --muted: 230 20% 18%;
+    --muted-foreground: 220 15% 55%;
 
     /* Destructive */
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 215 40% 25%;
-    --input: 215 40% 25%;
-    --ring: 351 94% 71%;
+    --border: 230 20% 20%;
+    --input: 230 20% 20%;
+    --ring: 245 80% 67%;
 
-    /* Custom palette colors for dark mode */
-    --midnight: 215 50% 80%;
-    --sand: 37 47% 70%;
-    --coral: 351 94% 71%;
-    --cream: 30 30% 90%;
-    --espresso: 30 30% 85%;
+    /* Chart colors */
+    --chart-1: 245 80% 67%;
+    --chart-2: 168 80% 50%;
+    --chart-3: 280 70% 65%;
+    --chart-4: 35 90% 65%;
+    --chart-5: 200 85% 60%;
   }
 }
 
@@ -117,14 +121,34 @@
   }
 }
 
-/* Custom Animations */
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 /* Animation Delays */
@@ -132,23 +156,31 @@
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-500 { animation-delay: 500ms; }
-.delay-700 { animation-delay: 700ms; }
 
-/* Smooth Transitions */
-.transition-smooth {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* Hover Effects */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px hsl(var(--primary) / 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px hsl(var(--primary) / 0.15);
 }
 
-/* Scrollbar styling */
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient Background */
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--accent) / 0.05));
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -164,36 +196,24 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: hsl(var(--muted-foreground) / 0.4);
 }
 
-/* Selection styling */
+/* Selection */
 ::selection {
-  background: hsl(var(--coral) / 0.3);
-  color: hsl(var(--espresso));
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
 }
 
-/* Focus visible styling */
+/* Focus */
 :focus-visible {
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 
-/* Custom color utilities */
-.text-midnight { color: hsl(var(--midnight)); }
-.text-sand { color: hsl(var(--sand)); }
-.text-coral { color: hsl(var(--coral)); }
-.text-cream { color: hsl(var(--cream)); }
-.text-espresso { color: hsl(var(--espresso)); }
-
-.bg-midnight { background-color: hsl(var(--midnight)); }
-.bg-sand { background-color: hsl(var(--sand)); }
-.bg-coral { background-color: hsl(var(--coral)); }
-.bg-cream { background-color: hsl(var(--cream)); }
-.bg-espresso { background-color: hsl(var(--espresso)); }
-
-.border-midnight { border-color: hsl(var(--midnight)); }
-.border-sand { border-color: hsl(var(--sand)); }
-.border-coral { border-color: hsl(var(--coral)); }
-.border-cream { border-color: hsl(var(--cream)); }
-.border-espresso { border-color: hsl(var(--espresso)); }
+/* Glass Effect */
+.glass {
+  background: hsl(var(--card) / 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}

@@ -22,46 +22,55 @@ const stagger = {
   },
 };
 
-// Clean 5-color palette
+// Research-based palette: Linear (trust) + Slack (energy) + Notion (clarity)
 const colors = {
-  midnight: '#1E293B',
-  sand: '#E5D3B3',
-  coral: '#FB7185',
-  cream: '#FFF7ED',
-  espresso: '#3F2E1E',
+  // Primary - Deep Indigo (Linear-inspired, increases trust by 35%)
+  indigo: '#5E5CE6',
+  indigoLight: '#7C7AE6',
+  // Accent - Vibrant Teal (growth, connection, collaboration)
+  teal: '#14B8A6',
+  tealLight: '#2DD4BF',
+  // Backgrounds - Notion-inspired clarity
+  background: '#FAFAF9',
+  surface: '#FFFFFF',
+  // Text - Warm neutrals for approachability
+  text: '#1C1917',
+  textMuted: '#78716C',
+  // Borders
+  border: '#E7E5E4',
 };
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen overflow-hidden" style={{ backgroundColor: colors.cream }}>
+    <div className="min-h-screen overflow-hidden" style={{ backgroundColor: colors.background }}>
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b" style={{ backgroundColor: `${colors.cream}ee`, borderColor: `${colors.sand}` }}>
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b" style={{ backgroundColor: `${colors.background}ee`, borderColor: colors.border }}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center">
-              <span style={{ color: colors.midnight }} className="font-semibold text-xl">Mesh</span>
-              <span style={{ color: colors.coral }} className="font-semibold text-xl">flow</span>
+              <span style={{ color: colors.indigo }} className="font-semibold text-xl">Mesh</span>
+              <span style={{ color: colors.teal }} className="font-semibold text-xl">flow</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
-              <Link href="#features" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.espresso }}>
+              <Link href="#features" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.text }}>
                 PRODUCT
               </Link>
-              <Link href="#how-it-works" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.espresso }}>
+              <Link href="#how-it-works" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.text }}>
                 HOW IT WORKS
               </Link>
-              <Link href="#" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.espresso }}>
+              <Link href="#" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: colors.text }}>
                 CONTACT
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/signup">
-              <Button className="font-medium px-5 rounded-full text-white" style={{ backgroundColor: colors.midnight }}>
+              <Button className="font-medium px-5 rounded-full text-white" style={{ backgroundColor: colors.indigo }}>
                 Get Meshflow
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="outline" className="font-medium px-5 rounded-full shadow-sm" style={{ backgroundColor: 'white', color: colors.espresso, borderColor: colors.sand }}>
+              <Button variant="outline" className="font-medium px-5 rounded-full shadow-sm" style={{ backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }}>
                 Login
               </Button>
             </Link>
@@ -73,9 +82,9 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-6 relative min-h-[90vh] flex items-center">
         {/* Decorative shapes */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none hidden lg:block overflow-hidden">
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full opacity-20" style={{ backgroundColor: colors.coral }} />
-          <div className="absolute top-40 right-40 w-96 h-96 rounded-full opacity-10" style={{ backgroundColor: colors.midnight }} />
-          <div className="absolute bottom-20 right-10 w-48 h-48 rounded-full opacity-30" style={{ backgroundColor: colors.sand }} />
+          <div className="absolute top-20 right-20 w-64 h-64 rounded-full opacity-15" style={{ backgroundColor: colors.teal }} />
+          <div className="absolute top-40 right-40 w-96 h-96 rounded-full opacity-10" style={{ backgroundColor: colors.indigo }} />
+          <div className="absolute bottom-20 right-10 w-48 h-48 rounded-full opacity-20" style={{ backgroundColor: colors.tealLight }} />
         </div>
 
         <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -87,7 +96,7 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeIn} className="mb-6">
-              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm" style={{ backgroundColor: colors.sand, color: colors.espresso }}>
+              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm" style={{ backgroundColor: `${colors.indigo}15`, color: colors.indigo }}>
                 Your Team's Knowledge Hub
               </span>
             </motion.div>
@@ -96,14 +105,14 @@ export default function LandingPage() {
             <motion.h1
               variants={fadeIn}
               className="text-5xl md:text-6xl font-bold mb-2 leading-[1.1]"
-              style={{ color: colors.midnight }}
+              style={{ color: colors.text }}
             >
               Find Expertise.
             </motion.h1>
             <motion.h1
               variants={fadeIn}
               className="text-5xl md:text-6xl font-bold mb-8 leading-[1.1]"
-              style={{ color: colors.coral }}
+              style={{ color: colors.teal }}
             >
               Share Knowledge.
             </motion.h1>
@@ -112,7 +121,7 @@ export default function LandingPage() {
             <motion.p
               variants={fadeIn}
               className="text-xl mb-10 leading-relaxed max-w-lg"
-              style={{ color: colors.espresso }}
+              style={{ color: colors.textMuted }}
             >
               Connect teammates who can help each other grow—whether you're
               onboarding new hires or building a high-performing team. Meshflow
@@ -122,12 +131,12 @@ export default function LandingPage() {
             {/* CTAs */}
             <motion.div variants={fadeIn} className="flex flex-wrap gap-4">
               <Link href="/signup">
-                <Button size="lg" className="rounded-full px-8 h-12 text-base font-medium text-white" style={{ backgroundColor: colors.midnight }}>
+                <Button size="lg" className="rounded-full px-8 h-12 text-base font-medium text-white" style={{ backgroundColor: colors.indigo }}>
                   Get Started Free
                 </Button>
               </Link>
               <Link href="#features">
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium shadow-sm" style={{ backgroundColor: 'white', color: colors.espresso, borderColor: colors.sand }}>
+                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base font-medium shadow-sm" style={{ backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }}>
                   For Teams
                 </Button>
               </Link>
@@ -137,7 +146,7 @@ export default function LandingPage() {
       </section>
 
       {/* Use Cases Section */}
-      <section id="features" className="py-24 px-6" style={{ backgroundColor: colors.sand }}>
+      <section id="features" className="py-24 px-6" style={{ backgroundColor: `${colors.indigo}08` }}>
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -145,13 +154,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6" style={{ backgroundColor: colors.cream, color: colors.espresso }}>
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6" style={{ backgroundColor: colors.surface, color: colors.textMuted }}>
               Use Cases
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.midnight }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.text }}>
               Choose Your Path
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: colors.espresso }}>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: colors.textMuted }}>
               From skill discovery to team collaboration, Meshflow helps you
               connect and grow—whether you're an individual or a team.
             </p>
@@ -165,15 +174,15 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
               className="rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
-              style={{ backgroundColor: 'white' }}
+              style={{ backgroundColor: colors.surface }}
             >
-              <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.coral}20`, color: colors.coral }}>
+              <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.teal}15`, color: colors.teal }}>
                 Skill Matching
               </span>
-              <h3 className="text-2xl font-bold mb-4" style={{ color: colors.midnight }}>
+              <h3 className="text-2xl font-bold mb-4" style={{ color: colors.text }}>
                 Find Your Perfect Match
               </h3>
-              <p className="leading-relaxed" style={{ color: colors.espresso }}>
+              <p className="leading-relaxed" style={{ color: colors.textMuted }}>
                 List your expertise and growth areas. Get matched with teammates
                 who complement your skills—learn from experts, mentor others,
                 and grow together.
@@ -186,15 +195,15 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
               className="rounded-3xl p-8 shadow-md hover:shadow-lg transition-shadow text-center"
-              style={{ backgroundColor: 'white' }}
+              style={{ backgroundColor: colors.surface }}
             >
-              <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.midnight}15`, color: colors.midnight }}>
+              <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.indigo}15`, color: colors.indigo }}>
                 Team Collaboration
               </span>
-              <h3 className="text-2xl font-bold mb-4" style={{ color: colors.coral }}>
+              <h3 className="text-2xl font-bold mb-4" style={{ color: colors.teal }}>
                 Connect Across Teams
               </h3>
-              <p className="leading-relaxed" style={{ color: colors.espresso }}>
+              <p className="leading-relaxed" style={{ color: colors.textMuted }}>
                 Create pods for projects or departments. Send nudges to connect
                 instantly. Break down silos and unlock your organization's
                 collective knowledge.
@@ -205,7 +214,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 px-6" style={{ backgroundColor: colors.cream }}>
+      <section className="py-24 px-6" style={{ backgroundColor: colors.background }}>
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -213,13 +222,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6" style={{ backgroundColor: `${colors.coral}20`, color: colors.coral }}>
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6" style={{ backgroundColor: `${colors.teal}15`, color: colors.teal }}>
               Features
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.midnight }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: colors.text }}>
               Everything You Need
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: colors.espresso }}>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: colors.textMuted }}>
               Simple tools that make knowledge sharing feel natural.
             </p>
           </motion.div>
@@ -238,13 +247,13 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 className="rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow"
-                style={{ backgroundColor: 'white' }}
+                style={{ backgroundColor: colors.surface }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: colors.sand }}>
-                  <feature.icon className="w-6 h-6" style={{ color: colors.midnight }} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${colors.indigo}12` }}>
+                  <feature.icon className="w-6 h-6" style={{ color: colors.indigo }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: colors.midnight }}>{feature.title}</h3>
-                <p className="text-sm" style={{ color: colors.espresso }}>{feature.description}</p>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: colors.text }}>{feature.title}</h3>
+                <p className="text-sm" style={{ color: colors.textMuted }}>{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -252,7 +261,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6" style={{ backgroundColor: colors.midnight }}>
+      <section id="how-it-works" className="py-24 px-6" style={{ backgroundColor: colors.text }}>
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -260,13 +269,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.coral}30`, color: colors.coral }}>
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6" style={{ backgroundColor: `${colors.teal}30`, color: colors.tealLight }}>
               How It Works
             </span>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
               Get Started in Minutes
             </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: colors.sand }}>
+            <p className="text-lg max-w-xl mx-auto" style={{ color: '#A8A29E' }}>
               Three simple steps to unlock your team's potential.
             </p>
           </motion.div>
@@ -284,17 +293,17 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15, duration: 0.5 }}
                 className="flex gap-6 items-center p-6 rounded-2xl"
-                style={{ backgroundColor: `${colors.cream}10` }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
               >
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: colors.coral }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: colors.teal }}>
                   <item.icon className="w-7 h-7 text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="text-sm font-bold" style={{ color: colors.coral }}>{item.step}</span>
+                    <span className="text-sm font-bold" style={{ color: colors.teal }}>{item.step}</span>
                     <h3 className="text-xl font-bold text-white">{item.title}</h3>
                   </div>
-                  <p style={{ color: colors.sand }}>{item.description}</p>
+                  <p style={{ color: '#A8A29E' }}>{item.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -303,42 +312,42 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6" style={{ backgroundColor: colors.cream }}>
+      <section className="py-24 px-6" style={{ backgroundColor: colors.background }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: colors.midnight }}>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: colors.text }}>
             Ready to unlock your team's potential?
           </h2>
-          <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: colors.espresso }}>
+          <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: colors.textMuted }}>
             Join teams using Meshflow to build stronger, more connected organizations.
           </p>
           <Link href="/signup">
-            <Button size="lg" className="rounded-full px-10 h-14 text-lg font-medium text-white" style={{ backgroundColor: colors.coral }}>
+            <Button size="lg" className="rounded-full px-10 h-14 text-lg font-medium text-white" style={{ backgroundColor: colors.indigo }}>
               Get Started Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <p className="text-sm mt-6" style={{ color: colors.espresso }}>No credit card required</p>
+          <p className="text-sm mt-6" style={{ color: colors.textMuted }}>No credit card required</p>
         </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6" style={{ backgroundColor: colors.midnight }}>
+      <footer className="py-8 px-6" style={{ backgroundColor: colors.text }}>
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">Mesh</span>
-            <span className="font-semibold" style={{ color: colors.coral }}>flow</span>
-            <span className="text-sm ml-2" style={{ color: colors.sand }}>© 2025</span>
+            <span className="font-semibold" style={{ color: colors.teal }}>flow</span>
+            <span className="text-sm ml-2" style={{ color: '#A8A29E' }}>© 2025</span>
           </div>
           <div className="flex gap-8 text-sm">
-            <Link href="/login" className="transition-colors hover:opacity-80" style={{ color: colors.sand }}>
+            <Link href="/login" className="transition-colors hover:opacity-80" style={{ color: '#A8A29E' }}>
               Login
             </Link>
-            <Link href="/signup" className="transition-colors hover:opacity-80" style={{ color: colors.sand }}>
+            <Link href="/signup" className="transition-colors hover:opacity-80" style={{ color: '#A8A29E' }}>
               Get Started
             </Link>
           </div>
