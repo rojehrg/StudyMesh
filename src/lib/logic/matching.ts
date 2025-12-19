@@ -113,7 +113,6 @@ interface Profile {
   currentProjects?: string[];
   reliability?: number;
   updatedAt?: string | Date; // For freshness/decay calculation
-  lookingToHelp?: boolean; // Active helper status
 }
 
 // Calculate freshness penalty for stale profiles
@@ -441,11 +440,6 @@ export function calculateMatches(profileA: Profile, profileB: Profile, isSamePod
   // This ensures stale profiles are deprioritized in the list
   const freshnessFactor = calculateFreshnessFactor(profileB);
   total = Math.round(total * freshnessFactor);
-
-  // Boost for users who are actively looking to help (+5 bonus)
-  if (profileB.lookingToHelp) {
-    total = Math.min(100, total + 5);
-  }
 
   return {
     score: Math.min(100, total),

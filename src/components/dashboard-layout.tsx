@@ -14,12 +14,11 @@ import {
   ChevronLeft,
   Menu,
   LogOut,
-  Sparkles
+  Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -27,6 +26,8 @@ import { toast } from "sonner";
 import { NudgesDropdown } from "@/components/nudges-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
+import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
+import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
 
 interface SidebarItemProps {
   icon: any;
@@ -84,10 +85,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
-  const [lookingToHelp, setLookingToHelp] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+
+  // Enable global keyboard shortcuts
+  useGlobalShortcuts();
 
   useEffect(() => {
     loadProfile();
@@ -100,39 +103,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, last_name, looking_to_help')
+        .select('first_name, last_name')
         .eq('user_id', user.id)
         .single();
 
       if (data) {
         setProfile(data);
-        setLookingToHelp(data.looking_to_help || false);
       }
     } catch (error) {
       console.error("Error loading profile:", error);
-    }
-  };
-
-  const toggleLookingToHelp = async (checked: boolean) => {
-    setLookingToHelp(checked);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({ looking_to_help: checked, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      toast.success(checked ? "You're now looking to help!" : "Help status turned off", {
-        description: checked ? "Teammates can see you're available" : "You won't appear as available to help"
-      });
-    } catch (error) {
-      console.error("Error updating status:", error);
-      setLookingToHelp(!checked); // Revert on error
-      toast.error("Failed to update status");
     }
   };
 
@@ -145,6 +124,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
+    { icon: Calendar, label: "Meetings", href: "/meetings" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: LogIn, label: "Join Pod", href: "/classes/join" },
     { icon: Settings, label: "Settings", href: "/settings" },
@@ -189,54 +169,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        {/* Looking to Help Toggle */}
-        <div className={cn(
-          "mx-3 mt-3 p-3 rounded-xl transition-all duration-300",
-          lookingToHelp
-            ? "bg-primary/10 shadow-md"
-            : "bg-muted/50 shadow-sm"
-        )}>
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-              lookingToHelp ? "bg-primary" : "bg-muted-foreground/30"
-            )}>
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            {!isCollapsed && (
-              <motion.div
-                initial={false}
-                animate={{ opacity: isCollapsed ? 0 : 1 }}
-                className="flex-1 min-w-0"
-              >
-                <div className="flex items-center justify-between">
-                  <span className={cn(
-                    "text-sm font-medium",
-                    lookingToHelp ? "text-primary" : "text-muted-foreground"
-                  )}>
-                    Looking to Help
-                  </span>
-                  <Switch
-                    checked={lookingToHelp}
-                    onCheckedChange={toggleLookingToHelp}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {lookingToHelp ? "Visible to teammates" : "Toggle to help others"}
-                </p>
-              </motion.div>
-            )}
-            {isCollapsed && (
-              <Switch
-                checked={lookingToHelp}
-                onCheckedChange={toggleLookingToHelp}
-                className="data-[state=checked]:bg-primary hidden"
-              />
-            )}
-          </div>
-        </div>
-
         {/* Nav Items */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
@@ -272,12 +204,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   ? `${profile.first_name} ${profile.last_name}`
                   : "User"}
               </p>
-              {lookingToHelp && (
-                <p className="text-xs text-primary truncate flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  Available to help
-                </p>
-              )}
             </motion.div>
 
             <motion.button
@@ -344,6 +270,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Onboarding Tour for New Users */}
       <OnboardingTour />
+
+      {/* Keyboard Shortcuts Help Dialog */}
+      <KeyboardShortcutsHelp />
     </div>
   );
 }
