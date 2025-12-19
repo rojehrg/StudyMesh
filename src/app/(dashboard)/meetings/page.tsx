@@ -128,7 +128,7 @@ export default function MeetingsPage() {
     } else {
       switch (meeting.myRsvp) {
         case 'accepted':
-          return <Badge className="bg-green-500/10 text-green-600">Accepted</Badge>;
+          return <Badge className="bg-success/10 text-success">Accepted</Badge>;
         case 'declined':
           return <Badge variant="destructive">Declined</Badge>;
         default:
@@ -252,7 +252,7 @@ export default function MeetingsPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-green-600 hover:bg-green-50"
+                                className="text-success hover:bg-success/10"
                                 onClick={() => handleRsvp(meeting.id, 'accepted')}
                               >
                                 <Check className="w-4 h-4" />

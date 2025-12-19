@@ -129,10 +129,10 @@ export default function NotificationsPage() {
 
   const getNotificationBgClass = (notification: any) => {
     if (notification.type === 'new_match' && !notification.read) {
-      return 'border-l-4 border-l-ctp-yellow bg-accent/10';
+      return 'border-l-4 border-l-warning bg-warning/5';
     }
     if (!notification.read) {
-      return 'border-l-4 border-l-ctp-peach bg-accent/10';
+      return 'border-l-4 border-l-accent bg-accent/5';
     }
     return '';
   };

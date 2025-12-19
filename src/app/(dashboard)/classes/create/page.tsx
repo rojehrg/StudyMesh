@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeft, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, ArrowLeft, Sparkles, Globe } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ export default function CreatePodPage() {
   const [businessUnit, setBusinessUnit] = useState("");
   const [initiativeOwner, setInitiativeOwner] = useState("");
   const [term, setTerm] = useState("");
+  const [allowCrossPodHelp, setAllowCrossPodHelp] = useState(true);
   
   const router = useRouter();
   const supabase = createClient();
@@ -41,7 +43,7 @@ export default function CreatePodPage() {
 
       const podCode = generatePodCode();
 
-      // Create pod
+      // Create pod with manager (creator is manager by default)
       const { data: pod, error: podError } = await supabase
         .from('pods')
         .insert({
@@ -51,6 +53,8 @@ export default function CreatePodPage() {
           initiative_owner: initiativeOwner,
           term: term || null,
           created_by: user.id,
+          manager_id: user.id,
+          allow_cross_pod_help: allowCrossPodHelp,
         })
         .select()
         .single();
@@ -156,12 +160,33 @@ export default function CreatePodPage() {
               />
             </div>
 
-            <div className="bg-accent/10 border border-accent/20 rounded-xl p-4">
-              <p className="text-sm text-accent font-medium mb-1">
-                🎯 What happens next?
+            {/* Cross-Pod Help Toggle */}
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                  <Globe className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <Label className="text-base font-semibold text-foreground">Allow Cross-Pod Help</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Members can receive help requests from people outside this pod
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={allowCrossPodHelp}
+                onCheckedChange={setAllowCrossPodHelp}
+                disabled={loading}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+
+            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
+              <p className="text-sm text-primary font-medium mb-1">
+                What happens next?
               </p>
-              <p className="text-sm text-accent">
-                After creating your pod, you'll get a unique share code. Your teammates can use this code to join and our matching algorithm will identify knowledge gaps automatically.
+              <p className="text-sm text-muted-foreground">
+                You'll get a unique share code. Teammates can join using this code, set their availability, and start nudging each other for help.
               </p>
             </div>
 

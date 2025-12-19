@@ -55,7 +55,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
         <Icon className="w-5 h-5 shrink-0" />
         {badge ? (
           <span className={cn(
-            "absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
+            "absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
             !isCollapsed && "hidden"
           )}>
             {badge}

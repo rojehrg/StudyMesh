@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, TrendingUp, BookOpen } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, TrendingUp, BookOpen, Globe, Shield, Zap, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -24,9 +26,11 @@ export default function PodDetailPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [currentUserExpertise, setCurrentUserExpertise] = useState<string[]>([]);
+  const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [nudgeDialogOpen, setNudgeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [isManager, setIsManager] = useState(false);
+  const [allowCrossPodHelp, setAllowCrossPodHelp] = useState(true);
 
   useEffect(() => {
     loadPodData();
@@ -41,14 +45,20 @@ export default function PodDetailPage() {
       }
       setCurrentUserId(user.id);
 
-      // Get current user's profile for expertise skills
+      // Get current user's profile
       const { data: currentProfile } = await supabase
         .from('profiles')
-        .select('expertise_skills')
+        .select('expertise_skills, knowledge_areas, timezone, availability_slots')
         .eq('user_id', user.id)
         .single();
 
-      setCurrentUserExpertise(currentProfile?.expertise_skills || []);
+      setCurrentUserProfile({
+        userId: user.id,
+        expertiseSkills: currentProfile?.expertise_skills || [],
+        knowledgeAreas: currentProfile?.knowledge_areas || [],
+        timezone: currentProfile?.timezone || 'America/New_York',
+        availabilitySlots: currentProfile?.availability_slots || [],
+      });
 
       // Get pod details
       const { data: podData, error: podError } = await supabase
@@ -64,6 +74,8 @@ export default function PodDetailPage() {
       }
 
       setPod(podData);
+      setIsManager(podData.manager_id === user.id || podData.created_by === user.id);
+      setAllowCrossPodHelp(podData.allow_cross_pod_help !== false);
 
       // Get pod members with profiles
       const { data: podMembers } = await supabase
@@ -87,9 +99,14 @@ export default function PodDetailPage() {
             name: profile?.major || "Team Member",
             department: profile?.department,
             expertiseSkills: profile?.expertise_skills || [],
+            knowledgeAreas: profile?.knowledge_areas || [],
             growthSkills: profile?.growth_skills || [],
             lookingToHelp: profile?.looking_to_help || false,
             slackHandle: profile?.slack_handle || "",
+            slackConnected: !!(profile?.slack_handle),
+            timezone: profile?.timezone || "America/New_York",
+            availabilitySlots: profile?.availability_slots || [],
+            currentlyAvailable: profile?.currently_available || false,
           };
         });
 
@@ -111,12 +128,36 @@ export default function PodDetailPage() {
     });
   };
 
+  const updateCrossPodHelp = async (enabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('pods')
+        .update({ allow_cross_pod_help: enabled })
+        .eq('id', pod.id);
+
+      if (error) throw error;
+
+      setAllowCrossPodHelp(enabled);
+      toast.success(enabled ? "Cross-pod help enabled" : "Cross-pod help disabled");
+    } catch (error) {
+      console.error("Error updating pod settings:", error);
+      toast.error("Failed to update settings");
+    }
+  };
+
   const openNudgeDialog = (member: any) => {
     setSelectedMember(member);
     setNudgeDialogOpen(true);
   };
 
-  const handleNudge = async (recipientId: string, topic: string, type: 'ask' | 'offer') => {
+  const handleNudge = async (data: {
+    recipientId: string;
+    topic: string;
+    type: 'ask' | 'offer';
+    meetingLength: '15min' | '30min' | '1hr' | 'async';
+    suggestedTime?: string;
+    message: string;
+  }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -128,16 +169,20 @@ export default function PodDetailPage() {
         .single();
 
       const senderName = senderProfile?.major || "A teammate";
-      const content = type === 'ask'
-        ? `${senderName} wants your help with ${topic}`
-        : `${senderName} can help you with ${topic}`;
 
       const { error } = await supabase.from('notifications').insert({
-        recipient_id: recipientId,
+        recipient_id: data.recipientId,
         sender_id: user.id,
         type: 'nudge',
-        content,
-        metadata: { topic, pod_id: pod.id, pod_code: pod.pod_code, nudge_type: type },
+        content: data.message,
+        metadata: {
+          topic: data.topic,
+          pod_id: pod.id,
+          pod_code: pod.pod_code,
+          nudge_type: data.type,
+          meeting_length: data.meetingLength,
+          suggested_time: data.suggestedTime,
+        },
         read: false,
       });
 
@@ -152,15 +197,18 @@ export default function PodDetailPage() {
           body: JSON.stringify({
             recipientSlackHandle: slackHandle,
             senderName,
-            topic,
+            topic: data.topic,
             podCode: pod?.pod_code,
-            nudgeType: type,
+            nudgeType: data.type,
+            meetingLength: data.meetingLength,
+            suggestedTime: data.suggestedTime,
+            message: data.message,
           }),
         }).catch(() => {});
       }
 
       toast.success("Nudge sent!", {
-        description: type === 'ask' ? `Asked for help with ${topic}` : `Offered help with ${topic}`
+        description: data.type === 'ask' ? `Asked for help with ${data.topic}` : `Offered help with ${data.topic}`
       });
     } catch (error) {
       console.error("Error sending nudge:", error);
@@ -248,6 +296,80 @@ export default function PodDetailPage() {
             </div>
           </CardHeader>
         </Card>
+
+        {/* Manager Settings */}
+        {isManager && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Pod Manager Settings
+              </CardTitle>
+              <CardDescription>
+                You created this pod. Manage settings here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card rounded-xl">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                    <Globe className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <Label className="text-base font-semibold text-foreground">Allow Cross-Pod Help</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Members can receive help requests from people outside this pod
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={allowCrossPodHelp}
+                  onCheckedChange={updateCrossPodHelp}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Currently Available in Pod */}
+        {members.filter(m => m.currentlyAvailable && m.userId !== currentUserId).length > 0 && (
+          <Card className="bg-success/5 border-success/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
+                <Zap className="w-5 h-5" />
+                Available Now
+              </CardTitle>
+              <CardDescription>These teammates are online and ready to help</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                {members
+                  .filter(m => m.currentlyAvailable && m.userId !== currentUserId)
+                  .map((member) => (
+                    <div
+                      key={member.userId}
+                      className="flex items-center gap-2 px-3 py-2 bg-success/10 rounded-lg cursor-pointer hover:bg-success/20 transition-colors"
+                      onClick={() => openNudgeDialog(member)}
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-success/20 text-success text-sm font-semibold">
+                          {(member.name || 'T')[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{member.name}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          Available now
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Simple Skill Overview */}
         {members.length > 1 && (topExpertise.length > 0 || topGrowth.length > 0) && (
@@ -380,16 +502,25 @@ export default function PodDetailPage() {
         </Card>
       </motion.div>
 
-      {selectedMember && (
+      {selectedMember && currentUserProfile && (
         <NudgeDialog
           open={nudgeDialogOpen}
           onClose={() => setNudgeDialogOpen(false)}
           member={{
             userId: selectedMember.userId,
             name: selectedMember.name,
-            expertiseSkills: selectedMember.expertiseSkills,
+            knowledgeAreas: selectedMember.knowledgeAreas || selectedMember.expertiseSkills || [],
+            timezone: selectedMember.timezone,
+            availabilitySlots: selectedMember.availabilitySlots,
+            currentlyAvailable: selectedMember.currentlyAvailable,
+            slackConnected: selectedMember.slackConnected,
           }}
-          currentUserExpertise={currentUserExpertise}
+          currentUser={{
+            userId: currentUserProfile.userId,
+            knowledgeAreas: currentUserProfile.knowledgeAreas || currentUserProfile.expertiseSkills || [],
+            timezone: currentUserProfile.timezone,
+            availabilitySlots: currentUserProfile.availabilitySlots,
+          }}
           onNudge={handleNudge}
         />
       )}

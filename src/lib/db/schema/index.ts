@@ -1,40 +1,64 @@
 import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time } from "drizzle-orm/pg-core";
 
+/**
+ * MESHFLOW DATABASE SCHEMA
+ *
+ * Availability-First Coordination Platform
+ *
+ * Core concepts:
+ * - Knowledge areas (not skills) - lightweight "I know X" tags
+ * - Availability grid with timezone awareness
+ * - Manager-controlled pods
+ * - Contextual nudges with meeting suggestions
+ */
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().unique(), // References Supabase Auth User ID
+
+  // Basic info
   firstName: text("first_name"),
   lastName: text("last_name"),
-  studyStyle: text("study_style"),
-  studyTimePreference: text("study_time_preference"),
-  strengths: text("strengths").array(), // Array of strings
-  expertiseSkills: text("expertise_skills").array(), // Skills I can teach
-  expertiseLevels: jsonb("expertise_levels").default({}), // Skill -> proficiency (0-100)
-  growthSkills: text("growth_skills").array(), // Skills I want to learn
-  growthLevels: jsonb("growth_levels").default({}), // Skill -> proficiency (0-100)
-  academicGoal: text("academic_goal"),
-  reliability: integer("reliability").default(0),
-  locationPreference: text("location_preference"),
-  collaborationPreference: text("collaboration_preference").default("hybrid"),
   department: text("department"),
-  preferredGroupSize: integer("preferred_group_size").default(3),
-  availability: jsonb("availability").default({}), // Legacy - kept for backward compatibility
-  timezone: text("timezone").default("America/New_York"), // User's timezone
-  major: text("major"), // Used for "Current Teams / Projects"
+  major: text("major"), // Job title
   bio: text("bio"),
-  currentProjects: text("current_projects").array(),
-  slackHandle: text("slack_handle"), // Slack user handle or ID (legacy)
-  slackUserId: text("slack_user_id"), // Slack user ID from OAuth
-  slackAccessToken: text("slack_access_token"), // OAuth access token for DMs
-  slackTeamId: text("slack_team_id"), // Slack workspace ID
-  slackConnected: boolean("slack_connected").default(false), // Is Slack connected via OAuth
-  email: text("email"), // User's email for notifications
-  emailNotifications: boolean("email_notifications").default(true), // Opt-in for email notifications
+
+  // Knowledge areas - lightweight tags (NOT skills with proficiency)
+  // Examples: "Rippling tax recon", "SQL debugging", "Salesforce setup"
+  knowledgeAreas: text("knowledge_areas").array(),
+
+  // Legacy: kept for backward compatibility during migration
+  expertiseSkills: text("expertise_skills").array(),
+
+  // Availability
+  timezone: text("timezone").default("America/New_York"),
+  availability: jsonb("availability").default({}), // Legacy JSONB format
+  currentlyAvailable: boolean("currently_available").default(false), // Live status indicator
+
+  // Collaboration preferences
+  preferredGroupSize: integer("preferred_group_size").default(3),
+  lookingToHelp: boolean("looking_to_help").default(true),
+
+  // Slack integration
+  slackHandle: text("slack_handle"),
+  slackUserId: text("slack_user_id"),
+  slackAccessToken: text("slack_access_token"),
+  slackTeamId: text("slack_team_id"),
+  slackConnected: boolean("slack_connected").default(false),
+
+  // Email notifications
+  email: text("email"),
+  emailNotifications: boolean("email_notifications").default(true),
+
+  // Onboarding
+  onboardingCompleted: boolean("onboarding_completed").default(false),
+
+  // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Granular availability schedules - replaces the old availability JSONB
+// Granular availability schedules - enhanced time slot management
 export const availabilitySchedules = pgTable("availability_schedules", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull(),
@@ -44,6 +68,31 @@ export const availabilitySchedules = pgTable("availability_schedules", {
   label: text("label"), // Optional: "Deep work", "Meetings", etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Pods - team containers with manager controls
+export const pods = pgTable("pods", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  podCode: text("pod_code").notNull().unique(),
+  podName: text("pod_name").notNull(),
+  businessUnit: text("business_unit"),
+  initiativeOwner: text("initiative_owner"),
+  term: text("term"),
+
+  // Manager controls
+  createdBy: uuid("created_by").notNull(),
+  managerId: uuid("manager_id"), // User who controls the pod (defaults to creator)
+  allowCrossPodHelp: boolean("allow_cross_pod_help").default(false), // Opt-in for cross-pod requests
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Pod members - who belongs to which pod
+export const podMembers = pgTable("pod_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  podId: uuid("pod_id").references(() => pods.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id").notNull(),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
 
 // Scheduled meetings between users
@@ -71,50 +120,34 @@ export const meetingParticipants = pgTable("meeting_participants", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const pods = pgTable("pods", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  podCode: text("pod_code").notNull().unique(),
-  podName: text("pod_name").notNull(),
-  businessUnit: text("business_unit"), // Formerly 'school'
-  initiativeOwner: text("initiative_owner"), // Formerly 'professor'
-  term: text("term"),
-  createdBy: uuid("created_by").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const podMembers = pgTable("pod_members", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  podId: uuid("pod_id").references(() => pods.id, { onDelete: "cascade" }).notNull(),
-  userId: uuid("user_id").notNull(),
-  joinedAt: timestamp("joined_at").defaultNow().notNull(),
-});
-
-export const compatibilityScores = pgTable("compatibility_scores", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  podId: uuid("pod_id").references(() => pods.id, { onDelete: "cascade" }).notNull(),
-  userAId: uuid("user_a_id").notNull(),
-  userBId: uuid("user_b_id").notNull(),
-  score: integer("score").notNull(),
-  scoreBreakdown: jsonb("score_breakdown").notNull(), // Stores the detailed match reasons/scores
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
+// Notifications - enhanced with meeting context
 export const notifications = pgTable("notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
   recipientId: uuid("recipient_id").notNull(),
   senderId: uuid("sender_id").notNull(),
-  type: text("type").notNull(), // 'nudge', 'system', etc.
+  type: text("type").notNull(), // 'nudge', 'new_match', 'system'
   content: text("content").notNull(),
-  metadata: jsonb("metadata").default({}), // Additional context (topic, pod_id, etc.)
+  metadata: jsonb("metadata").default({}),
+  // Enhanced metadata structure:
+  // {
+  //   topic?: string,           // What is this about?
+  //   meetingLength?: string,   // "15min", "30min", "1hr", "async"
+  //   suggestedTimes?: string[], // Based on availability overlap
+  //   podId?: string,
+  //   podCode?: string,
+  //   nudgeType?: string        // 'ask' or 'offer'
+  // }
   read: boolean("read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const openRequests = pgTable("open_requests", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").notNull(),
-  skill: text("skill").notNull(),
-  status: text("status").default("open"), // open, notified, closed
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
+// Type exports for TypeScript
+export type Profile = typeof profiles.$inferSelect;
+export type NewProfile = typeof profiles.$inferInsert;
+export type Pod = typeof pods.$inferSelect;
+export type NewPod = typeof pods.$inferInsert;
+export type PodMember = typeof podMembers.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type AvailabilitySchedule = typeof availabilitySchedules.$inferSelect;
+export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
+export type MeetingParticipant = typeof meetingParticipants.$inferSelect;

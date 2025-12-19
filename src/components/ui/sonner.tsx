@@ -20,11 +20,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
-        success: <CircleCheck className="h-4 w-4 text-primary" />,
-        info: <Info className="h-4 w-4 text-primary" />,
-        warning: <TriangleAlert className="h-4 w-4 text-accent" />,
+        success: <CircleCheck className="h-4 w-4 text-success" />,
+        info: <Info className="h-4 w-4 text-info" />,
+        warning: <TriangleAlert className="h-4 w-4 text-warning" />,
         error: <OctagonX className="h-4 w-4 text-destructive" />,
-        loading: <LoaderCircle className="h-4 w-4 animate-spin text-ctp-peach" />,
+        loading: <LoaderCircle className="h-4 w-4 animate-spin text-accent" />,
       }}
       toastOptions={{
         classNames: {
@@ -33,13 +33,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
           title: "group-[.toast]:text-foreground group-[.toast]:font-semibold",
           description: "group-[.toast]:text-muted-foreground",
           actionButton:
-            "group-[.toast]:bg-ctp-peach group-[.toast]:text-white group-[.toast]:rounded-lg",
+            "group-[.toast]:bg-accent group-[.toast]:text-accent-foreground group-[.toast]:rounded-lg",
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded-lg",
-          success: "group-[.toaster]:border-primary/30",
+          success: "group-[.toaster]:border-success/30",
           error: "group-[.toaster]:border-destructive/30",
-          warning: "group-[.toaster]:border-accent/30",
-          info: "group-[.toaster]:border-primary/30",
+          warning: "group-[.toaster]:border-warning/30",
+          info: "group-[.toaster]:border-info/30",
         },
       }}
       {...props}

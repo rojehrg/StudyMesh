@@ -54,12 +54,12 @@ export default function AboutPage() {
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center shrink-0">
-            <Brain className="w-6 h-6 text-white" />
+            <Brain className="w-6 h-6 text-accent-foreground" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-3">Our Mission</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Meshflow helps teams <strong className="text-accent dark:text-accent">outperform by filling knowledge gaps</strong>.
+              Meshflow helps teams <strong className="text-accent">outperform by filling knowledge gaps</strong>.
               The best teams aren't just skilled—they're connected. When expertise flows freely between
               teammates, blockers disappear, delivery accelerates, and everyone grows.
             </p>
@@ -90,7 +90,7 @@ export default function AboutPage() {
           className="bg-accent/10 rounded-2xl p-6 shadow-md"
         >
           <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center mb-4">
-            <Zap className="w-5 h-5 text-white" />
+            <Zap className="w-5 h-5 text-accent-foreground" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Our Solution</h3>
           <p className="text-muted-foreground leading-relaxed">
@@ -103,7 +103,7 @@ export default function AboutPage() {
       {/* How It's Different */}
       <motion.div variants={itemVariants} className="space-y-6">
         <div className="flex items-center gap-3 mb-2">
-          <Network className="w-6 h-6 text-accent dark:text-accent" />
+          <Network className="w-6 h-6 text-accent" />
           <h2 className="text-2xl font-bold text-foreground">How We're Different</h2>
         </div>
 
@@ -184,21 +184,21 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-5 rounded-xl bg-card shadow-md">
             <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center mb-3">
-              <Target className="w-4 h-4 text-white" />
+              <Target className="w-4 h-4 text-accent-foreground" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Skill Matching</h4>
             <p className="text-sm text-muted-foreground">Fuzzy matching connects similar skills automatically</p>
           </div>
           <div className="p-5 rounded-xl bg-card shadow-md">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mb-3">
-              <Users className="w-4 h-4 text-white" />
+              <Users className="w-4 h-4 text-primary-foreground" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Pod Organization</h4>
             <p className="text-sm text-muted-foreground">Group by project, team, or initiative</p>
           </div>
           <div className="p-5 rounded-xl bg-card shadow-md">
             <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center mb-3">
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4 text-accent-foreground" />
             </div>
             <h4 className="font-semibold text-foreground mb-1">Contextual Nudges</h4>
             <p className="text-sm text-muted-foreground">Ask for help or offer expertise directly</p>

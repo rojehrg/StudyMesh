@@ -94,7 +94,7 @@ export default function ClassesPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-accent hover:bg-peach-400" asChild>
+          <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
             <Link href="/classes/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Pod
@@ -180,7 +180,7 @@ export default function ClassesPage() {
               <Button variant="outline" asChild>
                 <Link href="/classes/join">Join Pod</Link>
               </Button>
-              <Button className="bg-accent hover:bg-peach-400" asChild>
+              <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
                 <Link href="/classes/create">Create Pod</Link>
               </Button>
             </div>
