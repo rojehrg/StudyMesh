@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Users, Target, Zap, Shield, TrendingUp, Network, Brain, ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
+import { Sparkles, Users, Target, Zap, Shield, TrendingUp, Network, Brain, ArrowRight, CheckCircle2, MessageCircle, UserPlus, Settings, Eye, Bell, Calendar, Handshake, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -202,6 +202,149 @@ export default function AboutPage() {
             </div>
             <h4 className="font-semibold text-foreground mb-1">Contextual Nudges</h4>
             <p className="text-sm text-muted-foreground">Ask for help or offer expertise directly</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* User Flow / How It Works */}
+      <motion.div variants={itemVariants} className="space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <ArrowRight className="w-6 h-6 text-accent" />
+          <h2 className="text-2xl font-bold text-foreground">How MeshFlow Works</h2>
+        </div>
+        <p className="text-muted-foreground">
+          A typical user journey through MeshFlow - from joining to collaborating:
+        </p>
+
+        {/* Flow Diagram */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Step 1 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-card shadow-md border-2 border-transparent hover:border-primary/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+              1
+            </div>
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-3">
+              <UserPlus className="w-5 h-5 text-primary" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Join a Pod</h4>
+            <p className="text-sm text-muted-foreground">
+              Sign up and join your team's Pod using a 6-character code, or create a new Pod for your team.
+            </p>
+            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hidden md:block" />
+          </motion.div>
+
+          {/* Step 2 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-card shadow-md border-2 border-transparent hover:border-primary/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+              2
+            </div>
+            <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center mb-3">
+              <Settings className="w-5 h-5 text-accent" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Set Your Profile</h4>
+            <p className="text-sm text-muted-foreground">
+              Add your knowledge areas, set weekly availability, and optionally connect Slack for notifications.
+            </p>
+            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hidden md:block lg:hidden" />
+          </motion.div>
+
+          {/* Step 3 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-card shadow-md border-2 border-transparent hover:border-primary/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
+              3
+            </div>
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-3">
+              <Eye className="w-5 h-5 text-primary" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Browse Your Pod</h4>
+            <p className="text-sm text-muted-foreground">
+              See teammates' skills and availability. Find who can help with what you need or who needs your expertise.
+            </p>
+          </motion.div>
+
+          {/* Step 4 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-card shadow-md border-2 border-transparent hover:border-accent/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-bold text-sm">
+              4
+            </div>
+            <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center mb-3">
+              <Bell className="w-5 h-5 text-accent" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Send a Nudge</h4>
+            <p className="text-sm text-muted-foreground">
+              Click "Nudge" to ask for help or offer help. Specify the topic, time needed, and optional message.
+            </p>
+            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hidden md:block" />
+          </motion.div>
+
+          {/* Step 5 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-card shadow-md border-2 border-transparent hover:border-accent/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-bold text-sm">
+              5
+            </div>
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mb-3">
+              <Calendar className="w-5 h-5 text-primary" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Schedule Meeting</h4>
+            <p className="text-sm text-muted-foreground">
+              MeshFlow suggests times based on overlapping availability. Pick a time and send an invite.
+            </p>
+            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hidden md:block lg:hidden" />
+          </motion.div>
+
+          {/* Step 6 */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="relative p-5 rounded-xl bg-accent/10 shadow-md border-2 border-accent/30"
+          >
+            <div className="absolute -top-3 -left-3 w-8 h-8 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-bold text-sm">
+              6
+            </div>
+            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center mb-3">
+              <Handshake className="w-5 h-5 text-accent-foreground" />
+            </div>
+            <h4 className="font-bold text-foreground mb-1">Collaborate & Grow</h4>
+            <p className="text-sm text-muted-foreground">
+              Meet, share knowledge, solve problems together. The more you help, the stronger your team becomes.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Flow Summary */}
+        <div className="bg-muted/50 rounded-xl p-6">
+          <h4 className="font-bold text-foreground mb-3">Key Concepts</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-foreground font-medium">Pod</p>
+              <p className="text-muted-foreground">A group of teammates working together. Join with a 6-letter code (e.g., ABC123).</p>
+            </div>
+            <div>
+              <p className="text-foreground font-medium">Nudge</p>
+              <p className="text-muted-foreground">A request to connect - either asking for help or offering to help someone.</p>
+            </div>
+            <div>
+              <p className="text-foreground font-medium">Knowledge Areas</p>
+              <p className="text-muted-foreground">Topics you can help with (e.g., React, SQL, Sales Strategy).</p>
+            </div>
+            <div>
+              <p className="text-foreground font-medium">Availability</p>
+              <p className="text-muted-foreground">Weekly time slots when you're open to meetings. Used for smart scheduling.</p>
+            </div>
           </div>
         </div>
       </motion.div>

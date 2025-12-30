@@ -130,12 +130,16 @@ export default function PodDetailPage() {
 
   const updateCrossPodHelp = async (enabled: boolean) => {
     try {
-      const { error } = await supabase
-        .from('pods')
-        .update({ allow_cross_pod_help: enabled })
-        .eq('id', pod.id);
+      const response = await fetch(`/api/pods/${podCode}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allow_cross_pod_help: enabled }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update');
+      }
 
       setAllowCrossPodHelp(enabled);
       toast.success(enabled ? "Cross-pod help enabled" : "Cross-pod help disabled");
@@ -375,9 +379,9 @@ export default function PodDetailPage() {
         {members.length > 1 && (topExpertise.length > 0 || topGrowth.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {topExpertise.length > 0 && (
-              <Card className="bg-accent/5">
+              <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-accent">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
                     <TrendingUp className="w-4 h-4" />
                     Top Skills in Pod
                   </CardTitle>
@@ -385,19 +389,19 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topExpertise.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-accent/15 text-accent px-3 py-1.5 rounded-full text-sm font-medium">
+                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
-                      </div>
+                      </Badge>
                     ))}
                   </div>
                 </CardContent>
               </Card>
             )}
             {topGrowth.length > 0 && (
-              <Card className="bg-primary/5">
+              <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-accent">
                     <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
@@ -405,10 +409,10 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topGrowth.map(([skill, count]) => (
-                      <div key={skill} className="flex items-center gap-1.5 bg-primary/15 text-primary px-3 py-1.5 rounded-full text-sm font-medium">
+                      <Badge key={skill} variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-medium border-accent/50 text-accent">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
-                      </div>
+                      </Badge>
                     ))}
                   </div>
                 </CardContent>

@@ -67,6 +67,8 @@ interface NudgeDialogProps {
     suggestedTime?: string;
     message: string;
   }) => Promise<void>;
+  onSuccess?: () => void; // Callback for celebration
+  isFirstNudge?: boolean; // Show extra celebration for first nudge
 }
 
 const MEETING_LENGTHS = [
@@ -100,12 +102,30 @@ const MEETING_LENGTHS = [
   },
 ];
 
+// Quick nudge templates
+const NUDGE_TEMPLATES = {
+  ask: [
+    { label: "Quick 15-min chat", topic: "Quick question about", meetingLength: "15min" as const },
+    { label: "Code review", topic: "Code review request for", meetingLength: "30min" as const },
+    { label: "Pair programming", topic: "Pair programming session on", meetingLength: "1hr" as const },
+    { label: "Async question", topic: "Quick async question about", meetingLength: "async" as const },
+  ],
+  offer: [
+    { label: "Office hours", topic: "I have time to help with", meetingLength: "30min" as const },
+    { label: "Quick tip", topic: "Quick tip about", meetingLength: "15min" as const },
+    { label: "Deep dive session", topic: "I can walk you through", meetingLength: "1hr" as const },
+    { label: "Async help", topic: "Happy to help async with", meetingLength: "async" as const },
+  ],
+};
+
 export function NudgeDialog({
   open,
   onClose,
   member,
   currentUser,
   onNudge,
+  onSuccess,
+  isFirstNudge,
 }: NudgeDialogProps) {
   const [nudgeType, setNudgeType] = useState<"ask" | "offer">("ask");
   const [topic, setTopic] = useState("");
@@ -180,6 +200,8 @@ export function NudgeDialog({
         message: generateMessage(),
       });
       onClose();
+      // Trigger celebration callback
+      onSuccess?.();
     } catch (error) {
       console.error("Error sending nudge:", error);
     } finally {
@@ -212,6 +234,28 @@ export function NudgeDialog({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Quick Templates */}
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wide">Quick Start</Label>
+            <div className="flex flex-wrap gap-2">
+              {NUDGE_TEMPLATES[nudgeType].map((template) => (
+                <Button
+                  key={template.label}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7"
+                  onClick={() => {
+                    setTopic(template.topic);
+                    setMeetingLength(template.meetingLength);
+                  }}
+                >
+                  {template.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* Nudge Type Selection */}
           <div className="space-y-3">
             <Label>What would you like to do?</Label>
@@ -386,8 +430,8 @@ export function NudgeDialog({
 
           {/* No overlap warning */}
           {meetingLength !== "async" && suggestedTimes.length === 0 && (
-            <div className="p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm">
-              <p className="font-medium text-warning-foreground">No overlapping availability found</p>
+            <div className="p-3 rounded-lg bg-muted border border-border text-sm">
+              <p className="font-medium text-muted-foreground">No overlapping availability found</p>
               <p className="text-muted-foreground text-xs mt-1">
                 {availabilityStatus || "Consider async communication or check back later."}
               </p>

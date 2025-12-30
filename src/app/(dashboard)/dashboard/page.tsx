@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { OnboardingChecklist } from "@/components/onboarding-checklist";
+import { AvailableDot } from "@/components/available-now-indicator";
 
 // Helper to format relative time
 function getTimeAgo(date: Date): string {
@@ -125,16 +127,61 @@ export default async function DashboardPage() {
     }
   }
 
-  // Profile completion - simplified
-  const completionSteps = [
-    { done: !!profile.department, label: "Add department" },
-    { done: !!profile.major, label: "Add job title" },
-    { done: knowledgeAreas.length > 0, label: "Add knowledge areas" },
-    { done: !!profile.timezone, label: "Set timezone" },
-    { done: podIds.length > 0, label: "Join a pod" },
+  // Check if user has sent their first nudge
+  const { data: sentNudges } = await supabase
+    .from('notifications')
+    .select('id')
+    .eq('sender_id', user.id)
+    .eq('type', 'nudge')
+    .limit(1);
+  const hasSentFirstNudge = (sentNudges?.length || 0) > 0;
+
+  // Gamified onboarding checklist items
+  const onboardingItems = [
+    {
+      id: "skills",
+      label: "Add your skills",
+      description: "Tell us what you're great at so teammates can find you.",
+      done: knowledgeAreas.length > 0,
+      href: "/settings",
+      action: "Add skills",
+    },
+    {
+      id: "availability",
+      label: "Set your availability",
+      description: "Let others know when you're free to help.",
+      done: !!profile.availability?.slots?.length,
+      href: "/settings",
+      action: "Set times",
+    },
+    {
+      id: "pod",
+      label: "Join a pod",
+      description: "Connect with your team to start collaborating.",
+      done: podIds.length > 0,
+      href: "/classes/join",
+      action: "Join",
+    },
+    {
+      id: "nudge",
+      label: "Send your first nudge",
+      description: "Reach out to a teammate for help or offer your expertise.",
+      done: hasSentFirstNudge,
+      href: pods.length > 0 ? `/classes/${pods[0]?.pod_code}` : "/classes",
+      action: "Nudge",
+    },
+    {
+      id: "profile",
+      label: "Complete your profile",
+      description: "Add your title and department to help teammates know you.",
+      done: !!profile.department && !!profile.major,
+      href: "/settings",
+      action: "Complete",
+    },
   ];
-  const completedSteps = completionSteps.filter(s => s.done).length;
-  const completionPercent = Math.round((completedSteps / completionSteps.length) * 100);
+
+  const completedSteps = onboardingItems.filter(s => s.done).length;
+  const completionPercent = Math.round(((completedSteps + 1) / (onboardingItems.length + 1)) * 100); // +1 for "Account created"
 
   return (
     <div className="space-y-8">
@@ -348,47 +395,9 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {/* Profile Completion */}
+      {/* Onboarding Checklist */}
       {completionPercent < 100 && (
-        <Card className="bg-primary/5 border-primary/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  Complete Your Profile
-                </CardTitle>
-                <CardDescription>Help teammates find you</CardDescription>
-              </div>
-              <Badge className="bg-primary text-primary-foreground text-lg px-3 py-1">
-                {completionPercent}%
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
-                <div
-                  className="bg-primary h-full rounded-full transition-all duration-500"
-                  style={{ width: `${completionPercent}%` }}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {completionSteps.filter(s => !s.done).slice(0, 4).map((step, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-sm text-foreground">
-                    <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
-                    {step.label}
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" asChild className="w-full hover:bg-primary/10 hover:border-primary/50">
-                <Link href="/settings">
-                  Complete Profile <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <OnboardingChecklist items={onboardingItems} />
       )}
 
       {/* Your Pods */}

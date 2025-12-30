@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Bell, CheckCheck, X, Loader2, Send, Sparkles, Zap } from "lucide-react";
@@ -16,88 +16,104 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [sentNotifications, setSentNotifications] = useState<any[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const userIdRef = useRef<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
-  // Load notifications
-  const loadNotifications = useCallback(async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      setCurrentUserId(user.id);
-
-      const { data } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('recipient_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      setNotifications(data || []);
-
-      const { data: sent } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('sender_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      setSentNotifications(sent || []);
-    } catch (error) {
-      console.error("Error loading notifications:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
-
-  // Set up realtime subscription
+  // Load notifications and set up realtime
   useEffect(() => {
-    loadNotifications();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    // Subscribe to new notifications for this user
-    const channel = supabase
-      .channel('notifications-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          const newNotification = payload.new as any;
+    const init = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-          // Check if this notification is for the current user
-          if (newNotification.recipient_id === currentUserId) {
-            // Add to beginning of list
-            setNotifications(prev => [newNotification, ...prev]);
+        setCurrentUserId(user.id);
+        userIdRef.current = user.id;
 
-            // Show toast notification
-            const nudgeType = newNotification.metadata?.nudge_type;
-            toast.success(
-              nudgeType === 'ask' ? "Someone needs your help!" : "Someone offered to help!",
-              {
-                description: newNotification.content?.slice(0, 80) + (newNotification.content?.length > 80 ? "..." : ""),
-                icon: <Zap className="w-4 h-4 text-success" />,
-                action: {
-                  label: "View",
-                  onClick: () => handleNotificationClick(newNotification),
-                },
-              }
-            );
-          }
+        // Load notifications
+        const { data } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('recipient_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
 
-          // Check if this was sent by current user
-          if (newNotification.sender_id === currentUserId) {
-            setSentNotifications(prev => [newNotification, ...prev]);
-          }
-        }
-      )
-      .subscribe();
+        setNotifications(data || []);
+
+        const { data: sent } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('sender_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+        setSentNotifications(sent || []);
+
+        // Set up realtime subscription after we have the user ID
+        channel = supabase
+          .channel('notifications-realtime')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'notifications',
+              filter: `recipient_id=eq.${user.id}`,
+            },
+            (payload) => {
+              const newNotification = payload.new as any;
+
+              // Add to beginning of list
+              setNotifications(prev => [newNotification, ...prev]);
+
+              // Show toast notification
+              const nudgeType = newNotification.metadata?.nudge_type;
+              toast.success(
+                nudgeType === 'ask' ? "Someone needs your help!" : "Someone offered to help!",
+                {
+                  description: newNotification.content?.slice(0, 80) + (newNotification.content?.length > 80 ? "..." : ""),
+                  icon: <Zap className="w-4 h-4 text-success" />,
+                  action: {
+                    label: "View",
+                    onClick: () => {
+                      router.push('/notifications');
+                    },
+                  },
+                }
+              );
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'notifications',
+              filter: `sender_id=eq.${user.id}`,
+            },
+            (payload) => {
+              const newNotification = payload.new as any;
+              setSentNotifications(prev => [newNotification, ...prev]);
+            }
+          )
+          .subscribe();
+
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
-  }, [currentUserId, loadNotifications, supabase]);
+  }, [supabase, router]);
 
   const markAllAsRead = async () => {
     try {

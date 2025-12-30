@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Globe, Clock, Zap, ChevronDown, Check, Search } from "lucide-react";
+import { Globe, Clock, Zap, ChevronDown, Check, Search, X } from "lucide-react";
 
 // Comprehensive timezone list grouped by region
 const TIMEZONE_OPTIONS = [
@@ -561,17 +561,29 @@ export function AvailabilityGrid({
       {/* Slot Summary */}
       {slots.length > 0 && (
         <div className="text-sm space-y-1">
-          <p className="font-medium text-foreground">Your availability:</p>
+          <p className="font-medium text-foreground">Your availability: <span className="text-xs text-muted-foreground font-normal">(click to remove)</span></p>
           <div className="flex flex-wrap gap-2">
             {DAYS.map((day, dayIndex) => {
               const daySlots = slots.filter((s) => s.day === dayIndex);
               if (daySlots.length === 0) return null;
 
-              return (
-                <Badge key={day} variant="secondary" className="font-normal">
-                  {day}: {daySlots.map((s) => `${formatSlotTime(s.startSlot)}-${formatSlotTime(s.endSlot)}`).join(", ")}
+              return daySlots.map((slot, slotIdx) => (
+                <Badge
+                  key={`${day}-${slotIdx}`}
+                  variant="secondary"
+                  className={cn(
+                    "font-normal gap-1 pr-1",
+                    !readOnly && "cursor-pointer hover:bg-destructive/20 hover:text-destructive"
+                  )}
+                  onClick={() => {
+                    if (readOnly) return;
+                    setSlots(slots.filter((s) => !(s.day === dayIndex && s.startSlot === slot.startSlot && s.endSlot === slot.endSlot)));
+                  }}
+                >
+                  {day}: {formatSlotTime(slot.startSlot)}-{formatSlotTime(slot.endSlot)}
+                  {!readOnly && <X className="w-3 h-3 ml-1" />}
                 </Badge>
-              );
+              ));
             })}
           </div>
         </div>
