@@ -88,12 +88,20 @@ export function AvailabilityGrid({
   // Notify parent of changes - use ref to avoid infinite loops with inline callbacks
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-  const initialValueRef = useRef(JSON.stringify({ timezone: value?.timezone, slots: value?.slots, currentlyAvailable: value?.currentlyAvailable }));
+  const lastNotifiedRef = useRef(JSON.stringify({ timezone: value?.timezone, slots: value?.slots, currentlyAvailable: value?.currentlyAvailable }));
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
-    // Only call onChange if the value has actually changed from the initial/last saved value
+    // Skip the very first render (mount)
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+
+    // Only call onChange if the value has actually changed from the last notified value
     const currentValue = JSON.stringify({ timezone, slots, currentlyAvailable });
-    if (currentValue !== initialValueRef.current) {
+    if (currentValue !== lastNotifiedRef.current) {
+      lastNotifiedRef.current = currentValue; // Update the ref BEFORE calling onChange
       onChangeRef.current?.({ timezone, slots, currentlyAvailable });
     }
   }, [timezone, slots, currentlyAvailable]);
