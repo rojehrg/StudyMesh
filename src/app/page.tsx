@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -259,15 +260,31 @@ export default function LandingPage() {
       {/* Problem Section */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-              Coordination is killing your team's productivity
-            </h2>
-            <p className="text-xl text-gray-500">
-              Distributed teams waste hours every week just trying to find time to meet.
-              There's a better way.
-            </p>
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+                Coordination is killing your team's productivity
+              </h2>
+              <p className="text-xl text-gray-500">
+                Distributed teams waste hours every week just trying to find time to meet.
+                There's a better way.
+              </p>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <Image
+                src="/images/online-group-meeting.png"
+                alt="Team struggling with coordination"
+                width={400}
+                height={300}
+                className="object-contain"
+              />
+            </motion.div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -310,15 +327,31 @@ export default function LandingPage() {
       {/* Solution / Features Section */}
       <section id="features" className="py-24 px-6 bg-[#F8F7F4]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-              One glance. Full visibility.
-            </h2>
-            <p className="text-xl text-gray-500">
-              Meshflow gives your entire team real-time visibility into who's available,
-              when they're free, and what they can help with.
-            </p>
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex justify-center order-2 md:order-1"
+            >
+              <Image
+                src="/images/teamwork-gears.png"
+                alt="Team working together"
+                width={350}
+                height={350}
+                className="object-contain"
+              />
+            </motion.div>
+            <div className="order-1 md:order-2">
+              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+                One glance. Full visibility.
+              </h2>
+              <p className="text-xl text-gray-500">
+                Meshflow gives your entire team real-time visibility into who's available,
+                when they're free, and what they can help with.
+              </p>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -375,14 +408,30 @@ export default function LandingPage() {
       {/* How It Works */}
       <section id="how-it-works" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-              Up and running in 2 minutes
-            </h2>
-            <p className="text-xl text-gray-500">
-              No complex setup. No calendar permissions required. Just instant team visibility.
-            </p>
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+                Up and running in 2 minutes
+              </h2>
+              <p className="text-xl text-gray-500">
+                No complex setup. No calendar permissions required. Just instant team visibility.
+              </p>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <Image
+                src="/images/remote-working.png"
+                alt="Remote collaboration"
+                width={400}
+                height={300}
+                className="object-contain"
+              />
+            </motion.div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
