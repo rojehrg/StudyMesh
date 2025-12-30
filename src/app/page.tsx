@@ -5,15 +5,11 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Users,
-  Clock,
   Zap,
   Calendar,
-  CheckCircle2,
   Globe,
   MessageSquare,
   Play,
-  ChevronRight,
-  Sparkles,
   Timer,
   Search,
 } from "lucide-react";
@@ -28,11 +24,14 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
+// Days matching the actual app
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-gray-900 antialiased">
+    <div className="min-h-screen bg-[#F8F7F4] text-gray-900 antialiased">
       {/* Navigation - Minimal, sticky */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAFA]/80 backdrop-blur-xl border-b border-gray-200/50">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#F8F7F4]/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-0.5">
             <span className="font-bold text-xl text-violet-600">Mesh</span>
@@ -46,14 +45,11 @@ export default function LandingPage() {
             <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               How it works
             </Link>
-            <Link href="#testimonials" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Testimonials
-            </Link>
           </div>
 
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost" className="font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
+              <Button variant="ghost" className="font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50">
                 Log in
               </Button>
             </Link>
@@ -79,7 +75,7 @@ export default function LandingPage() {
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
                 <Users className="w-4 h-4" />
-                Trusted by 500+ distributed teams
+                Built for distributed teams
               </span>
             </motion.div>
 
@@ -112,16 +108,16 @@ export default function LandingPage() {
               </Link>
               <Button
                 variant="outline"
-                className="h-14 px-8 text-base font-semibold rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50 gap-2"
+                className="h-14 px-8 text-base font-semibold rounded-xl bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 gap-2"
               >
                 <Play className="w-5 h-5" />
-                Watch 2-min Demo
+                Watch Demo
               </Button>
             </motion.div>
 
             {/* Objection Handler */}
             <motion.p variants={fadeIn} className="text-sm text-gray-400">
-              Free forever for teams up to 5. Setup takes 2 minutes.
+              Free forever for small teams. Setup takes 2 minutes.
             </motion.p>
           </motion.div>
 
@@ -132,103 +128,129 @@ export default function LandingPage() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="mt-16 max-w-5xl mx-auto"
           >
-            <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl shadow-gray-200/50 overflow-hidden">
+            <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl shadow-gray-300/30 overflow-hidden">
               {/* Browser Chrome */}
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+              <div className="px-4 py-3 bg-[#F8F7F4] border-b border-gray-200 flex items-center gap-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-amber-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
                 <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 bg-gray-100 rounded-md text-xs text-gray-500 font-medium">
-                    app.meshflow.io
+                  <div className="px-4 py-1 bg-white rounded-md text-xs text-gray-500 font-medium border border-gray-100">
+                    meshflow.io/dashboard
                   </div>
                 </div>
               </div>
 
               {/* App Preview */}
-              <div className="p-6 bg-gray-50/50">
+              <div className="p-6 bg-[#FAFAF8]">
                 <div className="grid grid-cols-3 gap-4">
-                  {/* Availability Grid Preview */}
-                  <div className="col-span-2 bg-white rounded-xl p-5 border border-gray-100">
+                  {/* Availability Grid Preview - Matching actual app */}
+                  <div className="col-span-2 bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <Calendar className="w-5 h-5 text-violet-600" />
                       <span className="font-semibold text-gray-900">Team Availability</span>
                       <span className="ml-auto text-xs text-gray-400">This week</span>
                     </div>
-                    <div className="grid grid-cols-5 gap-1">
-                      {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => (
-                        <div key={day} className="text-center text-xs font-medium text-gray-400 mb-2">{day}</div>
-                      ))}
-                      {Array.from({ length: 20 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-6 rounded ${
-                            [0, 1, 5, 6, 7, 10, 11, 12, 15, 16].includes(i)
-                              ? "bg-violet-500"
-                              : [2, 8, 13, 17].includes(i)
-                              ? "bg-violet-200"
-                              : "bg-gray-100"
-                          }`}
-                        />
+
+                    {/* Grid matching actual app structure */}
+                    <div className="space-y-1">
+                      {/* Header row with hours */}
+                      <div className="flex">
+                        <div className="w-12 shrink-0" />
+                        <div className="flex-1 flex">
+                          {[9, 10, 11, 12, 13, 14, 15, 16, 17].map((hour) => (
+                            <div key={hour} className="flex-1 text-center text-[10px] font-medium text-gray-400">
+                              {hour}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Day rows */}
+                      {DAYS.map((day, dayIndex) => (
+                        <div key={day} className="flex items-center">
+                          <div className="w-12 shrink-0 text-xs font-medium text-gray-500">{day}</div>
+                          <div className="flex-1 flex gap-0.5">
+                            {Array.from({ length: 18 }).map((_, slotIndex) => {
+                              // Create a realistic availability pattern
+                              const isWeekend = dayIndex >= 5;
+                              const isMorning = slotIndex < 6;
+                              const isAfternoon = slotIndex >= 6 && slotIndex < 12;
+                              const isAvailable = !isWeekend && (
+                                (dayIndex === 0 && slotIndex >= 2 && slotIndex <= 14) ||
+                                (dayIndex === 1 && slotIndex >= 0 && slotIndex <= 16) ||
+                                (dayIndex === 2 && slotIndex >= 4 && slotIndex <= 12) ||
+                                (dayIndex === 3 && slotIndex >= 2 && slotIndex <= 16) ||
+                                (dayIndex === 4 && slotIndex >= 0 && slotIndex <= 10)
+                              );
+
+                              return (
+                                <div
+                                  key={slotIndex}
+                                  className={`flex-1 h-5 rounded-sm ${
+                                    isAvailable ? "bg-violet-500" : "bg-gray-100"
+                                  }`}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       ))}
                     </div>
+
                     <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
                       <span className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded bg-violet-500" /> Available
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-violet-200" /> Limited
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-gray-100" /> Busy
+                        <span className="w-3 h-3 rounded bg-gray-100 border border-gray-200" /> Unavailable
                       </span>
                     </div>
                   </div>
 
                   {/* Online Now Preview */}
-                  <div className="bg-white rounded-xl p-5 border border-gray-100">
+                  <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <Zap className="w-5 h-5 text-green-500" />
-                      <span className="font-semibold text-gray-900">Online Now</span>
+                      <span className="font-semibold text-gray-900">Available Now</span>
                     </div>
                     <div className="space-y-3">
                       {[
-                        { name: "Sarah K.", role: "Design", status: "green" },
-                        { name: "Mike R.", role: "Engineering", status: "green" },
-                        { name: "Alex T.", role: "Product", status: "amber" },
+                        { initials: "SK", name: "Sarah K.", role: "Design Lead", available: true },
+                        { initials: "MR", name: "Mike R.", role: "Engineer", available: true },
+                        { initials: "AT", name: "Alex T.", role: "Product", available: false },
                       ].map((person, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center text-xs font-semibold">
-                            {person.name.split(" ").map(n => n[0]).join("")}
+                            {person.initials}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium text-gray-900 truncate">{person.name}</div>
                             <div className="text-xs text-gray-400">{person.role}</div>
                           </div>
-                          <div className={`w-2.5 h-2.5 rounded-full ${person.status === "green" ? "bg-green-500" : "bg-amber-500"}`} />
+                          <div className={`w-2.5 h-2.5 rounded-full ${person.available ? "bg-green-500" : "bg-gray-300"}`} />
                         </div>
                       ))}
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="text-xs text-gray-400 mb-2">Looking to help</div>
+                      <div className="flex -space-x-2">
+                        {["JD", "KL", "NP"].map((initials, i) => (
+                          <div key={i} className="w-7 h-7 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center text-[10px] font-semibold border-2 border-white">
+                            {initials}
+                          </div>
+                        ))}
+                        <div className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-semibold border-2 border-white">
+                          +2
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-
-          {/* Logo Strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-16 text-center"
-          >
-            <p className="text-sm text-gray-400 mb-6">Trusted by teams at</p>
-            <div className="flex items-center justify-center gap-12 opacity-50 grayscale">
-              {["Stripe", "Vercel", "Linear", "Notion", "Figma"].map((company) => (
-                <span key={company} className="text-lg font-semibold text-gray-400">{company}</span>
-              ))}
             </div>
           </motion.div>
         </div>
@@ -243,8 +265,8 @@ export default function LandingPage() {
               Coordination is killing your team's productivity
             </h2>
             <p className="text-xl text-gray-500">
-              The average knowledge worker spends 4.8 hours per week just trying to schedule meetings.
-              That's 250+ hours per year — wasted.
+              Distributed teams waste hours every week just trying to find time to meet.
+              There's a better way.
             </p>
           </div>
 
@@ -254,22 +276,16 @@ export default function LandingPage() {
                 icon: MessageSquare,
                 title: "Endless back-and-forth",
                 description: "\"When works for you?\" messages ping-ponging across Slack, email, and DMs.",
-                stat: "12 messages",
-                statLabel: "avg. to schedule one meeting",
               },
               {
                 icon: Globe,
                 title: "Time zone chaos",
-                description: "Distributed teams struggle to find overlapping hours across continents.",
-                stat: "3.2 hours",
-                statLabel: "lost weekly to timezone math",
+                description: "Distributed teams struggle to find overlapping hours across different locations.",
               },
               {
                 icon: Search,
                 title: "Who knows what?",
                 description: "Someone on your team has the answer, but who? And are they even available?",
-                stat: "67%",
-                statLabel: "of questions go unanswered",
               },
             ].map((problem, i) => (
               <motion.div
@@ -278,17 +294,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-gray-50 rounded-2xl p-8"
+                className="bg-[#F8F7F4] rounded-2xl p-8"
               >
-                <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-5">
+                <div className="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center mb-5">
                   <problem.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{problem.title}</h3>
-                <p className="text-gray-500 mb-6">{problem.description}</p>
-                <div className="pt-5 border-t border-gray-200">
-                  <div className="text-3xl font-bold text-red-600">{problem.stat}</div>
-                  <div className="text-sm text-gray-400">{problem.statLabel}</div>
-                </div>
+                <p className="text-gray-500">{problem.description}</p>
               </motion.div>
             ))}
           </div>
@@ -296,7 +308,7 @@ export default function LandingPage() {
       </section>
 
       {/* Solution / Features Section */}
-      <section id="features" className="py-24 px-6 bg-[#FAFAFA]">
+      <section id="features" className="py-24 px-6 bg-[#F8F7F4]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
@@ -320,13 +332,13 @@ export default function LandingPage() {
               {
                 icon: Zap,
                 title: "Real-time status",
-                description: "Know who's online and ready to help right now. Green dot means go.",
+                description: "Know who's online and ready to help right now. Toggle your availability with one click.",
                 color: "green",
               },
               {
                 icon: Users,
                 title: "Smart skill matching",
-                description: "Find teammates who can help with specific topics. AI-powered expertise matching.",
+                description: "Find teammates who can help with specific topics. Expertise tagging makes it easy.",
                 color: "blue",
               },
               {
@@ -378,7 +390,7 @@ export default function LandingPage() {
               {
                 step: "01",
                 title: "Create your pod",
-                description: "Set up a workspace for your team in seconds. Invite members with a simple link.",
+                description: "Set up a workspace for your team in seconds. Invite members with a simple code.",
               },
               {
                 step: "02",
@@ -388,7 +400,7 @@ export default function LandingPage() {
               {
                 step: "03",
                 title: "Start coordinating",
-                description: "See who's available, find the right expert, and schedule meetings without the chaos.",
+                description: "See who's available, find the right expert, and connect without the chaos.",
               },
             ].map((item, i) => (
               <motion.div
@@ -408,125 +420,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 px-6 bg-[#FAFAFA]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Testimonials</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-              Teams love Meshflow
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                quote: "We cut our meeting scheduling time by 80%. What used to take 15 back-and-forth messages now takes one glance.",
-                author: "Sarah Chen",
-                role: "Engineering Manager",
-                company: "TechCorp",
-                metric: "80% faster",
-              },
-              {
-                quote: "Finally, a tool that understands distributed teams. The timezone feature alone is worth it.",
-                author: "Marcus Johnson",
-                role: "Head of Remote",
-                company: "GlobalTeam",
-                metric: "4 hrs saved/week",
-              },
-              {
-                quote: "The skill matching feature is brilliant. We found experts we didn't even know we had.",
-                author: "Priya Patel",
-                role: "VP of Operations",
-                company: "ScaleUp Inc",
-                metric: "2x faster answers",
-              },
-            ].map((testimonial, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-8 border border-gray-100"
-              >
-                <div className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
-                  {testimonial.metric}
-                </div>
-                <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center font-semibold">
-                    {testimonial.author.split(" ").map(n => n[0]).join("")}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.author}</div>
-                    <div className="text-sm text-gray-500">{testimonial.role}, {testimonial.company}</div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 px-6 bg-violet-600">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            {[
-              { value: "500+", label: "Teams using Meshflow" },
-              { value: "50K+", label: "Hours saved monthly" },
-              { value: "94%", label: "User satisfaction" },
-              { value: "<2min", label: "Average setup time" },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <div className="text-5xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-violet-200">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Final CTA */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 bg-violet-600">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to end coordination chaos?
           </h2>
-          <p className="text-xl text-gray-500 mb-10">
-            Join 500+ teams who've reclaimed their time. Start free, no credit card required.
+          <p className="text-xl text-violet-100 mb-10">
+            Start free, no credit card required. Your team will thank you.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
-              <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
+              <Button className="h-14 px-8 text-base font-semibold bg-white text-violet-600 hover:bg-violet-50 rounded-xl shadow-lg gap-2">
                 Get Started Free
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="outline" className="h-14 px-8 text-base font-semibold rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50">
+              <Button variant="outline" className="h-14 px-8 text-base font-semibold rounded-xl bg-transparent border-white/30 text-white hover:bg-white/10">
                 Log in to your team
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-sm text-gray-400">
-            Free forever for teams up to 5 • No credit card required • Setup in 2 minutes
+          <p className="mt-6 text-sm text-violet-200">
+            Free forever for small teams • No credit card required • Setup in 2 minutes
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-gray-50 border-t border-gray-200">
+      <footer className="py-12 px-6 bg-[#F8F7F4] border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
               <span className="font-bold text-xl text-violet-600">Mesh</span>
               <span className="font-bold text-xl text-gray-900">flow</span>
             </div>
