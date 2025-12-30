@@ -149,64 +149,68 @@ export default function LandingPage() {
                 <div className="grid grid-cols-3 gap-4">
                   {/* Availability Grid Preview - Matching actual app */}
                   <div className="col-span-2 bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Calendar className="w-5 h-5 text-violet-600" />
-                      <span className="font-semibold text-gray-900">Team Availability</span>
-                      <span className="ml-auto text-xs text-gray-400">This week</span>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-violet-600" />
+                        <span className="font-semibold text-gray-900">Availability</span>
+                      </div>
+                      <span className="text-xs text-gray-400">4 hours/week available</span>
                     </div>
 
-                    {/* Grid matching actual app structure */}
-                    <div className="space-y-1">
+                    {/* Grid matching actual app structure - 24hr format */}
+                    <div className="space-y-0.5">
                       {/* Header row with hours */}
-                      <div className="flex">
-                        <div className="w-12 shrink-0" />
+                      <div className="flex items-center">
+                        <div className="w-8 shrink-0" />
                         <div className="flex-1 flex">
-                          {[9, 10, 11, 12, 13, 14, 15, 16, 17].map((hour) => (
-                            <div key={hour} className="flex-1 text-center text-[10px] font-medium text-gray-400">
+                          {["00", "02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22"].map((hour) => (
+                            <div key={hour} className="flex-1 text-center text-[9px] font-medium text-gray-400">
                               {hour}
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      {/* Day rows */}
-                      {DAYS.map((day, dayIndex) => (
-                        <div key={day} className="flex items-center">
-                          <div className="w-12 shrink-0 text-xs font-medium text-gray-500">{day}</div>
-                          <div className="flex-1 flex gap-0.5">
-                            {Array.from({ length: 18 }).map((_, slotIndex) => {
-                              // Create a realistic availability pattern
-                              const isWeekend = dayIndex >= 5;
-                              const isMorning = slotIndex < 6;
-                              const isAfternoon = slotIndex >= 6 && slotIndex < 12;
-                              const isAvailable = !isWeekend && (
-                                (dayIndex === 0 && slotIndex >= 2 && slotIndex <= 14) ||
-                                (dayIndex === 1 && slotIndex >= 0 && slotIndex <= 16) ||
-                                (dayIndex === 2 && slotIndex >= 4 && slotIndex <= 12) ||
-                                (dayIndex === 3 && slotIndex >= 2 && slotIndex <= 16) ||
-                                (dayIndex === 4 && slotIndex >= 0 && slotIndex <= 10)
-                              );
+                      {/* Day rows - matching screenshot pattern */}
+                      {DAYS.map((day, dayIndex) => {
+                        // Availability pattern matching the screenshot
+                        const availableSlots: Record<number, number[]> = {
+                          0: [2],           // Mon: 02:00-02:30
+                          1: [2, 4, 8],     // Tue: slots at 02, 04, 08
+                          2: [1],           // Wed: 01:00
+                          3: [5, 6],        // Thu: 05:00-06:00, 07:00
+                          4: [1, 11],       // Fri: 01:30-02:00, 11:00
+                          5: [],            // Sat: none
+                          6: [],            // Sun: none
+                        };
 
-                              return (
-                                <div
-                                  key={slotIndex}
-                                  className={`flex-1 h-5 rounded-sm ${
-                                    isAvailable ? "bg-violet-500" : "bg-gray-100"
-                                  }`}
-                                />
-                              );
-                            })}
+                        return (
+                          <div key={day} className="flex items-center">
+                            <div className="w-8 shrink-0 text-[10px] font-medium text-gray-500">{day}</div>
+                            <div className="flex-1 flex gap-px">
+                              {Array.from({ length: 12 }).map((_, slotIndex) => {
+                                const isAvailable = availableSlots[dayIndex]?.includes(slotIndex);
+                                return (
+                                  <div
+                                    key={slotIndex}
+                                    className={`flex-1 h-4 rounded-sm ${
+                                      isAvailable ? "bg-violet-400" : "bg-gray-100"
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
-                    <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-violet-500" /> Available
+                    <div className="flex items-center gap-4 mt-3 text-[10px] text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <span className="w-2.5 h-2.5 rounded-sm bg-violet-400" /> Available
                       </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-gray-100 border border-gray-200" /> Unavailable
+                      <span className="flex items-center gap-1">
+                        <span className="w-2.5 h-2.5 rounded-sm bg-gray-100 border border-gray-200" /> Unavailable
                       </span>
                     </div>
                   </div>
