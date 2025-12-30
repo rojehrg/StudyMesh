@@ -436,7 +436,11 @@ export default function PodDetailPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.03 }}
-                  className="p-4 rounded-xl bg-card shadow-sm hover:shadow-md transition-shadow"
+                  className={`p-4 rounded-xl border transition-all ${
+                    member.currentlyAvailable && member.userId !== currentUserId
+                      ? "bg-success/5 border-success/20 hover:border-success/40"
+                      : "bg-card border-border hover:border-primary/30 hover:shadow-md"
+                  }`}
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <Avatar className="h-10 w-10 shrink-0">
@@ -453,7 +457,13 @@ export default function PodDetailPage() {
                         {member.userId === currentUserId && (
                           <Badge variant="secondary" className="bg-primary/20 text-primary text-xs px-1.5">You</Badge>
                         )}
-                        {member.lookingToHelp && member.userId !== currentUserId && (
+                        {member.currentlyAvailable && member.userId !== currentUserId && (
+                          <Badge className="bg-success/20 text-success text-xs px-1.5 border-0 gap-0.5">
+                            <Zap className="w-3 h-3" />
+                            Now
+                          </Badge>
+                        )}
+                        {member.lookingToHelp && member.userId !== currentUserId && !member.currentlyAvailable && (
                           <span title="Looking to help">
                             <Sparkles className="w-4 h-4 text-accent" />
                           </span>

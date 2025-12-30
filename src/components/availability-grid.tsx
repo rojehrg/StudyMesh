@@ -1,36 +1,96 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Globe, Clock, Zap } from "lucide-react";
+import { Globe, Clock, Zap, ChevronDown, Check, Search } from "lucide-react";
 
-// Common timezones grouped by region
+// Comprehensive timezone list grouped by region
 const TIMEZONE_OPTIONS = [
-  { label: "Pacific Time (PT)", value: "America/Los_Angeles" },
-  { label: "Mountain Time (MT)", value: "America/Denver" },
-  { label: "Central Time (CT)", value: "America/Chicago" },
-  { label: "Eastern Time (ET)", value: "America/New_York" },
-  { label: "UTC", value: "UTC" },
-  { label: "London (GMT/BST)", value: "Europe/London" },
-  { label: "Paris (CET/CEST)", value: "Europe/Paris" },
-  { label: "Berlin (CET/CEST)", value: "Europe/Berlin" },
-  { label: "Istanbul (TRT)", value: "Europe/Istanbul" },
-  { label: "Dubai (GST)", value: "Asia/Dubai" },
-  { label: "India (IST)", value: "Asia/Kolkata" },
-  { label: "Singapore (SGT)", value: "Asia/Singapore" },
-  { label: "Tokyo (JST)", value: "Asia/Tokyo" },
-  { label: "Sydney (AEST/AEDT)", value: "Australia/Sydney" },
+  // Americas
+  { label: "Pacific Time (Los Angeles)", value: "America/Los_Angeles", region: "Americas" },
+  { label: "Mountain Time (Denver)", value: "America/Denver", region: "Americas" },
+  { label: "Central Time (Chicago)", value: "America/Chicago", region: "Americas" },
+  { label: "Eastern Time (New York)", value: "America/New_York", region: "Americas" },
+  { label: "Alaska (Anchorage)", value: "America/Anchorage", region: "Americas" },
+  { label: "Hawaii (Honolulu)", value: "Pacific/Honolulu", region: "Americas" },
+  { label: "Arizona (Phoenix)", value: "America/Phoenix", region: "Americas" },
+  { label: "Atlantic (Halifax)", value: "America/Halifax", region: "Americas" },
+  { label: "Newfoundland (St Johns)", value: "America/St_Johns", region: "Americas" },
+  { label: "Buenos Aires", value: "America/Argentina/Buenos_Aires", region: "Americas" },
+  { label: "São Paulo", value: "America/Sao_Paulo", region: "Americas" },
+  { label: "Mexico City", value: "America/Mexico_City", region: "Americas" },
+  { label: "Toronto", value: "America/Toronto", region: "Americas" },
+  { label: "Vancouver", value: "America/Vancouver", region: "Americas" },
+  { label: "Lima", value: "America/Lima", region: "Americas" },
+  { label: "Bogota", value: "America/Bogota", region: "Americas" },
+  { label: "Santiago", value: "America/Santiago", region: "Americas" },
+  // Europe
+  { label: "UTC / GMT", value: "UTC", region: "Europe" },
+  { label: "London (GMT/BST)", value: "Europe/London", region: "Europe" },
+  { label: "Paris (CET)", value: "Europe/Paris", region: "Europe" },
+  { label: "Berlin (CET)", value: "Europe/Berlin", region: "Europe" },
+  { label: "Amsterdam", value: "Europe/Amsterdam", region: "Europe" },
+  { label: "Brussels", value: "Europe/Brussels", region: "Europe" },
+  { label: "Madrid", value: "Europe/Madrid", region: "Europe" },
+  { label: "Rome", value: "Europe/Rome", region: "Europe" },
+  { label: "Zurich", value: "Europe/Zurich", region: "Europe" },
+  { label: "Stockholm", value: "Europe/Stockholm", region: "Europe" },
+  { label: "Oslo", value: "Europe/Oslo", region: "Europe" },
+  { label: "Copenhagen", value: "Europe/Copenhagen", region: "Europe" },
+  { label: "Helsinki", value: "Europe/Helsinki", region: "Europe" },
+  { label: "Warsaw", value: "Europe/Warsaw", region: "Europe" },
+  { label: "Prague", value: "Europe/Prague", region: "Europe" },
+  { label: "Vienna", value: "Europe/Vienna", region: "Europe" },
+  { label: "Athens", value: "Europe/Athens", region: "Europe" },
+  { label: "Istanbul", value: "Europe/Istanbul", region: "Europe" },
+  { label: "Moscow", value: "Europe/Moscow", region: "Europe" },
+  { label: "Dublin", value: "Europe/Dublin", region: "Europe" },
+  { label: "Lisbon", value: "Europe/Lisbon", region: "Europe" },
+  // Asia & Middle East
+  { label: "Dubai (GST)", value: "Asia/Dubai", region: "Asia" },
+  { label: "Riyadh", value: "Asia/Riyadh", region: "Asia" },
+  { label: "Tel Aviv (Jerusalem)", value: "Asia/Jerusalem", region: "Asia" },
+  { label: "Mumbai (Kolkata)", value: "Asia/Kolkata", region: "Asia" },
+  { label: "Bangalore", value: "Asia/Kolkata", region: "Asia" },
+  { label: "Singapore", value: "Asia/Singapore", region: "Asia" },
+  { label: "Hong Kong", value: "Asia/Hong_Kong", region: "Asia" },
+  { label: "Shanghai", value: "Asia/Shanghai", region: "Asia" },
+  { label: "Beijing", value: "Asia/Shanghai", region: "Asia" },
+  { label: "Tokyo", value: "Asia/Tokyo", region: "Asia" },
+  { label: "Seoul", value: "Asia/Seoul", region: "Asia" },
+  { label: "Taipei", value: "Asia/Taipei", region: "Asia" },
+  { label: "Manila", value: "Asia/Manila", region: "Asia" },
+  { label: "Jakarta", value: "Asia/Jakarta", region: "Asia" },
+  { label: "Bangkok", value: "Asia/Bangkok", region: "Asia" },
+  { label: "Ho Chi Minh", value: "Asia/Ho_Chi_Minh", region: "Asia" },
+  { label: "Kuala Lumpur", value: "Asia/Kuala_Lumpur", region: "Asia" },
+  { label: "Karachi", value: "Asia/Karachi", region: "Asia" },
+  { label: "Dhaka", value: "Asia/Dhaka", region: "Asia" },
+  // Pacific & Oceania
+  { label: "Sydney (AEST)", value: "Australia/Sydney", region: "Pacific" },
+  { label: "Melbourne", value: "Australia/Melbourne", region: "Pacific" },
+  { label: "Brisbane", value: "Australia/Brisbane", region: "Pacific" },
+  { label: "Perth", value: "Australia/Perth", region: "Pacific" },
+  { label: "Adelaide", value: "Australia/Adelaide", region: "Pacific" },
+  { label: "Auckland", value: "Pacific/Auckland", region: "Pacific" },
+  { label: "Fiji", value: "Pacific/Fiji", region: "Pacific" },
+  // Africa
+  { label: "Cairo", value: "Africa/Cairo", region: "Africa" },
+  { label: "Johannesburg", value: "Africa/Johannesburg", region: "Africa" },
+  { label: "Lagos", value: "Africa/Lagos", region: "Africa" },
+  { label: "Nairobi", value: "Africa/Nairobi", region: "Africa" },
+  { label: "Casablanca", value: "Africa/Casablanca", region: "Africa" },
 ];
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -40,7 +100,10 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
   const hour = Math.floor(i / 2);
   const minute = (i % 2) * 30;
-  return { hour, minute, label: `${hour.toString().padStart(2, "0")}:${minute === 0 ? "00" : "30"}` };
+  // 12-hour format helper
+  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  const ampm = hour < 12 ? "am" : "pm";
+  return { hour, minute, label: `${hour12}:${minute === 0 ? "00" : "30"}${ampm}` };
 });
 
 export interface AvailabilitySlot {
@@ -76,6 +139,29 @@ export function AvailabilityGrid({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ day: number; slot: number } | null>(null);
   const [dragMode, setDragMode] = useState<"add" | "remove">("add");
+  const [tzSearch, setTzSearch] = useState("");
+  const [tzOpen, setTzOpen] = useState(false);
+
+  // Filter timezones by search
+  const filteredTimezones = useMemo(() => {
+    if (!tzSearch) return TIMEZONE_OPTIONS;
+    const search = tzSearch.toLowerCase();
+    return TIMEZONE_OPTIONS.filter(
+      tz => tz.label.toLowerCase().includes(search) ||
+            tz.value.toLowerCase().includes(search) ||
+            tz.region.toLowerCase().includes(search)
+    );
+  }, [tzSearch]);
+
+  // Group filtered timezones by region
+  const groupedTimezones = useMemo(() => {
+    const groups: Record<string, typeof TIMEZONE_OPTIONS> = {};
+    filteredTimezones.forEach(tz => {
+      if (!groups[tz.region]) groups[tz.region] = [];
+      groups[tz.region].push(tz);
+    });
+    return groups;
+  }, [filteredTimezones]);
 
   // Auto-detect timezone on mount
   useEffect(() => {
@@ -230,11 +316,13 @@ export function AvailabilityGrid({
     setSlots(workSlots);
   };
 
-  // Format slot to time string
+  // Format slot to time string (12-hour format)
   const formatSlotTime = (slot: number) => {
     const hour = Math.floor(slot / 2);
     const minute = (slot % 2) * 30;
-    return `${hour.toString().padStart(2, "0")}:${minute === 0 ? "00" : "30"}`;
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const ampm = hour < 12 ? "am" : "pm";
+    return `${hour12}:${minute === 0 ? "00" : "30"}${ampm}`;
   };
 
   // Get current time in user's timezone
@@ -286,22 +374,73 @@ export function AvailabilityGrid({
     <div className="space-y-4" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        {/* Timezone Selector */}
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-muted-foreground" />
-          <Select value={timezone} onValueChange={setTimezone} disabled={readOnly}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select timezone" />
-            </SelectTrigger>
-            <SelectContent>
-              {TIMEZONE_OPTIONS.map((tz) => (
-                <SelectItem key={tz.value} value={tz.value}>
-                  {tz.label}
-                </SelectItem>
+        {/* Timezone Selector - Searchable */}
+        <Popover open={tzOpen} onOpenChange={setTzOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={tzOpen}
+              className="w-[240px] justify-between font-normal"
+              disabled={readOnly}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="truncate">
+                  {TIMEZONE_OPTIONS.find((tz) => tz.value === timezone)?.label || timezone}
+                </span>
+              </div>
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[280px] p-0" align="start">
+            <div className="flex items-center border-b px-3 py-2">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <Input
+                placeholder="Search timezone..."
+                value={tzSearch}
+                onChange={(e) => setTzSearch(e.target.value)}
+                className="h-8 border-0 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
+            <div className="max-h-[300px] overflow-y-auto p-1">
+              {Object.entries(groupedTimezones).map(([region, timezones]) => (
+                <div key={region}>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                    {region}
+                  </div>
+                  {timezones.map((tz) => (
+                    <button
+                      key={`${tz.value}-${tz.label}`}
+                      onClick={() => {
+                        setTimezone(tz.value);
+                        setTzOpen(false);
+                        setTzSearch("");
+                      }}
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
+                        timezone === tz.value && "bg-accent"
+                      )}
+                    >
+                      <Check
+                        className={cn(
+                          "h-4 w-4 shrink-0",
+                          timezone === tz.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span className="truncate">{tz.label}</span>
+                    </button>
+                  ))}
+                </div>
               ))}
-            </SelectContent>
-          </Select>
-        </div>
+              {filteredTimezones.length === 0 && (
+                <div className="py-6 text-center text-sm text-muted-foreground">
+                  No timezone found.
+                </div>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Currently Available Toggle */}
         <div className="flex items-center gap-3">
@@ -340,81 +479,81 @@ export function AvailabilityGrid({
         </div>
       )}
 
-      {/* Grid */}
-      <div className="border border-border rounded-lg overflow-hidden bg-card shadow-sm">
+      {/* Grid - GitHub contribution style */}
+      <div className="bg-card rounded-xl border border-border p-4 shadow-sm">
         {/* Hour Headers */}
-        <div className="flex border-b border-border bg-muted/50">
-          <div className="w-16 shrink-0 p-2 text-xs font-semibold text-foreground/70 border-r border-border" />
-          <div className="flex-1 flex">
-            {HOURS.filter((_, i) => i % 2 === 0).map((hour) => (
-              <div
-                key={hour}
-                className="flex-1 text-center text-xs font-semibold text-foreground/70 py-2"
-                style={{ minWidth: "2rem" }}
-              >
-                {hour.toString().padStart(2, "0")}
-              </div>
-            ))}
+        <div className="flex items-center mb-2">
+          <div className="w-12 shrink-0" />
+          <div className="flex-1 flex justify-between px-0.5">
+            {[0, 6, 12, 18, 23].map((hour) => {
+              const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+              const ampm = hour < 12 ? "am" : "pm";
+              return (
+                <span key={hour} className="text-[10px] text-muted-foreground font-medium">
+                  {hour12}{ampm}
+                </span>
+              );
+            })}
           </div>
         </div>
 
         {/* Day Rows */}
-        {DAYS.map((day, dayIndex) => (
-          <div key={day} className="flex border-b border-border last:border-b-0">
-            {/* Day Label */}
-            <div className="w-16 shrink-0 p-2 text-sm font-semibold text-foreground border-r border-border bg-muted/30 flex items-center">
-              {day}
-            </div>
-            {/* Time Slots */}
-            <div className="flex-1 flex">
-              {TIME_SLOTS.map((slot, slotIndex) => {
-                const isSelected = isSlotSelected(dayIndex, slotIndex);
-                const isCurrentSlot = getCurrentDay() === dayIndex && getCurrentTimeSlot() === slotIndex;
+        <div className="space-y-1">
+          {DAYS.map((day, dayIndex) => (
+            <div key={day} className="flex items-center gap-1">
+              {/* Day Label */}
+              <div className="w-12 shrink-0 text-xs font-medium text-muted-foreground">
+                {day}
+              </div>
+              {/* Time Slots - grouped by hour for better visual */}
+              <div className="flex-1 flex gap-px">
+                {TIME_SLOTS.map((slot, slotIndex) => {
+                  const isSelected = isSlotSelected(dayIndex, slotIndex);
+                  const isCurrentSlot = getCurrentDay() === dayIndex && getCurrentTimeSlot() === slotIndex;
 
-                return (
-                  <div
-                    key={slotIndex}
-                    className={cn(
-                      "flex-1 h-8 border-r last:border-r-0 transition-colors cursor-pointer select-none",
-                      slotIndex % 2 === 0 ? "border-r-border" : "border-r-border/50",
-                      isSelected
-                        ? "bg-primary hover:bg-primary/80"
-                        : "bg-muted/20 hover:bg-muted/60",
-                      isCurrentSlot && !isSelected && "ring-2 ring-inset ring-primary/50",
-                      readOnly && "cursor-default"
-                    )}
-                    style={{ minWidth: "0.5rem" }}
-                    onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
-                    onMouseEnter={() => handleMouseEnter(dayIndex, slotIndex)}
-                    title={`${day} ${formatSlotTime(slotIndex)}`}
-                  />
-                );
-              })}
+                  return (
+                    <div
+                      key={slotIndex}
+                      className={cn(
+                        "flex-1 h-6 rounded-sm transition-colors cursor-pointer select-none",
+                        isSelected
+                          ? "bg-primary hover:bg-primary/80"
+                          : "bg-muted/40 hover:bg-muted",
+                        isCurrentSlot && !isSelected && "ring-2 ring-primary/60",
+                        readOnly && "cursor-default"
+                      )}
+                      onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
+                      onMouseEnter={() => handleMouseEnter(dayIndex, slotIndex)}
+                      title={`${day} ${formatSlotTime(slotIndex)}`}
+                    />
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Legend & Summary */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between text-sm">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-primary" />
-            <span className="text-foreground/80">Available</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-primary" />
+            <span className="text-muted-foreground">Available</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-muted/30 border border-border" />
-            <span className="text-foreground/80">Unavailable</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-muted/40" />
+            <span className="text-muted-foreground">Busy</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-muted/30 border border-border ring-2 ring-inset ring-primary/50" />
-            <span className="text-foreground/80">Now</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-sm bg-muted/40 ring-2 ring-primary/60" />
+            <span className="text-muted-foreground">Current time</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-foreground/80">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="w-4 h-4" />
-          <span>
-            {slots.reduce((acc, s) => acc + (s.endSlot - s.startSlot) / 2, 0)} hours/week available
+          <span className="font-medium">
+            {slots.reduce((acc, s) => acc + (s.endSlot - s.startSlot) / 2, 0)} hrs/week
           </span>
         </div>
       </div>

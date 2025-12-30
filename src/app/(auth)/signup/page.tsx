@@ -91,16 +91,16 @@ export default function SignupPage() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-sm bg-card border-0">
+    <Card className="w-full max-w-md shadow-sm bg-white border border-gray-200">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-foreground">Create an account</CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardTitle className="text-2xl font-bold text-gray-900">Create an account</CardTitle>
+        <CardDescription className="text-gray-500">
           Enter your email below to create your account
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <div className="text-sm p-3 rounded-md bg-primary/10 text-primary">
+          <div className="text-sm p-3 rounded-md bg-violet-50 text-violet-700">
             {error}
           </div>
         )}
@@ -109,7 +109,7 @@ export default function SignupPage() {
             variant="outline"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="bg-secondary border-0 text-foreground hover:bg-secondary/80"
+            className="bg-gray-50 border-gray-200 text-gray-900 hover:bg-gray-100"
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -134,24 +134,24 @@ export default function SignupPage() {
           <Button
             variant="outline"
             disabled={loading}
-            className="bg-secondary border-0 text-foreground hover:bg-secondary/80"
+            className="bg-gray-50 border-gray-200 text-gray-900 hover:bg-gray-100"
           >
             SSO
           </Button>
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
+            <span className="w-full border-t border-gray-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="px-2 bg-card text-muted-foreground">
+            <span className="px-2 bg-white text-gray-500">
               Or continue with
             </span>
           </div>
         </div>
         <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-gray-900">Email</Label>
             <Input
               id="email"
               type="email"
@@ -160,11 +160,11 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              className="bg-secondary border-0 text-foreground"
+              className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-gray-900">Password</Label>
             <Input
               id="password"
               type="password"
@@ -172,12 +172,12 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              className="bg-secondary border-0 text-foreground"
+              className="bg-gray-50 border-gray-200 text-gray-900"
             />
           </div>
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full bg-violet-600 text-white hover:bg-violet-700"
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -186,9 +186,9 @@ export default function SignupPage() {
         </form>
       </CardContent>
       <CardFooter className="justify-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="font-medium text-violet-600 hover:underline">
             Sign in
           </Link>
         </p>

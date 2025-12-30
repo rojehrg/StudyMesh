@@ -1,11 +1,23 @@
 import Link from "next/link";
-import { PlusCircle, LogIn, Users, Sparkles, Clock, Bell, ArrowRight, Zap } from "lucide-react";
+import { PlusCircle, LogIn, Users, Sparkles, Clock, Bell, ArrowRight, Zap, MessageCircle, HandHelping, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+
+// Helper to format relative time
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+  return date.toLocaleDateString();
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -46,13 +58,40 @@ export default async function DashboardPage() {
     pods = podsData || [];
   }
 
-  // Get notifications
+  // Get notifications (unread count)
   const { data: notifications } = await supabase
     .from('notifications')
     .select('read')
     .eq('recipient_id', user.id);
 
   const unreadNotifications = notifications?.filter(n => !n.read).length || 0;
+
+  // Get recent nudges for the user (both sent and received)
+  const { data: recentNudges } = await supabase
+    .from('notifications')
+    .select('id, type, content, metadata, read, created_at, sender_id, recipient_id')
+    .or(`recipient_id.eq.${user.id},sender_id.eq.${user.id}`)
+    .eq('type', 'nudge')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  // Get sender/recipient profiles for nudges
+  const nudgeUserIds = [...new Set([
+    ...(recentNudges?.map(n => n.sender_id) || []),
+    ...(recentNudges?.map(n => n.recipient_id) || [])
+  ].filter(Boolean))] as string[];
+
+  let nudgeProfiles: Record<string, any> = {};
+  if (nudgeUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('user_id, first_name, last_name, major')
+      .in('user_id', nudgeUserIds);
+    nudgeProfiles = (profiles || []).reduce((acc, p) => {
+      acc[p.user_id] = p;
+      return acc;
+    }, {} as Record<string, any>);
+  }
   const knowledgeAreas = profile.knowledge_areas || profile.expertise_skills || [];
 
   // Get currently available teammates from user's pods
@@ -225,6 +264,80 @@ export default async function DashboardPage() {
                             <span className="text-xs text-muted-foreground">+{areas.length - 2}</span>
                           )}
                         </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Nudges */}
+      {recentNudges && recentNudges.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription>Your latest nudges and connections</CardDescription>
+              </div>
+              <Link href="/notifications" className="text-sm text-primary hover:underline font-medium">
+                View all →
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentNudges.map((nudge) => {
+                const isSent = nudge.sender_id === user.id;
+                const otherUserId = isSent ? nudge.recipient_id : nudge.sender_id;
+                const otherProfile = nudgeProfiles[otherUserId];
+                const otherName = otherProfile?.major || otherProfile?.first_name || "Teammate";
+                const nudgeType = (nudge.metadata as any)?.nudge_type;
+                const topic = (nudge.metadata as any)?.topic;
+                const timeAgo = getTimeAgo(new Date(nudge.created_at));
+
+                return (
+                  <div
+                    key={nudge.id}
+                    className={`flex items-start gap-3 p-3 rounded-xl border ${
+                      !nudge.read && !isSent ? "bg-primary/5 border-primary/20" : "bg-card border-border"
+                    }`}
+                  >
+                    <Avatar className="h-9 w-9 shrink-0">
+                      <AvatarFallback className={`font-semibold text-sm ${
+                        nudgeType === 'ask' ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
+                      }`}>
+                        {otherName[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-foreground text-sm">
+                          {isSent ? `You → ${otherName}` : `${otherName} → You`}
+                        </span>
+                        <Badge className={`text-xs px-1.5 border-0 ${
+                          nudgeType === 'ask'
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-green-100 text-green-700"
+                        }`}>
+                          {nudgeType === 'ask' ? (
+                            <><HelpCircle className="w-3 h-3 mr-0.5" /> Asked</>
+                          ) : (
+                            <><HandHelping className="w-3 h-3 mr-0.5" /> Offered</>
+                          )}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{timeAgo}</span>
+                      </div>
+                      {topic && (
+                        <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                          {topic}
+                        </p>
                       )}
                     </div>
                   </div>

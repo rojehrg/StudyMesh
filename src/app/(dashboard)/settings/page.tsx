@@ -350,53 +350,58 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
                   <Input
                     id="firstName"
                     placeholder="John"
                     value={profile.firstName}
                     onChange={(e) => updateProfile({ firstName: e.target.value })}
+                    className="h-9"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
                   <Input
                     id="lastName"
                     placeholder="Doe"
                     value={profile.lastName}
                     onChange={(e) => updateProfile({ lastName: e.target.value })}
+                    className="h-9"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="department" className="text-sm font-medium">Department</Label>
                   <Input
                     id="department"
                     placeholder="e.g. Engineering, Sales"
                     value={profile.department}
                     onChange={(e) => updateProfile({ department: e.target.value })}
+                    className="h-9"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="major">Job Title</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="major" className="text-sm font-medium">Job Title</Label>
                   <Input
                     id="major"
                     placeholder="e.g. Senior Account Executive"
                     value={profile.major}
                     onChange={(e) => updateProfile({ major: e.target.value })}
+                    className="h-9"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio / Working Style</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="bio" className="text-sm font-medium">Bio / Working Style</Label>
                 <Textarea
                   id="bio"
-                  rows={3}
+                  rows={2}
                   placeholder="Tell your team how you work best..."
                   value={profile.bio}
                   onChange={(e) => updateProfile({ bio: e.target.value })}
+                  className="resize-none"
                 />
               </div>
             </CardContent>
@@ -419,8 +424,9 @@ export default function SettingsPage() {
                       addKnowledgeArea();
                     }
                   }}
+                  className="h-9"
                 />
-                <Button onClick={() => addKnowledgeArea()} disabled={!knowledgeInput.trim()}>
+                <Button onClick={() => addKnowledgeArea()} disabled={!knowledgeInput.trim()} size="sm" className="h-9">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -528,14 +534,15 @@ export default function SettingsPage() {
               <CardDescription>Receive meeting invites and updates via email</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@company.com"
                   value={profile.email}
                   onChange={(e) => updateProfile({ email: e.target.value })}
+                  className="h-9"
                 />
               </div>
 
