@@ -363,40 +363,6 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Quick Actions */}
-      <Card className="bg-muted/50">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link href="/classes">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 transition-all cursor-pointer text-center group">
-                <Users className="w-6 h-6 text-primary mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Browse Pods</p>
-              </div>
-            </Link>
-            <Link href="/settings">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-accent/10 transition-all cursor-pointer text-center group">
-                <Clock className="w-6 h-6 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Set Availability</p>
-              </div>
-            </Link>
-            <Link href="/classes/join">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 transition-all cursor-pointer text-center group">
-                <LogIn className="w-6 h-6 text-primary mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Join Pod</p>
-              </div>
-            </Link>
-            <Link href="/notifications">
-              <div className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md hover:bg-accent/10 transition-all cursor-pointer text-center group">
-                <Bell className="w-6 h-6 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-sm font-medium text-foreground">Notifications</p>
-              </div>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -148,7 +148,7 @@ export function NudgesDropdown() {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-5 h-5 text-foreground" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -173,7 +173,7 @@ export function NudgesDropdown() {
             <button
               onClick={() => setActiveTab('received')}
               className={cn(
-                "flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors",
+                "flex-1 text-sm font-medium py-1.5 px-3 rounded-md transition-colors",
                 activeTab === 'received'
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -181,7 +181,7 @@ export function NudgesDropdown() {
             >
               Received
               {unreadCount > 0 && (
-                <span className="ml-1 bg-accent/10 text-accent px-1.5 py-0.5 rounded-full text-[10px]">
+                <span className="ml-1.5 bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-xs font-bold">
                   {unreadCount}
                 </span>
               )}
@@ -189,7 +189,7 @@ export function NudgesDropdown() {
             <button
               onClick={() => setActiveTab('sent')}
               className={cn(
-                "flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors",
+                "flex-1 text-sm font-medium py-1.5 px-3 rounded-md transition-colors",
                 activeTab === 'sent'
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"

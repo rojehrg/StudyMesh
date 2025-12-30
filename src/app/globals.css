@@ -16,65 +16,65 @@
 
 @layer base {
   :root {
-    /* ===== LIGHT MODE - Warm Notepad ===== */
+    /* ===== LIGHT MODE - Clean, easy on eyes ===== */
 
-    /* Background - Warm cream like quality paper */
-    --background: 48 50% 96%;
-    --foreground: 260 25% 18%;
+    /* Background - Soft off-white, not harsh */
+    --background: 0 0% 98%;
+    --foreground: 240 10% 15%;
 
-    /* Cards - Slightly warmer white */
-    --card: 48 40% 99%;
-    --card-foreground: 260 25% 18%;
+    /* Cards - Pure white for contrast */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
 
-    --popover: 48 40% 99%;
-    --popover-foreground: 260 25% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
 
-    /* Primary - Soft violet (main action color) */
-    --primary: 262 55% 55%;
+    /* Primary - Rich violet */
+    --primary: 262 60% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Very light lavender */
-    --secondary: 262 40% 96%;
-    --secondary-foreground: 262 35% 35%;
+    /* Secondary - Light gray */
+    --secondary: 240 5% 94%;
+    --secondary-foreground: 240 10% 30%;
 
-    /* Accent - Lighter violet for hover states (not orange) */
-    --accent: 262 45% 92%;
-    --accent-foreground: 262 55% 40%;
+    /* Accent - Light violet for hover states */
+    --accent: 262 50% 95%;
+    --accent-foreground: 262 60% 45%;
 
-    /* Muted - Warm gray */
-    --muted: 48 20% 92%;
-    --muted-foreground: 260 10% 45%;
+    /* Muted - Neutral gray */
+    --muted: 240 5% 94%;
+    --muted-foreground: 240 5% 45%;
 
-    /* Destructive - Soft rose */
-    --destructive: 0 55% 55%;
+    /* Destructive - Clean red */
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Soft violet (cohesive with primary) */
-    --success: 262 45% 58%;
+    /* Success - Green */
+    --success: 142 70% 40%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Soft muted gold */
-    --warning: 45 70% 50%;
-    --warning-foreground: 45 80% 15%;
+    /* Warning - Amber */
+    --warning: 38 90% 50%;
+    --warning-foreground: 38 90% 10%;
 
-    /* Info - Soft periwinkle */
-    --info: 230 60% 62%;
+    /* Info - Blue */
+    --info: 210 90% 55%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - Nearly invisible, warm */
-    --border: 48 20% 90%;
-    --input: 48 20% 90%;
-    --ring: 262 55% 55%;
+    /* Borders - Subtle gray */
+    --border: 240 5% 90%;
+    --input: 240 5% 90%;
+    --ring: 262 60% 50%;
 
     /* Radius */
     --radius: 0.625rem;
 
-    /* Chart colors - Purple/violet family */
-    --chart-1: 262 55% 55%;
-    --chart-2: 280 45% 60%;
-    --chart-3: 230 55% 60%;
-    --chart-4: 262 35% 70%;
-    --chart-5: 200 50% 55%;
+    /* Chart colors - Vibrant mix */
+    --chart-1: 262 60% 50%;
+    --chart-2: 340 70% 55%;
+    --chart-3: 210 90% 55%;
+    --chart-4: 142 70% 40%;
+    --chart-5: 38 90% 50%;
   }
 
   .dark {

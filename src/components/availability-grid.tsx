@@ -88,15 +88,14 @@ export function AvailabilityGrid({
   // Notify parent of changes - use ref to avoid infinite loops with inline callbacks
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-  const isMountedRef = useRef(false);
+  const initialValueRef = useRef(JSON.stringify({ timezone: value?.timezone, slots: value?.slots, currentlyAvailable: value?.currentlyAvailable }));
 
   useEffect(() => {
-    // Skip the initial mount call to avoid triggering unnecessary saves
-    if (!isMountedRef.current) {
-      isMountedRef.current = true;
-      return;
+    // Only call onChange if the value has actually changed from the initial/last saved value
+    const currentValue = JSON.stringify({ timezone, slots, currentlyAvailable });
+    if (currentValue !== initialValueRef.current) {
+      onChangeRef.current?.({ timezone, slots, currentlyAvailable });
     }
-    onChangeRef.current?.({ timezone, slots, currentlyAvailable });
   }, [timezone, slots, currentlyAvailable]);
 
   const isSlotSelected = useCallback((day: number, slot: number) => {

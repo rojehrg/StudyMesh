@@ -91,10 +91,10 @@ export default function SignupPage() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-sm" style={{ backgroundColor: 'hsl(48 40% 99%)', border: 'none' }}>
+    <Card className="w-full max-w-md shadow-sm" style={{ backgroundColor: 'white', border: 'none' }}>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold" style={{ color: 'hsl(260 25% 18%)' }}>Create an account</CardTitle>
-        <CardDescription style={{ color: 'hsl(260 10% 45%)' }}>
+        <CardTitle className="text-2xl font-bold" style={{ color: 'hsl(240 10% 15%)' }}>Create an account</CardTitle>
+        <CardDescription style={{ color: 'hsl(240 5% 45%)' }}>
           Enter your email below to create your account
         </CardDescription>
       </CardHeader>
@@ -109,7 +109,7 @@ export default function SignupPage() {
             variant="outline"
             onClick={handleGoogleLogin}
             disabled={loading}
-            style={{ backgroundColor: 'hsl(48 20% 92%)', border: 'none', color: 'hsl(260 25% 18%)' }}
+            style={{ backgroundColor: 'hsl(240 5% 94%)', border: 'none', color: 'hsl(240 10% 15%)' }}
             className="hover:opacity-80"
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ export default function SignupPage() {
           <Button
             variant="outline"
             disabled={loading}
-            style={{ backgroundColor: 'hsl(48 20% 92%)', border: 'none', color: 'hsl(260 25% 18%)' }}
+            style={{ backgroundColor: 'hsl(240 5% 94%)', border: 'none', color: 'hsl(240 10% 15%)' }}
             className="hover:opacity-80"
           >
             SSO
@@ -143,17 +143,17 @@ export default function SignupPage() {
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full" style={{ borderTop: '1px solid hsl(48 20% 88%)' }} />
+            <span className="w-full" style={{ borderTop: '1px solid hsl(240 5% 90%)' }} />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="px-2" style={{ backgroundColor: 'hsl(48 40% 99%)', color: 'hsl(260 10% 45%)' }}>
+            <span className="px-2" style={{ backgroundColor: 'white', color: 'hsl(240 5% 45%)' }}>
               Or continue with
             </span>
           </div>
         </div>
         <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" style={{ color: 'hsl(260 25% 18%)' }}>Email</Label>
+            <Label htmlFor="email" style={{ color: 'hsl(240 10% 15%)' }}>Email</Label>
             <Input
               id="email"
               type="email"
@@ -162,11 +162,11 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              style={{ backgroundColor: 'hsl(48 20% 94%)', border: 'none', color: 'hsl(260 25% 18%)' }}
+              style={{ backgroundColor: 'hsl(240 5% 94%)', border: 'none', color: 'hsl(240 10% 15%)' }}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" style={{ color: 'hsl(260 25% 18%)' }}>Password</Label>
+            <Label htmlFor="password" style={{ color: 'hsl(240 10% 15%)' }}>Password</Label>
             <Input
               id="password"
               type="password"
@@ -174,14 +174,14 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              style={{ backgroundColor: 'hsl(48 20% 94%)', border: 'none', color: 'hsl(260 25% 18%)' }}
+              style={{ backgroundColor: 'hsl(240 5% 94%)', border: 'none', color: 'hsl(240 10% 15%)' }}
             />
           </div>
           <Button
             type="submit"
             className="w-full"
             disabled={loading}
-            style={{ backgroundColor: 'hsl(262 55% 55%)', border: 'none', color: 'white' }}
+            style={{ backgroundColor: 'hsl(262 60% 50%)', border: 'none', color: 'white' }}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create account
@@ -189,9 +189,9 @@ export default function SignupPage() {
         </form>
       </CardContent>
       <CardFooter className="justify-center">
-        <p className="text-sm" style={{ color: 'hsl(260 10% 45%)' }}>
+        <p className="text-sm" style={{ color: 'hsl(240 5% 45%)' }}>
           Already have an account?{" "}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: 'hsl(262 55% 55%)' }}>
+          <Link href="/login" className="font-medium hover:underline" style={{ color: 'hsl(262 60% 50%)' }}>
             Sign in
           </Link>
         </p>

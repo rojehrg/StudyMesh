@@ -49,12 +49,12 @@ export default function LandingPage() {
       {/* Force light mode on landing page */}
       <div className="min-h-screen overflow-hidden light" style={{ colorScheme: 'light' }}>
         <div className="min-h-screen" style={{
-          backgroundColor: 'hsl(48 50% 96%)',
-          color: 'hsl(260 25% 18%)'
+          backgroundColor: 'hsl(0 0% 98%)',
+          color: 'hsl(240 10% 15%)'
         }}>
         {/* Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{
-          backgroundColor: 'hsla(48, 50%, 96%, 0.9)'
+          backgroundColor: 'hsla(0, 0%, 98%, 0.9)'
         }}>
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-10">
@@ -88,13 +88,17 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-3">
               <Link href="/login">
-                <Button variant="ghost" className="font-medium" style={{ color: 'hsl(260 25% 18%)' }}>
+                <Button
+                  variant="ghost"
+                  className="font-medium hover:bg-violet-50 transition-colors"
+                  style={{ color: 'hsl(240 10% 25%)' }}
+                >
                   Log in
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button className="font-medium rounded-full px-5" style={{
-                  backgroundColor: 'hsl(262 55% 55%)',
+                <Button className="font-medium rounded-full px-5 hover:opacity-90 transition-opacity" style={{
+                  backgroundColor: 'hsl(262 60% 50%)',
                   color: 'white'
                 }}>
                   Get Started
@@ -344,158 +348,109 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-24 px-6" style={{ backgroundColor: 'hsl(48 50% 96%)' }}>
-          <div className="max-w-5xl mx-auto">
+        {/* Features Section - Bento Grid Style */}
+        <section id="features" className="py-24 px-6" style={{ backgroundColor: 'hsl(0 0% 98%)' }}>
+          <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6" style={{
-                backgroundColor: 'hsla(262, 55%, 55%, 0.1)',
-                color: 'hsl(262 55% 55%)'
-              }}>
-                Features
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'hsl(260 25% 18%)' }}>
-                Everything you need to <span style={{ color: 'hsl(262 55% 55%)' }}>coordinate</span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'hsl(240 10% 15%)' }}>
+                Powerful features,<br /><span style={{ color: 'hsl(262 60% 50%)' }}>zero complexity</span>
               </h2>
-              <p className="text-lg max-w-xl mx-auto" style={{ color: 'hsl(260 10% 45%)' }}>
-                Visual availability, smart nudges, and Slack integration—all in one place.
+              <p className="text-lg max-w-xl mx-auto" style={{ color: 'hsl(240 5% 45%)' }}>
+                Everything you need to coordinate async teams, nothing you don't.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                {
-                  icon: Calendar,
-                  title: "Visual Availability Grid",
-                  description: "See your team's availability at a glance. Timezone-aware and always up to date.",
-                  features: ["Auto-detect timezone", "\"Available now\" status", "See overlap with teammates"],
-                },
-                {
-                  icon: Zap,
-                  title: "Smart Nudges",
-                  description: "Send help requests with context. Choose meeting length, suggest times automatically.",
-                  features: ["15min to 1hr options", "Auto-suggest times", "Async option for different shifts"],
-                },
-                {
-                  icon: Search,
-                  title: "Knowledge Discovery",
-                  description: "Simple \"I know X\" tags. Search for expertise and find who can help.",
-                  features: ["Lightweight tagging", "Fuzzy search", "No complex skill databases"],
-                },
-                {
-                  icon: Slack,
-                  title: "Slack Native",
-                  description: "Nudges delivered as Slack DMs. Works where your team already communicates.",
-                  features: ["Direct messages", "One-click OAuth", "Meeting links included"],
-                },
-              ].map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="rounded-2xl p-8 transition-all hover:scale-[1.02]"
-                  style={{ backgroundColor: 'white', boxShadow: '0 2px 8px hsla(260, 20%, 20%, 0.04)' }}
-                >
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style={{
-                    backgroundColor: 'hsla(262, 55%, 55%, 0.1)'
-                  }}>
-                    <feature.icon className="w-7 h-7" style={{ color: 'hsl(262 55% 55%)' }} />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3" style={{ color: 'hsl(260 25% 18%)' }}>{feature.title}</h3>
-                  <p className="mb-4" style={{ color: 'hsl(260 10% 45%)' }}>{feature.description}</p>
-                  <ul className="space-y-2">
-                    {feature.features.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm" style={{ color: 'hsl(260 10% 45%)' }}>
-                        <CheckCircle2 className="w-4 h-4" style={{ color: 'hsl(262 55% 55%)' }} />
-                        {item}
-                      </li>
+            {/* Bento Grid */}
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Large feature card */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="md:col-span-2 md:row-span-2 rounded-3xl p-8 relative overflow-hidden group"
+                style={{ backgroundColor: 'hsl(262 60% 50%)', minHeight: '400px' }}
+              >
+                <div className="relative z-10">
+                  <Calendar className="w-10 h-10 text-white/80 mb-4" />
+                  <h3 className="text-3xl font-bold text-white mb-3">Visual Availability</h3>
+                  <p className="text-white/80 text-lg max-w-md">
+                    See your entire team's availability at a glance. Auto-detected timezones, drag-to-select scheduling.
+                  </p>
+                </div>
+                {/* Decorative grid */}
+                <div className="absolute bottom-0 right-0 w-2/3 h-2/3 opacity-20">
+                  <div className="grid grid-cols-7 gap-1 p-4">
+                    {Array.from({ length: 28 }).map((_, i) => (
+                      <div key={i} className="h-8 rounded bg-white/30" style={{
+                        opacity: Math.random() > 0.5 ? 0.8 : 0.3
+                      }} />
                     ))}
-                  </ul>
-                </motion.div>
-              ))}
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Small cards */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="rounded-3xl p-6 group hover:scale-[1.02] transition-transform"
+                style={{ backgroundColor: 'white', border: '1px solid hsl(240 5% 92%)' }}
+              >
+                <Zap className="w-8 h-8 mb-3" style={{ color: 'hsl(262 60% 50%)' }} />
+                <h3 className="text-xl font-bold mb-2" style={{ color: 'hsl(240 10% 15%)' }}>Smart Nudges</h3>
+                <p className="text-sm" style={{ color: 'hsl(240 5% 45%)' }}>
+                  Send contextual help requests with suggested times. 15min to 1hr options.
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="rounded-3xl p-6 group hover:scale-[1.02] transition-transform"
+                style={{ backgroundColor: 'white', border: '1px solid hsl(240 5% 92%)' }}
+              >
+                <Search className="w-8 h-8 mb-3" style={{ color: 'hsl(262 60% 50%)' }} />
+                <h3 className="text-xl font-bold mb-2" style={{ color: 'hsl(240 10% 15%)' }}>Knowledge Tags</h3>
+                <p className="text-sm" style={{ color: 'hsl(240 5% 45%)' }}>
+                  Simple "I know X" tags. Find who knows what in seconds.
+                </p>
+              </motion.div>
+
+              {/* Slack integration - wide card */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="md:col-span-3 rounded-3xl p-8 flex items-center justify-between group"
+                style={{ backgroundColor: 'hsl(240 5% 96%)' }}
+              >
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#4A154B' }}>
+                    <Slack className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold mb-1" style={{ color: 'hsl(240 10% 15%)' }}>Native Slack Integration</h3>
+                    <p style={{ color: 'hsl(240 5% 45%)' }}>Nudges delivered as DMs. One-click OAuth. Works where you already are.</p>
+                  </div>
+                </div>
+                <ArrowRight className="w-6 h-6 text-gray-400 group-hover:translate-x-2 transition-transform" />
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* How It Works - Modern Steps */}
         <section id="how-it-works" className="py-24 px-6" style={{ backgroundColor: 'white' }}>
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6" style={{
-                backgroundColor: 'hsla(262, 55%, 55%, 0.1)',
-                color: 'hsl(262 55% 55%)'
-              }}>
-                How It Works
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'hsl(260 25% 18%)' }}>
-                Up and running in <span style={{ color: 'hsl(262 55% 55%)' }}>3 minutes</span>
-              </h2>
-              <p className="text-lg" style={{ color: 'hsl(260 10% 45%)' }}>No complex setup. No training needed.</p>
-            </motion.div>
-
-            <div className="space-y-6">
-              {[
-                {
-                  step: "01",
-                  title: "Set Your Availability",
-                  description: "Drag to select your available hours. Timezone auto-detected. Toggle \"available now\" when you're free.",
-                  icon: Calendar,
-                },
-                {
-                  step: "02",
-                  title: "Tag Your Knowledge",
-                  description: "Add simple tags for what you know: \"Salesforce API\", \"SQL debugging\", \"Tax setup\". That's it.",
-                  icon: Search,
-                },
-                {
-                  step: "03",
-                  title: "Send & Receive Nudges",
-                  description: "Find someone who can help, suggest a time, and they get a Slack DM with everything needed to say yes.",
-                  icon: MessageCircle,
-                },
-              ].map((item, index) => (
-                <motion.div
-                  key={item.step}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex gap-6 items-center p-6 rounded-2xl"
-                  style={{ backgroundColor: 'hsl(48 50% 97%)' }}
-                >
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0" style={{
-                    backgroundColor: 'hsl(262 55% 55%)',
-                    color: 'white'
-                  }}>
-                    <item.icon className="w-7 h-7" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="text-sm font-bold" style={{ color: 'hsl(262 55% 55%)' }}>{item.step}</span>
-                      <h3 className="text-xl font-bold" style={{ color: 'hsl(260 25% 18%)' }}>{item.title}</h3>
-                    </div>
-                    <p style={{ color: 'hsl(260 10% 45%)' }}>{item.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Teams Section */}
-        <section id="teams" className="py-24 px-6" style={{ backgroundColor: 'hsl(48 50% 96%)' }}>
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -503,96 +458,112 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6" style={{
-                backgroundColor: 'hsla(262, 40%, 55%, 0.08)',
-                color: 'hsl(260 20% 35%)'
-              }}>
-                For Teams
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'hsl(260 25% 18%)' }}>
-                Built for <span style={{ color: 'hsl(262 55% 55%)' }}>distributed</span> teams
+              <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'hsl(240 10% 15%)' }}>
+                Setup in <span style={{ color: 'hsl(262 60% 50%)' }}>under 3 minutes</span>
               </h2>
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                {
-                  title: "Remote Startups",
-                  description: "5-20 people across multiple time zones. Quick coordination without overhead.",
-                  example: "Teams in Turkey, Arizona, and California",
-                },
-                {
-                  title: "Support Teams",
-                  description: "Knowledge gaps on product issues. Different shifts, need fast answers.",
-                  example: "\"Who handled this tax issue before?\"",
-                },
-                {
-                  title: "Open Source",
-                  description: "Global contributors. Coordinate reviews and help requests across time zones.",
-                  example: "Maintainers in EU, contributors in Asia",
-                },
-              ].map((audience, index) => (
+                { num: "01", title: "Set availability", desc: "Drag to select hours. Timezone auto-detected." },
+                { num: "02", title: "Tag knowledge", desc: "Add what you know: \"React\", \"Tax compliance\"" },
+                { num: "03", title: "Start nudging", desc: "Find help, suggest times, send via Slack." },
+              ].map((step, i) => (
                 <motion.div
-                  key={audience.title}
+                  key={step.num}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="rounded-2xl p-6"
-                  style={{ backgroundColor: 'white' }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-center"
                 >
-                  <h3 className="text-xl font-bold mb-3" style={{ color: 'hsl(262 55% 55%)' }}>{audience.title}</h3>
-                  <p className="mb-4" style={{ color: 'hsl(260 10% 45%)' }}>{audience.description}</p>
-                  <p className="text-sm italic" style={{ color: 'hsl(260 10% 55%)' }}>{audience.example}</p>
+                  <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold" style={{
+                    backgroundColor: 'hsl(262 60% 50%)',
+                    color: 'white'
+                  }}>
+                    {step.num}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2" style={{ color: 'hsl(240 10% 15%)' }}>{step.title}</h3>
+                  <p style={{ color: 'hsl(240 5% 45%)' }}>{step.desc}</p>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-24 px-6" style={{ backgroundColor: 'hsla(262, 55%, 55%, 0.04)' }}>
+        {/* Social Proof / Trust */}
+        <section className="py-16 px-6" style={{ backgroundColor: 'hsl(0 0% 98%)' }}>
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <p className="text-sm font-medium mb-6" style={{ color: 'hsl(240 5% 50%)' }}>BUILT FOR TEAMS LIKE</p>
+              <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
+                {['Remote Startups', 'Support Teams', 'Open Source', 'Agencies'].map((team) => (
+                  <span key={team} className="text-xl font-semibold" style={{ color: 'hsl(240 10% 30%)' }}>{team}</span>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Section - Modern gradient */}
+        <section className="py-24 px-6 relative overflow-hidden" style={{ backgroundColor: 'hsl(262 60% 50%)' }}>
+          {/* Background decoration */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] rounded-full bg-white/5" />
+            <div className="absolute -bottom-1/2 -left-1/4 w-[600px] h-[600px] rounded-full bg-white/5" />
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-3xl mx-auto text-center relative z-10"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: 'hsl(260 25% 18%)' }}>
-              Ready to fix <span style={{ color: 'hsl(262 55% 55%)' }}>coordination</span>?
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Stop the coordination chaos
             </h2>
-            <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: 'hsl(260 10% 45%)' }}>
-              Stop wasting time on timezone math and Slack chaos. Start coordinating in seconds.
+            <p className="text-xl mb-10 text-white/80">
+              Join teams who've simplified how they find and help each other.
             </p>
-            <Link href="/signup">
-              <Button size="lg" className="rounded-full px-10 h-14 text-lg font-semibold gap-2" style={{
-                backgroundColor: 'hsl(262 55% 55%)',
-                color: 'white',
-                boxShadow: '0 8px 30px hsla(262, 55%, 55%, 0.25)'
-              }}>
-                <Zap className="w-5 h-5" />
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup">
+                <Button size="lg" className="rounded-full px-10 h-14 text-lg font-semibold gap-2 hover:scale-105 transition-transform" style={{
+                  backgroundColor: 'white',
+                  color: 'hsl(262 60% 50%)'
+                }}>
+                  <Zap className="w-5 h-5" />
+                  Get Started Free
+                </Button>
+              </Link>
+              <Link href="#how-it-works">
+                <Button size="lg" variant="ghost" className="rounded-full px-10 h-14 text-lg font-semibold text-white hover:bg-white/10">
+                  Learn More
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </section>
 
-        {/* Footer */}
-        <footer className="py-8 px-6" style={{ backgroundColor: 'white' }}>
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="font-bold" style={{ color: 'hsl(262 55% 55%)' }}>Mesh</span>
-              <span className="font-bold" style={{ color: 'hsl(260 25% 18%)' }}>flow</span>
-              <span className="text-sm ml-2" style={{ color: 'hsl(260 10% 55%)' }}>© 2025</span>
+        {/* Footer - Minimal */}
+        <footer className="py-12 px-6" style={{ backgroundColor: 'hsl(240 10% 10%)' }}>
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xl text-white">Mesh</span>
+                <span className="font-bold text-xl" style={{ color: 'hsl(262 60% 65%)' }}>flow</span>
+              </div>
+              <div className="flex gap-8 text-sm text-gray-400">
+                <Link href="/login" className="hover:text-white transition-colors">Login</Link>
+                <Link href="/signup" className="hover:text-white transition-colors">Get Started</Link>
+              </div>
             </div>
-            <div className="flex gap-8 text-sm" style={{ color: 'hsl(260 10% 50%)' }}>
-              <Link href="/login" className="hover:opacity-70 transition-opacity">
-                Login
-              </Link>
-              <Link href="/signup" className="hover:opacity-70 transition-opacity">
-                Get Started
-              </Link>
+            <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+              © 2025 Meshflow. Built for distributed teams.
             </div>
           </div>
         </footer>
