@@ -13,239 +13,146 @@ import {
   Search,
   CheckCircle2,
   Slack,
+  Sparkles,
+  Play,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Head from "next/head";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as const },
+    transition: { duration: 0.5, ease: "easeOut" as const },
   },
 };
 
 const stagger = {
   visible: {
     transition: {
-      staggerChildren: 0.12,
+      staggerChildren: 0.1,
     },
   },
-};
-
-// Professional color palette
-const colors = {
-  primary: "#0d9488", // Teal - growth, connection
-  primaryLight: "#14b8a6",
-  primaryDark: "#0f766e",
-  accent: "#f59e0b", // Amber - energy, urgency
-  background: "#fcfcfc",
-  surface: "#FFFFFF",
-  text: "#1a1a2e",
-  textMuted: "#64748b",
-  border: "#e2e8f0",
-  success: "#10b981",
 };
 
 export default function LandingPage() {
   return (
     <>
-      {/* SEO Meta Tags */}
       <Head>
         <title>Meshflow - Coordinate Help Across Time Zones for Remote Teams</title>
         <meta
           name="description"
-          content="Visual team availability, contextual help requests, and Slack integration. Free alternative to Calendly for small remote teams."
+          content="Visual team availability, contextual help requests, and Slack integration. The modern way to coordinate remote teams."
         />
-        <meta
-          property="og:title"
-          content="Meshflow - Remote Team Coordination Made Simple"
-        />
-        <meta
-          property="og:description"
-          content="Know who to ask, when they're free, and coordinate help in seconds. Built for distributed startups and support teams."
-        />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://meshflow.app" />
       </Head>
 
-      <div
-        className="min-h-screen overflow-hidden"
-        style={{ backgroundColor: colors.background }}
-      >
+      <div className="min-h-screen bg-background text-foreground overflow-hidden">
         {/* Navigation */}
-        <nav
-          className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
-          style={{
-            backgroundColor: `${colors.background}ee`,
-            borderColor: colors.border,
-          }}
-        >
-          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-12">
-              <Link href="/" className="flex items-center">
-                <span
-                  style={{ color: colors.primary }}
-                  className="font-bold text-xl"
-                >
-                  Mesh
-                </span>
-                <span style={{ color: colors.text }} className="font-bold text-xl">
-                  flow
-                </span>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+          <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-10">
+              <Link href="/" className="flex items-center gap-1">
+                <span className="text-primary font-bold text-xl">Mesh</span>
+                <span className="font-bold text-xl">flow</span>
               </Link>
               <div className="hidden md:flex items-center gap-8">
                 <Link
-                  href="#problem"
-                  className="text-sm font-medium transition-colors hover:opacity-70"
-                  style={{ color: colors.text }}
-                >
-                  THE PROBLEM
-                </Link>
-                <Link
                   href="#features"
-                  className="text-sm font-medium transition-colors hover:opacity-70"
-                  style={{ color: colors.text }}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  FEATURES
+                  Features
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="text-sm font-medium transition-colors hover:opacity-70"
-                  style={{ color: colors.text }}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  HOW IT WORKS
+                  How it works
+                </Link>
+                <Link
+                  href="#teams"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  For Teams
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/signup">
-                <Button
-                  className="font-medium px-5 rounded-full text-white"
-                  style={{ backgroundColor: colors.primary }}
-                >
-                  Start Free
+              <ThemeToggle />
+              <Link href="/login">
+                <Button variant="ghost" className="font-medium">
+                  Log in
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  className="font-medium px-5 rounded-full shadow-sm"
-                  style={{
-                    backgroundColor: colors.surface,
-                    color: colors.text,
-                    borderColor: colors.border,
-                  }}
-                >
-                  Login
+              <Link href="/signup">
+                <Button className="font-medium rounded-full px-5">
+                  Get Started
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>
           </div>
         </nav>
 
-        {/* Hero Section - New Positioning */}
-        <section className="pt-32 pb-20 px-6 relative min-h-[90vh] flex items-center">
-          {/* Decorative elements */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none hidden lg:block overflow-hidden">
-            <div
-              className="absolute top-20 right-20 w-64 h-64 rounded-full opacity-10"
-              style={{ backgroundColor: colors.primary }}
-            />
-            <div
-              className="absolute top-40 right-40 w-96 h-96 rounded-full opacity-5"
-              style={{ backgroundColor: colors.primaryDark }}
-            />
-            <div
-              className="absolute bottom-40 right-10 w-48 h-48 rounded-full opacity-10"
-              style={{ backgroundColor: colors.accent }}
-            />
+        {/* Hero Section */}
+        <section className="pt-32 pb-24 px-6 relative">
+          {/* Background gradient orbs */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute top-60 -left-40 w-[400px] h-[400px] rounded-full bg-accent/10 blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] rounded-full bg-primary/5 blur-3xl" />
           </div>
 
-          <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="max-w-6xl mx-auto relative z-10">
             <motion.div
               variants={stagger}
               initial="hidden"
               animate="visible"
-              className="max-w-2xl"
+              className="text-center max-w-3xl mx-auto"
             >
               {/* Badge */}
-              <motion.div variants={fadeIn} className="mb-6">
-                <span
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-sm"
-                  style={{
-                    backgroundColor: `${colors.primary}15`,
-                    color: colors.primary,
-                  }}
-                >
-                  <Globe className="w-4 h-4" />
-                  Built for Remote Teams
+              <motion.div variants={fadeIn} className="mb-8">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20">
+                  <Sparkles className="w-4 h-4" />
+                  Built for remote-first teams
                 </span>
               </motion.div>
 
-              {/* Headline - New Value Prop */}
+              {/* Headline */}
               <motion.h1
                 variants={fadeIn}
-                className="text-5xl md:text-6xl font-bold mb-2 leading-[1.1]"
-                style={{ color: colors.text }}
+                className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight"
               >
-                Coordinate help
-              </motion.h1>
-              <motion.h1
-                variants={fadeIn}
-                className="text-5xl md:text-6xl font-bold mb-8 leading-[1.1]"
-                style={{ color: colors.primary }}
-              >
-                across time zones.
+                Stop the timezone
+                <br />
+                <span className="text-primary">coordination chaos</span>
               </motion.h1>
 
               {/* Sub-headline */}
               <motion.p
                 variants={fadeIn}
-                className="text-xl mb-4 leading-relaxed max-w-lg font-medium"
-                style={{ color: colors.text }}
+                className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
               >
-                No Calendly. No Slack chaos.
-              </motion.p>
-
-              {/* Description */}
-              <motion.p
-                variants={fadeIn}
-                className="text-lg mb-10 leading-relaxed max-w-lg"
-                style={{ color: colors.textMuted }}
-              >
-                See who's available, send contextual help requests, and schedule
-                quick calls—all without the back-and-forth. Built for distributed
-                startups, support teams, and open source communities.
+                See who's available, find who knows what, and schedule help—all without the endless Slack threads.
               </motion.p>
 
               {/* CTAs */}
-              <motion.div variants={fadeIn} className="flex flex-wrap gap-4">
+              <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-4 mb-12">
                 <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="rounded-full px-8 h-12 text-base font-medium text-white gap-2"
-                    style={{ backgroundColor: colors.primary }}
-                  >
-                    <Zap className="w-4 h-4" />
-                    Get Started Free
+                  <Button size="lg" className="rounded-full px-8 h-14 text-base font-semibold gap-2 shadow-lg shadow-primary/25">
+                    <Zap className="w-5 h-5" />
+                    Start for Free
                   </Button>
                 </Link>
                 <Link href="#how-it-works">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="rounded-full px-8 h-12 text-base font-medium shadow-sm gap-2"
-                    style={{
-                      backgroundColor: colors.surface,
-                      color: colors.text,
-                      borderColor: colors.border,
-                    }}
+                    className="rounded-full px-8 h-14 text-base font-semibold gap-2"
                   >
+                    <Play className="w-5 h-5" />
                     See How It Works
-                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               </motion.div>
@@ -253,34 +160,99 @@ export default function LandingPage() {
               {/* Social Proof */}
               <motion.div
                 variants={fadeIn}
-                className="mt-10 flex items-center gap-4 text-sm"
-                style={{ color: colors.textMuted }}
+                className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground"
               >
                 <div className="flex items-center gap-2">
-                  <CheckCircle2
-                    className="w-4 h-4"
-                    style={{ color: colors.success }}
-                  />
-                  <span>Free forever for small teams</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                  <span>Free for teams under 10</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2
-                    className="w-4 h-4"
-                    style={{ color: colors.success }}
-                  />
-                  <span>Slack integration</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                  <span>No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                  <span>Slack integration included</span>
                 </div>
               </motion.div>
+            </motion.div>
+
+            {/* Hero Visual - App Preview */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mt-20 relative"
+            >
+              <div className="bg-card rounded-2xl border border-border shadow-2xl shadow-primary/10 overflow-hidden max-w-4xl mx-auto">
+                <div className="p-1 bg-muted/50 flex items-center gap-2">
+                  <div className="flex gap-1.5 ml-3">
+                    <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                    <div className="w-3 h-3 rounded-full bg-warning/60" />
+                    <div className="w-3 h-3 rounded-full bg-success/60" />
+                  </div>
+                  <div className="flex-1 text-center text-xs text-muted-foreground font-medium">
+                    meshflow.app/dashboard
+                  </div>
+                </div>
+                <div className="p-8 bg-gradient-to-b from-card to-muted/20">
+                  <div className="grid grid-cols-3 gap-6">
+                    {/* Availability Preview */}
+                    <div className="col-span-2 bg-background rounded-xl p-5 border border-border">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Calendar className="w-5 h-5 text-primary" />
+                        <span className="font-semibold">Team Availability</span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+                          <div key={i} className="text-center text-xs text-muted-foreground font-medium">{day}</div>
+                        ))}
+                        {Array.from({ length: 21 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-6 rounded ${
+                              [0, 1, 2, 7, 8, 9, 14, 15, 16].includes(i)
+                                ? 'bg-primary/30'
+                                : [3, 4, 10, 11, 17, 18].includes(i)
+                                ? 'bg-primary/15'
+                                : 'bg-muted'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {/* Team Members */}
+                    <div className="bg-background rounded-xl p-5 border border-border">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Users className="w-5 h-5 text-primary" />
+                        <span className="font-semibold">Online Now</span>
+                      </div>
+                      <div className="space-y-3">
+                        {['Sarah', 'Mike', 'Priya'].map((name, i) => (
+                          <div key={name} className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
+                              {name[0]}
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium">{name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {i === 0 ? 'Available' : i === 1 ? 'In a meeting' : 'Away'}
+                              </div>
+                            </div>
+                            <div className={`w-2 h-2 rounded-full ml-auto ${i === 0 ? 'bg-success' : i === 1 ? 'bg-warning' : 'bg-muted-foreground'}`} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
 
         {/* Problem Section */}
-        <section
-          id="problem"
-          className="py-24 px-6"
-          style={{ backgroundColor: colors.text }}
-        >
+        <section className="py-24 px-6 bg-card border-y border-border">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -288,44 +260,33 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span
-                className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6"
-                style={{
-                  backgroundColor: `${colors.accent}30`,
-                  color: colors.accent,
-                }}
-              >
+              <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-accent/20 text-accent-foreground">
                 The Problem
               </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-                Remote work coordination is broken
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Remote coordination is <span className="text-primary">broken</span>
               </h2>
-              <p className="text-lg max-w-2xl mx-auto" style={{ color: "#A8A29E" }}>
-                Your team has answers—but no one knows who to ask or when they're
-                free.
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Your team has answers—but no one knows who to ask or when they're free.
               </p>
             </motion.div>
 
-            {/* Problem Cards */}
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
                   icon: Clock,
-                  title: "Time Zone Math",
-                  description:
-                    "\"Is 3pm my time or yours?\" You're constantly calculating offsets and missing each other's availability windows.",
+                  title: "Timezone Math",
+                  description: "\"Is 3pm my time or yours?\" Constantly calculating offsets and missing availability windows.",
                 },
                 {
                   icon: Search,
-                  title: "Who Do I Ask?",
-                  description:
-                    "Deep product knowledge lives in people's heads. It's not on Google, Stack Overflow, or your wiki. But someone on your team knows.",
+                  title: "Hidden Expertise",
+                  description: "Knowledge lives in people's heads. Someone knows the answer—but who?",
                 },
                 {
                   icon: MessageCircle,
                   title: "Slack Chaos",
-                  description:
-                    "DMs flying everywhere, threads buried, no context. You spend more time coordinating than actually getting help.",
+                  description: "DMs flying everywhere, threads buried. More time coordinating than getting help.",
                 },
               ].map((problem, index) => (
                 <motion.div
@@ -334,31 +295,21 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="rounded-2xl p-6"
-                  style={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+                  className="rounded-2xl p-6 bg-background border border-border"
                 >
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${colors.accent}30` }}
-                  >
-                    <problem.icon className="w-6 h-6" style={{ color: colors.accent }} />
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
+                    <problem.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-white">
-                    {problem.title}
-                  </h3>
-                  <p style={{ color: "#A8A29E" }}>{problem.description}</p>
+                  <h3 className="text-lg font-semibold mb-2">{problem.title}</h3>
+                  <p className="text-muted-foreground">{problem.description}</p>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Solution / Features Section */}
-        <section
-          id="features"
-          className="py-24 px-6"
-          style={{ backgroundColor: colors.background }}
-        >
+        {/* Features Section */}
+        <section id="features" className="py-24 px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -366,290 +317,69 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span
-                className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6"
-                style={{
-                  backgroundColor: `${colors.primary}15`,
-                  color: colors.primary,
-                }}
-              >
-                The Solution
+              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6 bg-primary/10 text-primary">
+                Features
               </span>
-              <h2
-                className="text-4xl md:text-5xl font-bold mb-4"
-                style={{ color: colors.text }}
-              >
-                Meshflow makes it simple
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Everything you need to <span className="text-primary">coordinate</span>
               </h2>
-              <p
-                className="text-lg max-w-xl mx-auto"
-                style={{ color: colors.textMuted }}
-              >
-                Visual availability + contextual nudges + Slack integration
+              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+                Visual availability, smart nudges, and Slack integration—all in one place.
               </p>
             </motion.div>
 
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              {/* Feature 1 - Availability Grid */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="rounded-3xl p-8 shadow-md"
-                style={{ backgroundColor: colors.surface }}
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                  style={{ backgroundColor: `${colors.primary}15` }}
-                >
-                  <Calendar className="w-7 h-7" style={{ color: colors.primary }} />
-                </div>
-                <h3
-                  className="text-2xl font-bold mb-3"
-                  style={{ color: colors.text }}
-                >
-                  Visual Availability Grid
-                </h3>
-                <p className="mb-4" style={{ color: colors.textMuted }}>
-                  See your team's availability at a glance. Timezone-aware and
-                  always up to date. Know instantly who's free right now or later
-                  today.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Auto-detect timezone",
-                    "\"Currently available\" live status",
-                    "See overlap with teammates",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm"
-                      style={{ color: colors.textMuted }}
-                    >
-                      <CheckCircle2
-                        className="w-4 h-4"
-                        style={{ color: colors.success }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-
-              {/* Feature 2 - Contextual Nudges */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="rounded-3xl p-8 shadow-md"
-                style={{ backgroundColor: colors.surface }}
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                  style={{ backgroundColor: `${colors.accent}20` }}
-                >
-                  <Zap className="w-7 h-7" style={{ color: colors.accent }} />
-                </div>
-                <h3
-                  className="text-2xl font-bold mb-3"
-                  style={{ color: colors.text }}
-                >
-                  Contextual Nudges
-                </h3>
-                <p className="mb-4" style={{ color: colors.textMuted }}>
-                  Send help requests with context. Choose meeting length, suggest
-                  times from overlapping availability, preview before sending.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Quick call (15min) or deep dive (1hr)",
-                    "Auto-suggest meeting times",
-                    "Async option for different shifts",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm"
-                      style={{ color: colors.textMuted }}
-                    >
-                      <CheckCircle2
-                        className="w-4 h-4"
-                        style={{ color: colors.success }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-
-              {/* Feature 3 - Knowledge Tags */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="rounded-3xl p-8 shadow-md"
-                style={{ backgroundColor: colors.surface }}
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                  style={{ backgroundColor: `${colors.primary}15` }}
-                >
-                  <Search className="w-7 h-7" style={{ color: colors.primary }} />
-                </div>
-                <h3
-                  className="text-2xl font-bold mb-3"
-                  style={{ color: colors.text }}
-                >
-                  Lightweight Knowledge Tags
-                </h3>
-                <p className="mb-4" style={{ color: colors.textMuted }}>
-                  Not skills with proficiency levels. Just simple "I know X" tags.
-                  Search for "Salesforce API" and find who on your team can help.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Tag yourself: \"Rippling tax setup\"",
-                    "Search across your pod",
-                    "No complex skill databases",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm"
-                      style={{ color: colors.textMuted }}
-                    >
-                      <CheckCircle2
-                        className="w-4 h-4"
-                        style={{ color: colors.success }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-
-              {/* Feature 4 - Slack Integration */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                className="rounded-3xl p-8 shadow-md"
-                style={{ backgroundColor: colors.surface }}
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                  style={{ backgroundColor: "#4A154B20" }}
-                >
-                  <Slack className="w-7 h-7" style={{ color: "#4A154B" }} />
-                </div>
-                <h3
-                  className="text-2xl font-bold mb-3"
-                  style={{ color: colors.text }}
-                >
-                  Slack Native
-                </h3>
-                <p className="mb-4" style={{ color: colors.textMuted }}>
-                  Nudges delivered as Slack DMs. No new app to check. Works where
-                  your team already communicates.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    "Direct messages, not channels",
-                    "One-click OAuth connect",
-                    "Meeting links included",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm"
-                      style={{ color: colors.textMuted }}
-                    >
-                      <CheckCircle2
-                        className="w-4 h-4"
-                        style={{ color: colors.success }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-
-        {/* Who It's For Section */}
-        <section
-          className="py-24 px-6"
-          style={{ backgroundColor: `${colors.primary}08` }}
-        >
-          <div className="max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <span
-                className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6"
-                style={{ backgroundColor: colors.surface, color: colors.textMuted }}
-              >
-                Who It's For
-              </span>
-              <h2
-                className="text-4xl md:text-5xl font-bold mb-4"
-                style={{ color: colors.text }}
-              >
-                Built for distributed teams
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 gap-8">
               {[
                 {
-                  title: "Remote Startups",
-                  description:
-                    "5-20 people across multiple time zones. Can't afford Calendly. Need quick coordination without overhead.",
-                  example: "Team in Turkey, Arizona, and California",
+                  icon: Calendar,
+                  title: "Visual Availability Grid",
+                  description: "See your team's availability at a glance. Timezone-aware and always up to date.",
+                  features: ["Auto-detect timezone", "\"Available now\" status", "See overlap with teammates"],
+                  color: "primary",
                 },
                 {
-                  title: "Customer Support Teams",
-                  description:
-                    "Knowledge gaps on product-specific issues. Different shifts, remote. Need fast answers during customer calls.",
-                  example: "\"Who handled this tax reconciliation issue before?\"",
+                  icon: Zap,
+                  title: "Smart Nudges",
+                  description: "Send help requests with context. Choose meeting length, suggest times automatically.",
+                  features: ["15min to 1hr options", "Auto-suggest times", "Async option for different shifts"],
+                  color: "accent",
                 },
                 {
-                  title: "Open Source Communities",
-                  description:
-                    "Global contributors, no formal Slack. Need to coordinate reviews and help requests across time zones.",
-                  example: "Maintainers in Europe, contributors in Asia",
+                  icon: Search,
+                  title: "Knowledge Discovery",
+                  description: "Simple \"I know X\" tags. Search for expertise and find who can help.",
+                  features: ["Lightweight tagging", "Fuzzy search", "No complex skill databases"],
+                  color: "primary",
                 },
-              ].map((audience, index) => (
+                {
+                  icon: Slack,
+                  title: "Slack Native",
+                  description: "Nudges delivered as Slack DMs. Works where your team already communicates.",
+                  features: ["Direct messages", "One-click OAuth", "Meeting links included"],
+                  color: "accent",
+                },
+              ].map((feature, index) => (
                 <motion.div
-                  key={audience.title}
+                  key={feature.title}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="rounded-2xl p-6 shadow-md"
-                  style={{ backgroundColor: colors.surface }}
+                  className="rounded-2xl p-8 bg-card border border-border hover:border-primary/30 transition-colors"
                 >
-                  <h3
-                    className="text-xl font-bold mb-3"
-                    style={{ color: colors.primary }}
-                  >
-                    {audience.title}
-                  </h3>
-                  <p className="mb-4" style={{ color: colors.textMuted }}>
-                    {audience.description}
-                  </p>
-                  <p
-                    className="text-sm italic"
-                    style={{ color: colors.textMuted }}
-                  >
-                    {audience.example}
-                  </p>
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.color === 'primary' ? 'bg-primary/10' : 'bg-accent/20'}`}>
+                    <feature.icon className={`w-7 h-7 ${feature.color === 'primary' ? 'text-primary' : 'text-accent'}`} />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-muted-foreground mb-4">{feature.description}</p>
+                  <ul className="space-y-2">
+                    {feature.features.map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </motion.div>
               ))}
             </div>
@@ -657,11 +387,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works */}
-        <section
-          id="how-it-works"
-          className="py-24 px-6"
-          style={{ backgroundColor: colors.background }}
-        >
+        <section id="how-it-works" className="py-24 px-6 bg-card border-y border-border">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -669,24 +395,13 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span
-                className="inline-block px-4 py-2 rounded-full text-sm font-medium shadow-sm mb-6"
-                style={{
-                  backgroundColor: `${colors.primary}15`,
-                  color: colors.primary,
-                }}
-              >
+              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6 bg-primary/10 text-primary">
                 How It Works
               </span>
-              <h2
-                className="text-4xl md:text-5xl font-bold mb-4"
-                style={{ color: colors.text }}
-              >
-                Get started in 3 minutes
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Up and running in <span className="text-primary">3 minutes</span>
               </h2>
-              <p className="text-lg max-w-xl mx-auto" style={{ color: colors.textMuted }}>
-                No complex setup. No training needed.
-              </p>
+              <p className="text-lg text-muted-foreground">No complex setup. No training needed.</p>
             </motion.div>
 
             <div className="space-y-6">
@@ -694,22 +409,19 @@ export default function LandingPage() {
                 {
                   step: "01",
                   title: "Set Your Availability",
-                  description:
-                    "Drag to select your available hours. Timezone auto-detected. Toggle \"available now\" when you're free to help.",
+                  description: "Drag to select your available hours. Timezone auto-detected. Toggle \"available now\" when you're free.",
                   icon: Calendar,
                 },
                 {
                   step: "02",
                   title: "Tag Your Knowledge",
-                  description:
-                    "Add simple tags for what you know: \"Rippling setup\", \"SQL debugging\", \"Salesforce API\". No proficiency levels.",
+                  description: "Add simple tags for what you know: \"Salesforce API\", \"SQL debugging\", \"Tax setup\". That's it.",
                   icon: Search,
                 },
                 {
                   step: "03",
                   title: "Send & Receive Nudges",
-                  description:
-                    "Search for help, pick a teammate, suggest a time. They get a Slack DM with everything they need to say yes.",
+                  description: "Find someone who can help, suggest a time, and they get a Slack DM with everything needed to say yes.",
                   icon: MessageCircle,
                 },
               ].map((item, index) => (
@@ -718,32 +430,18 @@ export default function LandingPage() {
                   initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.15, duration: 0.5 }}
-                  className="flex gap-6 items-center p-6 rounded-2xl shadow-md"
-                  style={{ backgroundColor: colors.surface }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex gap-6 items-center p-6 rounded-2xl bg-background border border-border"
                 >
-                  <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: colors.primary }}
-                  >
-                    <item.icon className="w-7 h-7 text-white" />
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 bg-primary text-primary-foreground">
+                    <item.icon className="w-7 h-7" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: colors.primary }}
-                      >
-                        {item.step}
-                      </span>
-                      <h3
-                        className="text-xl font-bold"
-                        style={{ color: colors.text }}
-                      >
-                        {item.title}
-                      </h3>
+                      <span className="text-sm font-bold text-primary">{item.step}</span>
+                      <h3 className="text-xl font-bold">{item.title}</h3>
                     </div>
-                    <p style={{ color: colors.textMuted }}>{item.description}</p>
+                    <p className="text-muted-foreground">{item.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -751,95 +449,98 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Manager Controls Callout */}
-        <section className="py-16 px-6" style={{ backgroundColor: `${colors.primary}10` }}>
-          <div className="max-w-4xl mx-auto">
+        {/* Teams Section */}
+        <section id="teams" className="py-24 px-6">
+          <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-3xl shadow-lg"
-              style={{ backgroundColor: colors.surface }}
+              className="text-center mb-16"
             >
-              <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: `${colors.primary}15` }}
-              >
-                <Users className="w-10 h-10" style={{ color: colors.primary }} />
-              </div>
-              <div className="flex-1 text-center md:text-left">
-                <h3
-                  className="text-2xl font-bold mb-2"
-                  style={{ color: colors.text }}
-                >
-                  Manager-Controlled Pods
-                </h3>
-                <p style={{ color: colors.textMuted }}>
-                  One manager creates a pod per team. No chaos, no spam, no
-                  unwanted requests. Optionally open for cross-team help.
-                </p>
-              </div>
+              <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-6 bg-secondary text-secondary-foreground">
+                For Teams
+              </span>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Built for <span className="text-primary">distributed</span> teams
+              </h2>
             </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Remote Startups",
+                  description: "5-20 people across multiple time zones. Quick coordination without overhead.",
+                  example: "Teams in Turkey, Arizona, and California",
+                },
+                {
+                  title: "Support Teams",
+                  description: "Knowledge gaps on product issues. Different shifts, need fast answers.",
+                  example: "\"Who handled this tax issue before?\"",
+                },
+                {
+                  title: "Open Source",
+                  description: "Global contributors. Coordinate reviews and help requests across time zones.",
+                  example: "Maintainers in EU, contributors in Asia",
+                },
+              ].map((audience, index) => (
+                <motion.div
+                  key={audience.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="rounded-2xl p-6 bg-card border border-border"
+                >
+                  <h3 className="text-xl font-bold mb-3 text-primary">{audience.title}</h3>
+                  <p className="text-muted-foreground mb-4">{audience.description}</p>
+                  <p className="text-sm italic text-muted-foreground">{audience.example}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-6" style={{ backgroundColor: colors.text }}>
+        <section className="py-24 px-6 bg-primary/5 border-t border-border">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="max-w-3xl mx-auto text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Ready to fix coordination?
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to fix <span className="text-primary">coordination</span>?
             </h2>
-            <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: "#A8A29E" }}>
-              Stop wasting time on timezone math and Slack chaos. Start
-              coordinating help in seconds.
+            <p className="text-xl text-muted-foreground mb-10 max-w-xl mx-auto">
+              Stop wasting time on timezone math and Slack chaos. Start coordinating in seconds.
             </p>
             <Link href="/signup">
-              <Button
-                size="lg"
-                className="rounded-full px-10 h-14 text-lg font-medium text-white gap-2"
-                style={{ backgroundColor: colors.primary }}
-              >
+              <Button size="lg" className="rounded-full px-10 h-14 text-lg font-semibold gap-2 shadow-lg shadow-primary/25">
                 <Zap className="w-5 h-5" />
                 Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <p className="text-sm mt-6" style={{ color: "#A8A29E" }}>
-              Free forever for teams under 10 • No credit card required
+            <p className="text-sm text-muted-foreground mt-6">
+              Free forever for small teams • No credit card required
             </p>
           </motion.div>
         </section>
 
         {/* Footer */}
-        <footer className="py-8 px-6" style={{ backgroundColor: "#0f0f1a" }}>
+        <footer className="py-8 px-6 bg-card border-t border-border">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-white">Mesh</span>
-              <span className="font-bold" style={{ color: colors.primaryLight }}>
-                flow
-              </span>
-              <span className="text-sm ml-2" style={{ color: "#A8A29E" }}>
-                © 2025
-              </span>
+              <span className="font-bold text-primary">Mesh</span>
+              <span className="font-bold">flow</span>
+              <span className="text-sm text-muted-foreground ml-2">© 2025</span>
             </div>
-            <div className="flex gap-8 text-sm">
-              <Link
-                href="/login"
-                className="transition-colors hover:opacity-80"
-                style={{ color: "#A8A29E" }}
-              >
+            <div className="flex gap-8 text-sm text-muted-foreground">
+              <Link href="/login" className="hover:text-foreground transition-colors">
                 Login
               </Link>
-              <Link
-                href="/signup"
-                className="transition-colors hover:opacity-80"
-                style={{ color: "#A8A29E" }}
-              >
+              <Link href="/signup" className="hover:text-foreground transition-colors">
                 Get Started
               </Link>
             </div>

@@ -24,21 +24,54 @@ const SUGGESTED_KNOWLEDGE_AREAS = [
   "Copywriting", "SEO", "Growth", "Operations", "Legal", "Security",
 ];
 
+// Consolidated profile type to avoid state sync issues
+interface ProfileData {
+  firstName: string;
+  lastName: string;
+  department: string;
+  major: string;
+  bio: string;
+  knowledgeAreas: string[];
+  timezone: string;
+  availabilitySlots: AvailabilitySlot[];
+  currentlyAvailable: boolean;
+  lookingToHelp: boolean;
+  email: string;
+  emailNotifications: boolean;
+  slackHandle: string;
+  slackConnected: boolean;
+  slackUserId: string;
+}
+
+const DEFAULT_PROFILE: ProfileData = {
+  firstName: "",
+  lastName: "",
+  department: "",
+  major: "",
+  bio: "",
+  knowledgeAreas: [],
+  timezone: "America/New_York",
+  availabilitySlots: [],
+  currentlyAvailable: false,
+  lookingToHelp: false,
+  email: "",
+  emailNotifications: true,
+  slackHandle: "",
+  slackConnected: false,
+  slackUserId: "",
+};
+
 export default function SettingsPage() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [profile, setProfile] = useState<any>(null);
+  // Consolidated profile state - all editable fields in one place
+  const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [knowledgeInput, setKnowledgeInput] = useState("");
-  const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
-  const [timezone, setTimezone] = useState("America/New_York");
-  const [currentlyAvailable, setCurrentlyAvailable] = useState(false);
-  const [lookingToHelp, setLookingToHelp] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailNotifications, setEmailNotifications] = useState(true);
   const [slackConnecting, setSlackConnecting] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
+  const isInitialLoad = useRef(true);
 
   const supabase = createClient();
 
@@ -81,30 +114,36 @@ export default function SettingsPage() {
         .single();
 
       if (data) {
-        setProfile({
-          ...data,
+        const loadedProfile: ProfileData = {
           firstName: data.first_name || "",
           lastName: data.last_name || "",
+          department: data.department || "",
+          major: data.major || "",
+          bio: data.bio || "",
           knowledgeAreas: data.knowledge_areas || data.expertise_skills || [],
+          timezone: data.timezone || "America/New_York",
+          availabilitySlots: data.availability_slots || [],
+          currentlyAvailable: data.currently_available || false,
+          lookingToHelp: data.looking_to_help || false,
+          email: data.email || user.email || "",
+          emailNotifications: data.email_notifications !== false,
           slackHandle: data.slack_handle || "",
           slackConnected: data.slack_connected || false,
           slackUserId: data.slack_user_id || "",
-        });
-        setTimezone(data.timezone || "America/New_York");
-        setAvailabilitySlots(data.availability_slots || []);
-        setCurrentlyAvailable(data.currently_available || false);
-        setLookingToHelp(data.looking_to_help || false);
-        setEmail(data.email || user.email || "");
-        setEmailNotifications(data.email_notifications !== false);
+        };
+        setProfile(loadedProfile);
+        // Set the initial saved state to prevent immediate autosave
+        lastSavedRef.current = JSON.stringify(loadedProfile);
       }
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
+      isInitialLoad.current = false;
     }
   };
 
-  const saveProfile = useCallback(async (profileData: any, slots?: AvailabilitySlot[], tz?: string) => {
+  const saveProfile = useCallback(async (profileData: ProfileData) => {
     setSaveStatus('saving');
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -121,13 +160,13 @@ export default function SettingsPage() {
           knowledge_areas: profileData.knowledgeAreas || [],
           // Keep legacy fields for backward compatibility
           expertise_skills: profileData.knowledgeAreas || [],
-          availability_slots: slots ?? availabilitySlots,
-          timezone: tz ?? timezone,
-          currently_available: currentlyAvailable,
-          looking_to_help: lookingToHelp,
+          availability_slots: profileData.availabilitySlots,
+          timezone: profileData.timezone,
+          currently_available: profileData.currentlyAvailable,
+          looking_to_help: profileData.lookingToHelp,
           slack_handle: profileData.slackHandle || null,
-          email: email,
-          email_notifications: emailNotifications,
+          email: profileData.email,
+          email_notifications: profileData.emailNotifications,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id);
@@ -145,11 +184,12 @@ export default function SettingsPage() {
         description: "Please try again."
       });
     }
-  }, [supabase, timezone, availabilitySlots, currentlyAvailable, lookingToHelp, email, emailNotifications]);
+  }, [supabase]);
 
   // Auto-save profile with debounce
   useEffect(() => {
-    if (!profile || loading) return;
+    // Skip during initial load
+    if (loading || isInitialLoad.current) return;
 
     const currentData = JSON.stringify(profile);
     if (currentData === lastSavedRef.current) return;
@@ -169,22 +209,15 @@ export default function SettingsPage() {
     };
   }, [profile, loading, saveProfile]);
 
-  // Save when looking to help toggle changes
-  const handleLookingToHelpChange = async (checked: boolean) => {
-    setLookingToHelp(checked);
-    if (profile) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        await supabase
-          .from('profiles')
-          .update({ looking_to_help: checked, updated_at: new Date().toISOString() })
-          .eq('user_id', user.id);
-        toast.success(checked ? "You'll appear as 'looking to help'" : "Status updated");
-      } catch (error) {
-        console.error("Error updating status:", error);
-      }
-    }
+  // Update profile field helper
+  const updateProfile = (updates: Partial<ProfileData>) => {
+    setProfile(prev => ({ ...prev, ...updates }));
+  };
+
+  // Handle looking to help toggle - uses consolidated state now
+  const handleLookingToHelpChange = (checked: boolean) => {
+    updateProfile({ lookingToHelp: checked });
+    toast.success(checked ? "You'll appear as 'looking to help'" : "Status updated");
   };
 
   const addKnowledgeArea = (area?: string) => {
@@ -192,8 +225,7 @@ export default function SettingsPage() {
     if (!areaToAdd) return;
 
     if (!profile.knowledgeAreas.includes(areaToAdd)) {
-      setProfile({
-        ...profile,
+      updateProfile({
         knowledgeAreas: [...profile.knowledgeAreas, areaToAdd],
       });
     }
@@ -201,8 +233,7 @@ export default function SettingsPage() {
   };
 
   const removeKnowledgeArea = (area: string) => {
-    setProfile({
-      ...profile,
+    updateProfile({
       knowledgeAreas: profile.knowledgeAreas.filter((a: string) => a !== area),
     });
   };
@@ -218,7 +249,7 @@ export default function SettingsPage() {
     try {
       const response = await fetch('/api/slack/oauth', { method: 'POST' });
       if (response.ok) {
-        setProfile({ ...profile, slackConnected: false, slackUserId: "", slackHandle: "" });
+        updateProfile({ slackConnected: false, slackUserId: "", slackHandle: "" });
         toast.success("Slack disconnected");
       } else {
         toast.error("Failed to disconnect Slack");
@@ -231,7 +262,7 @@ export default function SettingsPage() {
 
   // Get filtered suggestions (exclude already added)
   const filteredSuggestions = SUGGESTED_KNOWLEDGE_AREAS.filter(
-    area => !profile?.knowledgeAreas?.includes(area) &&
+    area => !profile.knowledgeAreas.includes(area) &&
             area.toLowerCase().includes(knowledgeInput.toLowerCase())
   ).slice(0, 6);
 
@@ -239,14 +270,6 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-muted-foreground">Profile not found. Please complete onboarding.</p>
       </div>
     );
   }
@@ -331,8 +354,8 @@ export default function SettingsPage() {
                   <Input
                     id="firstName"
                     placeholder="John"
-                    value={profile.firstName || ""}
-                    onChange={(e) => setProfile({...profile, firstName: e.target.value})}
+                    value={profile.firstName}
+                    onChange={(e) => updateProfile({ firstName: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -340,8 +363,8 @@ export default function SettingsPage() {
                   <Input
                     id="lastName"
                     placeholder="Doe"
-                    value={profile.lastName || ""}
-                    onChange={(e) => setProfile({...profile, lastName: e.target.value})}
+                    value={profile.lastName}
+                    onChange={(e) => updateProfile({ lastName: e.target.value })}
                   />
                 </div>
               </div>
@@ -351,8 +374,8 @@ export default function SettingsPage() {
                   <Input
                     id="department"
                     placeholder="e.g. Engineering, Sales"
-                    value={profile.department || ""}
-                    onChange={(e) => setProfile({...profile, department: e.target.value})}
+                    value={profile.department}
+                    onChange={(e) => updateProfile({ department: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -360,8 +383,8 @@ export default function SettingsPage() {
                   <Input
                     id="major"
                     placeholder="e.g. Senior Account Executive"
-                    value={profile.major || ""}
-                    onChange={(e) => setProfile({...profile, major: e.target.value})}
+                    value={profile.major}
+                    onChange={(e) => updateProfile({ major: e.target.value })}
                   />
                 </div>
               </div>
@@ -371,8 +394,8 @@ export default function SettingsPage() {
                   id="bio"
                   rows={3}
                   placeholder="Tell your team how you work best..."
-                  value={profile.bio || ""}
-                  onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                  value={profile.bio}
+                  onChange={(e) => updateProfile({ bio: e.target.value })}
                 />
               </div>
             </CardContent>
@@ -462,7 +485,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <Switch
-                  checked={lookingToHelp}
+                  checked={profile.lookingToHelp}
                   onCheckedChange={handleLookingToHelpChange}
                   className="data-[state=checked]:bg-accent"
                 />
@@ -481,17 +504,16 @@ export default function SettingsPage() {
               {/* Availability Grid - includes timezone and currently available toggle */}
               <AvailabilityGrid
                 value={{
-                  timezone,
-                  slots: availabilitySlots,
-                  currentlyAvailable,
+                  timezone: profile.timezone,
+                  slots: profile.availabilitySlots,
+                  currentlyAvailable: profile.currentlyAvailable,
                 }}
                 onChange={(val) => {
-                  setTimezone(val.timezone);
-                  setAvailabilitySlots(val.slots);
-                  setCurrentlyAvailable(val.currentlyAvailable);
-                  if (profile) {
-                    saveProfile(profile, val.slots, val.timezone);
-                  }
+                  updateProfile({
+                    timezone: val.timezone,
+                    availabilitySlots: val.slots,
+                    currentlyAvailable: val.currentlyAvailable,
+                  });
                 }}
               />
             </CardContent>
@@ -511,13 +533,8 @@ export default function SettingsPage() {
                   id="email"
                   type="email"
                   placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (profile) {
-                      setProfile({ ...profile });
-                    }
-                  }}
+                  value={profile.email}
+                  onChange={(e) => updateProfile({ email: e.target.value })}
                 />
               </div>
 
@@ -534,13 +551,8 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <Switch
-                  checked={emailNotifications}
-                  onCheckedChange={(checked) => {
-                    setEmailNotifications(checked);
-                    if (profile) {
-                      setProfile({ ...profile });
-                    }
-                  }}
+                  checked={profile.emailNotifications}
+                  onCheckedChange={(checked) => updateProfile({ emailNotifications: checked })}
                   className="data-[state=checked]:bg-primary"
                 />
               </div>
