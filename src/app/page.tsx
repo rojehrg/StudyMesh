@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { AvailabilityGrid } from "@/components/availability-grid";
 import {
   ArrowRight,
   Users,
@@ -25,8 +26,22 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
-// Days matching the actual app
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// Demo availability data for the landing page preview
+const DEMO_AVAILABILITY = {
+  timezone: "America/New_York",
+  slots: [
+    { day: 0, startSlot: 4, endSlot: 6 },    // Mon 2:00-3:00
+    { day: 1, startSlot: 4, endSlot: 5 },    // Tue 2:00-2:30
+    { day: 1, startSlot: 8, endSlot: 10 },   // Tue 4:00-5:00
+    { day: 1, startSlot: 16, endSlot: 18 },  // Tue 8:00-9:00
+    { day: 2, startSlot: 2, endSlot: 4 },    // Wed 1:00-2:00
+    { day: 3, startSlot: 10, endSlot: 12 },  // Thu 5:00-6:00
+    { day: 3, startSlot: 14, endSlot: 16 },  // Thu 7:00-8:00
+    { day: 4, startSlot: 2, endSlot: 4 },    // Fri 1:00-2:00
+    { day: 4, startSlot: 22, endSlot: 24 },  // Fri 11:00-12:00
+  ],
+  currentlyAvailable: false,
+};
 
 export default function LandingPage() {
   return (
@@ -147,72 +162,13 @@ export default function LandingPage() {
               {/* App Preview */}
               <div className="p-6 bg-[#FAFAF8]">
                 <div className="grid grid-cols-3 gap-4">
-                  {/* Availability Grid Preview - Matching actual app */}
-                  <div className="col-span-2 bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-violet-600" />
-                        <span className="font-semibold text-gray-900">Availability</span>
-                      </div>
-                      <span className="text-xs text-gray-400">4 hours/week available</span>
-                    </div>
-
-                    {/* Grid matching actual app structure - 24hr format */}
-                    <div className="space-y-0.5">
-                      {/* Header row with hours */}
-                      <div className="flex items-center">
-                        <div className="w-8 shrink-0" />
-                        <div className="flex-1 flex">
-                          {["00", "02", "04", "06", "08", "10", "12", "14", "16", "18", "20", "22"].map((hour) => (
-                            <div key={hour} className="flex-1 text-center text-[9px] font-medium text-gray-400">
-                              {hour}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Day rows - matching screenshot pattern */}
-                      {DAYS.map((day, dayIndex) => {
-                        // Availability pattern matching the screenshot
-                        const availableSlots: Record<number, number[]> = {
-                          0: [2],           // Mon: 02:00-02:30
-                          1: [2, 4, 8],     // Tue: slots at 02, 04, 08
-                          2: [1],           // Wed: 01:00
-                          3: [5, 6],        // Thu: 05:00-06:00, 07:00
-                          4: [1, 11],       // Fri: 01:30-02:00, 11:00
-                          5: [],            // Sat: none
-                          6: [],            // Sun: none
-                        };
-
-                        return (
-                          <div key={day} className="flex items-center">
-                            <div className="w-8 shrink-0 text-[10px] font-medium text-gray-500">{day}</div>
-                            <div className="flex-1 flex gap-px">
-                              {Array.from({ length: 12 }).map((_, slotIndex) => {
-                                const isAvailable = availableSlots[dayIndex]?.includes(slotIndex);
-                                return (
-                                  <div
-                                    key={slotIndex}
-                                    className={`flex-1 h-4 rounded-sm ${
-                                      isAvailable ? "bg-violet-400" : "bg-gray-100"
-                                    }`}
-                                  />
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="flex items-center gap-4 mt-3 text-[10px] text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-violet-400" /> Available
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-gray-100 border border-gray-200" /> Unavailable
-                      </span>
-                    </div>
+                  {/* Availability Grid Preview - Using actual component */}
+                  <div className="col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <AvailabilityGrid
+                      value={DEMO_AVAILABILITY}
+                      readOnly={true}
+                      compact={true}
+                    />
                   </div>
 
                   {/* Online Now Preview */}
