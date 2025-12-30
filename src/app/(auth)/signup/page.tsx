@@ -143,7 +143,7 @@ export default function SignupPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -157,7 +157,7 @@ export default function SignupPage() {
                     required
                     disabled={loading}
                     minLength={6}
-                    className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <Button
@@ -173,7 +173,7 @@ export default function SignupPage() {
           </div>
 
           {/* Right side - Illustration */}
-          <div className="hidden lg:flex bg-gradient-to-br from-accent/5 via-accent/10 to-primary/10 items-center justify-center p-12">
+          <div className="hidden lg:flex bg-gradient-to-br from-teal-100 via-emerald-50 to-indigo-100 items-center justify-center p-12">
             <div className="relative w-full max-w-md">
               <Image
                 src="/images/supportive-business-team.png"
@@ -274,7 +274,7 @@ export default function SignupPage() {
         </div>
 
         {/* Right side - Illustration */}
-        <div className="hidden lg:flex bg-gradient-to-br from-accent/5 via-accent/10 to-primary/10 items-center justify-center p-12">
+        <div className="hidden lg:flex bg-gradient-to-br from-teal-100 via-emerald-50 to-indigo-100 items-center justify-center p-12">
           <div className="relative w-full max-w-md">
             <Image
               src="/images/supportive-business-team.png"

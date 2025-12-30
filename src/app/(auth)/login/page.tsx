@@ -146,7 +146,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div className="space-y-2">
@@ -159,7 +159,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
-                  className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <Button
@@ -182,7 +182,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right side - Illustration */}
-        <div className="hidden lg:flex bg-gradient-to-br from-primary/5 via-primary/10 to-accent/10 items-center justify-center p-12">
+        <div className="hidden lg:flex bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 items-center justify-center p-12">
           <div className="relative w-full max-w-md">
             <Image
               src="/images/collaboration-colleagues.png"
