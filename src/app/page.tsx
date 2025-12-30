@@ -36,31 +36,31 @@ const stagger = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen overflow-hidden bg-background text-foreground">
+    <div className="min-h-screen overflow-hidden bg-white text-gray-900">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/90 border-b border-border">
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/90 border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center gap-1">
-              <span className="font-bold text-xl text-primary">Mesh</span>
-              <span className="font-bold text-xl text-foreground">flow</span>
+              <span className="font-bold text-xl text-violet-600">Mesh</span>
+              <span className="font-bold text-xl text-gray-900">flow</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link
                 href="#features"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Features
               </Link>
               <Link
                 href="#how-it-works"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 How it works
               </Link>
               <Link
                 href="#teams"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 For Teams
               </Link>
@@ -70,13 +70,13 @@ export default function LandingPage() {
             <Link href="/login">
               <Button
                 variant="ghost"
-                className="font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                className="font-medium text-gray-900 hover:bg-gray-100"
               >
                 Log in
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="font-medium rounded-full px-5 bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button className="font-medium rounded-full px-5 bg-violet-600 text-white hover:bg-violet-700">
                 Get Started
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
@@ -89,8 +89,8 @@ export default function LandingPage() {
       <section className="pt-32 pb-24 px-6 relative">
         {/* Background gradient orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl bg-primary/10" />
-          <div className="absolute top-60 -left-40 w-[400px] h-[400px] rounded-full blur-3xl bg-primary/5" />
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl bg-violet-500/10" />
+          <div className="absolute top-60 -left-40 w-[400px] h-[400px] rounded-full blur-3xl bg-violet-500/5" />
         </div>
 
         <div className="max-w-6xl mx-auto relative z-10">
@@ -102,7 +102,7 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeIn} className="mb-8">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
                 <Sparkles className="w-4 h-4" />
                 Built for remote-first teams
               </span>
@@ -111,17 +111,17 @@ export default function LandingPage() {
             {/* Headline */}
             <motion.h1
               variants={fadeIn}
-              className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight text-foreground"
+              className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight text-gray-900"
             >
               Stop the timezone
               <br />
-              <span className="text-primary">coordination chaos</span>
+              <span className="text-violet-600">coordination chaos</span>
             </motion.h1>
 
             {/* Sub-headline */}
             <motion.p
               variants={fadeIn}
-              className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed text-muted-foreground"
+              className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed text-gray-500"
             >
               See who's available, find who knows what, and schedule help—all without the endless Slack threads.
             </motion.p>
@@ -131,7 +131,7 @@ export default function LandingPage() {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25"
+                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 bg-primary text-violet-600-foreground hover:bg-violet-600/90 shadow-lg shadow-violet-500/25"
                 >
                   <Zap className="w-5 h-5" />
                   Start for Free
@@ -141,7 +141,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 text-foreground hover:bg-accent"
+                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 text-gray-900 hover:bg-gray-100"
                 >
                   <Play className="w-5 h-5" />
                   See How It Works
@@ -152,18 +152,18 @@ export default function LandingPage() {
             {/* Value Props */}
             <motion.div
               variants={fadeIn}
-              className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground"
+              className="flex flex-wrap justify-center gap-6 text-sm text-gray-500"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <CheckCircle2 className="w-5 h-5 text-violet-600" />
                 <span>Visual availability grid</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <CheckCircle2 className="w-5 h-5 text-violet-600" />
                 <span>Smart nudge system</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
+                <CheckCircle2 className="w-5 h-5 text-violet-600" />
                 <span>Slack integration</span>
               </div>
             </motion.div>
@@ -176,63 +176,63 @@ export default function LandingPage() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="mt-20 relative"
           >
-            <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto bg-card shadow-2xl shadow-primary/10 border border-border">
-              <div className="p-1 flex items-center gap-2 bg-muted">
+            <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto bg-gray-50 shadow-2xl shadow-violet-500/10 border border-gray-200">
+              <div className="p-1 flex items-center gap-2 bg-gray-100">
                 <div className="flex gap-1.5 ml-3">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
-                <div className="flex-1 text-center text-xs font-medium text-muted-foreground">
+                <div className="flex-1 text-center text-xs font-medium text-gray-500">
                   meshflow.app/dashboard
                 </div>
               </div>
               <div className="p-8 bg-gradient-to-b from-card to-muted/30">
                 <div className="grid grid-cols-3 gap-6">
                   {/* Availability Preview */}
-                  <div className="col-span-2 rounded-xl p-5 bg-background border border-border">
+                  <div className="col-span-2 rounded-xl p-5 bg-white border border-gray-200">
                     <div className="flex items-center gap-2 mb-4">
-                      <Calendar className="w-5 h-5 text-primary" />
-                      <span className="font-semibold text-foreground">Team Availability</span>
+                      <Calendar className="w-5 h-5 text-violet-600" />
+                      <span className="font-semibold text-gray-900">Team Availability</span>
                     </div>
                     <div className="grid grid-cols-7 gap-1">
                       {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                        <div key={i} className="text-center text-xs font-medium text-muted-foreground">{day}</div>
+                        <div key={i} className="text-center text-xs font-medium text-gray-500">{day}</div>
                       ))}
                       {Array.from({ length: 21 }).map((_, i) => (
                         <div
                           key={i}
                           className={`h-6 rounded ${
                             [0, 1, 2, 7, 8, 9, 14, 15, 16].includes(i)
-                              ? 'bg-primary/30'
+                              ? 'bg-violet-600/30'
                               : [3, 4, 10, 11, 17, 18].includes(i)
-                              ? 'bg-primary/15'
-                              : 'bg-muted'
+                              ? 'bg-violet-600/15'
+                              : 'bg-gray-100'
                           }`}
                         />
                       ))}
                     </div>
                   </div>
                   {/* Team Members */}
-                  <div className="rounded-xl p-5 bg-background border border-border">
+                  <div className="rounded-xl p-5 bg-white border border-gray-200">
                     <div className="flex items-center gap-2 mb-4">
-                      <Users className="w-5 h-5 text-primary" />
-                      <span className="font-semibold text-foreground">Online Now</span>
+                      <Users className="w-5 h-5 text-violet-600" />
+                      <span className="font-semibold text-gray-900">Online Now</span>
                     </div>
                     <div className="space-y-3">
                       {['Sarah', 'Mike', 'Priya'].map((name, i) => (
                         <div key={name} className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-violet-600/15 text-violet-600">
                             {name[0]}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-foreground">{name}</div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-sm font-medium text-gray-900">{name}</div>
+                            <div className="text-xs text-gray-500">
                               {i === 0 ? 'Available' : i === 1 ? 'In a meeting' : 'Away'}
                             </div>
                           </div>
                           <div className={`w-2 h-2 rounded-full ml-auto ${
-                            i === 0 ? 'bg-success' : i === 1 ? 'bg-warning' : 'bg-muted-foreground'
+                            i === 0 ? 'bg-green-500' : i === 1 ? 'bg-amber-500' : 'bg-gray-100-foreground'
                           }`} />
                         </div>
                       ))}
@@ -246,7 +246,7 @@ export default function LandingPage() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-24 px-6 bg-card">
+      <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -254,13 +254,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-primary/10 text-primary">
+            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-violet-100 text-violet-700">
               The Problem
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              Remote coordination is <span className="text-primary">broken</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              Remote coordination is <span className="text-violet-600">broken</span>
             </h2>
-            <p className="text-lg max-w-2xl mx-auto text-muted-foreground">
+            <p className="text-lg max-w-2xl mx-auto text-gray-500">
               Your team has answers—but no one knows who to ask or when they're free.
             </p>
           </motion.div>
@@ -289,13 +289,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="rounded-2xl p-6 bg-background border border-border"
+                className="rounded-2xl p-6 bg-white border border-gray-200"
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
-                  <problem.icon className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-violet-600/10">
+                  <problem.icon className="w-6 h-6 text-violet-600" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">{problem.title}</h3>
-                <p className="text-muted-foreground">{problem.description}</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">{problem.title}</h3>
+                <p className="text-gray-500">{problem.description}</p>
               </motion.div>
             ))}
           </div>
@@ -303,7 +303,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section - Bento Grid Style */}
-      <section id="features" className="py-24 px-6 bg-background">
+      <section id="features" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -311,10 +311,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              Powerful features,<br /><span className="text-primary">zero complexity</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              Powerful features,<br /><span className="text-violet-600">zero complexity</span>
             </h2>
-            <p className="text-lg max-w-xl mx-auto text-muted-foreground">
+            <p className="text-lg max-w-xl mx-auto text-gray-500">
               Everything you need to coordinate async teams, nothing you don't.
             </p>
           </motion.div>
@@ -329,9 +329,9 @@ export default function LandingPage() {
               className="md:col-span-2 md:row-span-2 rounded-3xl p-8 relative overflow-hidden bg-primary min-h-[400px]"
             >
               <div className="relative z-10">
-                <Calendar className="w-10 h-10 text-primary-foreground/80 mb-4" />
-                <h3 className="text-3xl font-bold text-primary-foreground mb-3">Visual Availability</h3>
-                <p className="text-primary-foreground/80 text-lg max-w-md">
+                <Calendar className="w-10 h-10 text-violet-600-foreground/80 mb-4" />
+                <h3 className="text-3xl font-bold text-violet-600-foreground mb-3">Visual Availability</h3>
+                <p className="text-violet-600-foreground/80 text-lg max-w-md">
                   See your entire team's availability at a glance. Auto-detected timezones, drag-to-select scheduling.
                 </p>
               </div>
@@ -353,11 +353,11 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="rounded-3xl p-6 bg-card border border-border hover:shadow-lg transition-shadow"
+              className="rounded-3xl p-6 bg-gray-50 border border-gray-200 hover:shadow-lg transition-shadow"
             >
-              <Zap className="w-8 h-8 mb-3 text-primary" />
-              <h3 className="text-xl font-bold mb-2 text-foreground">Smart Nudges</h3>
-              <p className="text-sm text-muted-foreground">
+              <Zap className="w-8 h-8 mb-3 text-violet-600" />
+              <h3 className="text-xl font-bold mb-2 text-gray-900">Smart Nudges</h3>
+              <p className="text-sm text-gray-500">
                 Send contextual help requests with suggested times. 15min to 1hr options.
               </p>
             </motion.div>
@@ -367,11 +367,11 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="rounded-3xl p-6 bg-card border border-border hover:shadow-lg transition-shadow"
+              className="rounded-3xl p-6 bg-gray-50 border border-gray-200 hover:shadow-lg transition-shadow"
             >
-              <Search className="w-8 h-8 mb-3 text-primary" />
-              <h3 className="text-xl font-bold mb-2 text-foreground">Knowledge Tags</h3>
-              <p className="text-sm text-muted-foreground">
+              <Search className="w-8 h-8 mb-3 text-violet-600" />
+              <h3 className="text-xl font-bold mb-2 text-gray-900">Knowledge Tags</h3>
+              <p className="text-sm text-gray-500">
                 Simple "I know X" tags. Find who knows what in seconds.
               </p>
             </motion.div>
@@ -382,25 +382,25 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="md:col-span-3 rounded-3xl p-8 flex items-center justify-between bg-muted hover:bg-muted/80 transition-colors"
+              className="md:col-span-3 rounded-3xl p-8 flex items-center justify-between bg-gray-100 hover:bg-gray-100/80 transition-colors"
             >
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#4A154B]">
                   <Slack className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold mb-1 text-foreground">Native Slack Integration</h3>
-                  <p className="text-muted-foreground">Nudges delivered as DMs. One-click OAuth. Works where you already are.</p>
+                  <h3 className="text-2xl font-bold mb-1 text-gray-900">Native Slack Integration</h3>
+                  <p className="text-gray-500">Nudges delivered as DMs. One-click OAuth. Works where you already are.</p>
                 </div>
               </div>
-              <ArrowRight className="w-6 h-6 text-muted-foreground" />
+              <ArrowRight className="w-6 h-6 text-gray-500" />
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* How It Works - Modern Steps */}
-      <section id="how-it-works" className="py-24 px-6 bg-card">
+      <section id="how-it-works" className="py-24 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -408,8 +408,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              Setup in <span className="text-primary">under 3 minutes</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              Setup in <span className="text-violet-600">under 3 minutes</span>
             </h2>
           </motion.div>
 
@@ -427,11 +427,11 @@ export default function LandingPage() {
                 transition={{ delay: i * 0.1 }}
                 className="text-center"
               >
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold bg-primary text-primary-foreground">
+                <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold bg-primary text-violet-600-foreground">
                   {step.num}
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-foreground">{step.title}</h3>
-                <p className="text-muted-foreground">{step.desc}</p>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">{step.title}</h3>
+                <p className="text-gray-500">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -439,7 +439,7 @@ export default function LandingPage() {
       </section>
 
       {/* Social Proof / Trust */}
-      <section id="teams" className="py-16 px-6 bg-background">
+      <section id="teams" className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -447,10 +447,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <p className="text-sm font-medium mb-6 text-muted-foreground uppercase tracking-wider">Built for teams like</p>
+            <p className="text-sm font-medium mb-6 text-gray-500 uppercase tracking-wider">Built for teams like</p>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
               {['Remote Startups', 'Support Teams', 'Open Source', 'Agencies'].map((team) => (
-                <span key={team} className="text-xl font-semibold text-foreground/60">{team}</span>
+                <span key={team} className="text-xl font-semibold text-gray-900/60">{team}</span>
               ))}
             </div>
           </motion.div>
@@ -471,17 +471,17 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center relative z-10"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-primary-foreground">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-violet-600-foreground">
             Stop the coordination chaos
           </h2>
-          <p className="text-xl mb-10 text-primary-foreground/80">
+          <p className="text-xl mb-10 text-violet-600-foreground/80">
             Join teams who've simplified how they find and help each other.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
               <Button
                 size="lg"
-                className="rounded-full px-10 h-14 text-lg font-semibold gap-2 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                className="rounded-full px-10 h-14 text-lg font-semibold gap-2 bg-primary-foreground text-violet-600 hover:bg-primary-foreground/90"
               >
                 <Zap className="w-5 h-5" />
                 Get Started Free
@@ -491,7 +491,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="rounded-full px-10 h-14 text-lg font-semibold text-primary-foreground hover:bg-primary-foreground/10"
+                className="rounded-full px-10 h-14 text-lg font-semibold text-violet-600-foreground hover:bg-primary-foreground/10"
               >
                 Learn More
               </Button>
@@ -506,7 +506,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
               <span className="font-bold text-xl text-background">Mesh</span>
-              <span className="font-bold text-xl text-primary">flow</span>
+              <span className="font-bold text-xl text-violet-600">flow</span>
             </div>
             <div className="flex gap-8 text-sm text-background/60">
               <Link href="/login" className="hover:text-background transition-colors">Login</Link>

@@ -157,8 +157,7 @@ export default function SettingsPage() {
           department: profileData.department,
           major: profileData.major,
           bio: profileData.bio,
-          knowledge_areas: profileData.knowledgeAreas || [],
-          // Keep legacy fields for backward compatibility
+          // Use expertise_skills column (knowledge_areas doesn't exist in DB)
           expertise_skills: profileData.knowledgeAreas || [],
           availability: {
             slots: profileData.availabilitySlots,
