@@ -4,135 +4,136 @@
 
 /*
  * MESHFLOW COLOR PALETTE
- * Modern SaaS aesthetic inspired by Slack, Calendly, Linear
+ * Clean, minimal pastel palette - 4 core colors
  *
- * Core colors:
- * - Primary: Soft violet/purple (modern, trustworthy)
- * - Accent: Soft lavender (complementary highlight)
- * - Background: Warm off-white / warm dark
- * - All pastel, cohesive across light/dark
+ * Primary: Soft violet (actions, links, focus)
+ * Secondary: Light lavender (subtle backgrounds)
+ * Muted: Warm gray (text, disabled)
+ * Background: Warm cream/off-white (notepad feel)
+ *
+ * NO orange, NO harsh colors
  */
 
 @layer base {
   :root {
-    /* ===== LIGHT MODE ===== */
+    /* ===== LIGHT MODE - Warm Notepad ===== */
 
-    /* Background - Warm off-white (like quality paper) */
-    --background: 45 30% 97%;
-    --foreground: 250 20% 20%;
+    /* Background - Warm cream like quality paper */
+    --background: 48 50% 96%;
+    --foreground: 260 25% 18%;
 
-    /* Cards - Clean white with subtle warmth */
-    --card: 0 0% 100%;
-    --card-foreground: 250 20% 20%;
+    /* Cards - Slightly warmer white */
+    --card: 48 40% 99%;
+    --card-foreground: 260 25% 18%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 250 20% 20%;
+    --popover: 48 40% 99%;
+    --popover-foreground: 260 25% 18%;
 
-    /* Primary - Soft violet (modern, trustworthy) */
-    --primary: 262 60% 58%;
+    /* Primary - Soft violet (main action color) */
+    --primary: 262 55% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light lavender tint */
-    --secondary: 262 30% 95%;
-    --secondary-foreground: 262 40% 30%;
+    /* Secondary - Very light lavender */
+    --secondary: 262 40% 96%;
+    --secondary-foreground: 262 35% 35%;
 
-    /* Accent - Soft coral/peach for warmth */
-    --accent: 20 80% 75%;
-    --accent-foreground: 20 60% 25%;
+    /* Accent - Lighter violet for hover states (not orange) */
+    --accent: 262 45% 92%;
+    --accent-foreground: 262 55% 40%;
 
     /* Muted - Warm gray */
-    --muted: 45 15% 92%;
-    --muted-foreground: 250 10% 45%;
+    --muted: 48 20% 92%;
+    --muted-foreground: 260 10% 45%;
 
     /* Destructive - Soft rose */
-    --destructive: 0 65% 60%;
+    --destructive: 0 55% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Soft purple (instead of green) */
-    --success: 270 50% 60%;
+    /* Success - Soft violet (cohesive with primary) */
+    --success: 262 45% 58%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Soft amber */
-    --warning: 38 90% 65%;
-    --warning-foreground: 38 80% 20%;
+    /* Warning - Soft muted gold */
+    --warning: 45 70% 50%;
+    --warning-foreground: 45 80% 15%;
 
-    /* Info - Soft sky blue */
-    --info: 200 70% 60%;
+    /* Info - Soft periwinkle */
+    --info: 230 60% 62%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - Subtle, slightly purple-tinted */
-    --border: 262 15% 90%;
-    --input: 262 15% 90%;
-    --ring: 262 60% 58%;
+    /* Borders - Nearly invisible, warm */
+    --border: 48 20% 90%;
+    --input: 48 20% 90%;
+    --ring: 262 55% 55%;
 
     /* Radius */
     --radius: 0.625rem;
 
-    /* Chart colors - Purple-forward pastel palette */
-    --chart-1: 262 60% 58%;
-    --chart-2: 280 50% 65%;
-    --chart-3: 220 60% 60%;
-    --chart-4: 20 80% 70%;
-    --chart-5: 200 70% 60%;
+    /* Chart colors - Purple/violet family */
+    --chart-1: 262 55% 55%;
+    --chart-2: 280 45% 60%;
+    --chart-3: 230 55% 60%;
+    --chart-4: 262 35% 70%;
+    --chart-5: 200 50% 55%;
   }
 
   .dark {
-    /* ===== DARK MODE - Warm, not cold ===== */
+    /* ===== DARK MODE - Warm purple-tinted dark ===== */
 
     /* Background - Warm dark with purple undertone */
     --background: 260 20% 9%;
-    --foreground: 45 20% 95%;
+    --foreground: 48 25% 95%;
 
-    /* Cards - Elevated with purple tint */
-    --card: 260 18% 13%;
-    --card-foreground: 45 20% 95%;
+    /* Cards - Elevated */
+    --card: 260 18% 12%;
+    --card-foreground: 48 25% 95%;
 
-    --popover: 260 18% 15%;
-    --popover-foreground: 45 20% 95%;
+    --popover: 260 18% 14%;
+    --popover-foreground: 48 25% 95%;
 
-    /* Primary - Brighter violet for dark mode */
-    --primary: 262 65% 70%;
+    /* Primary - Lighter violet for dark mode */
+    --primary: 262 60% 68%;
     --primary-foreground: 260 20% 9%;
 
     /* Secondary - Dark purple tint */
-    --secondary: 260 15% 18%;
-    --secondary-foreground: 262 30% 85%;
+    --secondary: 260 15% 16%;
+    --secondary-foreground: 262 35% 80%;
 
-    /* Accent - Warmer coral for dark mode */
-    --accent: 20 75% 65%;
-    --accent-foreground: 260 20% 9%;
+    /* Accent - Subtle purple highlight for hover */
+    --accent: 262 25% 20%;
+    --accent-foreground: 262 50% 80%;
 
-    /* Muted - Dark with warmth */
-    --muted: 260 12% 16%;
-    --muted-foreground: 45 10% 55%;
+    /* Muted */
+    --muted: 260 12% 15%;
+    --muted-foreground: 48 10% 55%;
 
-    /* Destructive - Soft rose for dark */
-    --destructive: 0 60% 55%;
+    /* Destructive */
+    --destructive: 0 55% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Soft purple */
-    --success: 270 55% 65%;
+    /* Success - Violet */
+    --success: 262 50% 62%;
     --success-foreground: 260 20% 9%;
 
-    /* Warning - Amber for dark */
-    --warning: 38 85% 60%;
+    /* Warning */
+    --warning: 45 75% 55%;
     --warning-foreground: 260 20% 9%;
 
-    /* Info - Sky blue for dark */
-    --info: 200 75% 55%;
+    /* Info */
+    --info: 230 60% 60%;
     --info-foreground: 260 20% 9%;
 
-    /* Borders - Subtle purple */
-    --border: 260 12% 22%;
-    --input: 260 12% 22%;
-    --ring: 262 65% 70%;
+    /* Borders - Very subtle */
+    --border: 260 12% 18%;
+    --input: 260 12% 18%;
+    --ring: 262 60% 68%;
 
-    /* Chart colors - Dark mode pastels */
-    --chart-1: 262 65% 70%;
-    --chart-2: 280 55% 70%;
-    --chart-3: 220 65% 65%;
-    --chart-4: 20 75% 65%;
-    --chart-5: 200 75% 55%;
+    /* Chart colors */
+    --chart-1: 262 60% 68%;
+    --chart-2: 280 50% 65%;
+    --chart-3: 230 60% 62%;
+    --chart-4: 262 40% 72%;
+    --chart-5: 200 55% 55%;
   }
 }
 
@@ -356,4 +357,56 @@ select:focus {
   h3 {
     font-size: 1.125rem;
   }
+}
+
+/* ===== GLOBAL BORDER REMOVAL ===== */
+/* Remove borders from buttons */
+button,
+[role="button"] {
+  border: none;
+}
+
+/* Remove borders from cards globally */
+.border,
+[class*="border"] {
+  border-color: transparent;
+}
+
+/* Cards should use shadow instead of border */
+[class*="Card"],
+.card {
+  border: none;
+  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.04);
+}
+
+/* Clean button hover states - use background change, not border */
+button:hover,
+[role="button"]:hover {
+  border: none;
+}
+
+/* Ensure inputs look clean */
+input,
+textarea,
+select {
+  border: none;
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border: none;
+  outline: 2px solid hsl(var(--primary) / 0.5);
+  outline-offset: 0;
+}
+
+/* Tab triggers - no borders */
+[role="tablist"] [role="tab"] {
+  border: none;
+}
+
+/* Dialog/modal - no harsh borders */
+[role="dialog"] {
+  border: none;
 }

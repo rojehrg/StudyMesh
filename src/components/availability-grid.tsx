@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -85,10 +85,19 @@ export function AvailabilityGrid({
     }
   }, [value?.timezone]);
 
-  // Notify parent of changes
+  // Notify parent of changes - use ref to avoid infinite loops with inline callbacks
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const isMountedRef = useRef(false);
+
   useEffect(() => {
-    onChange?.({ timezone, slots, currentlyAvailable });
-  }, [timezone, slots, currentlyAvailable, onChange]);
+    // Skip the initial mount call to avoid triggering unnecessary saves
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
+    onChangeRef.current?.({ timezone, slots, currentlyAvailable });
+  }, [timezone, slots, currentlyAvailable]);
 
   const isSlotSelected = useCallback((day: number, slot: number) => {
     return slots.some(
