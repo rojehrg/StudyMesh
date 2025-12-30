@@ -29,6 +29,7 @@ import { OnboardingTour } from "@/components/onboarding-tour";
 import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
 import { RealtimeProvider } from "@/components/realtime-provider";
+import { CelebrationProvider } from "@/components/celebration-provider";
 
 interface SidebarItemProps {
   icon: any;
@@ -251,13 +252,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
         {/* Page Content - Add top margin for fixed header */}
         <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-14 pt-6">
-          {userId ? (
-            <RealtimeProvider userId={userId}>
-              {children}
-            </RealtimeProvider>
-          ) : (
-            children
-          )}
+          <CelebrationProvider>
+            {userId ? (
+              <RealtimeProvider userId={userId}>
+                {children}
+              </RealtimeProvider>
+            ) : (
+              children
+            )}
+          </CelebrationProvider>
         </main>
       </div>
 
