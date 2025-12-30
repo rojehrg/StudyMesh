@@ -57,6 +57,7 @@ export default async function DashboardPage() {
 
   // Get currently available teammates from user's pods
   let availableTeammates: any[] = [];
+  let helpersCount = 0;
   if (podIds.length > 0) {
     // Get all members of user's pods
     const { data: podMembers } = await supabase
@@ -68,35 +69,20 @@ export default async function DashboardPage() {
     const teammateIds = [...new Set(podMembers?.map(pm => pm.user_id) || [])];
 
     if (teammateIds.length > 0) {
-      const { data: availableProfiles } = await supabase
+      const { data: allProfiles } = await supabase
         .from('profiles')
-        .select('user_id, major, department, currently_available, looking_to_help, knowledge_areas, expertise_skills, timezone')
-        .in('user_id', teammateIds)
-        .eq('currently_available', true)
-        .limit(6);
+        .select('user_id, major, department, availability, knowledge_areas, expertise_skills, timezone')
+        .in('user_id', teammateIds);
 
-      availableTeammates = availableProfiles || [];
-    }
-  }
+      // Filter for currently available (from availability JSON)
+      availableTeammates = (allProfiles || [])
+        .filter(p => p.availability?.currentlyAvailable === true)
+        .slice(0, 6);
 
-  // Get people looking to help in user's pods
-  let helpersCount = 0;
-  if (podIds.length > 0) {
-    const { data: podMembers } = await supabase
-      .from('pod_members')
-      .select('user_id')
-      .in('pod_id', podIds)
-      .neq('user_id', user.id);
-
-    const teammateIds = [...new Set(podMembers?.map(pm => pm.user_id) || [])];
-
-    if (teammateIds.length > 0) {
-      const { count } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .in('user_id', teammateIds)
-        .eq('looking_to_help', true);
-      helpersCount = count || 0;
+      // Count people looking to help (from availability JSON)
+      helpersCount = (allProfiles || [])
+        .filter(p => p.availability?.lookingToHelp === true)
+        .length;
     }
   }
 

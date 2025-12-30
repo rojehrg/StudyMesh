@@ -48,7 +48,7 @@ export default function PodDetailPage() {
       // Get current user's profile
       const { data: currentProfile } = await supabase
         .from('profiles')
-        .select('expertise_skills, knowledge_areas, timezone, availability_slots')
+        .select('expertise_skills, knowledge_areas, timezone, availability')
         .eq('user_id', user.id)
         .single();
 
@@ -57,7 +57,7 @@ export default function PodDetailPage() {
         expertiseSkills: currentProfile?.expertise_skills || [],
         knowledgeAreas: currentProfile?.knowledge_areas || [],
         timezone: currentProfile?.timezone || 'America/New_York',
-        availabilitySlots: currentProfile?.availability_slots || [],
+        availabilitySlots: currentProfile?.availability?.slots || [],
       });
 
       // Get pod details
@@ -101,12 +101,12 @@ export default function PodDetailPage() {
             expertiseSkills: profile?.expertise_skills || [],
             knowledgeAreas: profile?.knowledge_areas || [],
             growthSkills: profile?.growth_skills || [],
-            lookingToHelp: profile?.looking_to_help || false,
+            lookingToHelp: profile?.availability?.lookingToHelp || false,
             slackHandle: profile?.slack_handle || "",
             slackConnected: !!(profile?.slack_handle),
             timezone: profile?.timezone || "America/New_York",
-            availabilitySlots: profile?.availability_slots || [],
-            currentlyAvailable: profile?.currently_available || false,
+            availabilitySlots: profile?.availability?.slots || [],
+            currentlyAvailable: profile?.availability?.currentlyAvailable || false,
           };
         });
 
