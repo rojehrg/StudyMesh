@@ -103,9 +103,9 @@
     --accent: 262 25% 20%;
     --accent-foreground: 262 50% 80%;
 
-    /* Muted */
+    /* Muted - increased foreground lightness for better readability */
     --muted: 260 12% 15%;
-    --muted-foreground: 48 10% 55%;
+    --muted-foreground: 48 15% 70%;
 
     /* Destructive */
     --destructive: 0 55% 50%;

@@ -164,7 +164,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               className="whitespace-nowrap overflow-hidden text-xl font-bold"
             >
               <span className="text-primary">esh</span>
-              <span className="text-accent">flow</span>
+              <span className="text-foreground">flow</span>
             </motion.span>
           </Link>
         </div>
