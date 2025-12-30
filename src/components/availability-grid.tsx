@@ -334,15 +334,15 @@ export function AvailabilityGrid({
       )}
 
       {/* Grid */}
-      <div className="border rounded-lg overflow-hidden bg-card">
+      <div className="border border-border rounded-lg overflow-hidden bg-card shadow-sm">
         {/* Hour Headers */}
-        <div className="flex border-b bg-muted/30">
-          <div className="w-16 shrink-0 p-2 text-xs font-medium text-muted-foreground border-r" />
+        <div className="flex border-b border-border bg-muted/50">
+          <div className="w-16 shrink-0 p-2 text-xs font-semibold text-foreground/70 border-r border-border" />
           <div className="flex-1 flex">
             {HOURS.filter((_, i) => i % 2 === 0).map((hour) => (
               <div
                 key={hour}
-                className="flex-1 text-center text-xs font-medium text-muted-foreground py-2"
+                className="flex-1 text-center text-xs font-semibold text-foreground/70 py-2"
                 style={{ minWidth: "2rem" }}
               >
                 {hour.toString().padStart(2, "0")}
@@ -353,9 +353,9 @@ export function AvailabilityGrid({
 
         {/* Day Rows */}
         {DAYS.map((day, dayIndex) => (
-          <div key={day} className="flex border-b last:border-b-0">
+          <div key={day} className="flex border-b border-border last:border-b-0">
             {/* Day Label */}
-            <div className="w-16 shrink-0 p-2 text-sm font-medium text-foreground border-r bg-muted/20 flex items-center">
+            <div className="w-16 shrink-0 p-2 text-sm font-semibold text-foreground border-r border-border bg-muted/30 flex items-center">
               {day}
             </div>
             {/* Time Slots */}
@@ -369,11 +369,11 @@ export function AvailabilityGrid({
                     key={slotIndex}
                     className={cn(
                       "flex-1 h-8 border-r last:border-r-0 transition-colors cursor-pointer select-none",
-                      slotIndex % 2 === 0 ? "border-r-border" : "border-r-border/30",
+                      slotIndex % 2 === 0 ? "border-r-border" : "border-r-border/50",
                       isSelected
                         ? "bg-primary hover:bg-primary/80"
-                        : "bg-background hover:bg-muted/50",
-                      isCurrentSlot && !isSelected && "ring-2 ring-inset ring-accent",
+                        : "bg-muted/20 hover:bg-muted/60",
+                      isCurrentSlot && !isSelected && "ring-2 ring-inset ring-primary/50",
                       readOnly && "cursor-default"
                     )}
                     style={{ minWidth: "0.5rem" }}
@@ -389,22 +389,22 @@ export function AvailabilityGrid({
       </div>
 
       {/* Legend & Summary */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between text-sm">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-primary" />
-            <span>Available</span>
+            <span className="text-foreground/80">Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-background border" />
-            <span>Unavailable</span>
+            <div className="w-4 h-4 rounded bg-muted/30 border border-border" />
+            <span className="text-foreground/80">Unavailable</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-background border ring-2 ring-inset ring-accent" />
-            <span>Now</span>
+            <div className="w-4 h-4 rounded bg-muted/30 border border-border ring-2 ring-inset ring-primary/50" />
+            <span className="text-foreground/80">Now</span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-foreground/80">
           <Clock className="w-4 h-4" />
           <span>
             {slots.reduce((acc, s) => acc + (s.endSlot - s.startSlot) / 2, 0)} hours/week available
