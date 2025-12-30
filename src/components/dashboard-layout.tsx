@@ -28,6 +28,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
 import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
+import { RealtimeProvider } from "@/components/realtime-provider";
 
 interface SidebarItemProps {
   icon: any;
@@ -85,6 +86,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -100,6 +102,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      setUserId(user.id);
 
       const { data } = await supabase
         .from('profiles')
@@ -247,7 +251,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
         {/* Page Content - Add top margin for fixed header */}
         <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-14 pt-6">
-          {children}
+          {userId ? (
+            <RealtimeProvider userId={userId}>
+              {children}
+            </RealtimeProvider>
+          ) : (
+            children
+          )}
         </main>
       </div>
 

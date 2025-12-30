@@ -139,7 +139,7 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -153,7 +153,7 @@ export default function SignupPage() {
                 required
                 disabled={loading}
                 minLength={6}
-                className="h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                className="h-11 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <Button

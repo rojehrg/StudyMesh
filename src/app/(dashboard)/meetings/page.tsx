@@ -21,6 +21,8 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ScheduleMeetingDialog } from "@/components/schedule-meeting-dialog";
+import { EmptyState } from "@/components/empty-state";
+import { PageLoader } from "@/components/loading-states";
 
 interface Meeting {
   id: string;
@@ -144,11 +146,7 @@ export default function MeetingsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <PageLoader message="Loading your meetings..." />;
   }
 
   return (
@@ -182,17 +180,18 @@ export default function MeetingsPage() {
 
         <TabsContent value="upcoming" className="space-y-4">
           {upcomingMeetings.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Calendar className="w-12 h-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No upcoming meetings</h3>
-                <p className="text-muted-foreground text-center mb-4">
-                  Schedule a meeting with your teammates to get started
-                </p>
-                <Button onClick={() => setShowScheduleDialog(true)} variant="outline" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Schedule your first meeting
-                </Button>
+            <Card className="border-dashed">
+              <CardContent className="py-2">
+                <EmptyState
+                  icon={Calendar}
+                  title="No meetings scheduled"
+                  description="Your calendar is clear! Schedule a meeting with teammates to collaborate in real-time."
+                  action={{
+                    label: "Schedule your first meeting",
+                    onClick: () => setShowScheduleDialog(true),
+                  }}
+                  variant="minimal"
+                />
               </CardContent>
             </Card>
           ) : (
@@ -285,13 +284,14 @@ export default function MeetingsPage() {
 
         <TabsContent value="past" className="space-y-4">
           {pastMeetings.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <CalendarDays className="w-12 h-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No past meetings</h3>
-                <p className="text-muted-foreground text-center">
-                  Your completed meetings will appear here
-                </p>
+            <Card className="border-dashed">
+              <CardContent className="py-2">
+                <EmptyState
+                  icon={CalendarDays}
+                  title="No past meetings"
+                  description="Your meeting history will show up here. Start by scheduling your first meeting!"
+                  variant="minimal"
+                />
               </CardContent>
             </Card>
           ) : (

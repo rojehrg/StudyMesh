@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, LogIn, Users, Loader2, Search, Clock, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { EmptyState } from "@/components/empty-state";
+import { PageLoader } from "@/components/loading-states";
 
 export default function ClassesPage() {
   const [loading, setLoading] = useState(true);
@@ -69,11 +71,7 @@ export default function ClassesPage() {
   );
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading your pods..." />;
   }
 
   return (
@@ -167,31 +165,21 @@ export default function ClassesPage() {
           ))}
         </div>
       ) : pods.length === 0 ? (
-        <Card className="shadow-lg">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">No pods yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-sm">
-              Spin up a pod or join one with a share code to get started with enablement.
-            </p>
-            <div className="flex gap-3">
-              <Button variant="outline" asChild>
-                <Link href="/classes/join">Join Pod</Link>
-              </Button>
-              <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
-                <Link href="/classes/create">Create Pod</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Users}
+          title="No pods yet"
+          description="Pods are where the magic happens. Create your own or join a team pod to start collaborating with teammates."
+          action={{ label: "Create Pod", href: "/classes/create" }}
+          secondaryAction={{ label: "Join Pod", href: "/classes/join" }}
+          variant="card"
+        />
       ) : (
-        <Card className="shadow-lg">
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">No pods match your search</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Search}
+          title="No pods match your search"
+          description="Try adjusting your search terms to find what you're looking for."
+          variant="card"
+        />
       )}
     </motion.div>
   );

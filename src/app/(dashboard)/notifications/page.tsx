@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/empty-state";
+import { PageLoader } from "@/components/loading-states";
 
 export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
@@ -50,9 +52,11 @@ export default function NotificationsPage() {
           .limit(50);
         setSentNotifications(sent || []);
 
-        // Set up realtime subscription after we have the user ID
-        channel = supabase
-          .channel('notifications-realtime')
+        // Set up realtime subscription for list updates (toasts handled by RealtimeProvider)
+        const channelName = `notifications-page-${user.id}-${Date.now()}`;
+        channel = supabase.channel(channelName);
+
+        channel
           .on(
             'postgres_changes',
             {
@@ -62,26 +66,9 @@ export default function NotificationsPage() {
               filter: `recipient_id=eq.${user.id}`,
             },
             (payload) => {
+              console.log('[Notifications Page] New notification:', payload);
               const newNotification = payload.new as any;
-
-              // Add to beginning of list
               setNotifications(prev => [newNotification, ...prev]);
-
-              // Show toast notification
-              const nudgeType = newNotification.metadata?.nudge_type;
-              toast.success(
-                nudgeType === 'ask' ? "Someone needs your help!" : "Someone offered to help!",
-                {
-                  description: newNotification.content?.slice(0, 80) + (newNotification.content?.length > 80 ? "..." : ""),
-                  icon: <Zap className="w-4 h-4 text-success" />,
-                  action: {
-                    label: "View",
-                    onClick: () => {
-                      router.push('/notifications');
-                    },
-                  },
-                }
-              );
             }
           )
           .on(
@@ -93,11 +80,14 @@ export default function NotificationsPage() {
               filter: `sender_id=eq.${user.id}`,
             },
             (payload) => {
+              console.log('[Notifications Page] Sent notification:', payload);
               const newNotification = payload.new as any;
               setSentNotifications(prev => [newNotification, ...prev]);
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+            console.log('[Notifications Page] Subscription status:', status);
+          });
 
       } catch (error) {
         console.error("Error loading notifications:", error);
@@ -110,6 +100,7 @@ export default function NotificationsPage() {
 
     return () => {
       if (channel) {
+        console.log('[Notifications Page] Cleaning up channel');
         supabase.removeChannel(channel);
       }
     };
@@ -225,11 +216,7 @@ export default function NotificationsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading your notifications..." />;
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -237,17 +224,17 @@ export default function NotificationsPage() {
   const renderList = (items: any[], isSent: boolean) => {
     if (items.length === 0) {
       return (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-3">
-              <Bell className="w-6 h-6 text-muted-foreground" />
-            </div>
-            <h3 className="text-base font-medium text-foreground mb-1">{isSent ? "No sent nudges" : "No notifications yet"}</h3>
-            <p className="text-muted-foreground text-sm max-w-sm">
-              {isSent ? "You haven't nudged anyone yet." : "When teammates nudge you or you get matched in pods, you'll see notifications here."}
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={isSent ? Send : Bell}
+          title={isSent ? "No sent nudges yet" : "All caught up!"}
+          description={
+            isSent
+              ? "You haven't nudged anyone yet. Find a teammate in your pod and send them a nudge!"
+              : "No new notifications. When teammates reach out or you get matched, you'll see it here."
+          }
+          action={isSent ? { label: "Browse Pods", href: "/classes" } : undefined}
+          variant="card"
+        />
       );
     }
 
