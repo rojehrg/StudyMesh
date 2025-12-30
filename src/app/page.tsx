@@ -5,80 +5,61 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Users,
-  MessageCircle,
   Clock,
   Zap,
   Calendar,
-  Search,
   CheckCircle2,
-  Slack,
-  Sparkles,
+  Globe,
+  MessageSquare,
   Play,
+  ChevronRight,
+  Sparkles,
+  Timer,
+  Search,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 const stagger = {
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen overflow-hidden bg-white text-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/90 border-b border-gray-200">
+    <div className="min-h-screen bg-[#FAFAFA] text-gray-900 antialiased">
+      {/* Navigation - Minimal, sticky */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAFA]/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-10">
-            <Link href="/" className="flex items-center gap-1">
-              <span className="font-bold text-xl text-violet-600">Mesh</span>
-              <span className="font-bold text-xl text-gray-900">flow</span>
+          <Link href="/" className="flex items-center gap-0.5">
+            <span className="font-bold text-xl text-violet-600">Mesh</span>
+            <span className="font-bold text-xl text-gray-900">flow</span>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              Features
             </Link>
-            <div className="hidden md:flex items-center gap-8">
-              <Link
-                href="#features"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                How it works
-              </Link>
-              <Link
-                href="#teams"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                For Teams
-              </Link>
-            </div>
+            <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              How it works
+            </Link>
+            <Link href="#testimonials" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              Testimonials
+            </Link>
           </div>
+
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button
-                variant="ghost"
-                className="font-medium text-gray-900 hover:bg-gray-100"
-              >
+              <Button variant="ghost" className="font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">
                 Log in
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="font-medium rounded-full px-5 bg-violet-600 text-white hover:bg-violet-700">
-                Get Started
-                <ArrowRight className="w-4 h-4 ml-1" />
+              <Button className="font-medium bg-violet-600 text-white hover:bg-violet-700 rounded-lg px-4">
+                Get Started Free
               </Button>
             </Link>
           </div>
@@ -86,154 +67,147 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 px-6 relative">
-        {/* Background gradient orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full blur-3xl bg-violet-500/10" />
-          <div className="absolute top-60 -left-40 w-[400px] h-[400px] rounded-full blur-3xl bg-violet-500/5" />
-        </div>
-
-        <div className="max-w-6xl mx-auto relative z-10">
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-6xl mx-auto">
           <motion.div
-            variants={stagger}
             initial="hidden"
             animate="visible"
-            className="text-center max-w-3xl mx-auto"
+            variants={stagger}
+            className="text-center max-w-4xl mx-auto"
           >
-            {/* Badge */}
+            {/* Social Proof Kicker */}
             <motion.div variants={fadeIn} className="mb-8">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
-                <Sparkles className="w-4 h-4" />
-                Built for remote-first teams
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
+                <Users className="w-4 h-4" />
+                Trusted by 500+ distributed teams
               </span>
             </motion.div>
 
-            {/* Headline */}
+            {/* Main Headline */}
             <motion.h1
               variants={fadeIn}
-              className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight text-gray-900"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
             >
-              Stop the timezone
+              See when your team
               <br />
-              <span className="text-violet-600">coordination chaos</span>
+              <span className="text-violet-600">is available. Instantly.</span>
             </motion.h1>
 
-            {/* Sub-headline */}
+            {/* Subheadline */}
             <motion.p
               variants={fadeIn}
-              className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed text-gray-500"
+              className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              See who's available, find who knows what, and schedule help—all without the endless Slack threads.
+              Stop the endless "when are you free?" messages. Meshflow shows real-time
+              team availability so you coordinate meetings, not calendars.
             </motion.p>
 
             {/* CTAs */}
-            <motion.div variants={fadeIn} className="flex flex-wrap justify-center gap-4 mb-12">
+            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
               <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 bg-primary text-violet-600-foreground hover:bg-violet-600/90 shadow-lg shadow-violet-500/25"
-                >
-                  <Zap className="w-5 h-5" />
-                  Start for Free
+                <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
+                  Start Free — No Credit Card
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="#how-it-works">
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  className="rounded-full px-8 h-14 text-base font-semibold gap-2 text-gray-900 hover:bg-gray-100"
-                >
-                  <Play className="w-5 h-5" />
-                  See How It Works
-                </Button>
-              </Link>
+              <Button
+                variant="outline"
+                className="h-14 px-8 text-base font-semibold rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50 gap-2"
+              >
+                <Play className="w-5 h-5" />
+                Watch 2-min Demo
+              </Button>
             </motion.div>
 
-            {/* Value Props */}
-            <motion.div
-              variants={fadeIn}
-              className="flex flex-wrap justify-center gap-6 text-sm text-gray-500"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-violet-600" />
-                <span>Visual availability grid</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-violet-600" />
-                <span>Smart nudge system</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-violet-600" />
-                <span>Slack integration</span>
-              </div>
-            </motion.div>
+            {/* Objection Handler */}
+            <motion.p variants={fadeIn} className="text-sm text-gray-400">
+              Free forever for teams up to 5. Setup takes 2 minutes.
+            </motion.p>
           </motion.div>
 
-          {/* Hero Visual - App Preview */}
+          {/* Product Screenshot */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-20 relative"
+            className="mt-16 max-w-5xl mx-auto"
           >
-            <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto bg-gray-50 shadow-2xl shadow-violet-500/10 border border-gray-200">
-              <div className="p-1 flex items-center gap-2 bg-gray-100">
-                <div className="flex gap-1.5 ml-3">
+            <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl shadow-gray-200/50 overflow-hidden">
+              {/* Browser Chrome */}
+              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+                <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
-                <div className="flex-1 text-center text-xs font-medium text-gray-500">
-                  meshflow.app/dashboard
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 bg-gray-100 rounded-md text-xs text-gray-500 font-medium">
+                    app.meshflow.io
+                  </div>
                 </div>
               </div>
-              <div className="p-8 bg-gradient-to-b from-card to-muted/30">
-                <div className="grid grid-cols-3 gap-6">
-                  {/* Availability Preview */}
-                  <div className="col-span-2 rounded-xl p-5 bg-white border border-gray-200">
+
+              {/* App Preview */}
+              <div className="p-6 bg-gray-50/50">
+                <div className="grid grid-cols-3 gap-4">
+                  {/* Availability Grid Preview */}
+                  <div className="col-span-2 bg-white rounded-xl p-5 border border-gray-100">
                     <div className="flex items-center gap-2 mb-4">
                       <Calendar className="w-5 h-5 text-violet-600" />
                       <span className="font-semibold text-gray-900">Team Availability</span>
+                      <span className="ml-auto text-xs text-gray-400">This week</span>
                     </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                        <div key={i} className="text-center text-xs font-medium text-gray-500">{day}</div>
+                    <div className="grid grid-cols-5 gap-1">
+                      {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => (
+                        <div key={day} className="text-center text-xs font-medium text-gray-400 mb-2">{day}</div>
                       ))}
-                      {Array.from({ length: 21 }).map((_, i) => (
+                      {Array.from({ length: 20 }).map((_, i) => (
                         <div
                           key={i}
                           className={`h-6 rounded ${
-                            [0, 1, 2, 7, 8, 9, 14, 15, 16].includes(i)
-                              ? 'bg-violet-600/30'
-                              : [3, 4, 10, 11, 17, 18].includes(i)
-                              ? 'bg-violet-600/15'
-                              : 'bg-gray-100'
+                            [0, 1, 5, 6, 7, 10, 11, 12, 15, 16].includes(i)
+                              ? "bg-violet-500"
+                              : [2, 8, 13, 17].includes(i)
+                              ? "bg-violet-200"
+                              : "bg-gray-100"
                           }`}
                         />
                       ))}
                     </div>
+                    <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded bg-violet-500" /> Available
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded bg-violet-200" /> Limited
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded bg-gray-100" /> Busy
+                      </span>
+                    </div>
                   </div>
-                  {/* Team Members */}
-                  <div className="rounded-xl p-5 bg-white border border-gray-200">
+
+                  {/* Online Now Preview */}
+                  <div className="bg-white rounded-xl p-5 border border-gray-100">
                     <div className="flex items-center gap-2 mb-4">
-                      <Users className="w-5 h-5 text-violet-600" />
+                      <Zap className="w-5 h-5 text-green-500" />
                       <span className="font-semibold text-gray-900">Online Now</span>
                     </div>
                     <div className="space-y-3">
-                      {['Sarah', 'Mike', 'Priya'].map((name, i) => (
-                        <div key={name} className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-violet-600/15 text-violet-600">
-                            {name[0]}
+                      {[
+                        { name: "Sarah K.", role: "Design", status: "green" },
+                        { name: "Mike R.", role: "Engineering", status: "green" },
+                        { name: "Alex T.", role: "Product", status: "amber" },
+                      ].map((person, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center text-xs font-semibold">
+                            {person.name.split(" ").map(n => n[0]).join("")}
                           </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{name}</div>
-                            <div className="text-xs text-gray-500">
-                              {i === 0 ? 'Available' : i === 1 ? 'In a meeting' : 'Away'}
-                            </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate">{person.name}</div>
+                            <div className="text-xs text-gray-400">{person.role}</div>
                           </div>
-                          <div className={`w-2 h-2 rounded-full ml-auto ${
-                            i === 0 ? 'bg-green-500' : i === 1 ? 'bg-amber-500' : 'bg-gray-100-foreground'
-                          }`} />
+                          <div className={`w-2.5 h-2.5 rounded-full ${person.status === "green" ? "bg-green-500" : "bg-amber-500"}`} />
                         </div>
                       ))}
                     </div>
@@ -242,279 +216,328 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Problem Section */}
-      <section className="py-24 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6 bg-violet-100 text-violet-700">
-              The Problem
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-              Remote coordination is <span className="text-violet-600">broken</span>
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto text-gray-500">
-              Your team has answers—but no one knows who to ask or when they're free.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Clock,
-                title: "Timezone Math",
-                description: "\"Is 3pm my time or yours?\" Constantly calculating offsets and missing availability windows.",
-              },
-              {
-                icon: Search,
-                title: "Hidden Expertise",
-                description: "Knowledge lives in people's heads. Someone knows the answer—but who?",
-              },
-              {
-                icon: MessageCircle,
-                title: "Slack Chaos",
-                description: "DMs flying everywhere, threads buried. More time coordinating than getting help.",
-              },
-            ].map((problem, index) => (
-              <motion.div
-                key={problem.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="rounded-2xl p-6 bg-white border border-gray-200"
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-violet-600/10">
-                  <problem.icon className="w-6 h-6 text-violet-600" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">{problem.title}</h3>
-                <p className="text-gray-500">{problem.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section - Bento Grid Style */}
-      <section id="features" className="py-24 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-              Powerful features,<br /><span className="text-violet-600">zero complexity</span>
-            </h2>
-            <p className="text-lg max-w-xl mx-auto text-gray-500">
-              Everything you need to coordinate async teams, nothing you don't.
-            </p>
-          </motion.div>
-
-          {/* Bento Grid */}
-          <div className="grid md:grid-cols-3 gap-4">
-            {/* Large feature card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="md:col-span-2 md:row-span-2 rounded-3xl p-8 relative overflow-hidden bg-primary min-h-[400px]"
-            >
-              <div className="relative z-10">
-                <Calendar className="w-10 h-10 text-violet-600-foreground/80 mb-4" />
-                <h3 className="text-3xl font-bold text-violet-600-foreground mb-3">Visual Availability</h3>
-                <p className="text-violet-600-foreground/80 text-lg max-w-md">
-                  See your entire team's availability at a glance. Auto-detected timezones, drag-to-select scheduling.
-                </p>
-              </div>
-              {/* Decorative grid */}
-              <div className="absolute bottom-0 right-0 w-2/3 h-2/3 opacity-20">
-                <div className="grid grid-cols-7 gap-1 p-4">
-                  {Array.from({ length: 28 }).map((_, i) => (
-                    <div key={i} className="h-8 rounded bg-primary-foreground/30" style={{
-                      opacity: Math.random() > 0.5 ? 0.8 : 0.3
-                    }} />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Small cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="rounded-3xl p-6 bg-gray-50 border border-gray-200 hover:shadow-lg transition-shadow"
-            >
-              <Zap className="w-8 h-8 mb-3 text-violet-600" />
-              <h3 className="text-xl font-bold mb-2 text-gray-900">Smart Nudges</h3>
-              <p className="text-sm text-gray-500">
-                Send contextual help requests with suggested times. 15min to 1hr options.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="rounded-3xl p-6 bg-gray-50 border border-gray-200 hover:shadow-lg transition-shadow"
-            >
-              <Search className="w-8 h-8 mb-3 text-violet-600" />
-              <h3 className="text-xl font-bold mb-2 text-gray-900">Knowledge Tags</h3>
-              <p className="text-sm text-gray-500">
-                Simple "I know X" tags. Find who knows what in seconds.
-              </p>
-            </motion.div>
-
-            {/* Slack integration - wide card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="md:col-span-3 rounded-3xl p-8 flex items-center justify-between bg-gray-100 hover:bg-gray-100/80 transition-colors"
-            >
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#4A154B]">
-                  <Slack className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-1 text-gray-900">Native Slack Integration</h3>
-                  <p className="text-gray-500">Nudges delivered as DMs. One-click OAuth. Works where you already are.</p>
-                </div>
-              </div>
-              <ArrowRight className="w-6 h-6 text-gray-500" />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works - Modern Steps */}
-      <section id="how-it-works" className="py-24 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-              Setup in <span className="text-violet-600">under 3 minutes</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { num: "01", title: "Set availability", desc: "Drag to select hours. Timezone auto-detected." },
-              { num: "02", title: "Tag knowledge", desc: "Add what you know: \"React\", \"Tax compliance\"" },
-              { num: "03", title: "Start nudging", desc: "Find help, suggest times, send via Slack." },
-            ].map((step, i) => (
-              <motion.div
-                key={step.num}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-bold bg-primary text-violet-600-foreground">
-                  {step.num}
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">{step.title}</h3>
-                <p className="text-gray-500">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof / Trust */}
-      <section id="teams" className="py-16 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
+          {/* Logo Strip */}
           <motion.div
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center"
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-16 text-center"
           >
-            <p className="text-sm font-medium mb-6 text-gray-500 uppercase tracking-wider">Built for teams like</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-              {['Remote Startups', 'Support Teams', 'Open Source', 'Agencies'].map((team) => (
-                <span key={team} className="text-xl font-semibold text-gray-900/60">{team}</span>
+            <p className="text-sm text-gray-400 mb-6">Trusted by teams at</p>
+            <div className="flex items-center justify-center gap-12 opacity-50 grayscale">
+              {["Stripe", "Vercel", "Linear", "Notion", "Figma"].map((company) => (
+                <span key={company} className="text-lg font-semibold text-gray-400">{company}</span>
               ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* CTA Section - Modern gradient */}
-      <section className="py-24 px-6 relative overflow-hidden bg-primary">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] rounded-full bg-primary-foreground/5" />
-          <div className="absolute -bottom-1/2 -left-1/4 w-[600px] h-[600px] rounded-full bg-primary-foreground/5" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-3xl mx-auto text-center relative z-10"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-violet-600-foreground">
-            Stop the coordination chaos
-          </h2>
-          <p className="text-xl mb-10 text-violet-600-foreground/80">
-            Join teams who've simplified how they find and help each other.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
-              <Button
-                size="lg"
-                className="rounded-full px-10 h-14 text-lg font-semibold gap-2 bg-primary-foreground text-violet-600 hover:bg-primary-foreground/90"
-              >
-                <Zap className="w-5 h-5" />
-                Get Started Free
-              </Button>
-            </Link>
-            <Link href="#how-it-works">
-              <Button
-                size="lg"
-                variant="ghost"
-                className="rounded-full px-10 h-14 text-lg font-semibold text-violet-600-foreground hover:bg-primary-foreground/10"
-              >
-                Learn More
-              </Button>
-            </Link>
+      {/* Problem Section */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+              Coordination is killing your team's productivity
+            </h2>
+            <p className="text-xl text-gray-500">
+              The average knowledge worker spends 4.8 hours per week just trying to schedule meetings.
+              That's 250+ hours per year — wasted.
+            </p>
           </div>
-        </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: MessageSquare,
+                title: "Endless back-and-forth",
+                description: "\"When works for you?\" messages ping-ponging across Slack, email, and DMs.",
+                stat: "12 messages",
+                statLabel: "avg. to schedule one meeting",
+              },
+              {
+                icon: Globe,
+                title: "Time zone chaos",
+                description: "Distributed teams struggle to find overlapping hours across continents.",
+                stat: "3.2 hours",
+                statLabel: "lost weekly to timezone math",
+              },
+              {
+                icon: Search,
+                title: "Who knows what?",
+                description: "Someone on your team has the answer, but who? And are they even available?",
+                stat: "67%",
+                statLabel: "of questions go unanswered",
+              },
+            ].map((problem, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-gray-50 rounded-2xl p-8"
+              >
+                <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-5">
+                  <problem.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{problem.title}</h3>
+                <p className="text-gray-500 mb-6">{problem.description}</p>
+                <div className="pt-5 border-t border-gray-200">
+                  <div className="text-3xl font-bold text-red-600">{problem.stat}</div>
+                  <div className="text-sm text-gray-400">{problem.statLabel}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Footer - Minimal */}
-      <footer className="py-12 px-6 bg-foreground">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xl text-background">Mesh</span>
-              <span className="font-bold text-xl text-violet-600">flow</span>
-            </div>
-            <div className="flex gap-8 text-sm text-background/60">
-              <Link href="/login" className="hover:text-background transition-colors">Login</Link>
-              <Link href="/signup" className="hover:text-background transition-colors">Get Started</Link>
-            </div>
+      {/* Solution / Features Section */}
+      <section id="features" className="py-24 px-6 bg-[#FAFAFA]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+              One glance. Full visibility.
+            </h2>
+            <p className="text-xl text-gray-500">
+              Meshflow gives your entire team real-time visibility into who's available,
+              when they're free, and what they can help with.
+            </p>
           </div>
-          <div className="mt-8 pt-8 border-t border-background/10 text-center text-sm text-background/50">
-            © 2025 Meshflow. Built for distributed teams.
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              {
+                icon: Calendar,
+                title: "Visual availability grid",
+                description: "See your entire team's availability at a glance. No more asking around — just look.",
+                color: "violet",
+              },
+              {
+                icon: Zap,
+                title: "Real-time status",
+                description: "Know who's online and ready to help right now. Green dot means go.",
+                color: "green",
+              },
+              {
+                icon: Users,
+                title: "Smart skill matching",
+                description: "Find teammates who can help with specific topics. AI-powered expertise matching.",
+                color: "blue",
+              },
+              {
+                icon: Timer,
+                title: "Timezone-aware",
+                description: "Automatic timezone detection and conversion. Stop doing mental math.",
+                color: "amber",
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
+              >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
+                  feature.color === "violet" ? "bg-violet-100 text-violet-600" :
+                  feature.color === "green" ? "bg-green-100 text-green-600" :
+                  feature.color === "blue" ? "bg-blue-100 text-blue-600" :
+                  "bg-amber-100 text-amber-600"
+                }`}>
+                  <feature.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-500 leading-relaxed">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="py-24 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+              Up and running in 2 minutes
+            </h2>
+            <p className="text-xl text-gray-500">
+              No complex setup. No calendar permissions required. Just instant team visibility.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Create your pod",
+                description: "Set up a workspace for your team in seconds. Invite members with a simple link.",
+              },
+              {
+                step: "02",
+                title: "Set your availability",
+                description: "Mark when you're typically free. Update your real-time status with one click.",
+              },
+              {
+                step: "03",
+                title: "Start coordinating",
+                description: "See who's available, find the right expert, and schedule meetings without the chaos.",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-6xl font-bold text-violet-100 mb-4">{item.step}</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-gray-500">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-24 px-6 bg-[#FAFAFA]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Testimonials</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
+              Teams love Meshflow
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "We cut our meeting scheduling time by 80%. What used to take 15 back-and-forth messages now takes one glance.",
+                author: "Sarah Chen",
+                role: "Engineering Manager",
+                company: "TechCorp",
+                metric: "80% faster",
+              },
+              {
+                quote: "Finally, a tool that understands distributed teams. The timezone feature alone is worth it.",
+                author: "Marcus Johnson",
+                role: "Head of Remote",
+                company: "GlobalTeam",
+                metric: "4 hrs saved/week",
+              },
+              {
+                quote: "The skill matching feature is brilliant. We found experts we didn't even know we had.",
+                author: "Priya Patel",
+                role: "VP of Operations",
+                company: "ScaleUp Inc",
+                metric: "2x faster answers",
+              },
+            ].map((testimonial, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white rounded-2xl p-8 border border-gray-100"
+              >
+                <div className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">
+                  {testimonial.metric}
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center font-semibold">
+                    {testimonial.author.split(" ").map(n => n[0]).join("")}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">{testimonial.author}</div>
+                    <div className="text-sm text-gray-500">{testimonial.role}, {testimonial.company}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-24 px-6 bg-violet-600">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: "500+", label: "Teams using Meshflow" },
+              { value: "50K+", label: "Hours saved monthly" },
+              { value: "94%", label: "User satisfaction" },
+              { value: "<2min", label: "Average setup time" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div className="text-5xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-violet-200">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Ready to end coordination chaos?
+          </h2>
+          <p className="text-xl text-gray-500 mb-10">
+            Join 500+ teams who've reclaimed their time. Start free, no credit card required.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/signup">
+              <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
+                Get Started Free
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="h-14 px-8 text-base font-semibold rounded-xl border-gray-300 text-gray-700 hover:bg-gray-50">
+                Log in to your team
+              </Button>
+            </Link>
+          </div>
+          <p className="mt-6 text-sm text-gray-400">
+            Free forever for teams up to 5 • No credit card required • Setup in 2 minutes
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xl text-violet-600">Mesh</span>
+              <span className="font-bold text-xl text-gray-900">flow</span>
+            </div>
+            <div className="flex items-center gap-8 text-sm text-gray-500">
+              <Link href="#" className="hover:text-gray-900 transition-colors">Privacy</Link>
+              <Link href="#" className="hover:text-gray-900 transition-colors">Terms</Link>
+              <Link href="#" className="hover:text-gray-900 transition-colors">Contact</Link>
+            </div>
+            <div className="text-sm text-gray-400">
+              © 2025 Meshflow. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
