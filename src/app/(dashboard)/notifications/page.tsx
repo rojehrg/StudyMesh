@@ -1,30 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckCheck, X, Loader2, Send, Sparkles } from "lucide-react";
+import { Bell, CheckCheck, X, Loader2, Send, Sparkles, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [sentNotifications, setSentNotifications] = useState<any[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
+  // Load notifications
+  const loadNotifications = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setCurrentUserId(user.id);
 
       const { data } = await supabase
         .from('notifications')
@@ -47,7 +47,57 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  // Set up realtime subscription
+  useEffect(() => {
+    loadNotifications();
+
+    // Subscribe to new notifications for this user
+    const channel = supabase
+      .channel('notifications-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+        },
+        (payload) => {
+          const newNotification = payload.new as any;
+
+          // Check if this notification is for the current user
+          if (newNotification.recipient_id === currentUserId) {
+            // Add to beginning of list
+            setNotifications(prev => [newNotification, ...prev]);
+
+            // Show toast notification
+            const nudgeType = newNotification.metadata?.nudge_type;
+            toast.success(
+              nudgeType === 'ask' ? "Someone needs your help!" : "Someone offered to help!",
+              {
+                description: newNotification.content?.slice(0, 80) + (newNotification.content?.length > 80 ? "..." : ""),
+                icon: <Zap className="w-4 h-4 text-success" />,
+                action: {
+                  label: "View",
+                  onClick: () => handleNotificationClick(newNotification),
+                },
+              }
+            );
+          }
+
+          // Check if this was sent by current user
+          if (newNotification.sender_id === currentUserId) {
+            setSentNotifications(prev => [newNotification, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUserId, loadNotifications, supabase]);
 
   const markAllAsRead = async () => {
     try {
@@ -102,6 +152,12 @@ export default function NotificationsPage() {
     if (notification.type === 'new_match') {
       // Navigate to Working Circles to see the new match
       router.push('/groups');
+    } else if (notification.type === 'nudge' && metadata.pod_code) {
+      // Navigate to pod page where they can respond and schedule
+      router.push(`/classes/${metadata.pod_code}`);
+    } else if (notification.type === 'meeting_invite' && metadata.meeting_id) {
+      // Navigate to meetings page
+      router.push('/meetings');
     } else if (metadata.pod_code) {
       router.push(`/classes/${metadata.pod_code}`);
     }

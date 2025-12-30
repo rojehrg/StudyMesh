@@ -62,24 +62,82 @@ function slotToTime(slot: number, timezone: string): string {
 /**
  * Get timezone abbreviation
  */
-function getTimezoneAbbrev(timezone: string): string {
+export function getTimezoneAbbrev(timezone: string): string {
   const abbrevMap: Record<string, string> = {
+    // Americas
     "America/Los_Angeles": "PT",
+    "America/Vancouver": "PT",
     "America/Denver": "MT",
+    "America/Phoenix": "MST",
     "America/Chicago": "CT",
     "America/New_York": "ET",
+    "America/Toronto": "ET",
+    "America/Halifax": "AT",
+    "America/St_Johns": "NT",
+    "America/Anchorage": "AKT",
+    "Pacific/Honolulu": "HST",
+    "America/Mexico_City": "CST",
+    "America/Sao_Paulo": "BRT",
+    "America/Argentina/Buenos_Aires": "ART",
+    "America/Lima": "PET",
+    "America/Bogota": "COT",
+    "America/Santiago": "CLT",
+    // Europe
     "UTC": "UTC",
     "Europe/London": "GMT",
+    "Europe/Dublin": "GMT",
+    "Europe/Lisbon": "WET",
     "Europe/Paris": "CET",
     "Europe/Berlin": "CET",
+    "Europe/Amsterdam": "CET",
+    "Europe/Brussels": "CET",
+    "Europe/Madrid": "CET",
+    "Europe/Rome": "CET",
+    "Europe/Zurich": "CET",
+    "Europe/Vienna": "CET",
+    "Europe/Prague": "CET",
+    "Europe/Warsaw": "CET",
+    "Europe/Stockholm": "CET",
+    "Europe/Oslo": "CET",
+    "Europe/Copenhagen": "CET",
+    "Europe/Helsinki": "EET",
+    "Europe/Athens": "EET",
     "Europe/Istanbul": "TRT",
+    "Europe/Moscow": "MSK",
+    // Asia & Middle East
     "Asia/Dubai": "GST",
+    "Asia/Riyadh": "AST",
+    "Asia/Jerusalem": "IST",
     "Asia/Kolkata": "IST",
+    "Asia/Karachi": "PKT",
+    "Asia/Dhaka": "BST",
+    "Asia/Bangkok": "ICT",
+    "Asia/Ho_Chi_Minh": "ICT",
+    "Asia/Jakarta": "WIB",
     "Asia/Singapore": "SGT",
+    "Asia/Kuala_Lumpur": "MYT",
+    "Asia/Manila": "PHT",
+    "Asia/Hong_Kong": "HKT",
+    "Asia/Shanghai": "CST",
+    "Asia/Taipei": "CST",
+    "Asia/Seoul": "KST",
     "Asia/Tokyo": "JST",
-    "Australia/Sydney": "AEDT",
+    // Pacific & Oceania
+    "Australia/Perth": "AWST",
+    "Australia/Adelaide": "ACST",
+    "Australia/Sydney": "AEST",
+    "Australia/Melbourne": "AEST",
+    "Australia/Brisbane": "AEST",
+    "Pacific/Auckland": "NZST",
+    "Pacific/Fiji": "FJT",
+    // Africa
+    "Africa/Cairo": "EET",
+    "Africa/Johannesburg": "SAST",
+    "Africa/Lagos": "WAT",
+    "Africa/Nairobi": "EAT",
+    "Africa/Casablanca": "WET",
   };
-  return abbrevMap[timezone] || timezone.split("/").pop()?.slice(0, 3) || "???";
+  return abbrevMap[timezone] || timezone.split("/").pop()?.replace(/_/g, " ") || "???";
 }
 
 /**

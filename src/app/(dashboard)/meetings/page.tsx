@@ -96,6 +96,10 @@ export default function MeetingsPage() {
 
   const formatDateTime = (dateStr: string) => {
     const date = new Date(dateStr);
+    const tzAbbrev = new Intl.DateTimeFormat('en-US', {
+      timeZoneName: 'short'
+    }).formatToParts(date).find(p => p.type === 'timeZoneName')?.value || '';
+
     return {
       date: date.toLocaleDateString('en-US', {
         weekday: 'short',
@@ -106,12 +110,14 @@ export default function MeetingsPage() {
         hour: 'numeric',
         minute: '2-digit'
       }),
+      timezone: tzAbbrev,
       full: date.toLocaleString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         hour: 'numeric',
-        minute: '2-digit'
+        minute: '2-digit',
+        timeZoneName: 'short'
       })
     };
   };
@@ -191,7 +197,7 @@ export default function MeetingsPage() {
             </Card>
           ) : (
             upcomingMeetings.map((meeting) => {
-              const { date, time, full } = formatDateTime(meeting.scheduled_time);
+              const { date, time, timezone, full } = formatDateTime(meeting.scheduled_time);
               return (
                 <motion.div
                   key={meeting.id}
@@ -218,7 +224,7 @@ export default function MeetingsPage() {
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Clock className="w-4 h-4" />
-                              {time} ({meeting.duration_minutes} min)
+                              {time} {timezone} ({meeting.duration_minutes} min)
                             </div>
                             {meeting.participants && (
                               <div className="flex items-center gap-1.5">
