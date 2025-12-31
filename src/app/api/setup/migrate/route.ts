@@ -1,9 +1,26 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { rateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 // This endpoint runs database migrations to add missing columns
 // Protected by ADMIN_SECRET - must provide Bearer token
 export async function POST(req: Request) {
+  // Rate limiting - prevent brute force attacks
+  const clientIP = getClientIP(req);
+  const rateLimitResult = rateLimit(`setup:migrate:${clientIP}`, RATE_LIMITS.admin);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
+        },
+      }
+    );
+  }
+
   // Admin secret check - prevent unauthorized access
   const adminSecret = process.env.ADMIN_SECRET;
   const authHeader = req.headers.get("authorization");

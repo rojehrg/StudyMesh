@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const STATE_COOKIE_NAME = "slack_connect_state";
+const STATE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
 export async function GET(request: Request) {
   try {
@@ -22,15 +25,33 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${APP_URL}/settings?slack=error&message=missing_params`);
     }
 
+    // Validate CSRF state parameter
+    const cookieStore = await cookies();
+    const storedState = cookieStore.get(STATE_COOKIE_NAME)?.value;
+
+    // Clear the state cookie immediately
+    cookieStore.delete(STATE_COOKIE_NAME);
+
+    if (!storedState || state !== storedState) {
+      console.error("[Slack Connect] State mismatch - potential CSRF attack");
+      return NextResponse.redirect(`${APP_URL}/settings?slack=error&message=invalid_state`);
+    }
+
     if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET) {
       return NextResponse.redirect(`${APP_URL}/settings?slack=error&message=not_configured`);
     }
 
-    // Decode state to get user ID
+    // Decode state to get user ID and validate timestamp
     let userId: string;
     try {
       const decoded = JSON.parse(Buffer.from(state, "base64").toString());
       userId = decoded.userId;
+
+      // Check if state has expired
+      if (Date.now() - decoded.timestamp > STATE_MAX_AGE_MS) {
+        console.error("[Slack Connect] State expired");
+        return NextResponse.redirect(`${APP_URL}/settings?slack=error&message=state_expired`);
+      }
     } catch {
       return NextResponse.redirect(`${APP_URL}/settings?slack=error&message=invalid_state`);
     }

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const STATE_COOKIE_NAME = "slack_oauth_state";
+const STATE_COOKIE_MAX_AGE = 60 * 10; // 10 minutes
 
 /**
  * Initiates Slack OAuth flow for authentication
@@ -46,6 +49,16 @@ export async function GET() {
     slackAuthUrl.searchParams.set("user_scope", userScopes);
     slackAuthUrl.searchParams.set("redirect_uri", redirectUri);
     slackAuthUrl.searchParams.set("state", state);
+
+    // Store state in a secure cookie for CSRF validation in callback
+    const cookieStore = await cookies();
+    cookieStore.set(STATE_COOKIE_NAME, state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: STATE_COOKIE_MAX_AGE,
+      path: "/",
+    });
 
     return NextResponse.redirect(slackAuthUrl.toString());
   } catch (error) {

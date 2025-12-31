@@ -8,6 +8,8 @@ const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const STATE_COOKIE_NAME = "slack_oauth_state";
+const STATE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 /**
  * Handles Slack OAuth callback
@@ -18,6 +20,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const error = url.searchParams.get("error");
+    const state = url.searchParams.get("state");
 
     // Handle user cancellation
     if (error) {
@@ -27,6 +30,30 @@ export async function GET(request: Request) {
 
     if (!code) {
       return NextResponse.redirect(`${APP_URL}/?error=missing_code`);
+    }
+
+    // Validate CSRF state parameter
+    const cookieStore = await cookies();
+    const storedState = cookieStore.get(STATE_COOKIE_NAME)?.value;
+
+    // Clear the state cookie immediately
+    cookieStore.delete(STATE_COOKIE_NAME);
+
+    if (!state || !storedState || state !== storedState) {
+      console.error("[Slack Auth] State mismatch - potential CSRF attack");
+      return NextResponse.redirect(`${APP_URL}/?error=invalid_state`);
+    }
+
+    // Validate state timestamp to prevent replay attacks
+    try {
+      const stateData = JSON.parse(Buffer.from(state, "base64").toString());
+      if (Date.now() - stateData.timestamp > STATE_MAX_AGE_MS) {
+        console.error("[Slack Auth] State expired");
+        return NextResponse.redirect(`${APP_URL}/?error=state_expired`);
+      }
+    } catch {
+      console.error("[Slack Auth] Invalid state format");
+      return NextResponse.redirect(`${APP_URL}/?error=invalid_state`);
     }
 
     if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET) {

@@ -1,8 +1,28 @@
 import { NextResponse } from "next/server";
 import { client } from "@/lib/db";
+import { rateLimit, getClientIP, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting - prevent brute force attacks
+    const clientIP = getClientIP(req);
+    const rateLimitResult = rateLimit(`admin:migrate:${clientIP}`, RATE_LIMITS.admin);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
+            "X-RateLimit-Limit": String(RATE_LIMITS.admin.limit),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(rateLimitResult.resetTime),
+          },
+        }
+      );
+    }
+
     // Admin secret check - prevent unauthorized access
     const adminSecret = process.env.ADMIN_SECRET;
     const authHeader = req.headers.get("authorization");
