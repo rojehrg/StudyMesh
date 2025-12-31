@@ -165,22 +165,22 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-primary"
+              className="h-full bg-violet-600"
               initial={{ width: "0%" }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-sm text-muted-foreground font-medium">
-            <span className={step >= 1 ? "text-primary" : ""}>About You</span>
-            <span className={step >= 2 ? "text-primary" : ""}>Skills</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Bio</span>
+          <div className="flex justify-between mt-2 text-sm text-gray-500 font-medium">
+            <span className={step >= 1 ? "text-violet-600" : ""}>About You</span>
+            <span className={step >= 2 ? "text-violet-600" : ""}>Skills</span>
+            <span className={step >= 3 ? "text-violet-600" : ""}>Bio</span>
           </div>
         </div>
 
@@ -192,10 +192,10 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-border">
+              <Card className="shadow-lg border-gray-200 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Tell us about yourself</CardTitle>
-                  <CardDescription>This helps us match you with the right pods.</CardDescription>
+                  <CardTitle className="text-2xl text-gray-900">Tell us about yourself</CardTitle>
+                  <CardDescription className="text-gray-500">This helps us match you with the right pods.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
+                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -261,15 +261,15 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-border">
+              <Card className="shadow-lg border-gray-200 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Your Capabilities</CardTitle>
-                  <CardDescription>What can you teach? What do you want to learn?</CardDescription>
+                  <CardTitle className="text-2xl text-gray-900">Your Capabilities</CardTitle>
+                  <CardDescription className="text-gray-500">What can you teach? What do you want to learn?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
                   {/* Expertise */}
                   <div className="space-y-3">
-                    <Label className="text-accent font-semibold flex items-center gap-2">
+                    <Label className="text-emerald-600 font-semibold flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
@@ -279,14 +279,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Python, Sales)"
                       type="expertise"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted/50 rounded-lg border border-border">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200">
                       {formData.expertiseSkills.length === 0 && (
-                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
                       )}
                       {formData.expertiseSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-accent/20 text-accent hover:bg-accent/30 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-accent/40 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-emerald-300 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
 
                   {/* Growth */}
                   <div className="space-y-3">
-                    <Label className="text-primary font-semibold flex items-center gap-2">
+                    <Label className="text-violet-600 font-semibold flex items-center gap-2">
                       <ArrowRight className="w-4 h-4" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
@@ -306,14 +306,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Leadership, SQL)"
                       type="growth"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted/50 rounded-lg border border-border">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200">
                        {formData.growthSkills.length === 0 && (
-                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
                       )}
                       {formData.growthSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-primary/20 text-primary hover:bg-primary/30 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-200 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-primary/40 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-violet-300 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
@@ -322,11 +322,11 @@ export default function OnboardingPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
-                  <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
+                  <Button variant="ghost" onClick={() => setStep(1)} className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">Back</Button>
                   <Button
                     onClick={() => setStep(3)}
                     disabled={formData.expertiseSkills.length === 0}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
+                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -342,19 +342,19 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-border">
+              <Card className="shadow-lg border-gray-200 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Final Polish</CardTitle>
-                  <CardDescription>How can teammates partner with you?</CardDescription>
+                  <CardTitle className="text-2xl text-gray-900">Final Polish</CardTitle>
+                  <CardDescription className="text-gray-500">How can teammates partner with you?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Timezone */}
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-primary" />
+                    <Label className="flex items-center gap-2 text-gray-700">
+                      <Globe className="w-4 h-4 text-violet-600" />
                       Your Timezone
                     </Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-500">
                       We auto-detected your timezone. Change it if needed for accurate meeting suggestions.
                     </p>
                     <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
@@ -418,11 +418,11 @@ export default function OnboardingPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
-                  <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
+                  <Button variant="ghost" onClick={() => setStep(2)} className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">Back</Button>
                   <Button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 transition-all active:scale-95"
+                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-8 transition-all active:scale-95"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Complete Profile
