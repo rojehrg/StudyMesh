@@ -99,6 +99,7 @@ export default async function DashboardPage() {
   // Get currently available teammates from user's pods
   let availableTeammates: any[] = [];
   let helpersCount = 0;
+  let hasTeammates = false;
   if (podIds.length > 0) {
     // Get all members of user's pods
     const { data: podMembers } = await supabase
@@ -108,6 +109,7 @@ export default async function DashboardPage() {
       .neq('user_id', user.id);
 
     const teammateIds = [...new Set(podMembers?.map(pm => pm.user_id) || [])];
+    hasTeammates = teammateIds.length > 0;
 
     if (teammateIds.length > 0) {
       const { data: allProfiles } = await supabase
@@ -156,19 +158,21 @@ export default async function DashboardPage() {
     },
     {
       id: "pod",
-      label: "Join a pod",
+      label: "Join or create a pod",
       description: "Connect with your team to start collaborating.",
       done: podIds.length > 0,
-      href: "/classes/join",
-      action: "Join",
+      href: "/classes",
+      action: "Get started",
     },
     {
       id: "nudge",
       label: "Send your first nudge",
-      description: "Reach out to a teammate for help or offer your expertise.",
-      done: hasSentFirstNudge,
+      description: hasTeammates
+        ? "Reach out to a teammate for help or offer your expertise."
+        : "Invite teammates to your pod first, then you can nudge them.",
+      done: hasSentFirstNudge || (podIds.length > 0 && !hasTeammates),
       href: pods.length > 0 ? `/classes/${pods[0]?.pod_code}` : "/classes",
-      action: "Nudge",
+      action: hasTeammates ? "Nudge" : "Invite",
     },
     {
       id: "profile",
@@ -249,7 +253,7 @@ export default async function DashboardPage() {
             <CardContent>
               <div className="text-3xl font-bold text-foreground">{helpersCount}</div>
               <p className="text-sm text-muted-foreground mt-1">
-                {helpersCount === 0 ? "Be the first" : "Open to helping"}
+                {helpersCount === 0 ? "No helpers yet" : `${helpersCount === 1 ? "Teammate" : "Teammates"} ready to help`}
               </p>
             </CardContent>
           </Card>

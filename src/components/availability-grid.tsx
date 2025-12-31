@@ -14,6 +14,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Globe, Clock, Zap, ChevronDown, Check, Search, X } from "lucide-react";
+import { toast } from "sonner";
 
 // Comprehensive timezone list grouped by region
 const TIMEZONE_OPTIONS = [
@@ -305,6 +306,7 @@ export function AvailabilityGrid({
 
   const clearAll = () => {
     setSlots([]);
+    toast.success("Availability cleared");
   };
 
   const setWorkHours = () => {
@@ -314,6 +316,7 @@ export function AvailabilityGrid({
       workSlots.push({ day, startSlot: 18, endSlot: 34 }); // 9:00 - 17:00
     }
     setSlots(workSlots);
+    toast.success("Availability set to 9-5 Mon-Fri");
   };
 
   // Format slot to time string (12-hour format)

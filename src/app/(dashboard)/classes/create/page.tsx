@@ -77,8 +77,9 @@ export default function CreatePodPage() {
       router.push(`/classes/${podCode}`);
     } catch (error: any) {
       console.error("Error creating pod:", error);
+      const errorMessage = error?.message || error?.error_description || (typeof error === 'string' ? error : "Please try again.");
       toast.error("Failed to create pod", {
-        description: error.message || "Please try again."
+        description: errorMessage
       });
     } finally {
       setLoading(false);

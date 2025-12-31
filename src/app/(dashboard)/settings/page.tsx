@@ -354,7 +354,7 @@ export default function SettingsPage() {
                   <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
                   <Input
                     id="firstName"
-                    placeholder="John"
+                    placeholder="Enter your first name"
                     value={profile.firstName}
                     onChange={(e) => updateProfile({ firstName: e.target.value })}
                     className="h-9"
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                   <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
                   <Input
                     id="lastName"
-                    placeholder="Doe"
+                    placeholder="Enter your last name"
                     value={profile.lastName}
                     onChange={(e) => updateProfile({ lastName: e.target.value })}
                     className="h-9"

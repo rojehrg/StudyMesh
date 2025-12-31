@@ -149,10 +149,10 @@ export default function OnboardingPage() {
       if (error) throw error;
 
       toast.success("Profile completed!", {
-        description: "Let's find your first matches!"
+        description: "Welcome to Meshflow!"
       });
-      // Redirect to Working Circles to show immediate matches
-      router.push("/groups");
+      // Redirect to dashboard
+      router.push("/dashboard");
       router.refresh();
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
                         id="firstName"
-                        placeholder="John"
+                        placeholder="Enter your first name"
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
                         className="h-11"
@@ -213,7 +213,7 @@ export default function OnboardingPage() {
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         id="lastName"
-                        placeholder="Doe"
+                        placeholder="Enter your last name"
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
                         className="h-11"
