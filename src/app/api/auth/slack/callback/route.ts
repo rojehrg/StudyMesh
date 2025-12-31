@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { encryptToken } from "@/lib/encryption";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET;
@@ -244,7 +245,7 @@ export async function GET(request: Request) {
         .update({
           organization_id: organization.id,
           slack_user_id: slackUserId,
-          slack_access_token: botAccessToken,
+          slack_access_token: encryptToken(botAccessToken),
           slack_team_id: workspaceId,
           slack_connected: true,
           slack_handle: `@${slackUser.name}`,
@@ -267,7 +268,7 @@ export async function GET(request: Request) {
           avatar_url: userAvatar,
           timezone: userTimezone,
           slack_user_id: slackUserId,
-          slack_access_token: botAccessToken,
+          slack_access_token: encryptToken(botAccessToken),
           slack_team_id: workspaceId,
           slack_connected: true,
           slack_handle: `@${slackUser.name}`,

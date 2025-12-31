@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { notifyParticipant } from "@/lib/notifications";
+import { decryptToken } from "@/lib/encryption";
 
 export async function GET(request: Request) {
   try {
@@ -191,14 +192,14 @@ export async function POST(request: Request) {
     for (const pid of participantIds) {
       const profile = participantProfiles?.find(p => p.user_id === pid);
 
-      // Notify participant
+      // Notify participant (decrypt token for Slack API calls)
       const notifiedVia = await notifyParticipant(
         {
           userId: pid,
           email: profile?.email,
           slackHandle: profile?.slack_handle,
           slackUserId: profile?.slack_user_id,
-          slackAccessToken: profile?.slack_access_token,
+          slackAccessToken: decryptToken(profile?.slack_access_token) ?? undefined,
           slackConnected: profile?.slack_connected,
           firstName: profile?.first_name,
           lastName: profile?.last_name,

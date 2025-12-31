@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { encryptToken } from "@/lib/encryption";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET;
@@ -105,7 +106,7 @@ export async function GET(request: Request) {
       .from("profiles")
       .update({
         slack_user_id: authedUserId,
-        slack_access_token: accessToken,
+        slack_access_token: encryptToken(accessToken),
         slack_team_id: teamId,
         slack_connected: true,
         slack_handle: `@${slackHandle}`,
