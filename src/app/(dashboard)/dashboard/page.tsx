@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/');
+    redirect('/login');
   }
 
   // Fetch profile - use maybeSingle to handle case where profile doesn't exist

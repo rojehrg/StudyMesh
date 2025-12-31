@@ -68,16 +68,36 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   console.log(`[Middleware] User found: ${!!user}`);
 
-  // Protected routes - redirect unauthenticated users to landing page
+  // Protected routes - redirect unauthenticated users to login
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    console.log("[Middleware] Redirecting to landing page");
-    return NextResponse.redirect(new URL('/', request.url))
+    console.log("[Middleware] Redirecting to /login");
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Onboarding requires auth
-  if (request.nextUrl.pathname.startsWith('/onboarding') && !user) {
-    console.log("[Middleware] Redirecting to landing page");
-    return NextResponse.redirect(new URL('/', request.url))
+  // Onboarding and org-setup require auth
+  if ((request.nextUrl.pathname.startsWith('/onboarding') || request.nextUrl.pathname.startsWith('/org-setup')) && !user) {
+    console.log("[Middleware] Redirecting to /login");
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Auth routes - redirect authenticated users to dashboard
+  if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user) {
+    // Check if user has completed onboarding
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('expertise_skills')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    const needsOnboarding = !profile?.expertise_skills || profile.expertise_skills.length === 0;
+
+    if (needsOnboarding) {
+      console.log("[Middleware] Redirecting to /onboarding");
+      return NextResponse.redirect(new URL('/onboarding', request.url))
+    }
+
+    console.log("[Middleware] Redirecting to /dashboard");
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response

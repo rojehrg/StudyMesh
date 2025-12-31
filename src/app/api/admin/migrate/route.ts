@@ -3,18 +3,28 @@ import { client } from "@/lib/db";
 
 export async function POST() {
   try {
-    // Create organizations table (represents Slack workspaces)
+    // Create organizations table
     await client`
       CREATE TABLE IF NOT EXISTS "organizations" (
         "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-        "slack_team_id" text NOT NULL UNIQUE,
         "name" text NOT NULL,
+        "invite_code" text UNIQUE,
+        "owner_id" uuid,
+        "slack_team_id" text UNIQUE,
         "slack_team_name" text,
         "slack_team_icon" text,
+        "slack_bot_token" text,
         "created_at" timestamp DEFAULT now() NOT NULL,
         "updated_at" timestamp DEFAULT now() NOT NULL
       )
     `;
+
+    // Add invite_code and owner_id if table already exists
+    await client`ALTER TABLE "organizations" ADD COLUMN IF NOT EXISTS "invite_code" text UNIQUE`;
+    await client`ALTER TABLE "organizations" ADD COLUMN IF NOT EXISTS "owner_id" uuid`;
+    await client`ALTER TABLE "organizations" ADD COLUMN IF NOT EXISTS "slack_bot_token" text`;
+    await client`ALTER TABLE "organizations" ALTER COLUMN "slack_team_id" DROP NOT NULL`;
+    await client`CREATE INDEX IF NOT EXISTS "organizations_invite_code_idx" ON "organizations" ("invite_code")`;
 
     // Add organization columns to profiles
     await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE`;

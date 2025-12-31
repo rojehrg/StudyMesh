@@ -116,7 +116,7 @@ export default function OnboardingPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     // Force hard navigation to clear all state
-    window.location.href = "/";
+    window.location.href = "/login";
   };
 
   const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>
@@ -189,11 +189,24 @@ export default function OnboardingPage() {
 
       if (error) throw error;
 
-      toast.success("Profile completed!", {
-        description: "Welcome to Meshflow!"
-      });
-      // Redirect to dashboard
-      router.push("/dashboard");
+      // Check if user has an organization
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile?.organization_id) {
+        toast.success("Profile completed!", {
+          description: "Welcome to Meshflow!"
+        });
+        router.push("/dashboard");
+      } else {
+        toast.success("Profile completed!", {
+          description: "Now let's set up your team"
+        });
+        router.push("/org-setup");
+      }
       router.refresh();
     } catch (error) {
       console.error("Error saving profile:", error);

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus } from "@phosphor-icons/react";
+import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy } from "@phosphor-icons/react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -40,6 +40,15 @@ interface ProfileData {
   slackUserId: string;
 }
 
+interface OrgData {
+  id: string;
+  name: string;
+  inviteCode: string;
+  isOwner: boolean;
+  slackConnected: boolean;
+  slackTeamName: string;
+}
+
 const DEFAULT_PROFILE: ProfileData = {
   firstName: "",
   lastName: "",
@@ -63,9 +72,11 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
+  const [org, setOrg] = useState<OrgData | null>(null);
   const [knowledgeInput, setKnowledgeInput] = useState("");
   const [slackConnecting, setSlackConnecting] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const [copiedInvite, setCopiedInvite] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
   const isInitialLoad = useRef(true);
@@ -99,7 +110,7 @@ export default function SettingsPage() {
 
       const { data } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, organizations(*)')
         .eq('user_id', user.id)
         .single();
 
@@ -123,6 +134,18 @@ export default function SettingsPage() {
         };
         setProfile(loadedProfile);
         lastSavedRef.current = JSON.stringify(loadedProfile);
+
+        // Load organization data
+        if (data.organizations) {
+          setOrg({
+            id: data.organizations.id,
+            name: data.organizations.name,
+            inviteCode: data.organizations.invite_code || "",
+            isOwner: data.organizations.owner_id === user.id,
+            slackConnected: !!data.organizations.slack_team_id,
+            slackTeamName: data.organizations.slack_team_name || "",
+          });
+        }
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -228,10 +251,20 @@ export default function SettingsPage() {
     );
   }
 
+  const copyInviteCode = () => {
+    if (org?.inviteCode) {
+      navigator.clipboard.writeText(org.inviteCode);
+      setCopiedInvite(true);
+      toast.success("Invite code copied!");
+      setTimeout(() => setCopiedInvite(false), 2000);
+    }
+  };
+
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "availability", label: "Availability", icon: Clock },
     { id: "notifications", label: "Notifications", icon: Envelope },
+    { id: "organization", label: "Organization", icon: Buildings },
   ];
 
   return (
@@ -517,6 +550,114 @@ export default function SettingsPage() {
               )}
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Organization Tab */}
+      {activeTab === "organization" && (
+        <div className="space-y-6">
+          {org ? (
+            <>
+              {/* Org Info */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-base font-semibold">Organization</CardTitle>
+                  <CardDescription>Your team workspace</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Buildings className="w-6 h-6 text-primary" weight="duotone" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground">{org.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {org.isOwner ? "Owner" : "Member"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Invite Code */}
+              {org.isOwner && org.inviteCode && (
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-base font-semibold">Invite Code</CardTitle>
+                    <CardDescription>Share this code to invite teammates</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 p-3 bg-muted rounded-lg font-mono text-lg tracking-widest text-center">
+                        {org.inviteCode}
+                      </div>
+                      <Button onClick={copyInviteCode} variant="outline" size="icon">
+                        {copiedInvite ? (
+                          <Check className="w-4 h-4 text-success" weight="duotone" />
+                        ) : (
+                          <Copy className="w-4 h-4" weight="duotone" />
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Org Slack Integration */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-base font-semibold">Workspace Slack</CardTitle>
+                  <CardDescription>Connect your organization's Slack workspace</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {org.slackConnected ? (
+                    <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
+                          <Check className="w-5 h-5 text-success" weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">Connected</p>
+                          <p className="text-sm text-muted-foreground">
+                            {org.slackTeamName || "Workspace connected"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
+                          <ChatCircle className="w-5 h-5 text-[#4A154B]" weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">Connect Workspace Slack</p>
+                          <p className="text-sm text-muted-foreground">Enable Slack notifications for your team</p>
+                        </div>
+                      </div>
+                      {org.isOwner && (
+                        <Button className="bg-[#4A154B] hover:bg-[#611f69]">
+                          <Link className="w-4 h-4 mr-2" weight="duotone" />
+                          Connect
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Buildings className="w-12 h-12 text-muted-foreground mx-auto mb-4" weight="duotone" />
+                <h3 className="font-semibold text-foreground mb-2">No Organization</h3>
+                <p className="text-sm text-muted-foreground mb-4">You're not part of an organization yet</p>
+                <Button asChild>
+                  <a href="/org-setup">Join or Create Organization</a>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </motion.div>

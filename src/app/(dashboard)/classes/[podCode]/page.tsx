@@ -59,7 +59,7 @@ export default function PodDetailPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push('/');
+        router.push('/login');
         return;
       }
       setCurrentUserId(user.id);
