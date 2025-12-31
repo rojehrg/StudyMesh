@@ -127,7 +127,7 @@ export default function ClassesPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="group-hover:text-accent transition-colors">
+                        <CardTitle className="group-hover:text-primary transition-colors">
                           {pod.pod_name}
                         </CardTitle>
                         <CardDescription className="mt-2 flex items-center gap-1">

@@ -194,8 +194,9 @@ export default function NotificationsPage() {
           : n
       ));
 
-      // Send response notification to the original sender
-      if (metadata.sender_id) {
+      // Send response notification to the original sender (sender_id is a column, not in metadata)
+      const originalSenderId = notification.sender_id;
+      if (originalSenderId) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const { data: profile } = await supabase
@@ -206,8 +207,9 @@ export default function NotificationsPage() {
 
           const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Someone';
 
+          // Create in-app notification
           await supabase.from('notifications').insert({
-            recipient_id: metadata.sender_id,
+            recipient_id: originalSenderId,
             sender_id: user.id,
             type: 'nudge_response',
             content: accepted
@@ -219,6 +221,27 @@ export default function NotificationsPage() {
               original_nudge_id: notification.id
             }
           });
+
+          // Send Slack notification to original sender
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('slack_handle')
+            .eq('user_id', originalSenderId)
+            .single();
+
+          if (senderProfile?.slack_handle) {
+            fetch('/api/slack/nudge-response', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                recipientSlackHandle: senderProfile.slack_handle,
+                responderName: senderName,
+                accepted,
+                topic: metadata.topic,
+                podCode: metadata.pod_code
+              }),
+            }).catch(() => {}); // Fire and forget
+          }
         }
       }
 
@@ -226,7 +249,7 @@ export default function NotificationsPage() {
 
       // If accepted, navigate to pod to schedule
       if (accepted && metadata.pod_code) {
-        router.push(`/classes/${metadata.pod_code}?schedule=${metadata.sender_id}`);
+        router.push(`/classes/${metadata.pod_code}?schedule=${originalSenderId}`);
       }
     } catch (error) {
       console.error("Error responding to nudge:", error);

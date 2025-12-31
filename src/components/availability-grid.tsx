@@ -258,15 +258,34 @@ export function AvailabilityGrid({
       return;
     }
 
-    // If no drag movement, just toggle the single slot
+    // If no drag movement (single click), toggle the single slot
     const { day, slot } = dragStart;
     const isSelected = isSlotSelected(day, slot);
 
     if (dragMode === "add" && !isSelected) {
+      // Add single slot
       const filtered = slots.filter(
         (s) => s.day !== day || s.endSlot <= slot || s.startSlot > slot
       );
       setSlots([...filtered, { day, startSlot: slot, endSlot: slot + 1 }]);
+    } else if (dragMode === "remove" && isSelected) {
+      // Remove single slot - split or trim existing slots
+      const newSlots: AvailabilitySlot[] = [];
+      slots.forEach((s) => {
+        if (s.day !== day || slot < s.startSlot || slot >= s.endSlot) {
+          // Keep slots that don't contain this slot
+          newSlots.push(s);
+        } else {
+          // This slot contains the clicked position - split it
+          if (s.startSlot < slot) {
+            newSlots.push({ day, startSlot: s.startSlot, endSlot: slot });
+          }
+          if (s.endSlot > slot + 1) {
+            newSlots.push({ day, startSlot: slot + 1, endSlot: s.endSlot });
+          }
+        }
+      });
+      setSlots(newSlots);
     }
 
     setIsDragging(false);

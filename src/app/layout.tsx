@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: "Visual team availability, contextual help requests, and Slack integration. Free alternative to Calendly for small remote teams. Built for distributed startups and support teams.",
   keywords: ["remote team coordination", "time zone scheduling", "team availability", "Slack integration", "distributed teams", "remote work tools"],
   authors: [{ name: "Meshflow" }],
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
   openGraph: {
     title: "Meshflow - Remote Team Coordination Made Simple",
     description: "Know who to ask, when they're free, and coordinate help in seconds. Built for distributed startups and support teams.",

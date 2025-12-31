@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <defs>
+    <linearGradient id="meshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#meshGradient)"/>
+  <path d="M45 135V67.5l28 33.75 17-33.75 17 33.75 28-33.75V135" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="45" cy="56" r="8.5" fill="white"/>
+  <circle cx="73" cy="56" r="8.5" fill="white"/>
+  <circle cx="90" cy="56" r="8.5" fill="white"/>
+  <circle cx="107" cy="56" r="8.5" fill="white"/>
+  <circle cx="135" cy="56" r="8.5" fill="white"/>
+</svg>

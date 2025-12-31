@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { NudgeDialog } from "@/components/nudge-dialog";
+import { ScheduleMeetingDialog } from "@/components/schedule-meeting-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 export default function PodDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const podCode = params.podCode as string;
   const supabase = createClient();
 
@@ -31,10 +33,27 @@ export default function PodDetailPage() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [isManager, setIsManager] = useState(false);
   const [allowCrossPodHelp, setAllowCrossPodHelp] = useState(true);
+  const [scheduleMeetingOpen, setScheduleMeetingOpen] = useState(false);
+  const [scheduleWithUserId, setScheduleWithUserId] = useState<string | null>(null);
 
   useEffect(() => {
     loadPodData();
   }, [podCode]);
+
+  // Handle schedule query parameter from nudge acceptance
+  useEffect(() => {
+    const scheduleUserId = searchParams.get('schedule');
+    if (scheduleUserId && pod && members.length > 0) {
+      // Check if this user is in the pod
+      const memberExists = members.some(m => m.userId === scheduleUserId);
+      if (memberExists) {
+        setScheduleWithUserId(scheduleUserId);
+        setScheduleMeetingOpen(true);
+        // Clear the query parameter from URL
+        router.replace(`/classes/${podCode}`, { scroll: false });
+      }
+    }
+  }, [searchParams, pod, members, podCode, router]);
 
   const loadPodData = async () => {
     try {
@@ -396,7 +415,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topExpertise.map(([skill, count]) => (
-                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium">
+                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </Badge>
@@ -408,7 +427,7 @@ export default function PodDetailPage() {
             {topGrowth.length > 0 && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-accent">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
                     <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
@@ -416,7 +435,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topGrowth.map(([skill, count]) => (
-                      <Badge key={skill} variant="outline" className="gap-1.5 px-3 py-1.5 text-sm font-medium border-accent/50 text-accent">
+                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </Badge>
@@ -493,7 +512,7 @@ export default function PodDetailPage() {
                     {member.expertiseSkills.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {member.expertiseSkills.slice(0, 3).map((skill: string) => (
-                          <span key={skill} className="text-sm bg-accent/15 text-accent px-2.5 py-0.5 rounded">
+                          <span key={skill} className="text-sm bg-primary/15 text-primary dark:bg-primary/20 dark:text-primary px-2.5 py-0.5 rounded font-medium">
                             {skill}
                           </span>
                         ))}
@@ -547,6 +566,23 @@ export default function PodDetailPage() {
             availabilitySlots: currentUserProfile.availabilitySlots,
           }}
           onNudge={handleNudge}
+        />
+      )}
+
+      {/* Schedule Meeting Dialog - auto-opened from nudge acceptance */}
+      {pod && (
+        <ScheduleMeetingDialog
+          open={scheduleMeetingOpen}
+          onOpenChange={(open) => {
+            setScheduleMeetingOpen(open);
+            if (!open) setScheduleWithUserId(null);
+          }}
+          onSuccess={() => {
+            setScheduleMeetingOpen(false);
+            setScheduleWithUserId(null);
+          }}
+          preselectedPodId={pod.id}
+          preselectedUserIds={scheduleWithUserId ? [scheduleWithUserId] : []}
         />
       )}
     </>

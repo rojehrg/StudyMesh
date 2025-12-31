@@ -1,21 +1,23 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { toast } from "sonner";
-import { Zap, Sparkles } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { NotificationToast } from "@/components/notification-toast";
 
 interface RealtimeContextType {
   isConnected: boolean;
   newNotificationCount: number;
   clearNotificationCount: () => void;
+  triggerRefresh: () => void;
 }
 
 const RealtimeContext = createContext<RealtimeContextType>({
   isConnected: false,
   newNotificationCount: 0,
   clearNotificationCount: () => {},
+  triggerRefresh: () => {},
 });
 
 export function useRealtime() {
@@ -30,10 +32,17 @@ interface RealtimeProviderProps {
 export function RealtimeProvider({ children, userId }: RealtimeProviderProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [newNotificationCount, setNewNotificationCount] = useState(0);
+  const [currentNotification, setCurrentNotification] = useState<any>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const supabase = createClient();
+  const router = useRouter();
 
   const clearNotificationCount = useCallback(() => {
     setNewNotificationCount(0);
+  }, []);
+
+  const triggerRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
   }, []);
 
   useEffect(() => {
@@ -65,26 +74,11 @@ export function RealtimeProvider({ children, userId }: RealtimeProviderProps) {
             // Increment counter
             setNewNotificationCount(prev => prev + 1);
 
-            // Show toast
-            const nudgeType = notification.metadata?.nudge_type;
-            const isMatch = notification.type === 'new_match';
+            // Show custom toast
+            setCurrentNotification(notification);
 
-            if (isMatch) {
-              toast.success("New Working Circle Match!", {
-                description: notification.content?.slice(0, 100),
-                icon: <Sparkles className="w-4 h-4 text-accent" />,
-                duration: 5000,
-              });
-            } else {
-              toast.success(
-                nudgeType === 'ask' ? "Someone needs your help!" : "Someone offered to help!",
-                {
-                  description: notification.content?.slice(0, 100),
-                  icon: <Zap className="w-4 h-4 text-success" />,
-                  duration: 5000,
-                }
-              );
-            }
+            // Trigger refresh for components that need it
+            triggerRefresh();
           }
         )
         .subscribe((status) => {
@@ -101,11 +95,37 @@ export function RealtimeProvider({ children, userId }: RealtimeProviderProps) {
         supabase.removeChannel(channel);
       }
     };
-  }, [userId, supabase]);
+  }, [userId, supabase, triggerRefresh]);
+
+  const handleNotificationAction = () => {
+    if (currentNotification?.type === 'nudge') {
+      router.push('/notifications');
+    } else if (currentNotification?.type === 'nudge_response' && currentNotification?.metadata?.accepted) {
+      const podCode = currentNotification.metadata?.pod_code;
+      const senderId = currentNotification.sender_id;
+      if (podCode && senderId) {
+        // Navigate with schedule param to auto-open meeting dialog with sender pre-selected
+        router.push(`/classes/${podCode}?schedule=${senderId}`);
+      } else if (podCode) {
+        router.push(`/classes/${podCode}`);
+      } else {
+        router.push('/meetings');
+      }
+    } else if (currentNotification?.metadata?.pod_code) {
+      router.push(`/classes/${currentNotification.metadata.pod_code}`);
+    } else {
+      router.push('/notifications');
+    }
+  };
 
   return (
-    <RealtimeContext.Provider value={{ isConnected, newNotificationCount, clearNotificationCount }}>
+    <RealtimeContext.Provider value={{ isConnected, newNotificationCount, clearNotificationCount, triggerRefresh }}>
       {children}
+      <NotificationToast
+        notification={currentNotification}
+        onDismiss={() => setCurrentNotification(null)}
+        onAction={handleNotificationAction}
+      />
     </RealtimeContext.Provider>
   );
 }

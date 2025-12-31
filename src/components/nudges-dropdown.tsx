@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useRealtime } from "@/components/realtime-provider";
 
 interface Notification {
   id: string;
@@ -26,24 +27,30 @@ export function NudgesDropdown() {
   const [sentNotifications, setSentNotifications] = useState<Notification[]>([]);
   const [activeTab, setActiveTab] = useState<'received' | 'sent'>('received');
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  // Use realtime context for live updates
+  const { newNotificationCount, clearNotificationCount } = useRealtime();
+
   useEffect(() => {
     loadNotifications();
-
-    // Set up realtime subscription for new notifications
-    const channel = supabase
-      .channel('notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
-        loadNotifications();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
+
+  // Reload when new notification comes in via realtime
+  useEffect(() => {
+    if (newNotificationCount > 0) {
+      loadNotifications();
+    }
+  }, [newNotificationCount]);
+
+  // Clear count when dropdown is opened
+  useEffect(() => {
+    if (isOpen) {
+      clearNotificationCount();
+    }
+  }, [isOpen, clearNotificationCount]);
 
   const loadNotifications = async () => {
     try {
@@ -140,16 +147,24 @@ export function NudgesDropdown() {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  // Show realtime count as a pulse indicator, plus unread from DB
+  const totalUnread = unreadCount + newNotificationCount;
   const displayedNotifications = activeTab === 'received' ? notifications : sentNotifications;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5 text-foreground" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm">
-              {unreadCount > 9 ? '9+' : unreadCount}
+          <Bell className={cn(
+            "w-5 h-5 text-foreground transition-transform",
+            newNotificationCount > 0 && "animate-[wiggle_0.5s_ease-in-out]"
+          )} />
+          {totalUnread > 0 && (
+            <span className={cn(
+              "absolute -top-1 -right-1 min-w-[20px] h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center px-1.5 shadow-sm transition-all",
+              newNotificationCount > 0 && "animate-pulse ring-2 ring-primary/50"
+            )}>
+              {totalUnread > 9 ? '9+' : totalUnread}
             </span>
           )}
         </Button>
