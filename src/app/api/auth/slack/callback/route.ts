@@ -104,11 +104,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${APP_URL}/?error=no_email`);
     }
 
-    console.log("[Slack Auth] User info retrieved:", {
-      email: userEmail,
-      name: userName,
-      workspace: workspaceName
-    });
+    console.log("[Slack Auth] User info retrieved for workspace:", workspaceName);
 
     // Create Supabase admin client
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -176,7 +172,7 @@ export async function GET(request: Request) {
 
     if (existingUser) {
       supabaseUser = existingUser;
-      console.log("[Slack Auth] Found existing user:", supabaseUser.email);
+      console.log("[Slack Auth] Found existing user");
     } else {
       // Create new user with a random password (they'll never use it - Slack only)
       const { data: newUser, error: userError } = await supabaseAdmin.auth.admin.createUser({
@@ -195,7 +191,7 @@ export async function GET(request: Request) {
       }
 
       supabaseUser = newUser.user;
-      console.log("[Slack Auth] Created new user:", supabaseUser?.email);
+      console.log("[Slack Auth] Created new user");
     }
 
     if (!supabaseUser) {

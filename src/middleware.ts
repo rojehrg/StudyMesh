@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
-  console.log(`[Middleware] Processing ${request.nextUrl.pathname}`);
   
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -66,17 +65,14 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  console.log(`[Middleware] User found: ${!!user}`);
 
   // Protected routes - redirect unauthenticated users to login
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    console.log("[Middleware] Redirecting to /login");
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // Onboarding and org-setup require auth
   if ((request.nextUrl.pathname.startsWith('/onboarding') || request.nextUrl.pathname.startsWith('/org-setup')) && !user) {
-    console.log("[Middleware] Redirecting to /login");
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -92,11 +88,9 @@ export async function middleware(request: NextRequest) {
     const needsOnboarding = !profile?.expertise_skills || profile.expertise_skills.length === 0;
 
     if (needsOnboarding) {
-      console.log("[Middleware] Redirecting to /onboarding");
       return NextResponse.redirect(new URL('/onboarding', request.url))
     }
 
-    console.log("[Middleware] Redirecting to /dashboard");
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

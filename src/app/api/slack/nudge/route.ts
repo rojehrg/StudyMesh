@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   try {
+    // Authentication check
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const webhook = process.env.SLACK_WEBHOOK_URL;
     if (!webhook) {
       return NextResponse.json({ skipped: true, reason: "Webhook not configured" }, { status: 200 });

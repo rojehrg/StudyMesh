@@ -88,6 +88,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "userIds array is required" }, { status: 400 });
     }
 
+    // Authorization: Check that requester is in the same organization as the users being queried
+    const { data: requesterProfile } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (requesterProfile?.organization_id) {
+      // Verify all queried users are in the same organization
+      const { data: targetProfiles } = await supabase
+        .from('profiles')
+        .select('user_id, organization_id')
+        .in('user_id', userIds);
+
+      const unauthorizedUsers = (targetProfiles || []).filter(
+        p => p.organization_id !== requesterProfile.organization_id
+      );
+
+      if (unauthorizedUsers.length > 0) {
+        return NextResponse.json({ error: "Unauthorized to view these users" }, { status: 403 });
+      }
+    }
+
     // Get availability from profiles table (stored as JSON in availability column)
     const { data: profiles, error } = await supabase
       .from('profiles')

@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { client } from "@/lib/db";
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
+    // Admin secret check - prevent unauthorized access
+    const adminSecret = process.env.ADMIN_SECRET;
+    const authHeader = req.headers.get("authorization");
+
+    if (!adminSecret || authHeader !== `Bearer ${adminSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Create organizations table
     await client`
       CREATE TABLE IF NOT EXISTS "organizations" (
