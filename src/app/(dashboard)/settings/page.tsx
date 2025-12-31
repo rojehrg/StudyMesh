@@ -418,29 +418,6 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Status */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Sparkle className="w-5 h-5 text-primary" weight="duotone" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">Looking to Help</p>
-                    <p className="text-sm text-muted-foreground">Show others you're available to assist</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={profile.lookingToHelp}
-                  onCheckedChange={(checked) => {
-                    updateProfile({ lookingToHelp: checked });
-                    toast.success(checked ? "Status updated" : "Status removed");
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
         </div>
       )}
 

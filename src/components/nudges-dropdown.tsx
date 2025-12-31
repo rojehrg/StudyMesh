@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, Check, Send, X } from "lucide-react";
+import { Bell, Check, Send, X, Calendar } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +21,7 @@ interface Notification {
   read: boolean;
   created_at: string;
   metadata?: any;
+  sender_id?: string;
 }
 
 export function NudgesDropdown() {
@@ -128,6 +130,75 @@ export function NudgesDropdown() {
 
     if (notification.metadata?.pod_code) {
       router.push(`/classes/${notification.metadata.pod_code}`);
+    }
+  };
+
+  const handleNudgeResponse = async (notification: Notification, accepted: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const metadata = notification.metadata || {};
+
+      // Update notification with response
+      await supabase
+        .from('notifications')
+        .update({
+          read: true,
+          metadata: {
+            ...metadata,
+            responded: true,
+            accepted
+          }
+        })
+        .eq('id', notification.id);
+
+      // Update local state
+      setNotifications(notifications.map(n =>
+        n.id === notification.id
+          ? { ...n, read: true, metadata: { ...n.metadata, responded: true, accepted } }
+          : n
+      ));
+
+      // Get current user info
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('user_id', user.id)
+          .single();
+
+        const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Someone';
+
+        // Send response notification to original sender
+        const originalSenderId = (notification as any).sender_id;
+        if (originalSenderId) {
+          await supabase.from('notifications').insert({
+            recipient_id: originalSenderId,
+            sender_id: user.id,
+            type: 'nudge_response',
+            content: accepted
+              ? `${senderName} accepted your nudge and wants to connect!`
+              : `${senderName} isn't available right now.`,
+            metadata: {
+              pod_code: metadata.pod_code,
+              accepted,
+              original_nudge_id: notification.id
+            }
+          });
+        }
+      }
+
+      toast.success(accepted ? "Nudge accepted!" : "Response sent");
+
+      // If accepted, navigate to pod to schedule
+      if (accepted && metadata.pod_code) {
+        setIsOpen(false);
+        const originalSenderId = (notification as any).sender_id;
+        router.push(`/classes/${metadata.pod_code}?schedule=${originalSenderId}`);
+      }
+    } catch (error) {
+      console.error("Error responding to nudge:", error);
+      toast.error("Failed to respond");
     }
   };
 
@@ -272,9 +343,37 @@ export function NudgesDropdown() {
                           {notification.metadata.pod_code}
                         </span>
                       )}
+                      {notification.type === 'nudge' && notification.metadata?.responded && (
+                        <span className={cn(
+                          "text-xs px-1.5 py-0.5 rounded",
+                          notification.metadata.accepted
+                            ? "bg-green-500/10 text-green-600"
+                            : "bg-muted text-muted-foreground"
+                        )}>
+                          {notification.metadata.accepted ? "Accepted" : "Declined"}
+                        </span>
+                      )}
                     </div>
+                    {/* Accept/Decline buttons for nudges */}
+                    {activeTab === 'received' && notification.type === 'nudge' && !notification.metadata?.responded && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={(e) => handleNudgeResponse(notification, true, e)}
+                          className="flex items-center gap-1 text-xs bg-primary text-primary-foreground px-2.5 py-1 rounded-md hover:bg-primary/90 transition-colors"
+                        >
+                          <Calendar className="w-3 h-3" />
+                          Accept
+                        </button>
+                        <button
+                          onClick={(e) => handleNudgeResponse(notification, false, e)}
+                          className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-muted transition-colors"
+                        >
+                          Not Now
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {!notification.read && activeTab === 'received' && (
+                  {!notification.read && activeTab === 'received' && notification.type !== 'nudge' && (
                     <button
                       onClick={(e) => markAsRead(notification.id, e)}
                       className="text-muted-foreground hover:text-primary p-1"
@@ -287,6 +386,16 @@ export function NudgesDropdown() {
               </div>
             ))
           )}
+        </div>
+
+        {/* View all link */}
+        <div className="p-2 border-t border-border">
+          <button
+            onClick={() => { setIsOpen(false); router.push('/notifications'); }}
+            className="w-full text-sm text-primary hover:text-primary/80 font-medium py-1.5"
+          >
+            View all notifications
+          </button>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
