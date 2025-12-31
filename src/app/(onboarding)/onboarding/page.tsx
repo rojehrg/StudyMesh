@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, Loader2, ArrowRight, CheckCircle2, Globe, ChevronDown, Search } from "lucide-react";
+import { X, Loader2, ArrowRight, CheckCircle2, Globe, ChevronDown, Search, LogOut } from "lucide-react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { SkillAutocomplete } from "@/components/skill-autocomplete";
@@ -48,6 +49,7 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [timezoneSearch, setTimezoneSearch] = useState("");
   const [timezoneOpen, setTimezoneOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -65,18 +67,33 @@ export default function OnboardingPage() {
     growthInput: "",
   });
 
-  // Auto-detect timezone on mount
+  // Get user email and auto-detect timezone on mount
   useEffect(() => {
-    try {
-      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
-      if (matchedTimezone) {
-        setFormData(prev => ({ ...prev, timezone: detectedTimezone }));
+    const init = async () => {
+      // Get user email
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setUserEmail(user.email);
       }
-    } catch (e) {
-      // Fallback to default
-    }
-  }, []);
+
+      // Auto-detect timezone
+      try {
+        const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
+        if (matchedTimezone) {
+          setFormData(prev => ({ ...prev, timezone: detectedTimezone }));
+        }
+      } catch (e) {
+        // Fallback to default
+      }
+    };
+    init();
+  }, [supabase]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>
     tz.label.toLowerCase().includes(timezoneSearch.toLowerCase()) ||
@@ -165,10 +182,31 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
-        {/* Progress Bar */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="h-16 px-8 flex items-center justify-between border-b border-gray-200 bg-white">
+        <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
+          <span className="font-bold text-xl text-violet-600">Mesh</span>
+          <span className="font-bold text-xl text-gray-900">flow</span>
+        </Link>
+        {userEmail && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">{userEmail}</span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Log out
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-4rem)]">
+        <div className="w-full max-w-2xl">
+          {/* Progress Bar */}
+          <div className="mb-8">
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-violet-600"
@@ -432,6 +470,7 @@ export default function OnboardingPage() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
