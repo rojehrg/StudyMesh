@@ -14,7 +14,8 @@ import {
   CaretLeft,
   List,
   SignOut,
-  CalendarBlank
+  CalendarBlank,
+  Bell
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -134,6 +135,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: SquaresFour, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
+    { icon: Bell, label: "Nudges", href: "/notifications" },
     { icon: CalendarBlank, label: "Meetings", href: "/meetings" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: SignIn, label: "Join Pod", href: "/classes/join" },
