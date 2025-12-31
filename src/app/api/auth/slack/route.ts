@@ -8,7 +8,8 @@ const STATE_COOKIE_MAX_AGE = 60 * 10; // 10 minutes
 
 /**
  * Initiates Slack OAuth flow for authentication
- * This is the ONLY way to sign in to Meshflow
+ * This is one of three sign-in methods (Email/Password, Google, Slack)
+ * Also used to connect Slack workspace for notifications
  */
 export async function GET() {
   try {
