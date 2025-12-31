@@ -106,11 +106,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       setUserId(user.id);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name')
+        .select('*')
         .eq('user_id', user.id)
         .single();
+
+      if (error) {
+        console.warn("Could not load profile:", error.message);
+        return;
+      }
 
       if (data) {
         setProfile(data);

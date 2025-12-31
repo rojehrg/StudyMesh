@@ -76,12 +76,19 @@ export function OnboardingTour() {
         return;
       }
 
-      // Check if profile was created recently (within last 5 minutes = new user)
-      const { data: profile } = await supabase
+      // Check if profile exists and onboarding status
+      // Use select('*') to avoid 406 errors if specific columns don't exist
+      const { data: profile, error } = await supabase
         .from('profiles')
-        .select('created_at, onboarding_completed')
+        .select('*')
         .eq('user_id', user.id)
         .single();
+
+      if (error) {
+        console.warn("Could not fetch profile for tour status:", error.message);
+        setHasSeenTour(true); // Don't show tour on error
+        return;
+      }
 
       if (profile) {
         // If onboarding_completed is explicitly set, respect it
@@ -92,7 +99,7 @@ export function OnboardingTour() {
         }
 
         // Show tour for users who haven't seen it
-        if (profile.onboarding_completed === false || profile.onboarding_completed === null) {
+        if (profile.onboarding_completed === false || profile.onboarding_completed === null || profile.onboarding_completed === undefined) {
           setHasSeenTour(false);
           setIsOpen(true);
         }
