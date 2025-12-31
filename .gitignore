@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# legacy submodules
-legacy/.spec-kit
+# test scripts (local only)
+CLAUDE_TEST_SCRIPT.md
