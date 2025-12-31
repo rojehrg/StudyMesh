@@ -3,6 +3,34 @@ import { client } from "@/lib/db";
 
 export async function POST() {
   try {
+    // Create organizations table (represents Slack workspaces)
+    await client`
+      CREATE TABLE IF NOT EXISTS "organizations" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "slack_team_id" text NOT NULL UNIQUE,
+        "name" text NOT NULL,
+        "slack_team_name" text,
+        "slack_team_icon" text,
+        "created_at" timestamp DEFAULT now() NOT NULL,
+        "updated_at" timestamp DEFAULT now() NOT NULL
+      )
+    `;
+
+    // Add organization columns to profiles
+    await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE`;
+    await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "first_name" text`;
+    await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "last_name" text`;
+    await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "avatar_url" text`;
+    await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "slack_handle" text`;
+
+    // Add organization_id to pods
+    await client`ALTER TABLE "pods" ADD COLUMN IF NOT EXISTS "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE`;
+
+    // Create indexes for organization lookups
+    await client`CREATE INDEX IF NOT EXISTS "profiles_organization_id_idx" ON "profiles" ("organization_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "profiles_slack_user_id_idx" ON "profiles" ("slack_user_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "pods_organization_id_idx" ON "pods" ("organization_id")`;
+
     // Add new columns to profiles table
     await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "timezone" text DEFAULT 'America/New_York'`;
     await client`ALTER TABLE "profiles" ADD COLUMN IF NOT EXISTS "email" text`;
@@ -76,8 +104,9 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       message: "Migration completed successfully",
-      tables: ["availability_schedules", "scheduled_meetings", "meeting_participants"],
-      profileUpdates: ["timezone", "email", "email_notifications", "slack_user_id", "slack_access_token", "slack_team_id", "slack_connected", "removed looking_to_help"]
+      tables: ["organizations", "availability_schedules", "scheduled_meetings", "meeting_participants"],
+      profileUpdates: ["organization_id", "first_name", "last_name", "avatar_url", "slack_handle", "timezone", "email", "email_notifications", "slack_user_id", "slack_access_token", "slack_team_id", "slack_connected"],
+      podUpdates: ["organization_id"]
     });
   } catch (error) {
     console.error("Migration error:", error);
