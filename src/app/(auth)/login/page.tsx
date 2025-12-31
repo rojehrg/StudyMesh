@@ -47,15 +47,28 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      router.push("/dashboard");
-      router.refresh();
+      // Check if user has a profile before redirecting
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (profile) {
+          router.push("/dashboard");
+        } else {
+          router.push("/onboarding");
+        }
+        router.refresh();
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
