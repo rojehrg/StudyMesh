@@ -78,62 +78,63 @@
   }
 
   .dark {
-    /* ===== DARK MODE - High contrast, readable ===== */
+    /* ===== DARK MODE - Clean charcoal/gray palette ===== */
 
-    /* Background - Deep purple-black */
-    --background: 260 20% 8%;
-    --foreground: 0 0% 98%;
+    /* Background - Deep charcoal */
+    --background: 220 10% 7%;
+    --foreground: 0 0% 95%;
 
-    /* Cards - Elevated with subtle border feel */
-    --card: 260 15% 13%;
-    --card-foreground: 0 0% 98%;
+    /* Cards - Elevated charcoal */
+    --card: 220 8% 12%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 260 15% 15%;
-    --popover-foreground: 0 0% 98%;
+    /* Popover - Slightly lighter for depth */
+    --popover: 220 8% 14%;
+    --popover-foreground: 0 0% 95%;
 
-    /* Primary - Bright violet for dark mode */
-    --primary: 262 70% 72%;
-    --primary-foreground: 260 20% 8%;
+    /* Primary - Bright violet (brand color) */
+    --primary: 262 83% 68%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Visible purple tint */
-    --secondary: 260 20% 20%;
-    --secondary-foreground: 0 0% 95%;
+    /* Secondary - Neutral dark gray */
+    --secondary: 220 8% 18%;
+    --secondary-foreground: 0 0% 90%;
 
-    /* Accent - Brighter purple for visibility */
-    --accent: 262 40% 35%;
-    --accent-foreground: 0 0% 98%;
+    /* Accent - Subtle highlight */
+    --accent: 220 8% 20%;
+    --accent-foreground: 0 0% 95%;
 
-    /* Muted - Much brighter for readability */
-    --muted: 260 15% 18%;
-    --muted-foreground: 0 0% 75%;
+    /* Muted - For subtle text and backgrounds */
+    --muted: 220 8% 16%;
+    --muted-foreground: 220 5% 55%;
 
-    /* Destructive */
-    --destructive: 0 65% 55%;
+    /* Destructive - Clear red */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Bright green */
-    --success: 142 60% 55%;
+    /* Success - Vibrant green */
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Bright amber */
-    --warning: 45 90% 55%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 10%;
 
-    /* Info - Bright blue */
-    --info: 210 80% 60%;
+    /* Info - Clear blue */
+    --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - More visible */
-    --border: 260 15% 25%;
-    --input: 260 15% 22%;
-    --ring: 262 70% 72%;
+    /* Borders - Subtle but visible */
+    --border: 220 8% 20%;
+    --input: 220 8% 18%;
+    --ring: 262 83% 68%;
 
-    /* Chart colors - Brighter */
-    --chart-1: 262 70% 72%;
-    --chart-2: 280 60% 70%;
-    --chart-3: 210 80% 65%;
-    --chart-4: 262 50% 75%;
-    --chart-5: 180 60% 55%;
+    /* Chart colors - Vibrant for visibility */
+    --chart-1: 262 83% 68%;
+    --chart-2: 340 75% 65%;
+    --chart-3: 217 91% 60%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 38 92% 50%;
   }
 }
 

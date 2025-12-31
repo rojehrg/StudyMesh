@@ -219,19 +219,19 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="h-16 px-8 flex items-center justify-between border-b border-gray-200 bg-white">
+      <div className="h-16 px-8 flex items-center justify-between border-b border-border bg-card">
         <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-          <span className="font-bold text-xl text-violet-600">Mesh</span>
-          <span className="font-bold text-xl text-gray-900">flow</span>
+          <span className="font-bold text-xl text-primary">Mesh</span>
+          <span className="font-bold text-xl text-foreground">flow</span>
         </Link>
         {userEmail && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">{userEmail}</span>
+            <span className="text-sm text-muted-foreground">{userEmail}</span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <SignOut className="w-4 h-4" weight="duotone" />
               Log out
@@ -244,18 +244,18 @@ export default function OnboardingPage() {
         <div className="w-full max-w-2xl">
           {/* Progress Bar */}
           <div className="mb-8">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-violet-600"
+              className="h-full bg-primary"
               initial={{ width: "0%" }}
               animate={{ width: `${(step / 3) * 100}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-sm text-gray-500 font-medium">
-            <span className={step >= 1 ? "text-violet-600" : ""}>About You</span>
-            <span className={step >= 2 ? "text-violet-600" : ""}>Skills</span>
-            <span className={step >= 3 ? "text-violet-600" : ""}>Bio</span>
+          <div className="flex justify-between mt-2 text-sm text-muted-foreground font-medium">
+            <span className={step >= 1 ? "text-primary" : ""}>About You</span>
+            <span className={step >= 2 ? "text-primary" : ""}>Skills</span>
+            <span className={step >= 3 ? "text-primary" : ""}>Bio</span>
           </div>
         </div>
 
@@ -267,52 +267,52 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-gray-200 bg-white">
+              <Card className="shadow-lg border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Tell us about yourself</CardTitle>
-                  <CardDescription className="text-gray-500">This helps us match you with the right pods.</CardDescription>
+                  <CardTitle className="text-2xl text-foreground">Tell us about yourself</CardTitle>
+                  <CardDescription className="text-muted-foreground">This helps us match you with the right pods.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-gray-700">First Name</Label>
+                      <Label htmlFor="firstName" className="text-foreground">First Name</Label>
                       <Input
                         id="firstName"
                         placeholder="Enter your first name"
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
-                        className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                        className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-gray-700">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-foreground">Last Name</Label>
                       <Input
                         id="lastName"
                         placeholder="Enter your last name"
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
-                        className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                        className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="dept" className="text-gray-700">Department</Label>
+                    <Label htmlFor="dept" className="text-foreground">Department</Label>
                     <Input
                       id="dept"
                       placeholder="e.g. Engineering, Sales, Product"
                       value={formData.department}
                       onChange={e => setFormData({...formData, department: e.target.value})}
-                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                      className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="role" className="text-gray-700">Job Title</Label>
+                    <Label htmlFor="role" className="text-foreground">Job Title</Label>
                     <Input
                       id="role"
                       placeholder="e.g. Senior Account Executive"
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value})}
-                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                      className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 </CardContent>
@@ -320,7 +320,7 @@ export default function OnboardingPage() {
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
                   </Button>
@@ -336,15 +336,15 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-gray-200 bg-white">
+              <Card className="shadow-lg border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Your Capabilities</CardTitle>
-                  <CardDescription className="text-gray-500">What can you teach? What do you want to learn?</CardDescription>
+                  <CardTitle className="text-2xl text-foreground">Your Capabilities</CardTitle>
+                  <CardDescription className="text-muted-foreground">What can you teach? What do you want to learn?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
                   {/* Expertise */}
                   <div className="space-y-3">
-                    <Label className="text-emerald-600 font-semibold flex items-center gap-2">
+                    <Label className="text-success font-semibold flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" weight="duotone" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
@@ -354,14 +354,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Python, Sales)"
                       type="expertise"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted rounded-lg border border-border">
                       {formData.expertiseSkills.length === 0 && (
-                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.expertiseSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-success/15 text-success hover:bg-success/25 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-emerald-300 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-success/30 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" weight="duotone" />
                           </button>
                         </Badge>
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
 
                   {/* Growth */}
                   <div className="space-y-3">
-                    <Label className="text-violet-600 font-semibold flex items-center gap-2">
+                    <Label className="text-primary font-semibold flex items-center gap-2">
                       <ArrowRight className="w-4 h-4" weight="duotone" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
@@ -381,14 +381,14 @@ export default function OnboardingPage() {
                       placeholder="Add a skill (e.g. Leadership, SQL)"
                       type="growth"
                     />
-                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 bg-muted rounded-lg border border-border">
                        {formData.growthSkills.length === 0 && (
-                        <span className="text-sm text-gray-400 italic p-1">No skills added yet...</span>
+                        <span className="text-sm text-muted-foreground italic p-1">No skills added yet...</span>
                       )}
                       {formData.growthSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-200 pl-3 pr-1 py-1.5 text-sm">
+                        <Badge key={skill} variant="secondary" className="bg-primary/15 text-primary hover:bg-primary/25 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
-                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-violet-300 rounded-full p-0.5 transition-colors">
+                          <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-primary/30 rounded-full p-0.5 transition-colors">
                             <X className="h-3.5 w-3.5" weight="duotone" />
                           </button>
                         </Badge>
@@ -397,11 +397,11 @@ export default function OnboardingPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
-                  <Button variant="ghost" onClick={() => setStep(1)} className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">Back</Button>
+                  <Button variant="ghost" onClick={() => setStep(1)} className="text-muted-foreground hover:text-foreground hover:bg-accent">Back</Button>
                   <Button
                     onClick={() => setStep(3)}
                     disabled={formData.expertiseSkills.length === 0}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
                   </Button>
@@ -417,40 +417,40 @@ export default function OnboardingPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="shadow-lg border-gray-200 bg-white">
+              <Card className="shadow-lg border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Final Polish</CardTitle>
-                  <CardDescription className="text-gray-500">How can teammates partner with you?</CardDescription>
+                  <CardTitle className="text-2xl text-foreground">Final Polish</CardTitle>
+                  <CardDescription className="text-muted-foreground">How can teammates partner with you?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Timezone */}
                   <div className="space-y-2">
-                    <Label className="flex items-center gap-2 text-gray-700">
-                      <GlobeHemisphereWest className="w-4 h-4 text-violet-600" weight="duotone" />
+                    <Label className="flex items-center gap-2 text-foreground">
+                      <GlobeHemisphereWest className="w-4 h-4 text-primary" weight="duotone" />
                       Your Timezone
                     </Label>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       We auto-detected your timezone. Change it if needed for accurate meeting suggestions.
                     </p>
                     <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between h-11 font-normal bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                          className="w-full justify-between h-11 font-normal bg-background border-input text-foreground hover:bg-accent"
                         >
                           <span className="truncate">{selectedTimezoneLabel}</span>
                           <CaretDown className="h-4 w-4 opacity-50 shrink-0" weight="duotone" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[350px] p-0 bg-white border-gray-200" align="start">
-                        <div className="p-2 border-b border-gray-200">
+                      <PopoverContent className="w-[350px] p-0 bg-popover border-border" align="start">
+                        <div className="p-2 border-b border-border">
                           <div className="relative">
-                            <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" weight="duotone" />
+                            <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="duotone" />
                             <Input
                               placeholder="Search timezone..."
                               value={timezoneSearch}
                               onChange={(e) => setTimezoneSearch(e.target.value)}
-                              className="pl-8 h-9 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                              className="pl-8 h-9 bg-background border-input text-foreground placeholder:text-muted-foreground"
                             />
                           </div>
                         </div>
@@ -464,13 +464,13 @@ export default function OnboardingPage() {
                                   setTimezoneOpen(false);
                                   setTimezoneSearch("");
                                 }}
-                                className={`w-full flex items-center justify-between px-2 py-2 text-sm rounded-md hover:bg-violet-50 transition-colors text-gray-700 ${
-                                  formData.timezone === tz.value ? "bg-violet-50" : ""
+                                className={`w-full flex items-center justify-between px-2 py-2 text-sm rounded-md hover:bg-accent transition-colors text-foreground ${
+                                  formData.timezone === tz.value ? "bg-accent" : ""
                                 }`}
                               >
                                 <span>{tz.label}</span>
                                 {formData.timezone === tz.value && (
-                                  <CheckCircle className="h-4 w-4 text-violet-600" weight="duotone" />
+                                  <CheckCircle className="h-4 w-4 text-primary" weight="duotone" />
                                 )}
                               </button>
                             ))}
@@ -482,10 +482,10 @@ export default function OnboardingPage() {
 
                   {/* Bio */}
                   <div className="space-y-2">
-                    <Label htmlFor="bio" className="text-gray-700">Bio / Working Style</Label>
+                    <Label htmlFor="bio" className="text-foreground">Bio / Working Style</Label>
                     <Textarea
                       id="bio"
-                      className="min-h-[120px] text-base resize-none bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                      className="min-h-[120px] text-base resize-none bg-background border-input text-foreground placeholder:text-muted-foreground"
                       placeholder="I'm usually available in the mornings. I prefer async reviews but happy to jump on a call for complex blockers."
                       value={formData.bio}
                       onChange={e => setFormData({...formData, bio: e.target.value})}
@@ -493,11 +493,11 @@ export default function OnboardingPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-2">
-                  <Button variant="ghost" onClick={() => setStep(2)} className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">Back</Button>
+                  <Button variant="ghost" onClick={() => setStep(2)} className="text-muted-foreground hover:text-foreground hover:bg-accent">Back</Button>
                   <Button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-8 transition-all active:scale-95"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 transition-all active:scale-95"
                   >
                     {loading && <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" />}
                     Complete Profile

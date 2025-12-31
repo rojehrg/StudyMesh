@@ -155,19 +155,19 @@ export default function OrgSetupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="h-16 px-8 flex items-center justify-between border-b border-gray-200 bg-white">
+      <div className="h-16 px-8 flex items-center justify-between border-b border-border bg-card">
         <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-          <span className="font-bold text-xl text-violet-600">Mesh</span>
-          <span className="font-bold text-xl text-gray-900">flow</span>
+          <span className="font-bold text-xl text-primary">Mesh</span>
+          <span className="font-bold text-xl text-foreground">flow</span>
         </Link>
         {userEmail && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">{userEmail}</span>
+            <span className="text-sm text-muted-foreground">{userEmail}</span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <SignOut className="w-4 h-4" weight="duotone" />
               Log out
@@ -184,40 +184,40 @@ export default function OrgSetupPage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Join your team</h1>
-                <p className="text-gray-500">Create a new organization or join an existing one</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">Join your team</h1>
+                <p className="text-muted-foreground">Create a new organization or join an existing one</p>
               </div>
 
               <div className="grid gap-4">
                 <Card
-                  className="cursor-pointer hover:border-violet-300 hover:shadow-md transition-all bg-white"
+                  className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all bg-card"
                   onClick={() => setMode('create')}
                 >
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center">
-                      <Buildings className="w-6 h-6 text-violet-600" weight="duotone" />
+                    <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center">
+                      <Buildings className="w-6 h-6 text-primary" weight="duotone" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">Create Organization</h3>
-                      <p className="text-sm text-gray-500">Start fresh and invite your team</p>
+                      <h3 className="font-semibold text-foreground">Create Organization</h3>
+                      <p className="text-sm text-muted-foreground">Start fresh and invite your team</p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400" weight="duotone" />
+                    <ArrowRight className="w-5 h-5 text-muted-foreground" weight="duotone" />
                   </CardContent>
                 </Card>
 
                 <Card
-                  className="cursor-pointer hover:border-violet-300 hover:shadow-md transition-all bg-white"
+                  className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all bg-card"
                   onClick={() => setMode('join')}
                 >
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                      <UserPlus className="w-6 h-6 text-emerald-600" weight="duotone" />
+                    <div className="w-12 h-12 rounded-xl bg-success/15 flex items-center justify-center">
+                      <UserPlus className="w-6 h-6 text-success" weight="duotone" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">Join with Invite Code</h3>
-                      <p className="text-sm text-gray-500">Enter a code from your team admin</p>
+                      <h3 className="font-semibold text-foreground">Join with Invite Code</h3>
+                      <p className="text-sm text-muted-foreground">Enter a code from your team admin</p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400" weight="duotone" />
+                    <ArrowRight className="w-5 h-5 text-muted-foreground" weight="duotone" />
                   </CardContent>
                 </Card>
               </div>
@@ -229,22 +229,22 @@ export default function OrgSetupPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <Card className="shadow-lg border-gray-200 bg-white">
+              <Card className="shadow-lg border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Create Organization</CardTitle>
-                  <CardDescription className="text-gray-500">
+                  <CardTitle className="text-2xl text-foreground">Create Organization</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     You'll get an invite code to share with your team
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="orgName" className="text-gray-700">Organization Name</Label>
+                    <Label htmlFor="orgName" className="text-foreground">Organization Name</Label>
                     <Input
                       id="orgName"
                       placeholder="e.g. Acme Inc, Engineering Team"
                       value={orgName}
                       onChange={e => setOrgName(e.target.value)}
-                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                      className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
                       onKeyDown={e => e.key === 'Enter' && handleCreateOrg()}
                     />
                   </div>
@@ -253,14 +253,14 @@ export default function OrgSetupPage() {
                   <Button
                     variant="ghost"
                     onClick={() => setMode('choose')}
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Back
                   </Button>
                   <Button
                     onClick={handleCreateOrg}
                     disabled={loading || !orgName.trim()}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     {loading && <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" />}
                     Create Organization
@@ -275,22 +275,22 @@ export default function OrgSetupPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <Card className="shadow-lg border-gray-200 bg-white">
+              <Card className="shadow-lg border-border bg-card">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-gray-900">Join Organization</CardTitle>
-                  <CardDescription className="text-gray-500">
+                  <CardTitle className="text-2xl text-foreground">Join Organization</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Enter the invite code from your team admin
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteCode" className="text-gray-700">Invite Code</Label>
+                    <Label htmlFor="inviteCode" className="text-foreground">Invite Code</Label>
                     <Input
                       id="inviteCode"
                       placeholder="e.g. ABC123"
                       value={inviteCode}
                       onChange={e => setInviteCode(e.target.value.toUpperCase())}
-                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 uppercase tracking-widest text-center text-lg font-mono"
+                      className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground uppercase tracking-widest text-center text-lg font-mono"
                       maxLength={6}
                       onKeyDown={e => e.key === 'Enter' && handleJoinOrg()}
                     />
@@ -300,14 +300,14 @@ export default function OrgSetupPage() {
                   <Button
                     variant="ghost"
                     onClick={() => setMode('choose')}
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Back
                   </Button>
                   <Button
                     onClick={handleJoinOrg}
                     disabled={loading || !inviteCode.trim()}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
                     {loading && <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" />}
                     Join Organization

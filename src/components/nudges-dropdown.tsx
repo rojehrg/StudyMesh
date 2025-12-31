@@ -347,7 +347,7 @@ export function NudgesDropdown() {
                         <span className={cn(
                           "text-xs px-1.5 py-0.5 rounded",
                           notification.metadata.accepted
-                            ? "bg-green-500/10 text-green-600"
+                            ? "bg-success/15 text-success"
                             : "bg-muted text-muted-foreground"
                         )}>
                           {notification.metadata.accepted ? "Accepted" : "Declined"}
