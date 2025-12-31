@@ -4,18 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
+  SquaresFour,
   BookOpen,
-  Users,
+  UsersThree,
   PlusCircle,
-  LogIn,
-  Settings,
+  SignIn,
+  Gear,
   Info,
-  ChevronLeft,
-  Menu,
-  LogOut,
-  Calendar
-} from "lucide-react";
+  CaretLeft,
+  List,
+  SignOut,
+  CalendarBlank
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -54,7 +54,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       title={isCollapsed ? label : ""}
     >
       <div className="relative flex items-center">
-        <Icon className="w-5 h-5 shrink-0" />
+        <Icon className="w-5 h-5 shrink-0" weight="duotone" />
         {badge ? (
           <span className={cn(
             "absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
@@ -132,12 +132,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   };
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: SquaresFour, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
-    { icon: Calendar, label: "Meetings", href: "/meetings" },
+    { icon: CalendarBlank, label: "Meetings", href: "/meetings" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
-    { icon: LogIn, label: "Join Pod", href: "/classes/join" },
-    { icon: Settings, label: "Settings", href: "/settings" },
+    { icon: SignIn, label: "Join Pod", href: "/classes/join" },
+    { icon: Gear, label: "Settings", href: "/settings" },
     { icon: Info, label: "About Meshflow", href: "/about" },
   ];
 
@@ -227,7 +227,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95"
               title="Logout"
             >
-              <LogOut className="w-4 h-4" />
+              <SignOut className="w-4 h-4" weight="duotone" />
             </motion.button>
           </div>
         </div>
@@ -245,7 +245,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         )}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
-              <Menu className="w-6 h-6 text-foreground" />
+              <List className="w-6 h-6 text-foreground" weight="duotone" />
             </Button>
             <span className="ml-3 font-bold text-lg md:hidden text-foreground">Meshflow</span>
           </div>
@@ -280,10 +280,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
       >
-        <ChevronLeft className={cn(
+        <CaretLeft className={cn(
           "w-4 h-4 transition-transform duration-300",
           isCollapsed && "rotate-180"
-        )} />
+        )} weight="duotone" />
       </button>
 
       {/* Onboarding Tour for New Users */}

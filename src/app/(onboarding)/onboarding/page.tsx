@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, Loader2, ArrowRight, CheckCircle2, Globe, ChevronDown, Search, LogOut } from "lucide-react";
+import { X, CircleNotch, ArrowRight, CheckCircle, GlobeHemisphereWest, CaretDown, MagnifyingGlass, SignOut } from "@phosphor-icons/react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -197,7 +197,7 @@ export default function OnboardingPage() {
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <SignOut className="w-4 h-4" weight="duotone" />
               Log out
             </button>
           </div>
@@ -286,7 +286,7 @@ export default function OnboardingPage() {
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
                     className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
                   >
-                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                    Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
                   </Button>
                 </CardFooter>
               </Card>
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
                   {/* Expertise */}
                   <div className="space-y-3">
                     <Label className="text-emerald-600 font-semibold flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4" /> Expertise (I can mentor others)
+                      <CheckCircle className="w-4 h-4" weight="duotone" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
                       value={formData.skillInput}
@@ -326,7 +326,7 @@ export default function OnboardingPage() {
                         <Badge key={skill} variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
                           <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-emerald-300 rounded-full p-0.5 transition-colors">
-                            <X className="h-3.5 w-3.5" />
+                            <X className="h-3.5 w-3.5" weight="duotone" />
                           </button>
                         </Badge>
                       ))}
@@ -336,7 +336,7 @@ export default function OnboardingPage() {
                   {/* Growth */}
                   <div className="space-y-3">
                     <Label className="text-violet-600 font-semibold flex items-center gap-2">
-                      <ArrowRight className="w-4 h-4" /> Growth Areas (I want to learn)
+                      <ArrowRight className="w-4 h-4" weight="duotone" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
                       value={formData.growthInput}
@@ -353,7 +353,7 @@ export default function OnboardingPage() {
                         <Badge key={skill} variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-200 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
                           <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-violet-300 rounded-full p-0.5 transition-colors">
-                            <X className="h-3.5 w-3.5" />
+                            <X className="h-3.5 w-3.5" weight="duotone" />
                           </button>
                         </Badge>
                       ))}
@@ -367,7 +367,7 @@ export default function OnboardingPage() {
                     disabled={formData.expertiseSkills.length === 0}
                     className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-6"
                   >
-                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                    Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
                   </Button>
                 </CardFooter>
               </Card>
@@ -390,7 +390,7 @@ export default function OnboardingPage() {
                   {/* Timezone */}
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-gray-700">
-                      <Globe className="w-4 h-4 text-violet-600" />
+                      <GlobeHemisphereWest className="w-4 h-4 text-violet-600" weight="duotone" />
                       Your Timezone
                     </Label>
                     <p className="text-sm text-gray-500">
@@ -403,13 +403,13 @@ export default function OnboardingPage() {
                           className="w-full justify-between h-11 font-normal bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                         >
                           <span className="truncate">{selectedTimezoneLabel}</span>
-                          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                          <CaretDown className="h-4 w-4 opacity-50 shrink-0" weight="duotone" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[350px] p-0 bg-white border-gray-200" align="start">
                         <div className="p-2 border-b border-gray-200">
                           <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" weight="duotone" />
                             <Input
                               placeholder="Search timezone..."
                               value={timezoneSearch}
@@ -434,7 +434,7 @@ export default function OnboardingPage() {
                               >
                                 <span>{tz.label}</span>
                                 {formData.timezone === tz.value && (
-                                  <CheckCircle2 className="h-4 w-4 text-violet-600" />
+                                  <CheckCircle className="h-4 w-4 text-violet-600" weight="duotone" />
                                 )}
                               </button>
                             ))}
@@ -463,7 +463,7 @@ export default function OnboardingPage() {
                     disabled={loading}
                     className="bg-violet-600 hover:bg-violet-700 text-white h-11 px-8 transition-all active:scale-95"
                   >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {loading && <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" />}
                     Complete Profile
                   </Button>
                 </CardFooter>

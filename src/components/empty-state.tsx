@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  Users,
+  UsersThree,
   Bell,
-  Calendar,
-  Sparkles,
-  Search,
-  MessageCircle,
+  CalendarBlank,
+  Sparkle,
+  MagnifyingGlass,
+  ChatCircle,
   FolderOpen,
-  Zap,
-  LucideIcon,
-} from "lucide-react";
+  Lightning,
+  Icon as PhosphorIcon,
+} from "@phosphor-icons/react";
 
 interface EmptyStateProps {
-  icon?: LucideIcon;
+  icon?: PhosphorIcon;
   title: string;
   description: string;
   action?: {
@@ -38,7 +38,7 @@ interface EmptyStateProps {
 // Pre-defined empty states for common scenarios
 export const emptyStatePresets = {
   noPods: {
-    icon: Users,
+    icon: UsersThree,
     title: "No pods yet",
     description: "Pods are where the magic happens. Create one or join your team's pod to start collaborating.",
     action: { label: "Create a Pod", href: "/classes/create" },
@@ -50,29 +50,29 @@ export const emptyStatePresets = {
     description: "No new notifications. When teammates reach out or you get matched, you'll see it here.",
   },
   noMeetings: {
-    icon: Calendar,
+    icon: CalendarBlank,
     title: "No meetings scheduled",
     description: "Your calendar is clear. Nudge a teammate to set up a quick sync!",
     action: { label: "Browse Pods", href: "/classes" },
   },
   noMatches: {
-    icon: Sparkles,
+    icon: Sparkle,
     title: "No matches yet",
     description: "We're still looking for the perfect match. Add more skills to your profile to improve matching.",
     action: { label: "Update Skills", href: "/settings" },
   },
   noResults: {
-    icon: Search,
+    icon: MagnifyingGlass,
     title: "No results found",
     description: "Try adjusting your search or filters to find what you're looking for.",
   },
   noMembers: {
-    icon: Users,
+    icon: UsersThree,
     title: "No members yet",
     description: "Share your pod code with teammates to get started.",
   },
   noMessages: {
-    icon: MessageCircle,
+    icon: ChatCircle,
     title: "No messages yet",
     description: "Start the conversation! Send a nudge to connect with teammates.",
   },
@@ -82,7 +82,7 @@ export const emptyStatePresets = {
     description: "This space is waiting to be filled with great things.",
   },
   noAvailable: {
-    icon: Zap,
+    icon: Lightning,
     title: "No one available right now",
     description: "Everyone's busy at the moment. Check back later or set your availability to let others know when you're free.",
     action: { label: "Set Availability", href: "/settings" },
@@ -155,6 +155,7 @@ export function EmptyState({
               ? "w-6 h-6 text-muted-foreground"
               : "w-8 h-8 text-primary"
           )}
+          weight="duotone"
         />
       </motion.div>
 

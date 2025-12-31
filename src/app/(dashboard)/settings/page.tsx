@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, X, Check, User, Clock, Mail, Link2, Unlink, MessageCircle, Cloud, CloudOff, Sparkles, Plus } from "lucide-react";
+import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus } from "@phosphor-icons/react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -223,7 +223,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <CircleNotch className="w-6 h-6 animate-spin text-primary" weight="duotone" />
       </div>
     );
   }
@@ -231,7 +231,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "availability", label: "Availability", icon: Clock },
-    { id: "notifications", label: "Notifications", icon: Mail },
+    { id: "notifications", label: "Notifications", icon: Envelope },
   ];
 
   return (
@@ -243,10 +243,10 @@ export default function SettingsPage() {
           <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {saveStatus === 'saving' && <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>}
-          {saveStatus === 'saved' && <><Check className="h-4 w-4 text-success" /> Saved</>}
-          {saveStatus === 'error' && <><CloudOff className="h-4 w-4 text-destructive" /> Error</>}
-          {saveStatus === 'idle' && <><Cloud className="h-4 w-4" /> Auto-save</>}
+          {saveStatus === 'saving' && <><CircleNotch className="h-4 w-4 animate-spin" weight="duotone" /> Saving...</>}
+          {saveStatus === 'saved' && <><Check className="h-4 w-4 text-success" weight="duotone" /> Saved</>}
+          {saveStatus === 'error' && <><CloudSlash className="h-4 w-4 text-destructive" weight="duotone" /> Error</>}
+          {saveStatus === 'idle' && <><Cloud className="h-4 w-4" weight="duotone" /> Auto-save</>}
         </div>
       </div>
 
@@ -262,7 +262,7 @@ export default function SettingsPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <tab.icon className="w-4 h-4" />
+            <tab.icon className="w-4 h-4" weight="duotone" />
             {tab.label}
           </button>
         ))}
@@ -346,7 +346,7 @@ export default function SettingsPage() {
                   size="sm"
                   className="bg-primary hover:bg-primary/90"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4" weight="duotone" />
                 </Button>
               </div>
 
@@ -376,7 +376,7 @@ export default function SettingsPage() {
                     >
                       {area}
                       <button onClick={() => removeKnowledgeArea(area)} className="hover:text-primary/70">
-                        <X className="w-3 h-3" />
+                        <X className="w-3 h-3" weight="duotone" />
                       </button>
                     </Badge>
                   ))
@@ -391,7 +391,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-primary" />
+                    <Sparkle className="w-5 h-5 text-primary" weight="duotone" />
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Looking to Help</p>
@@ -458,7 +458,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-primary" />
+                    <Envelope className="w-5 h-5 text-primary" weight="duotone" />
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Email Notifications</p>
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                      <Check className="w-5 h-5 text-success" />
+                      <Check className="w-5 h-5 text-success" weight="duotone" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Connected</p>
@@ -494,7 +494,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10">
-                    <Unlink className="w-4 h-4 mr-2" />
+                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
                     Disconnect
                   </Button>
                 </div>
@@ -502,7 +502,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
-                      <MessageCircle className="w-5 h-5 text-[#4A154B]" />
+                      <ChatCircle className="w-5 h-5 text-[#4A154B]" weight="duotone" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Connect Slack</p>
@@ -510,7 +510,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69]">
-                    {slackConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4 mr-2" />}
+                    {slackConnecting ? <CircleNotch className="w-4 h-4 animate-spin" weight="duotone" /> : <Link className="w-4 h-4 mr-2" weight="duotone" />}
                     Connect
                   </Button>
                 </div>

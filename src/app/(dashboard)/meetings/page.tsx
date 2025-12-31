@@ -7,17 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
-  Calendar,
+  CalendarBlank,
   Clock,
-  Users,
-  Video,
+  UsersThree,
+  VideoCamera,
   Plus,
   Check,
   X,
-  ChevronRight,
-  Loader2,
-  CalendarDays
-} from "lucide-react";
+  CaretRight,
+  CircleNotch,
+  CalendarCheck
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ScheduleMeetingDialog } from "@/components/schedule-meeting-dialog";
@@ -161,7 +161,7 @@ export default function MeetingsPage() {
           <p className="text-muted-foreground mt-1">Schedule and manage your team meetings</p>
         </div>
         <Button onClick={() => setShowScheduleDialog(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4" weight="duotone" />
           Schedule Meeting
         </Button>
       </div>
@@ -169,11 +169,11 @@ export default function MeetingsPage() {
       <Tabs defaultValue="upcoming" className="space-y-6">
         <TabsList>
           <TabsTrigger value="upcoming" className="gap-2">
-            <Calendar className="w-4 h-4" />
+            <CalendarBlank className="w-4 h-4" weight="duotone" />
             Upcoming ({upcomingMeetings.length})
           </TabsTrigger>
           <TabsTrigger value="past" className="gap-2">
-            <CalendarDays className="w-4 h-4" />
+            <CalendarCheck className="w-4 h-4" weight="duotone" />
             Past ({pastMeetings.length})
           </TabsTrigger>
         </TabsList>
@@ -183,7 +183,7 @@ export default function MeetingsPage() {
             <Card className="border-dashed">
               <CardContent className="py-2">
                 <EmptyState
-                  icon={Calendar}
+                  icon={CalendarBlank}
                   title="No meetings scheduled"
                   description="Your calendar is clear! Schedule a meeting with teammates to collaborate in real-time."
                   action={{
@@ -218,16 +218,16 @@ export default function MeetingsPage() {
 
                           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1.5">
-                              <Calendar className="w-4 h-4" />
+                              <CalendarBlank className="w-4 h-4" weight="duotone" />
                               {date}
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <Clock className="w-4 h-4" />
+                              <Clock className="w-4 h-4" weight="duotone" />
                               {time} {timezone} ({meeting.duration_minutes} min)
                             </div>
                             {meeting.participants && (
                               <div className="flex items-center gap-1.5">
-                                <Users className="w-4 h-4" />
+                                <UsersThree className="w-4 h-4" weight="duotone" />
                                 {meeting.participants.length} participant{meeting.participants.length !== 1 ? 's' : ''}
                               </div>
                             )}
@@ -246,7 +246,7 @@ export default function MeetingsPage() {
                           {meeting.meeting_link && (
                             <Button size="sm" asChild className="gap-2">
                               <a href={meeting.meeting_link} target="_blank" rel="noopener noreferrer">
-                                <Video className="w-4 h-4" />
+                                <VideoCamera className="w-4 h-4" weight="duotone" />
                                 Join
                               </a>
                             </Button>
@@ -260,7 +260,7 @@ export default function MeetingsPage() {
                                 className="text-success hover:bg-success/10"
                                 onClick={() => handleRsvp(meeting.id, 'accepted')}
                               >
-                                <Check className="w-4 h-4" />
+                                <Check className="w-4 h-4" weight="duotone" />
                               </Button>
                               <Button
                                 size="sm"
@@ -268,7 +268,7 @@ export default function MeetingsPage() {
                                 className="text-destructive hover:bg-destructive/10"
                                 onClick={() => handleRsvp(meeting.id, 'declined')}
                               >
-                                <X className="w-4 h-4" />
+                                <X className="w-4 h-4" weight="duotone" />
                               </Button>
                             </div>
                           )}
@@ -287,7 +287,7 @@ export default function MeetingsPage() {
             <Card className="border-dashed">
               <CardContent className="py-2">
                 <EmptyState
-                  icon={CalendarDays}
+                  icon={CalendarCheck}
                   title="No past meetings"
                   description="Your meeting history will show up here. Start by scheduling your first meeting!"
                   variant="minimal"

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckCheck, X, Loader2, Send, Sparkles, Zap, Check, Calendar } from "lucide-react";
+import { Bell, Checks, X, CircleNotch, PaperPlaneTilt, Sparkle, Lightning, Check, CalendarBlank } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -259,12 +259,12 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (notification: any, isSent: boolean) => {
     if (isSent) {
-      return <Send className="w-5 h-5 text-muted-foreground" />;
+      return <PaperPlaneTilt className="w-5 h-5 text-muted-foreground" weight="duotone" />;
     }
     if (notification.type === 'new_match') {
-      return <Sparkles className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} />;
+      return <Sparkle className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} weight="duotone" />;
     }
-    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} />;
+    return <Bell className={`w-5 h-5 ${!notification.read ? 'text-accent' : 'text-muted-foreground'}`} weight="duotone" />;
   };
 
   const getNotificationTitle = (notification: any, isSent: boolean) => {
@@ -318,7 +318,7 @@ export default function NotificationsPage() {
     if (items.length === 0) {
       return (
         <EmptyState
-          icon={isSent ? Send : Bell}
+          icon={isSent ? PaperPlaneTilt : Bell}
           title={isSent ? "No sent nudges yet" : "All caught up!"}
           description={
             isSent
@@ -401,7 +401,7 @@ export default function NotificationsPage() {
                             onClick={(e) => { e.stopPropagation(); handleNudgeResponse(notification, true); }}
                             className="gap-1"
                           >
-                            <Calendar className="w-3 h-3" />
+                            <CalendarBlank className="w-3 h-3" weight="duotone" />
                             Accept & Schedule
                           </Button>
                           <Button
@@ -423,7 +423,7 @@ export default function NotificationsPage() {
                     )}
                     {!isSent && (
                       <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}>
-                        <X className="h-4 w-4 text-muted-foreground" />
+                        <X className="h-4 w-4 text-muted-foreground" weight="duotone" />
                       </Button>
                     )}
                   </div>
@@ -453,7 +453,7 @@ export default function NotificationsPage() {
         </div>
         {unreadCount > 0 && (
           <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-            <CheckCheck className="mr-2 h-4 w-4" />
+            <Checks className="mr-2 h-4 w-4" weight="duotone" />
             Mark all as read
           </Button>
         )}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusCircle, LogIn, Users, Sparkles, Clock, Bell, ArrowRight, Zap, MessageCircle, HandHelping, HelpCircle } from "lucide-react";
+import { PlusCircle, SignIn, UsersThree, Sparkle, Clock, Bell, ArrowRight, Lightning, ChatCircle, HandsClapping, Question } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -209,13 +209,13 @@ export default async function DashboardPage() {
           <div className="hidden sm:flex gap-3">
             <Button variant="outline" asChild>
               <Link href="/classes/join">
-                <LogIn className="mr-2 h-4 w-4" />
+                <SignIn className="mr-2 h-4 w-4" weight="duotone" />
                 Join Pod
               </Link>
             </Button>
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
               <Link href="/classes/create">
-                <PlusCircle className="mr-2 h-4 w-4" />
+                <PlusCircle className="mr-2 h-4 w-4" weight="duotone" />
                 Create Pod
               </Link>
             </Button>
@@ -227,13 +227,13 @@ export default async function DashboardPage() {
       <div className="flex sm:hidden gap-3">
         <Button variant="outline" className="flex-1" asChild>
           <Link href="/classes/join">
-            <LogIn className="mr-2 h-4 w-4" />
+            <SignIn className="mr-2 h-4 w-4" weight="duotone" />
             Join Pod
           </Link>
         </Button>
         <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
           <Link href="/classes/create">
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="mr-2 h-4 w-4" weight="duotone" />
             Create Pod
           </Link>
         </Button>
@@ -245,7 +245,7 @@ export default async function DashboardPage() {
           <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-primary/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Your Pods</CardTitle>
-              <Users className="h-5 w-5 text-primary" />
+              <UsersThree className="h-5 w-5 text-primary" weight="duotone" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">{podIds.length}</div>
@@ -260,7 +260,7 @@ export default async function DashboardPage() {
           <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-success/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Available Now</CardTitle>
-              <Zap className="h-5 w-5 text-success" />
+              <Lightning className="h-5 w-5 text-success" weight="duotone" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">{availableTeammates.length}</div>
@@ -275,7 +275,7 @@ export default async function DashboardPage() {
           <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-accent/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Looking to Help</CardTitle>
-              <Sparkles className="h-5 w-5 text-accent" />
+              <Sparkle className="h-5 w-5 text-accent" weight="duotone" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">{helpersCount}</div>
@@ -290,7 +290,7 @@ export default async function DashboardPage() {
           <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-primary/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
-              <Bell className="h-5 w-5 text-primary" />
+              <Bell className="h-5 w-5 text-primary" weight="duotone" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">{unreadNotifications}</div>
@@ -309,7 +309,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-success" />
+                  <Lightning className="w-5 h-5 text-success" weight="duotone" />
                   Available Now
                 </CardTitle>
                 <CardDescription>Teammates ready for a quick chat</CardDescription>
@@ -334,7 +334,7 @@ export default async function DashboardPage() {
                       <div className="flex items-center gap-2">
                         <h4 className="font-semibold text-foreground truncate">{teammate.major || "Teammate"}</h4>
                         <Badge className="bg-success/20 text-success text-xs px-1.5 border-0 shrink-0">
-                          <Clock className="w-3 h-3 mr-1" />
+                          <Clock className="w-3 h-3 mr-1" weight="duotone" />
                           Now
                         </Badge>
                       </div>
@@ -367,7 +367,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-primary" />
+                  <ChatCircle className="w-5 h-5 text-primary" weight="duotone" />
                   Recent Activity
                 </CardTitle>
                 <CardDescription>Your latest nudges and connections</CardDescription>
@@ -413,9 +413,9 @@ export default async function DashboardPage() {
                             : "bg-success/20 text-success"
                         }`}>
                           {nudgeType === 'ask' ? (
-                            <><HelpCircle className="w-3 h-3 mr-0.5" /> Asked</>
+                            <><Question className="w-3 h-3 mr-0.5" weight="duotone" /> Asked</>
                           ) : (
-                            <><HandHelping className="w-3 h-3 mr-0.5" /> Offered</>
+                            <><HandsClapping className="w-3 h-3 mr-0.5" weight="duotone" /> Offered</>
                           )}
                         </Badge>
                         <span className="text-xs text-muted-foreground">{timeAgo}</span>
@@ -471,10 +471,10 @@ export default async function DashboardPage() {
                   <CardContent>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
+                        <UsersThree className="w-4 h-4" weight="duotone" />
                         View members
                       </span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4" weight="duotone" />
                     </div>
                   </CardContent>
                 </Card>
@@ -485,7 +485,7 @@ export default async function DashboardPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-primary" />
+                <UsersThree className="w-8 h-8 text-primary" weight="duotone" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Join your first pod</h3>
               <p className="text-muted-foreground mb-6 max-w-md">
@@ -494,13 +494,13 @@ export default async function DashboardPage() {
               <div className="flex gap-3">
                 <Button variant="outline" asChild>
                   <Link href="/classes/join">
-                    <LogIn className="mr-2 h-4 w-4" />
+                    <SignIn className="mr-2 h-4 w-4" weight="duotone" />
                     Join Pod
                   </Link>
                 </Button>
                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
                   <Link href="/classes/create">
-                    <PlusCircle className="mr-2 h-4 w-4" />
+                    <PlusCircle className="mr-2 h-4 w-4" weight="duotone" />
                     Create Pod
                   </Link>
                 </Button>

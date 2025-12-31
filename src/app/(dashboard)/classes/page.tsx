@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, LogIn, Users, Loader2, Search, Clock, Building2 } from "lucide-react";
+import { PlusCircle, SignIn, UsersThree, CircleNotch, MagnifyingGlass, Clock, Buildings } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { EmptyState } from "@/components/empty-state";
 import { PageLoader } from "@/components/loading-states";
@@ -88,13 +88,13 @@ export default function ClassesPage() {
         <div className="flex gap-3">
           <Button variant="outline" asChild>
             <Link href="/classes/join">
-              <LogIn className="mr-2 h-4 w-4" />
+              <SignIn className="mr-2 h-4 w-4" weight="duotone" />
               Join Pod
             </Link>
           </Button>
           <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
             <Link href="/classes/create">
-              <PlusCircle className="mr-2 h-4 w-4" />
+              <PlusCircle className="mr-2 h-4 w-4" weight="duotone" />
               Create Pod
             </Link>
           </Button>
@@ -103,7 +103,7 @@ export default function ClassesPage() {
 
       {pods.length > 0 && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="duotone" />
           <Input
             placeholder="Search pods by name or business unit..."
             value={searchQuery}
@@ -131,7 +131,7 @@ export default function ClassesPage() {
                           {pod.pod_name}
                         </CardTitle>
                         <CardDescription className="mt-2 flex items-center gap-1">
-                          <Building2 className="w-3 h-3" />
+                          <Buildings className="w-3 h-3" weight="duotone" />
                           {pod.business_unit || "General"}
                         </CardDescription>
                       </div>
@@ -143,11 +143,11 @@ export default function ClassesPage() {
                   <CardContent>
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2 text-muted-foreground">
-                        <Users className="w-4 h-4" />
+                        <UsersThree className="w-4 h-4" weight="duotone" />
                         <span>{pod.memberCount} {pod.memberCount === 1 ? 'member' : 'members'}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-3 h-3" />
+                        <Clock className="w-3 h-3" weight="duotone" />
                         <span className="text-xs">
                           {new Date(pod.created_at).toLocaleDateString()}
                         </span>
@@ -166,7 +166,7 @@ export default function ClassesPage() {
         </div>
       ) : pods.length === 0 ? (
         <EmptyState
-          icon={Users}
+          icon={UsersThree}
           title="No pods yet"
           description="Pods are where the magic happens. Create your own or join a team pod to start collaborating with teammates."
           action={{ label: "Create Pod", href: "/classes/create" }}
@@ -175,7 +175,7 @@ export default function ClassesPage() {
         />
       ) : (
         <EmptyState
-          icon={Search}
+          icon={MagnifyingGlass}
           title="No pods match your search"
           description="Try adjusting your search terms to find what you're looking for."
           variant="card"
