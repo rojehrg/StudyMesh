@@ -687,9 +687,9 @@ export default function LandingPage() {
               <span className="font-bold text-xl text-gray-900">flow</span>
             </div>
             <div className="flex items-center gap-8 text-sm text-gray-500">
-              <Link href="#" className="hover:text-gray-900 transition-colors">Privacy</Link>
-              <Link href="#" className="hover:text-gray-900 transition-colors">Terms</Link>
-              <Link href="#" className="hover:text-gray-900 transition-colors">Contact</Link>
+              <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms</Link>
+              <Link href="mailto:support@meshflow.app" className="hover:text-gray-900 transition-colors">Contact</Link>
             </div>
             <div className="text-sm text-gray-400">
               © 2025 Meshflow. All rights reserved.
