@@ -200,44 +200,44 @@ export default function OnboardingPage() {
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName" className="text-gray-700">First Name</Label>
                       <Input
                         id="firstName"
                         placeholder="Enter your first name"
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
-                        className="h-11"
+                        className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName" className="text-gray-700">Last Name</Label>
                       <Input
                         id="lastName"
                         placeholder="Enter your last name"
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
-                        className="h-11"
+                        className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="dept">Department</Label>
+                    <Label htmlFor="dept" className="text-gray-700">Department</Label>
                     <Input
                       id="dept"
                       placeholder="e.g. Engineering, Sales, Product"
                       value={formData.department}
                       onChange={e => setFormData({...formData, department: e.target.value})}
-                      className="h-11"
+                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="role">Job Title</Label>
+                    <Label htmlFor="role" className="text-gray-700">Job Title</Label>
                     <Input
                       id="role"
                       placeholder="e.g. Senior Account Executive"
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value})}
-                      className="h-11"
+                      className="h-11 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                     />
                   </div>
                 </CardContent>
@@ -361,21 +361,21 @@ export default function OnboardingPage() {
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between h-11 font-normal"
+                          className="w-full justify-between h-11 font-normal bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
                         >
                           <span className="truncate">{selectedTimezoneLabel}</span>
                           <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[350px] p-0" align="start">
-                        <div className="p-2 border-b">
+                      <PopoverContent className="w-[350px] p-0 bg-white border-gray-200" align="start">
+                        <div className="p-2 border-b border-gray-200">
                           <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <Input
                               placeholder="Search timezone..."
                               value={timezoneSearch}
                               onChange={(e) => setTimezoneSearch(e.target.value)}
-                              className="pl-8 h-9"
+                              className="pl-8 h-9 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                             />
                           </div>
                         </div>
@@ -389,13 +389,13 @@ export default function OnboardingPage() {
                                   setTimezoneOpen(false);
                                   setTimezoneSearch("");
                                 }}
-                                className={`w-full flex items-center justify-between px-2 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
-                                  formData.timezone === tz.value ? "bg-accent" : ""
+                                className={`w-full flex items-center justify-between px-2 py-2 text-sm rounded-md hover:bg-violet-50 transition-colors text-gray-700 ${
+                                  formData.timezone === tz.value ? "bg-violet-50" : ""
                                 }`}
                               >
                                 <span>{tz.label}</span>
                                 {formData.timezone === tz.value && (
-                                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                                  <CheckCircle2 className="h-4 w-4 text-violet-600" />
                                 )}
                               </button>
                             ))}
@@ -407,10 +407,10 @@ export default function OnboardingPage() {
 
                   {/* Bio */}
                   <div className="space-y-2">
-                    <Label htmlFor="bio">Bio / Working Style</Label>
+                    <Label htmlFor="bio" className="text-gray-700">Bio / Working Style</Label>
                     <Textarea
                       id="bio"
-                      className="min-h-[120px] text-base resize-none"
+                      className="min-h-[120px] text-base resize-none bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
                       placeholder="I'm usually available in the mornings. I prefer async reviews but happy to jump on a call for complex blockers."
                       value={formData.bio}
                       onChange={e => setFormData({...formData, bio: e.target.value})}
