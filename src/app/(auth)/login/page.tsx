@@ -24,7 +24,18 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.replace("/dashboard");
+        // Check if user has a profile before deciding where to redirect
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (profile) {
+          router.replace("/dashboard");
+        } else {
+          router.replace("/onboarding");
+        }
       } else {
         setCheckingSession(false);
       }
