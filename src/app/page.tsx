@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -14,8 +15,11 @@ import {
   Timer,
   Search,
   Clock,
+  Bell,
+  Target,
+  ChevronDown,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -41,11 +45,53 @@ const availabilityPattern: Record<number, number[]> = {
   6: [],                       // Sun
 };
 
+// Features for accordion
+const features = [
+  {
+    id: "pods",
+    title: "Enablement Pods",
+    description: "Create focused workspaces for your team. Invite members with a simple code and see everyone's availability in one place.",
+    icon: Users,
+  },
+  {
+    id: "availability",
+    title: "Visual Availability Grid",
+    description: "GitHub-style heatmap shows your entire team's weekly availability. Set your hours once, update your real-time status with one click.",
+    icon: Calendar,
+  },
+  {
+    id: "nudges",
+    title: "Smart Nudges",
+    description: "Send contextual help requests to the right teammate. \"Need help with React\" or \"Can assist with Python\" — nudge and connect.",
+    icon: Bell,
+  },
+  {
+    id: "slack",
+    title: "Slack Integration",
+    description: "Get nudge notifications directly in Slack. When someone accepts, you're prompted to schedule a meeting instantly.",
+    icon: MessageSquare,
+  },
+  {
+    id: "timezones",
+    title: "Timezone-Aware Scheduling",
+    description: "Automatic timezone detection and conversion. Find overlapping hours across distributed teams without the mental math.",
+    icon: Globe,
+  },
+  {
+    id: "skills",
+    title: "Skill & Expertise Matching",
+    description: "Tag what you know and what you want to learn. Find the teammate who can actually help with your specific problem.",
+    icon: Target,
+  },
+];
+
 export default function LandingPage() {
+  const [activeFeature, setActiveFeature] = useState("pods");
+
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-gray-900 antialiased">
+    <div className="min-h-screen bg-white text-gray-900 antialiased">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#F8F7F4]/80 backdrop-blur-xl border-b border-gray-200/50">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-0.5">
             <span className="font-bold text-xl text-violet-600">Mesh</span>
@@ -77,7 +123,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-28 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
@@ -140,11 +186,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-16 max-w-5xl mx-auto"
+            className="mt-12 max-w-5xl mx-auto"
           >
             <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl shadow-gray-300/30 overflow-hidden">
               {/* Browser Chrome */}
-              <div className="px-4 py-3 bg-[#F8F7F4] border-b border-gray-200 flex items-center gap-2">
+              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-amber-400" />
@@ -152,13 +198,13 @@ export default function LandingPage() {
                 </div>
                 <div className="flex-1 flex justify-center">
                   <div className="px-4 py-1 bg-white rounded-md text-xs text-gray-500 font-medium border border-gray-100">
-                    meshflow.io/dashboard
+                    meshflow.space/dashboard
                   </div>
                 </div>
               </div>
 
               {/* App Preview Content */}
-              <div className="p-6 bg-[#FAFAF8]">
+              <div className="p-6 bg-gray-50">
                 <div className="grid md:grid-cols-3 gap-6">
                   {/* Availability Grid - GitHub Contribution Style */}
                   <div className="md:col-span-2 bg-white rounded-xl p-6 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-500">
@@ -287,9 +333,9 @@ export default function LandingPage() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
             <div>
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
@@ -353,10 +399,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Solution / Features Section */}
-      <section id="features" className="py-24 px-6 bg-[#F8F7F4]">
+      {/* Solution / Features Section - ACCORDION STYLE */}
+      <section id="features" className="py-16 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -366,83 +412,196 @@ export default function LandingPage() {
               <Image
                 src="/images/teamwork-gears.svg"
                 alt="Team working together"
-                width={450}
-                height={450}
+                width={400}
+                height={400}
                 className="object-contain"
               />
             </motion.div>
             <div className="order-1 md:order-2">
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                One glance. Full visibility.
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
+                Everything you need to coordinate
               </h2>
               <p className="text-xl text-gray-500">
-                Meshflow gives your entire team real-time visibility into who's available,
-                when they're free, and what they can help with.
+                See who's available, find the right expert, and connect — all without the scheduling chaos.
               </p>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                icon: Calendar,
-                title: "Visual availability grid",
-                description: "See your entire team's availability at a glance. No more asking around — just look.",
-                color: "violet",
-              },
-              {
-                icon: Zap,
-                title: "Real-time status",
-                description: "Know who's online and ready to help right now. Toggle your availability with one click.",
-                color: "green",
-              },
-              {
-                icon: Users,
-                title: "Smart skill matching",
-                description: "Find teammates who can help with specific topics. Expertise tagging makes it easy.",
-                color: "blue",
-              },
-              {
-                icon: Timer,
-                title: "Timezone-aware",
-                description: "Automatic timezone detection and conversion. Stop doing mental math.",
-                color: "amber",
-              },
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`bg-white rounded-2xl p-8 shadow-md shadow-gray-200/50 border-l-4 hover:shadow-lg transition-all duration-300 ${
-                  feature.color === "violet" ? "border-l-violet-500" :
-                  feature.color === "green" ? "border-l-green-500" :
-                  feature.color === "blue" ? "border-l-blue-500" :
-                  "border-l-amber-500"
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
-                  feature.color === "violet" ? "bg-violet-100 text-violet-600" :
-                  feature.color === "green" ? "bg-green-100 text-green-600" :
-                  feature.color === "blue" ? "bg-blue-100 text-blue-600" :
-                  "bg-amber-100 text-amber-600"
-                }`}>
-                  <feature.icon className="w-6 h-6" />
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            {/* Left: Accordion */}
+            <div className="space-y-2">
+              {features.map((feature) => (
+                <motion.div
+                  key={feature.id}
+                  className={`rounded-xl border transition-all cursor-pointer ${
+                    activeFeature === feature.id
+                      ? "bg-white border-violet-200 shadow-lg shadow-violet-100/50"
+                      : "bg-white/50 border-gray-200 hover:bg-white/80"
+                  }`}
+                  onClick={() => setActiveFeature(feature.id)}
+                >
+                  <div className="p-5">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        activeFeature === feature.id
+                          ? "bg-violet-600 text-white"
+                          : "bg-gray-100 text-gray-500"
+                      }`}>
+                        <feature.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`font-semibold ${
+                          activeFeature === feature.id ? "text-gray-900" : "text-gray-600"
+                        }`}>
+                          {feature.title}
+                        </h3>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
+                        activeFeature === feature.id ? "rotate-180" : ""
+                      }`} />
+                    </div>
+                    <AnimatePresence>
+                      {activeFeature === feature.id && (
+                        <motion.p
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="text-gray-500 mt-3 pl-14"
+                        >
+                          {feature.description}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Right: Feature visual */}
+            <div className="relative">
+              <div className="sticky top-24">
+                {/* Decorative blob */}
+                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-violet-100/50 rounded-full blur-3xl" />
+
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                  <div className="p-8">
+                    <AnimatePresence mode="wait">
+                      {activeFeature === "pods" && (
+                        <motion.div key="pods" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Users className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Your team, organized</h4>
+                          <p className="text-gray-500 mb-4">Create pods for different teams or projects. Share a simple code to invite members.</p>
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-medium text-gray-900">Engineering Pod</span>
+                              <span className="text-xs bg-violet-100 text-violet-600 px-2 py-1 rounded font-mono">ENG-2024</span>
+                            </div>
+                            <div className="flex -space-x-2">
+                              {["SK", "MR", "AT", "JD", "+4"].map((init, i) => (
+                                <div key={i} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-medium ${i < 4 ? "bg-violet-100 text-violet-600" : "bg-gray-100 text-gray-500"}`}>
+                                  {init}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                      {activeFeature === "availability" && (
+                        <motion.div key="availability" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Calendar className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">See everyone at a glance</h4>
+                          <p className="text-gray-500 mb-4">Set your weekly availability once. Toggle "available now" with one click.</p>
+                          <div className="grid grid-cols-5 gap-1">
+                            {[...Array(25)].map((_, i) => (
+                              <div key={i} className={`h-8 rounded ${[0,1,5,6,10,11,15,20].includes(i) ? "bg-violet-500" : [2,7,12,16,21].includes(i) ? "bg-violet-300" : "bg-gray-100"}`} />
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                      {activeFeature === "nudges" && (
+                        <motion.div key="nudges" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Bell className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Request help, contextually</h4>
+                          <p className="text-gray-500 mb-4">Nudge a teammate about a specific topic. They accept, you schedule a meeting.</p>
+                          <div className="bg-violet-50 rounded-xl p-4 border border-violet-100">
+                            <p className="text-sm font-medium text-gray-900">New nudge from Mike</p>
+                            <p className="text-sm text-gray-500 mt-1">"Need help with React hooks - 15 min?"</p>
+                            <div className="flex gap-2 mt-3">
+                              <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white text-xs">Accept</Button>
+                              <Button size="sm" variant="outline" className="text-xs">Later</Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                      {activeFeature === "slack" && (
+                        <motion.div key="slack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <MessageSquare className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Notifications where you work</h4>
+                          <p className="text-gray-500 mb-4">Get nudges in Slack. When accepted, automatically prompted to schedule.</p>
+                          <div className="bg-[#4A154B] rounded-lg p-4 text-white">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-6 h-6 rounded bg-white/20 flex items-center justify-center text-xs">M</div>
+                              <span className="font-medium text-sm">Meshflow</span>
+                            </div>
+                            <p className="text-sm opacity-90">Sarah accepted your nudge!</p>
+                            <p className="text-xs opacity-70 mt-1">Click to schedule a meeting →</p>
+                          </div>
+                        </motion.div>
+                      )}
+                      {activeFeature === "timezones" && (
+                        <motion.div key="timezones" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Globe className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">No more timezone math</h4>
+                          <p className="text-gray-500 mb-4">See everyone's availability in your local time. Find overlap instantly.</p>
+                          <div className="space-y-2">
+                            {[{ city: "New York", time: "2:00 PM", you: true }, { city: "London", time: "7:00 PM" }, { city: "Tokyo", time: "4:00 AM +1" }].map((tz, i) => (
+                              <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${tz.you ? "bg-violet-50 border border-violet-100" : "bg-gray-50"}`}>
+                                <span className={tz.you ? "font-medium text-gray-900" : "text-gray-600"}>{tz.city} {tz.you && <span className="text-xs text-violet-600">(You)</span>}</span>
+                                <span className="font-mono text-sm text-gray-900">{tz.time}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                      {activeFeature === "skills" && (
+                        <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Target className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Find the right expert</h4>
+                          <p className="text-gray-500 mb-4">Tag your skills. See what teammates know and what they want to learn.</p>
+                          <div className="space-y-3">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-2">Top skills in pod</p>
+                              <div className="flex flex-wrap gap-2">
+                                {["React", "TypeScript", "Python", "AWS"].map((skill, i) => (
+                                  <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium bg-violet-100 text-violet-600">{skill}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 mb-2">People want to learn</p>
+                              <div className="flex flex-wrap gap-2">
+                                {["GraphQL", "Rust", "K8s"].map((skill, i) => (
+                                  <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600">{skill}</span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 bg-white">
+      <section id="how-it-works" className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
             <div>
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
@@ -504,7 +663,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 px-6 bg-violet-600">
+      <section className="py-16 px-6 bg-violet-600">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to end coordination chaos?
@@ -532,7 +691,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-[#F8F7F4] border-t border-gray-200">
+      <footer className="py-12 px-6 bg-gray-50 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-0.5">
