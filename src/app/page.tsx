@@ -20,6 +20,13 @@ import {
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Slack SVG Icon
+const SlackIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/>
+  </svg>
+);
+
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -106,18 +113,12 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" className="font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="font-medium bg-violet-600 text-white hover:bg-violet-700 rounded-lg px-4">
-                Get Started Free
-              </Button>
-            </Link>
-          </div>
+          <Link href="/api/auth/slack">
+            <Button className="font-medium bg-[#4A154B] text-white hover:bg-[#3a1039] rounded-lg px-4 gap-2">
+              <SlackIcon className="w-4 h-4" />
+              Add to Slack
+            </Button>
+          </Link>
         </div>
       </nav>
 
@@ -159,10 +160,10 @@ export default function LandingPage() {
 
             {/* CTAs */}
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-              <Link href="/signup">
-                <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
-                  Start Free — No Credit Card
-                  <ArrowRight className="w-5 h-5" weight="duotone" />
+              <Link href="/api/auth/slack">
+                <Button className="h-14 px-8 text-base font-semibold bg-[#4A154B] text-white hover:bg-[#3a1039] rounded-xl shadow-lg shadow-purple-900/20 gap-3">
+                  <SlackIcon className="w-5 h-5" />
+                  Add to Slack
                 </Button>
               </Link>
               <Button
@@ -176,7 +177,7 @@ export default function LandingPage() {
 
             {/* Objection Handler */}
             <motion.p variants={fadeIn} className="text-sm text-gray-400">
-              Free forever for small teams. Setup takes 2 minutes.
+              Free for your Slack workspace. Setup takes 2 minutes.
             </motion.p>
           </motion.div>
 
@@ -619,8 +620,8 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Create your pod",
-                description: "Set up a workspace for your team in seconds. Invite members with a simple code.",
+                title: "Add to your Slack workspace",
+                description: "One click to install. Your entire team is automatically onboarded from Slack.",
               },
               {
                 step: "02",
@@ -657,23 +658,18 @@ export default function LandingPage() {
             Ready to end coordination chaos?
           </h2>
           <p className="text-xl text-violet-100 mb-10">
-            Start free, no credit card required. Your team will thank you.
+            Add Meshflow to your Slack workspace. Your team will thank you.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button className="h-14 px-8 text-base font-semibold bg-white text-violet-600 hover:bg-violet-50 rounded-xl shadow-lg gap-2">
-                Get Started Free
-                <ArrowRight className="w-5 h-5" weight="duotone" />
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" className="h-14 px-8 text-base font-semibold rounded-xl bg-transparent border-white/30 text-white hover:bg-white/10">
-                Log in to your team
+          <div className="flex items-center justify-center">
+            <Link href="/api/auth/slack">
+              <Button className="h-14 px-8 text-base font-semibold bg-white text-[#4A154B] hover:bg-gray-50 rounded-xl shadow-lg gap-3">
+                <SlackIcon className="w-5 h-5" />
+                Add to Slack
               </Button>
             </Link>
           </div>
           <p className="mt-6 text-sm text-violet-200">
-            Free forever for small teams • No credit card required • Setup in 2 minutes
+            Free for your Slack workspace • No credit card required • Setup in 2 minutes
           </p>
         </div>
       </section>

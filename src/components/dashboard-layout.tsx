@@ -128,7 +128,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     // Force a hard navigation to clear any cached state
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [

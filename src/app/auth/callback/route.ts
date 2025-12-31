@@ -16,15 +16,15 @@ export async function GET(request: Request) {
     origin
   });
 
-  // Handle OAuth errors from Google
+  // Handle OAuth errors
   if (error) {
     console.error('[OAuth Callback] OAuth error:', error, errorDescription);
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errorDescription || error)}`)
+    return NextResponse.redirect(`${origin}/?error=${encodeURIComponent(errorDescription || error)}`)
   }
 
   if (!code) {
     console.error('[OAuth Callback] No code received');
-    return NextResponse.redirect(`${origin}/login?error=no_code`)
+    return NextResponse.redirect(`${origin}/?error=no_code`)
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 
   if (!url || !key) {
     console.error('[OAuth Callback] Missing Supabase environment variables')
-    return NextResponse.redirect(`${origin}/login?error=config_error`)
+    return NextResponse.redirect(`${origin}/?error=config_error`)
   }
 
   const cookieStore = await cookies()
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
 
   if (exchangeError) {
     console.error('[OAuth Callback] Exchange failed:', exchangeError);
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(exchangeError.message)}`)
+    return NextResponse.redirect(`${origin}/?error=${encodeURIComponent(exchangeError.message)}`)
   }
 
   // Check if user needs onboarding

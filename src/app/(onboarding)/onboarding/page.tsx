@@ -67,25 +67,48 @@ export default function OnboardingPage() {
     growthInput: "",
   });
 
-  // Get user email and auto-detect timezone on mount
+  // Get user data and pre-populate from Slack profile on mount
   useEffect(() => {
     const init = async () => {
-      // Get user email
+      // Get user
       const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
+      if (!user) return;
+
+      if (user.email) {
         setUserEmail(user.email);
       }
 
-      // Auto-detect timezone
-      try {
-        const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
-        if (matchedTimezone) {
-          setFormData(prev => ({ ...prev, timezone: detectedTimezone }));
+      // Fetch existing profile (may have Slack data pre-filled)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, timezone, avatar_url')
+        .eq('user_id', user.id)
+        .single();
+
+      // Pre-populate from profile (Slack data) or user metadata
+      const firstName = profile?.first_name || user.user_metadata?.full_name?.split(' ')[0] || '';
+      const lastName = profile?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
+
+      // Use profile timezone, or auto-detect
+      let timezone = profile?.timezone || 'America/New_York';
+      if (!profile?.timezone) {
+        try {
+          const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
+          if (matchedTimezone) {
+            timezone = detectedTimezone;
+          }
+        } catch (e) {
+          // Fallback to default
         }
-      } catch (e) {
-        // Fallback to default
       }
+
+      setFormData(prev => ({
+        ...prev,
+        firstName,
+        lastName,
+        timezone,
+      }));
     };
     init();
   }, [supabase]);
@@ -93,7 +116,7 @@ export default function OnboardingPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     // Force hard navigation to clear all state
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>

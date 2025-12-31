@@ -68,28 +68,16 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   console.log(`[Middleware] User found: ${!!user}`);
 
-  // Protected routes
+  // Protected routes - redirect unauthenticated users to landing page
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    console.log("[Middleware] Redirecting to /login");
-    return NextResponse.redirect(new URL('/login', request.url))
+    console.log("[Middleware] Redirecting to landing page");
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Auth routes (redirect if already logged in)
-  if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user) {
-    // Check if user has a profile before deciding where to redirect
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (profile) {
-      console.log("[Middleware] User has profile, redirecting to /dashboard");
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    } else {
-      console.log("[Middleware] No profile, redirecting to /onboarding");
-      return NextResponse.redirect(new URL('/onboarding', request.url))
-    }
+  // Onboarding requires auth
+  if (request.nextUrl.pathname.startsWith('/onboarding') && !user) {
+    console.log("[Middleware] Redirecting to landing page");
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return response
