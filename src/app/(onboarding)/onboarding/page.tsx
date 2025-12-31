@@ -92,7 +92,8 @@ export default function OnboardingPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
+    // Force hard navigation to clear all state
+    window.location.href = "/login";
   };
 
   const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>
