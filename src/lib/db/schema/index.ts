@@ -12,9 +12,26 @@ import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time } from "d
  * - Contextual nudges with meeting suggestions
  */
 
+// Organizations - team workspaces
+export const organizations = pgTable("organizations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  inviteCode: text("invite_code").notNull().unique(),
+  ownerId: uuid("owner_id").notNull(), // References the user who created the org
+
+  // Slack workspace integration
+  slackTeamId: text("slack_team_id"),
+  slackTeamName: text("slack_team_name"),
+  slackAccessToken: text("slack_access_token"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().unique(), // References Supabase Auth User ID
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "set null" }),
 
   // Basic info
   firstName: text("first_name"),
@@ -142,6 +159,8 @@ export const notifications = pgTable("notifications", {
 });
 
 // Type exports for TypeScript
+export type Organization = typeof organizations.$inferSelect;
+export type NewOrganization = typeof organizations.$inferInsert;
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type Pod = typeof pods.$inferSelect;
