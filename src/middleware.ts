@@ -76,8 +76,20 @@ export async function middleware(request: NextRequest) {
 
   // Auth routes (redirect if already logged in)
   if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user) {
-    console.log("[Middleware] Redirecting to /dashboard");
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Check if user has a profile before deciding where to redirect
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (profile) {
+      console.log("[Middleware] User has profile, redirecting to /dashboard");
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    } else {
+      console.log("[Middleware] No profile, redirecting to /onboarding");
+      return NextResponse.redirect(new URL('/onboarding', request.url))
+    }
   }
 
   return response
