@@ -393,6 +393,13 @@ export default function NotificationsPage() {
                         )}
                       </div>
 
+                      {/* Debug info - remove after testing */}
+                      {!isSent && (
+                        <p className="text-xs text-red-500 mt-1">
+                          DEBUG: type="{notification.type}" | responded={String(notification.metadata?.responded)}
+                        </p>
+                      )}
+
                       {/* Accept/Decline buttons for nudges that haven't been responded to */}
                       {!isSent && notification.type === 'nudge' && !notification.metadata?.responded && (
                         <div className="flex items-center gap-2 mt-3">
