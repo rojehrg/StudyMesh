@@ -161,7 +161,7 @@ export default function LandingPage() {
               <div className="p-6 bg-[#FAFAF8]">
                 <div className="grid md:grid-cols-3 gap-6">
                   {/* Availability Grid - GitHub Contribution Style */}
-                  <div className="md:col-span-2 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                  <div className="md:col-span-2 bg-white rounded-xl p-6 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-500">
                     <div className="flex items-center justify-between mb-5">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-violet-600" />
@@ -227,7 +227,7 @@ export default function LandingPage() {
                   {/* Right sidebar */}
                   <div className="space-y-4">
                     {/* Available Now */}
-                    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                    <div className="bg-white rounded-xl p-5 shadow-md shadow-gray-200/50 border-l-4 border-l-green-500">
                       <div className="flex items-center gap-2 mb-4">
                         <Zap className="w-5 h-5 text-green-500" />
                         <span className="font-semibold text-gray-900">Available Now</span>
@@ -257,7 +257,7 @@ export default function LandingPage() {
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                    <div className="bg-white rounded-xl p-5 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-400">
                       <div className="text-xs text-gray-400 mb-3">This week</div>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
@@ -307,10 +307,10 @@ export default function LandingPage() {
               className="flex justify-center"
             >
               <Image
-                src="/images/online-group-meeting.png"
+                src="/images/online-group-meeting.svg"
                 alt="Team coordination challenges"
-                width={400}
-                height={300}
+                width={500}
+                height={400}
                 className="object-contain"
               />
             </motion.div>
@@ -340,7 +340,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-[#F8F7F4] rounded-2xl p-8"
+                className="bg-white rounded-2xl p-8 shadow-md shadow-gray-200/50 border-l-4 border-l-red-400"
               >
                 <div className="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center mb-5">
                   <problem.icon className="w-6 h-6" />
@@ -364,10 +364,10 @@ export default function LandingPage() {
               className="flex justify-center order-2 md:order-1"
             >
               <Image
-                src="/images/teamwork-gears.png"
+                src="/images/teamwork-gears.svg"
                 alt="Team working together"
-                width={350}
-                height={350}
+                width={450}
+                height={450}
                 className="object-contain"
               />
             </motion.div>
@@ -416,7 +416,12 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
+                className={`bg-white rounded-2xl p-8 shadow-md shadow-gray-200/50 border-l-4 hover:shadow-lg transition-all duration-300 ${
+                  feature.color === "violet" ? "border-l-violet-500" :
+                  feature.color === "green" ? "border-l-green-500" :
+                  feature.color === "blue" ? "border-l-blue-500" :
+                  "border-l-amber-500"
+                }`}
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
                   feature.color === "violet" ? "bg-violet-100 text-violet-600" :
@@ -454,10 +459,10 @@ export default function LandingPage() {
               className="flex justify-center"
             >
               <Image
-                src="/images/remote-working.png"
+                src="/images/collaboration-colleagues.svg"
                 alt="Remote collaboration"
-                width={400}
-                height={300}
+                width={500}
+                height={400}
                 className="object-contain"
               />
             </motion.div>

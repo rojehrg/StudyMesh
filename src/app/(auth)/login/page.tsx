@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+import startupMeeting from "../../../../public/animations/startup-meeting.json";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,9 +29,7 @@ export default function LoginPage() {
         password,
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       router.push("/dashboard");
       router.refresh();
@@ -76,133 +74,114 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
-      <div className="grid lg:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/50 overflow-hidden">
-        {/* Left side - Form */}
-        <div className="p-8 lg:p-12">
-          <div className="max-w-sm mx-auto">
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-slate-900">Welcome back!</h1>
-              <p className="text-slate-500 mt-2">Sign in to continue collaborating with your team.</p>
-            </div>
-
-            {error && (
-              <div className="mb-4 text-sm p-3 rounded-lg bg-red-50 text-red-600 border border-red-100">
-                {error}
-              </div>
-            )}
-
-            {/* Google Button - Primary */}
-            <Button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full h-11 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm"
-              variant="outline"
-            >
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-              )}
-              Continue with Google
-            </Button>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="px-2 bg-white text-slate-400">
-                  or
-                </span>
-              </div>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-700">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-700">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                  className="h-11 !bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full h-11 bg-primary hover:bg-primary/90"
-                disabled={loading}
-              >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign in
-              </Button>
-            </form>
-
-            <p className="text-center text-sm text-slate-500 mt-6">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-medium text-primary hover:underline">
-                Sign up
-              </Link>
-            </p>
-          </div>
+    <div className="flex min-h-screen">
+      {/* Left side - Login form */}
+      <div className="flex-1 flex flex-col bg-white">
+        {/* Logo */}
+        <div className="h-16 px-8 flex items-center">
+          <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
+            <span className="font-bold text-xl text-violet-600">Mesh</span>
+            <span className="font-bold text-xl text-gray-900">flow</span>
+          </Link>
         </div>
 
-        {/* Right side - Illustration */}
-        <div className="hidden lg:flex bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 items-center justify-center p-12">
-          <div className="relative w-full max-w-md">
-            <Image
-              src="/images/collaboration-colleagues.png"
-              alt="Team collaboration"
-              width={500}
-              height={500}
-              className="w-full h-auto"
-              priority
-            />
-            <div className="mt-6 text-center">
-              <h3 className="text-lg font-semibold text-slate-800">Collaborate with your team</h3>
-              <p className="text-slate-600 mt-1">Find the right people, get help faster</p>
+        {/* Form container */}
+        <div className="flex-1 flex items-center justify-center px-8 md:px-16 lg:px-24">
+          <div className="w-full max-w-md">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              Hey, welcome back!
+              <span className="inline-block animate-[wave_1s_ease-in-out_infinite]">👋</span>
+            </h1>
+            <p className="mt-3 text-gray-500 text-lg">Good to see you again. Let&apos;s get you signed in.</p>
+
+          {error && (
+            <div className="mt-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+              {error}
             </div>
+          )}
+
+          <form onSubmit={handleLogin} className="mt-8 space-y-5">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="you@example.com"
+                className="w-full h-11 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="Enter your password"
+                className="w-full h-11 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              Sign in
+            </button>
+          </form>
+
+          <div className="mt-6 flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-sm text-gray-500">or</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="mt-6 w-full h-11 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:opacity-50 flex items-center justify-center gap-3 transition-colors"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+            Continue with Google
+          </button>
+
+          <p className="mt-8 text-sm text-gray-500">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="font-medium text-violet-600 hover:text-violet-500">
+              Sign up
+            </Link>
+          </p>
           </div>
         </div>
       </div>
 
-      <p className="text-center text-xs text-slate-400 mt-6">
-        By continuing, you agree to our Terms of Service and Privacy Policy.
-      </p>
+      {/* Right side - Animation with lavender background */}
+      <div className="hidden md:flex flex-1 bg-violet-100 items-center justify-center">
+        <Lottie
+          animationData={startupMeeting}
+          loop={true}
+          style={{ width: 400, height: 350 }}
+        />
+      </div>
     </div>
   );
 }

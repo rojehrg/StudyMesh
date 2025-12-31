@@ -162,6 +162,12 @@
   50% { transform: translateY(-10px); }
 }
 
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-15deg); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -292,33 +298,6 @@ select:focus-visible {
   border-radius: var(--radius);
 }
 
-/* Remove default input borders for cleaner look */
-input:not([type="checkbox"]):not([type="radio"]),
-textarea,
-select {
-  border-color: transparent;
-  background-color: hsl(var(--muted) / 0.5);
-}
-
-input:not([type="checkbox"]):not([type="radio"]):focus,
-textarea:focus,
-select:focus {
-  border-color: hsl(var(--primary));
-  background-color: hsl(var(--background));
-}
-
-/* Dark mode specific enhancements */
-.dark input:not([type="checkbox"]):not([type="radio"]),
-.dark textarea,
-.dark select {
-  background-color: hsl(var(--muted) / 0.3);
-}
-
-.dark input:not([type="checkbox"]):not([type="radio"]):focus,
-.dark textarea:focus,
-.dark select:focus {
-  background-color: hsl(var(--card));
-}
 
 /* Badge without borders */
 .badge-clean {
