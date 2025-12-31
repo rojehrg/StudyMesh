@@ -525,7 +525,7 @@ export default function LandingPage() {
                             <p className="text-sm text-gray-500 mt-1">"Need help with React hooks - 15 min?"</p>
                             <div className="flex gap-2 mt-3">
                               <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white text-xs">Accept</Button>
-                              <Button size="sm" variant="outline" className="text-xs">Later</Button>
+                              <Button size="sm" variant="outline" className="text-xs border-gray-300 text-gray-600 hover:bg-gray-100">Later</Button>
                             </div>
                           </div>
                         </motion.div>
