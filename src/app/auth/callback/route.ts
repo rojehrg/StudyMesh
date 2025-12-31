@@ -79,7 +79,7 @@ export async function GET(request: Request) {
       .from('profiles')
       .select('id')
       .eq('user_id', data.user.id)
-      .single()
+      .maybeSingle()
 
     if (!profile) {
       console.log('[OAuth Callback] New user, redirecting to onboarding');

@@ -77,16 +77,22 @@ export function OnboardingTour() {
       }
 
       // Check if profile exists and onboarding status
-      // Use select('*') to avoid 406 errors if specific columns don't exist
+      // Use maybeSingle() to handle case where profile doesn't exist yet
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.warn("Could not fetch profile for tour status:", error.message);
         setHasSeenTour(true); // Don't show tour on error
+        return;
+      }
+
+      // No profile yet - user needs to complete onboarding first
+      if (!profile) {
+        setHasSeenTour(true); // Don't show tour until they have a profile
         return;
       }
 

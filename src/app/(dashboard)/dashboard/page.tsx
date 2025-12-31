@@ -30,12 +30,16 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  // Fetch profile
-  const { data: profile } = await supabase
+  // Fetch profile - use maybeSingle to handle case where profile doesn't exist
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
+
+  if (profileError) {
+    console.error("Error fetching profile:", profileError.message);
+  }
 
   if (!profile) {
     redirect('/onboarding');

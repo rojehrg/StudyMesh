@@ -110,7 +110,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.warn("Could not load profile:", error.message);
