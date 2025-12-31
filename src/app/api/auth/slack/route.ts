@@ -32,10 +32,10 @@ export async function GET() {
       "email",           // User email
     ].join(",");
 
-    // Generate a random state for CSRF protection
+    // Generate a cryptographically secure random state for CSRF protection
     const state = Buffer.from(JSON.stringify({
       timestamp: Date.now(),
-      random: Math.random().toString(36).substring(7)
+      nonce: crypto.randomUUID()
     })).toString("base64");
 
     const redirectUri = `${APP_URL}/api/auth/slack/callback`;

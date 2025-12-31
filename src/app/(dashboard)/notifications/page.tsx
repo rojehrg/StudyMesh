@@ -66,7 +66,6 @@ export default function NotificationsPage() {
               filter: `recipient_id=eq.${user.id}`,
             },
             (payload) => {
-              console.log('[Notifications Page] New notification:', payload);
               const newNotification = payload.new as any;
               setNotifications(prev => [newNotification, ...prev]);
             }
@@ -80,14 +79,11 @@ export default function NotificationsPage() {
               filter: `sender_id=eq.${user.id}`,
             },
             (payload) => {
-              console.log('[Notifications Page] Sent notification:', payload);
               const newNotification = payload.new as any;
               setSentNotifications(prev => [newNotification, ...prev]);
             }
           )
-          .subscribe((status) => {
-            console.log('[Notifications Page] Subscription status:', status);
-          });
+          .subscribe();
 
       } catch (error) {
         console.error("Error loading notifications:", error);
@@ -100,7 +96,6 @@ export default function NotificationsPage() {
 
     return () => {
       if (channel) {
-        console.log('[Notifications Page] Cleaning up channel');
         supabase.removeChannel(channel);
       }
     };

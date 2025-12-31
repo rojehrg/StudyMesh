@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft, Users, Copy, Check, Bell, Sparkles, TrendingUp, BookOpen, Globe, Shield, Zap, Clock } from "lucide-react";
+import { CircleNotch, ArrowLeft, Users, Copy, Check, Bell, Sparkle, TrendUp, BookOpen, Globe, Shield, Lightning, Clock } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -107,7 +107,7 @@ export default function PodDetailPage() {
 
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('*')
+          .select('user_id, first_name, last_name, major, department, expertise_skills, knowledge_areas, growth_skills, slack_handle, timezone, availability')
           .in('user_id', userIds);
 
         const membersWithProfiles = podMembers.map(pm => {
@@ -247,8 +247,8 @@ export default function PodDetailPage() {
     }
   };
 
-  // Calculate simple skill stats
-  const getSkillStats = () => {
+  // Calculate simple skill stats - memoized to avoid recalculation on every render
+  const { topExpertise, topGrowth } = useMemo(() => {
     const expertiseCount: Record<string, number> = {};
     const growthCount: Record<string, number> = {};
 
@@ -270,19 +270,17 @@ export default function PodDetailPage() {
       .slice(0, 5);
 
     return { topExpertise, topGrowth };
-  };
+  }, [members]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <CircleNotch className="w-8 h-8 animate-spin text-primary" weight="duotone" />
       </div>
     );
   }
 
   if (!pod) return null;
-
-  const { topExpertise, topGrowth } = getSkillStats();
 
   return (
     <>
@@ -294,7 +292,7 @@ export default function PodDetailPage() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
             <Link href="/classes">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="mr-2 h-4 w-4" weight="duotone" />
               Back to Pods
             </Link>
           </Button>
@@ -320,7 +318,7 @@ export default function PodDetailPage() {
                   variant="outline"
                   className="hover:bg-primary/10 h-9 w-9"
                 >
-                  {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-primary" weight="duotone" /> : <Copy className="h-4 w-4" weight="duotone" />}
                 </Button>
               </div>
             </div>
@@ -332,7 +330,7 @@ export default function PodDetailPage() {
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
+                <Shield className="w-5 h-5 text-primary" weight="duotone" />
                 Pod Manager Settings
               </CardTitle>
               <CardDescription>
@@ -343,7 +341,7 @@ export default function PodDetailPage() {
               <div className="flex items-center justify-between p-4 bg-card rounded-xl">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Globe className="w-5 h-5 text-primary" />
+                    <Globe className="w-5 h-5 text-primary" weight="duotone" />
                   </div>
                   <div>
                     <Label className="text-base font-semibold text-foreground">Allow Cross-Pod Help</Label>
@@ -367,7 +365,7 @@ export default function PodDetailPage() {
           <Card className="bg-success/5 border-success/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
-                <Zap className="w-5 h-5" />
+                <Lightning className="w-5 h-5" weight="duotone" />
                 Available Now
               </CardTitle>
               <CardDescription>These teammates are online and ready to help</CardDescription>
@@ -390,7 +388,7 @@ export default function PodDetailPage() {
                       <div>
                         <p className="text-sm font-medium text-foreground">{member.name}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
+                          <Clock className="w-3 h-3" weight="duotone" />
                           Available now
                         </p>
                       </div>
@@ -408,7 +406,7 @@ export default function PodDetailPage() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
-                    <TrendingUp className="w-4 h-4" />
+                    <TrendUp className="w-4 h-4" weight="duotone" />
                     Top Skills in Pod
                   </CardTitle>
                 </CardHeader>
@@ -428,7 +426,7 @@ export default function PodDetailPage() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
-                    <BookOpen className="w-4 h-4" />
+                    <BookOpen className="w-4 h-4" weight="duotone" />
                     People Want to Learn
                   </CardTitle>
                 </CardHeader>
@@ -489,13 +487,13 @@ export default function PodDetailPage() {
                         )}
                         {member.currentlyAvailable && member.userId !== currentUserId && (
                           <Badge className="bg-success/20 text-success text-xs px-1.5 border-0 gap-0.5">
-                            <Zap className="w-3 h-3" />
+                            <Lightning className="w-3 h-3" />
                             Now
                           </Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && !member.currentlyAvailable && (
                           <span title="Looking to help">
-                            <Sparkles className="w-4 h-4 text-accent" />
+                            <Sparkle className="w-4 h-4 text-accent" weight="duotone" />
                           </span>
                         )}
                       </div>

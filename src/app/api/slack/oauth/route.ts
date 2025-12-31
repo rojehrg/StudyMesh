@@ -29,8 +29,12 @@ export async function GET(request: Request) {
       "im:write",        // Open DM channels
     ].join(",");
 
-    // Use the user's ID as state to verify the callback
-    const state = Buffer.from(JSON.stringify({ userId: user.id })).toString("base64");
+    // Use the user's ID with a cryptographically secure nonce as state for CSRF protection
+    const state = Buffer.from(JSON.stringify({
+      userId: user.id,
+      nonce: crypto.randomUUID(),
+      timestamp: Date.now()
+    })).toString("base64");
 
     const redirectUri = `${APP_URL}/api/slack/oauth/callback`;
 
