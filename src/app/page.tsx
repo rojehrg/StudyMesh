@@ -492,13 +492,13 @@ export default function LandingPage() {
                           <Users className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Your team, organized</h4>
                           <p className="text-gray-500 mb-4">Create pods for different teams or projects. Share a simple code to invite members.</p>
-                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                          <div className="flex justify-center py-4">
                             <Image
-                              src="/images/pods-screenshot.png"
-                              alt="Enablement Pods - Frontend Devs team with 14 members"
-                              width={400}
+                              src="/images/pods-illustration.svg"
+                              alt="Team collaboration illustration"
+                              width={300}
                               height={200}
-                              className="w-full h-auto"
+                              className="object-contain"
                             />
                           </div>
                         </motion.div>
@@ -535,13 +535,13 @@ export default function LandingPage() {
                           <MessageSquare className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Notifications where you work</h4>
                           <p className="text-gray-500 mb-4">Get nudges in Slack. When accepted, automatically prompted to schedule.</p>
-                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                          <div className="flex justify-center py-4">
                             <Image
-                              src="/images/slack-screenshot.png"
-                              alt="Meshflow Slack integration - Meeting invite notification"
-                              width={400}
+                              src="/images/slack-illustration.svg"
+                              alt="Messaging and notifications illustration"
+                              width={300}
                               height={200}
-                              className="w-full h-auto"
+                              className="object-contain"
                             />
                           </div>
                         </motion.div>
@@ -551,13 +551,13 @@ export default function LandingPage() {
                           <Globe className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">No more timezone math</h4>
                           <p className="text-gray-500 mb-4">See everyone's availability in your local time. Find overlap instantly.</p>
-                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                          <div className="flex justify-center py-4">
                             <Image
-                              src="/images/timezone-screenshot.png"
-                              alt="Timezone selector with multiple timezone options"
-                              width={400}
+                              src="/images/timezone-illustration.svg"
+                              alt="Global timezone coordination illustration"
+                              width={300}
                               height={200}
-                              className="w-full h-auto"
+                              className="object-contain"
                             />
                           </div>
                         </motion.div>
@@ -567,13 +567,13 @@ export default function LandingPage() {
                           <Target className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Find the right expert</h4>
                           <p className="text-gray-500 mb-4">Tag your skills. See what teammates know and what they want to learn.</p>
-                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                          <div className="flex justify-center py-4">
                             <Image
-                              src="/images/skills-screenshot.png"
-                              alt="Skills and expertise tagging interface"
-                              width={400}
+                              src="/images/skills-illustration.svg"
+                              alt="Skills and expertise matching illustration"
+                              width={300}
                               height={200}
-                              className="w-full h-auto"
+                              className="object-contain"
                             />
                           </div>
                         </motion.div>
