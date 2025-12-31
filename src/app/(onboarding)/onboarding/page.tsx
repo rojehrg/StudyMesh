@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,45 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { X, Loader2, ArrowRight, CheckCircle2, Globe, ChevronDown, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { SkillAutocomplete } from "@/components/skill-autocomplete";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Timezone options
+const TIMEZONE_OPTIONS = [
+  { label: "Pacific Time (Los Angeles)", value: "America/Los_Angeles", region: "Americas" },
+  { label: "Mountain Time (Denver)", value: "America/Denver", region: "Americas" },
+  { label: "Central Time (Chicago)", value: "America/Chicago", region: "Americas" },
+  { label: "Eastern Time (New York)", value: "America/New_York", region: "Americas" },
+  { label: "Alaska (Anchorage)", value: "America/Anchorage", region: "Americas" },
+  { label: "Hawaii (Honolulu)", value: "Pacific/Honolulu", region: "Americas" },
+  { label: "Toronto", value: "America/Toronto", region: "Americas" },
+  { label: "UTC / GMT", value: "UTC", region: "Europe" },
+  { label: "London (GMT/BST)", value: "Europe/London", region: "Europe" },
+  { label: "Paris (CET)", value: "Europe/Paris", region: "Europe" },
+  { label: "Berlin (CET)", value: "Europe/Berlin", region: "Europe" },
+  { label: "Amsterdam", value: "Europe/Amsterdam", region: "Europe" },
+  { label: "Dubai (GST)", value: "Asia/Dubai", region: "Asia" },
+  { label: "Mumbai (Kolkata)", value: "Asia/Kolkata", region: "Asia" },
+  { label: "Singapore", value: "Asia/Singapore", region: "Asia" },
+  { label: "Hong Kong", value: "Asia/Hong_Kong", region: "Asia" },
+  { label: "Tokyo", value: "Asia/Tokyo", region: "Asia" },
+  { label: "Sydney (AEST)", value: "Australia/Sydney", region: "Pacific" },
+  { label: "Auckland", value: "Pacific/Auckland", region: "Pacific" },
+];
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [timezoneSearch, setTimezoneSearch] = useState("");
+  const [timezoneOpen, setTimezoneOpen] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -27,11 +58,32 @@ export default function OnboardingPage() {
     department: "",
     role: "",
     bio: "",
+    timezone: "America/New_York",
     expertiseSkills: [] as string[],
     growthSkills: [] as string[],
     skillInput: "",
     growthInput: "",
   });
+
+  // Auto-detect timezone on mount
+  useEffect(() => {
+    try {
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
+      if (matchedTimezone) {
+        setFormData(prev => ({ ...prev, timezone: detectedTimezone }));
+      }
+    } catch (e) {
+      // Fallback to default
+    }
+  }, []);
+
+  const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>
+    tz.label.toLowerCase().includes(timezoneSearch.toLowerCase()) ||
+    tz.value.toLowerCase().includes(timezoneSearch.toLowerCase())
+  );
+
+  const selectedTimezoneLabel = TIMEZONE_OPTIONS.find(tz => tz.value === formData.timezone)?.label || formData.timezone;
 
   const handleAddSkill = (type: 'expertise' | 'growth') => {
     const input = type === 'expertise' ? formData.skillInput : formData.growthInput;
@@ -86,6 +138,7 @@ export default function OnboardingPage() {
           department: formData.department,
           major: formData.role, // Mapping 'Job Title' to 'major' column
           bio: formData.bio,
+          timezone: formData.timezone,
           expertise_skills: formData.expertiseSkills,
           growth_skills: formData.growthSkills,
           updated_at: new Date().toISOString(),
@@ -294,12 +347,70 @@ export default function OnboardingPage() {
                   <CardTitle className="text-2xl">Final Polish</CardTitle>
                   <CardDescription>How can teammates partner with you?</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
+                  {/* Timezone */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" />
+                      Your Timezone
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      We auto-detected your timezone. Change it if needed for accurate meeting suggestions.
+                    </p>
+                    <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between h-11 font-normal"
+                        >
+                          <span className="truncate">{selectedTimezoneLabel}</span>
+                          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[350px] p-0" align="start">
+                        <div className="p-2 border-b">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder="Search timezone..."
+                              value={timezoneSearch}
+                              onChange={(e) => setTimezoneSearch(e.target.value)}
+                              className="pl-8 h-9"
+                            />
+                          </div>
+                        </div>
+                        <ScrollArea className="h-[250px]">
+                          <div className="p-1">
+                            {filteredTimezones.map((tz) => (
+                              <button
+                                key={tz.value}
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, timezone: tz.value }));
+                                  setTimezoneOpen(false);
+                                  setTimezoneSearch("");
+                                }}
+                                className={`w-full flex items-center justify-between px-2 py-2 text-sm rounded-md hover:bg-accent transition-colors ${
+                                  formData.timezone === tz.value ? "bg-accent" : ""
+                                }`}
+                              >
+                                <span>{tz.label}</span>
+                                {formData.timezone === tz.value && (
+                                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Bio */}
                   <div className="space-y-2">
                     <Label htmlFor="bio">Bio / Working Style</Label>
                     <Textarea
                       id="bio"
-                      className="min-h-[150px] text-base resize-none"
+                      className="min-h-[120px] text-base resize-none"
                       placeholder="I'm usually available in the mornings. I prefer async reviews but happy to jump on a call for complex blockers."
                       value={formData.bio}
                       onChange={e => setFormData({...formData, bio: e.target.value})}

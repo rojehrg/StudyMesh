@@ -268,10 +268,20 @@ export default function JoinPodPage() {
                 </div>
 
                 {podPreview.alreadyMember ? (
-                  <div className="mt-6 bg-card border border-accent/30 rounded-lg p-3">
-                    <p className="text-sm text-accent font-medium">
-                      ✅ You're already a member of this pod
-                    </p>
+                  <div className="mt-6 space-y-3">
+                    <div className="bg-card border border-accent/30 rounded-lg p-3">
+                      <p className="text-sm text-accent font-medium">
+                        ✅ You're already a member of this pod
+                      </p>
+                    </div>
+                    <Button
+                      asChild
+                      className="w-full bg-accent hover:bg-accent/80"
+                    >
+                      <Link href={`/classes/${podPreview.pod_code}`}>
+                        View Pod
+                      </Link>
+                    </Button>
                   </div>
                 ) : (
                   <Button

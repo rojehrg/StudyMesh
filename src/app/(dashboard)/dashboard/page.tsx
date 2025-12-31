@@ -210,62 +210,70 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Your Pods</CardTitle>
-            <Users className="h-5 w-5 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">{podIds.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {podIds.length === 0 ? "Join your first pod" : "Active teams"}
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/classes">
+          <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-primary/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Your Pods</CardTitle>
+              <Users className="h-5 w-5 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{podIds.length}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {podIds.length === 0 ? "Join your first pod" : "Active teams"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Available Now</CardTitle>
-            <Zap className="h-5 w-5 text-success" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">{availableTeammates.length}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {availableTeammates.length === 0 ? "No one right now" : "Teammates online"}
-            </p>
-          </CardContent>
-        </Card>
+        <a href="#available-teammates">
+          <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-success/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Available Now</CardTitle>
+              <Zap className="h-5 w-5 text-success" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{availableTeammates.length}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {availableTeammates.length === 0 ? "No one right now" : "Teammates online"}
+              </p>
+            </CardContent>
+          </Card>
+        </a>
 
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Looking to Help</CardTitle>
-            <Sparkles className="h-5 w-5 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">{helpersCount}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {helpersCount === 0 ? "Be the first" : "Open to helping"}
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/classes">
+          <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-accent/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Looking to Help</CardTitle>
+              <Sparkles className="h-5 w-5 text-accent" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{helpersCount}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {helpersCount === 0 ? "Be the first" : "Open to helping"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="hover-lift">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
-            <Bell className="h-5 w-5 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">{unreadNotifications}</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {unreadNotifications === 0 ? "All caught up" : "Unread nudges"}
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/notifications">
+          <Card className="hover-lift cursor-pointer h-full transition-colors hover:border-primary/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Notifications</CardTitle>
+              <Bell className="h-5 w-5 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground">{unreadNotifications}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {unreadNotifications === 0 ? "All caught up" : "Unread nudges"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Available Teammates */}
       {availableTeammates.length > 0 && (
-        <Card>
+        <Card id="available-teammates">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
