@@ -93,10 +93,17 @@ export default function PodDetailPage() {
 
         const membersWithProfiles = podMembers.map(pm => {
           const profile = profiles?.find(p => p.user_id === pm.user_id);
+          // Build display name from first_name and last_name, fallback to major or "Team Member"
+          const displayName = profile?.first_name && profile?.last_name
+            ? `${profile.first_name} ${profile.last_name}`
+            : profile?.first_name || profile?.major || "Team Member";
           return {
             userId: pm.user_id,
             joinedAt: pm.joined_at,
-            name: profile?.major || "Team Member",
+            name: displayName,
+            firstName: profile?.first_name,
+            lastName: profile?.last_name,
+            role: profile?.major, // Keep role/title separate
             department: profile?.department,
             expertiseSkills: profile?.expertise_skills || [],
             knowledgeAreas: profile?.knowledge_areas || [],
@@ -473,7 +480,11 @@ export default function PodDetailPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">{member.department || "No department"}</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {member.role && member.department
+                          ? `${member.role} • ${member.department}`
+                          : member.role || member.department || "Team Member"}
+                      </p>
                     </div>
                   </div>
 

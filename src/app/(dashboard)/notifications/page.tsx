@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckCheck, X, Loader2, Send, Sparkles, Zap } from "lucide-react";
+import { Bell, CheckCheck, X, Loader2, Send, Sparkles, Zap, Check, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +170,70 @@ export default function NotificationsPage() {
     }
   };
 
+  const handleNudgeResponse = async (notification: any, accepted: boolean) => {
+    try {
+      const metadata = notification.metadata || {};
+
+      // Update notification with response
+      await supabase
+        .from('notifications')
+        .update({
+          read: true,
+          metadata: {
+            ...metadata,
+            responded: true,
+            accepted
+          }
+        })
+        .eq('id', notification.id);
+
+      // Update local state
+      setNotifications(notifications.map(n =>
+        n.id === notification.id
+          ? { ...n, read: true, metadata: { ...n.metadata, responded: true, accepted } }
+          : n
+      ));
+
+      // Send response notification to the original sender
+      if (metadata.sender_id) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('user_id', user.id)
+            .single();
+
+          const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Someone';
+
+          await supabase.from('notifications').insert({
+            recipient_id: metadata.sender_id,
+            sender_id: user.id,
+            type: 'nudge_response',
+            content: accepted
+              ? `${senderName} accepted your nudge and wants to connect!`
+              : `${senderName} isn't available right now.`,
+            metadata: {
+              pod_code: metadata.pod_code,
+              accepted,
+              original_nudge_id: notification.id
+            }
+          });
+        }
+      }
+
+      toast.success(accepted ? "Nudge accepted! Let's schedule a time." : "Response sent");
+
+      // If accepted, navigate to pod to schedule
+      if (accepted && metadata.pod_code) {
+        router.push(`/classes/${metadata.pod_code}?schedule=${metadata.sender_id}`);
+      }
+    } catch (error) {
+      console.error("Error responding to nudge:", error);
+      toast.error("Failed to respond");
+    }
+  };
+
   const getNotificationIcon = (notification: any, isSent: boolean) => {
     if (isSent) {
       return <Send className="w-5 h-5 text-muted-foreground" />;
@@ -186,6 +250,12 @@ export default function NotificationsPage() {
     }
     if (notification.type === 'nudge') {
       return isSent ? 'Nudge Sent' : 'Nudge Received';
+    }
+    if (notification.type === 'nudge_response') {
+      return notification.metadata?.accepted ? 'Nudge Accepted!' : 'Nudge Response';
+    }
+    if (notification.type === 'meeting_invite') {
+      return 'Meeting Invitation';
     }
     return 'Notification';
   };
@@ -292,11 +362,38 @@ export default function NotificationsPage() {
                             {notification.metadata.pod_code}
                           </Badge>
                         )}
+                        {/* Show response status for nudges */}
+                        {notification.type === 'nudge' && notification.metadata?.responded && (
+                          <Badge variant={notification.metadata.accepted ? "default" : "secondary"} className="text-xs">
+                            {notification.metadata.accepted ? "Accepted" : "Declined"}
+                          </Badge>
+                        )}
                       </div>
+
+                      {/* Accept/Decline buttons for nudges that haven't been responded to */}
+                      {!isSent && notification.type === 'nudge' && !notification.metadata?.responded && (
+                        <div className="flex items-center gap-2 mt-3">
+                          <Button
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); handleNudgeResponse(notification, true); }}
+                            className="gap-1"
+                          >
+                            <Calendar className="w-3 h-3" />
+                            Accept & Schedule
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => { e.stopPropagation(); handleNudgeResponse(notification, false); }}
+                          >
+                            Not Now
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {!notification.read && !isSent && (
+                    {!notification.read && !isSent && notification.type !== 'nudge' && (
                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}>
                         Mark read
                       </Button>

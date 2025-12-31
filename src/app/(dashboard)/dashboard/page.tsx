@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AvailableDot } from "@/components/available-now-indicator";
+import { LookingToHelpToggle } from "@/components/looking-to-help-toggle";
 
 // Helper to format relative time
 function getTimeAgo(date: Date): string {
@@ -191,6 +192,9 @@ export default async function DashboardPage() {
   const completedSteps = onboardingItems.filter(s => s.done).length;
   const completionPercent = Math.round(((completedSteps + 1) / (onboardingItems.length + 1)) * 100); // +1 for "Account created"
 
+  // Get current lookingToHelp status
+  const isLookingToHelp = profile.availability?.lookingToHelp || false;
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -200,20 +204,39 @@ export default async function DashboardPage() {
           </h1>
           <p className="text-muted-foreground mt-1">See who's available to help</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" asChild>
-            <Link href="/classes/join">
-              <LogIn className="mr-2 h-4 w-4" />
-              Join Pod
-            </Link>
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
-            <Link href="/classes/create">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create Pod
-            </Link>
-          </Button>
+        <div className="flex items-center gap-3">
+          <LookingToHelpToggle initialValue={isLookingToHelp} userId={user.id} />
+          <div className="hidden sm:flex gap-3">
+            <Button variant="outline" asChild>
+              <Link href="/classes/join">
+                <LogIn className="mr-2 h-4 w-4" />
+                Join Pod
+              </Link>
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+              <Link href="/classes/create">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Pod
+              </Link>
+            </Button>
+          </div>
         </div>
+      </div>
+
+      {/* Mobile buttons */}
+      <div className="flex sm:hidden gap-3">
+        <Button variant="outline" className="flex-1" asChild>
+          <Link href="/classes/join">
+            <LogIn className="mr-2 h-4 w-4" />
+            Join Pod
+          </Link>
+        </Button>
+        <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+          <Link href="/classes/create">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Pod
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Cards */}

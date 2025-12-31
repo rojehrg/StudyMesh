@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-interface AvailabilitySlot {
-  day_of_week: number;
-  start_time: string;
-  end_time: string;
-  label?: string;
+// Availability slot format from profiles.availability JSON
+interface ProfileAvailabilitySlot {
+  day: number;      // 0-6 (Mon-Sun)
+  startSlot: number; // 0-47 (30-min intervals)
+  endSlot: number;
 }
 
 interface TimeRange {
@@ -13,10 +13,9 @@ interface TimeRange {
   end: number;   // minutes from midnight
 }
 
-// Convert time string "HH:MM" to minutes from midnight
-function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  return hours * 60 + minutes;
+// Convert slot number (0-47) to minutes from midnight
+function slotToMinutes(slot: number): number {
+  return slot * 30; // Each slot is 30 minutes
 }
 
 // Convert minutes from midnight to time string "HH:MM"
@@ -89,38 +88,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "userIds array is required" }, { status: 400 });
     }
 
-    // Get availability for all users
-    const { data: availabilities, error } = await supabase
-      .from('availability_schedules')
-      .select('user_id, day_of_week, start_time, end_time, label')
+    // Get availability from profiles table (stored as JSON in availability column)
+    const { data: profiles, error } = await supabase
+      .from('profiles')
+      .select('user_id, availability, timezone, first_name, last_name')
       .in('user_id', userIds);
 
     if (error) {
       throw error;
     }
 
+    // Parse availability slots from profiles
+    // The availability JSON format: { slots: [{ day, startSlot, endSlot }], currentlyAvailable, lookingToHelp }
+    const userAvailabilityMap: Record<string, ProfileAvailabilitySlot[]> = {};
+
+    for (const profile of profiles || []) {
+      const availability = profile.availability as { slots?: ProfileAvailabilitySlot[] } | null;
+      userAvailabilityMap[profile.user_id] = availability?.slots || [];
+    }
+
     // Group by day
     const result: Record<number, { slots: Array<{ start: string; end: string }> }> = {};
 
-    // If specific day is requested
+    // Note: availability uses day 0-6 as Mon-Sun, but we need to handle this consistently
+    // The frontend may pass dayOfWeek as 0-6 (Sun-Sat) or 0-6 (Mon-Sun) depending on context
+    // We'll use 0-6 (Mon-Sun) to match the stored format
     const daysToProcess = dayOfWeek !== undefined ? [dayOfWeek] : [0, 1, 2, 3, 4, 5, 6];
 
     for (const day of daysToProcess) {
       // Group slots by user for this day
       const userSlots: Record<string, TimeRange[]> = {};
 
-      for (const slot of availabilities || []) {
-        if (slot.day_of_week !== day) continue;
+      for (const userId of userIds) {
+        const slots = userAvailabilityMap[userId] || [];
+        const daySlots = slots.filter(s => s.day === day);
 
-        const userId = slot.user_id;
-        if (!userSlots[userId]) {
-          userSlots[userId] = [];
+        if (daySlots.length > 0) {
+          userSlots[userId] = daySlots.map(slot => ({
+            start: slotToMinutes(slot.startSlot),
+            end: slotToMinutes(slot.endSlot)
+          }));
         }
-
-        userSlots[userId].push({
-          start: timeToMinutes(slot.start_time),
-          end: timeToMinutes(slot.end_time)
-        });
       }
 
       // Check if all requested users have availability on this day
@@ -146,19 +154,22 @@ export async function POST(request: Request) {
       };
     }
 
-    // Get user profiles for display
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, first_name, last_name, timezone')
-      .in('user_id', userIds);
+    // We already have profiles from the initial query
+    const profilesForDisplay = (profiles || []).map(p => ({
+      user_id: p.user_id,
+      first_name: p.first_name,
+      last_name: p.last_name,
+      timezone: p.timezone
+    }));
 
     return NextResponse.json({
       success: true,
       userIds,
       durationMinutes,
       overlap: result,
-      profiles: profiles || [],
-      dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      profiles: profilesForDisplay,
+      // Note: dayNames index 0 = Monday since we use Mon-Sun (0-6) format
+      dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     });
   } catch (error) {
     console.error("Error finding availability overlap:", error);

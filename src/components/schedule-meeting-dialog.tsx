@@ -76,10 +76,13 @@ export function ScheduleMeetingDialog({
   const [selectedTime, setSelectedTime] = useState("");
   const [duration, setDuration] = useState("30");
   const [meetingLink, setMeetingLink] = useState("");
+  const [useManualTime, setUseManualTime] = useState(false);
+  const [manualTime, setManualTime] = useState("");
 
   const supabase = createClient();
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  // Day names matching availability format: 0=Monday, 6=Sunday
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   useEffect(() => {
     if (open) {
@@ -113,6 +116,8 @@ export function ScheduleMeetingDialog({
     setDuration("30");
     setMeetingLink("");
     setOverlap({});
+    setUseManualTime(false);
+    setManualTime("");
   };
 
   const loadPods = async () => {
@@ -220,9 +225,12 @@ export function ScheduleMeetingDialog({
 
     try {
       // Calculate the next occurrence of the selected day
+      // selectedDay is in Mon=0 format, but JS getDay() uses Sun=0
+      // Convert: Mon(0) -> 1, Tue(1) -> 2, ..., Sun(6) -> 0
       const now = new Date();
-      const todayDay = now.getDay();
-      let daysUntil = selectedDay - todayDay;
+      const todayJsDay = now.getDay(); // 0=Sun, 1=Mon, ...
+      const targetJsDay = (selectedDay + 1) % 7; // Convert from Mon=0 to Sun=0 format
+      let daysUntil = targetJsDay - todayJsDay;
       if (daysUntil <= 0) daysUntil += 7; // Next week if today or past
 
       const meetingDate = new Date(now);
@@ -411,12 +419,46 @@ export function ScheduleMeetingDialog({
               <div className="space-y-2">
                 <Label>Available Times</Label>
                 {!hasOverlap ? (
-                  <div className="text-center py-8 bg-muted/30 rounded-xl">
-                    <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground">No overlapping availability found</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Ask participants to update their availability in Settings
-                    </p>
+                  <div className="space-y-4">
+                    <div className="text-center py-6 bg-muted/30 rounded-xl">
+                      <Calendar className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">No overlapping availability found</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        You can still pick a manual time below
+                      </p>
+                    </div>
+
+                    {/* Manual time picker */}
+                    <div className="p-4 border border-dashed rounded-lg space-y-3">
+                      <Label className="text-sm font-medium">Pick a manual time</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Day</Label>
+                          <Select
+                            value={selectedDay !== null ? String(selectedDay) : ""}
+                            onValueChange={(v) => { setSelectedDay(parseInt(v)); setUseManualTime(true); }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {dayNames.map((day, idx) => (
+                                <SelectItem key={idx} value={String(idx)}>{day}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Time</Label>
+                          <Input
+                            type="time"
+                            value={manualTime}
+                            onChange={(e) => { setManualTime(e.target.value); setSelectedTime(e.target.value); setUseManualTime(true); }}
+                            className="h-10"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -429,7 +471,7 @@ export function ScheduleMeetingDialog({
                           <p className="text-sm font-medium text-foreground">{dayName}</p>
                           <div className="flex flex-wrap gap-2">
                             {daySlots.map((slot, idx) => {
-                              const isSelected = selectedDay === dayIndex && selectedTime === slot.start;
+                              const isSelected = selectedDay === dayIndex && selectedTime === slot.start && !useManualTime;
                               return (
                                 <Button
                                   key={idx}
@@ -438,6 +480,7 @@ export function ScheduleMeetingDialog({
                                   onClick={() => {
                                     setSelectedDay(dayIndex);
                                     setSelectedTime(slot.start);
+                                    setUseManualTime(false);
                                   }}
                                   className="gap-1"
                                 >
@@ -450,6 +493,48 @@ export function ScheduleMeetingDialog({
                         </div>
                       );
                     })}
+
+                    {/* Manual time alternative */}
+                    <div className="pt-3 border-t">
+                      <button
+                        type="button"
+                        onClick={() => setUseManualTime(!useManualTime)}
+                        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                      >
+                        <Clock className="w-3 h-3" />
+                        {useManualTime ? "Use suggested times" : "Or pick a different time"}
+                      </button>
+
+                      {useManualTime && (
+                        <div className="mt-3 grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">Day</Label>
+                            <Select
+                              value={selectedDay !== null ? String(selectedDay) : ""}
+                              onValueChange={(v) => setSelectedDay(parseInt(v))}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select day" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {dayNames.map((day, idx) => (
+                                  <SelectItem key={idx} value={String(idx)}>{day}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">Time</Label>
+                            <Input
+                              type="time"
+                              value={manualTime}
+                              onChange={(e) => { setManualTime(e.target.value); setSelectedTime(e.target.value); }}
+                              className="h-10"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

@@ -11,6 +11,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Globe, Clock, Zap, ChevronDown, Check, Search, X } from "lucide-react";
@@ -309,15 +316,70 @@ export function AvailabilityGrid({
     toast.success("Availability cleared");
   };
 
-  const setWorkHours = () => {
-    // Set 9am-5pm Mon-Fri
+  const setPreset = (preset: string) => {
     const workSlots: AvailabilitySlot[] = [];
-    for (let day = 0; day < 5; day++) {
-      workSlots.push({ day, startSlot: 18, endSlot: 34 }); // 9:00 - 17:00
+
+    switch (preset) {
+      case "9-5":
+        // 9am-5pm Mon-Fri
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 18, endSlot: 34 }); // 9:00 - 17:00
+        }
+        toast.success("Availability set to 9-5 Mon-Fri");
+        break;
+      case "10-6":
+        // 10am-6pm Mon-Fri
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 20, endSlot: 36 }); // 10:00 - 18:00
+        }
+        toast.success("Availability set to 10-6 Mon-Fri");
+        break;
+      case "8-4":
+        // 8am-4pm Mon-Fri
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 16, endSlot: 32 }); // 8:00 - 16:00
+        }
+        toast.success("Availability set to 8-4 Mon-Fri");
+        break;
+      case "evenings":
+        // 6pm-10pm Mon-Fri
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 36, endSlot: 44 }); // 18:00 - 22:00
+        }
+        toast.success("Availability set to evenings (6-10pm) Mon-Fri");
+        break;
+      case "mornings":
+        // 6am-12pm Mon-Fri
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 12, endSlot: 24 }); // 6:00 - 12:00
+        }
+        toast.success("Availability set to mornings (6am-12pm) Mon-Fri");
+        break;
+      case "weekends":
+        // 10am-6pm Sat-Sun
+        workSlots.push({ day: 5, startSlot: 20, endSlot: 36 }); // Saturday
+        workSlots.push({ day: 6, startSlot: 20, endSlot: 36 }); // Sunday
+        toast.success("Availability set to weekends 10-6");
+        break;
+      case "flexible":
+        // 10am-8pm every day
+        for (let day = 0; day < 7; day++) {
+          workSlots.push({ day, startSlot: 20, endSlot: 40 }); // 10:00 - 20:00
+        }
+        toast.success("Availability set to flexible (10am-8pm daily)");
+        break;
+      default:
+        // Default 9-5
+        for (let day = 0; day < 5; day++) {
+          workSlots.push({ day, startSlot: 18, endSlot: 34 });
+        }
     }
+
     setSlots(workSlots);
-    toast.success("Availability set to 9-5 Mon-Fri");
   };
+
+  // Legacy function for backward compatibility
+  const setWorkHours = () => setPreset("9-5");
 
   // Format slot to time string (12-hour format)
   const formatSlotTime = (slot: number) => {
@@ -472,10 +534,21 @@ export function AvailabilityGrid({
 
       {/* Quick Actions */}
       {!readOnly && (
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={setWorkHours}>
-            Set 9-5 Mon-Fri
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          <Select onValueChange={setPreset}>
+            <SelectTrigger className="w-[180px] h-9">
+              <SelectValue placeholder="Quick presets..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="9-5">9-5 Mon-Fri</SelectItem>
+              <SelectItem value="10-6">10-6 Mon-Fri</SelectItem>
+              <SelectItem value="8-4">8-4 Mon-Fri</SelectItem>
+              <SelectItem value="mornings">Mornings (6am-12pm)</SelectItem>
+              <SelectItem value="evenings">Evenings (6-10pm)</SelectItem>
+              <SelectItem value="weekends">Weekends only</SelectItem>
+              <SelectItem value="flexible">Flexible (10am-8pm daily)</SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline" size="sm" onClick={clearAll}>
             Clear All
           </Button>
