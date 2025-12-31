@@ -415,7 +415,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topExpertise.map(([skill, count]) => (
-                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary/15 text-primary">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </Badge>
@@ -427,7 +427,7 @@ export default function PodDetailPage() {
             {topGrowth.length > 0 && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                  <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
                     <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
@@ -435,7 +435,7 @@ export default function PodDetailPage() {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {topGrowth.map(([skill, count]) => (
-                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                      <Badge key={skill} variant="secondary" className="gap-1.5 px-3 py-1.5 text-sm font-medium bg-success/15 text-success">
                         <span>{skill}</span>
                         <span className="text-xs opacity-70">×{count}</span>
                       </Badge>

@@ -397,7 +397,7 @@ export default async function DashboardPage() {
                   >
                     <Avatar className="h-9 w-9 shrink-0">
                       <AvatarFallback className={`font-semibold text-sm ${
-                        nudgeType === 'ask' ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
+                        nudgeType === 'ask' ? "bg-info/20 text-info" : "bg-success/20 text-success"
                       }`}>
                         {otherName[0].toUpperCase()}
                       </AvatarFallback>
@@ -409,8 +409,8 @@ export default async function DashboardPage() {
                         </span>
                         <Badge className={`text-xs px-1.5 border-0 ${
                           nudgeType === 'ask'
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-green-100 text-green-700"
+                            ? "bg-info/20 text-info"
+                            : "bg-success/20 text-success"
                         }`}>
                           {nudgeType === 'ask' ? (
                             <><HelpCircle className="w-3 h-3 mr-0.5" /> Asked</>

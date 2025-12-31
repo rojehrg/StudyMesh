@@ -575,7 +575,7 @@ export function AvailabilityGrid({
       )}
 
       {/* Grid - GitHub contribution style */}
-      <div className="bg-card rounded-xl border border-border p-4 shadow-sm">
+      <div className="bg-card rounded-xl border border-border p-4">
         {/* Hour Headers */}
         <div className="flex items-center mb-2">
           <div className="w-12 shrink-0" />
@@ -613,8 +613,8 @@ export function AvailabilityGrid({
                         "flex-1 h-6 rounded-sm transition-colors cursor-pointer select-none",
                         isSelected
                           ? "bg-primary hover:bg-primary/80"
-                          : "bg-muted/40 hover:bg-muted",
-                        isCurrentSlot && !isSelected && "ring-2 ring-primary/60",
+                          : "bg-muted hover:bg-accent",
+                        isCurrentSlot && !isSelected && "ring-2 ring-primary/50",
                         readOnly && "cursor-default"
                       )}
                       onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
@@ -637,11 +637,11 @@ export function AvailabilityGrid({
             <span className="text-muted-foreground">Available</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-muted/40" />
+            <div className="w-3 h-3 rounded-sm bg-muted" />
             <span className="text-muted-foreground">Busy</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-muted/40 ring-2 ring-primary/60" />
+            <div className="w-3 h-3 rounded-sm bg-muted ring-2 ring-primary/50" />
             <span className="text-muted-foreground">Current time</span>
           </div>
         </div>

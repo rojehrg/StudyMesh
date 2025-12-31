@@ -492,18 +492,14 @@ export default function LandingPage() {
                           <Users className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Your team, organized</h4>
                           <p className="text-gray-500 mb-4">Create pods for different teams or projects. Share a simple code to invite members.</p>
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="font-medium text-gray-900">Engineering Pod</span>
-                              <span className="text-xs bg-violet-100 text-violet-600 px-2 py-1 rounded font-mono">ENG-2024</span>
-                            </div>
-                            <div className="flex -space-x-2">
-                              {["SK", "MR", "AT", "JD", "+4"].map((init, i) => (
-                                <div key={i} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-medium ${i < 4 ? "bg-violet-100 text-violet-600" : "bg-gray-100 text-gray-500"}`}>
-                                  {init}
-                                </div>
-                              ))}
-                            </div>
+                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <Image
+                              src="/images/pods-screenshot.png"
+                              alt="Enablement Pods - Frontend Devs team with 14 members"
+                              width={400}
+                              height={200}
+                              className="w-full h-auto"
+                            />
                           </div>
                         </motion.div>
                       )}
@@ -539,13 +535,14 @@ export default function LandingPage() {
                           <MessageSquare className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Notifications where you work</h4>
                           <p className="text-gray-500 mb-4">Get nudges in Slack. When accepted, automatically prompted to schedule.</p>
-                          <div className="bg-[#4A154B] rounded-lg p-4 text-white">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-6 h-6 rounded bg-white/20 flex items-center justify-center text-xs">M</div>
-                              <span className="font-medium text-sm">Meshflow</span>
-                            </div>
-                            <p className="text-sm opacity-90">Sarah accepted your nudge!</p>
-                            <p className="text-xs opacity-70 mt-1">Click to schedule a meeting →</p>
+                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <Image
+                              src="/images/slack-screenshot.png"
+                              alt="Meshflow Slack integration - Meeting invite notification"
+                              width={400}
+                              height={200}
+                              className="w-full h-auto"
+                            />
                           </div>
                         </motion.div>
                       )}
@@ -554,13 +551,14 @@ export default function LandingPage() {
                           <Globe className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">No more timezone math</h4>
                           <p className="text-gray-500 mb-4">See everyone's availability in your local time. Find overlap instantly.</p>
-                          <div className="space-y-2">
-                            {[{ city: "New York", time: "2:00 PM", you: true }, { city: "London", time: "7:00 PM" }, { city: "Tokyo", time: "4:00 AM +1" }].map((tz, i) => (
-                              <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${tz.you ? "bg-violet-50 border border-violet-100" : "bg-gray-50"}`}>
-                                <span className={tz.you ? "font-medium text-gray-900" : "text-gray-600"}>{tz.city} {tz.you && <span className="text-xs text-violet-600">(You)</span>}</span>
-                                <span className="font-mono text-sm text-gray-900">{tz.time}</span>
-                              </div>
-                            ))}
+                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <Image
+                              src="/images/timezone-screenshot.png"
+                              alt="Timezone selector with multiple timezone options"
+                              width={400}
+                              height={200}
+                              className="w-full h-auto"
+                            />
                           </div>
                         </motion.div>
                       )}
@@ -569,23 +567,14 @@ export default function LandingPage() {
                           <Target className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Find the right expert</h4>
                           <p className="text-gray-500 mb-4">Tag your skills. See what teammates know and what they want to learn.</p>
-                          <div className="space-y-3">
-                            <div>
-                              <p className="text-xs text-gray-500 mb-2">Top skills in pod</p>
-                              <div className="flex flex-wrap gap-2">
-                                {["React", "TypeScript", "Python", "AWS"].map((skill, i) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium bg-violet-100 text-violet-600">{skill}</span>
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500 mb-2">People want to learn</p>
-                              <div className="flex flex-wrap gap-2">
-                                {["GraphQL", "Rust", "K8s"].map((skill, i) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600">{skill}</span>
-                                ))}
-                              </div>
-                            </div>
+                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <Image
+                              src="/images/skills-screenshot.png"
+                              alt="Skills and expertise tagging interface"
+                              width={400}
+                              height={200}
+                              className="w-full h-auto"
+                            />
                           </div>
                         </motion.div>
                       )}

@@ -7,16 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, X, Check, User, Clock, Mail, Link2, Unlink, MessageCircle, Cloud, CloudOff, Sparkles, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { AvailabilityGrid, type AvailabilitySlot } from "@/components/availability-grid";
 
-// Common knowledge areas for suggestions
 const SUGGESTED_KNOWLEDGE_AREAS = [
   "JavaScript", "TypeScript", "Python", "React", "Node.js", "SQL", "AWS",
   "Product Management", "Design", "Sales", "Marketing", "Data Analysis",
@@ -24,7 +22,6 @@ const SUGGESTED_KNOWLEDGE_AREAS = [
   "Copywriting", "SEO", "Growth", "Operations", "Legal", "Security",
 ];
 
-// Consolidated profile type to avoid state sync issues
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -65,23 +62,20 @@ export default function SettingsPage() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  // Consolidated profile state - all editable fields in one place
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [knowledgeInput, setKnowledgeInput] = useState("");
   const [slackConnecting, setSlackConnecting] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
   const isInitialLoad = useRef(true);
 
   const supabase = createClient();
 
-  // Handle Slack OAuth callback result
   useEffect(() => {
     const slackStatus = searchParams.get('slack');
     if (slackStatus === 'success') {
-      toast.success("Slack connected successfully!", {
-        description: "You'll now receive meeting invites as direct messages."
-      });
+      toast.success("Slack connected successfully!");
       window.history.replaceState({}, '', '/settings');
       loadProfile();
     } else if (slackStatus === 'cancelled') {
@@ -89,11 +83,7 @@ export default function SettingsPage() {
       window.history.replaceState({}, '', '/settings');
     } else if (slackStatus === 'error') {
       const message = searchParams.get('message') || 'Unknown error';
-      toast.error("Failed to connect Slack", {
-        description: message === 'not_configured'
-          ? "Slack OAuth is not configured for this workspace."
-          : `Error: ${message}`
-      });
+      toast.error("Failed to connect Slack", { description: message });
       window.history.replaceState({}, '', '/settings');
     }
   }, [searchParams]);
@@ -132,7 +122,6 @@ export default function SettingsPage() {
           slackUserId: data.slack_user_id || "",
         };
         setProfile(loadedProfile);
-        // Set the initial saved state to prevent immediate autosave
         lastSavedRef.current = JSON.stringify(loadedProfile);
       }
     } catch (error) {
@@ -157,7 +146,6 @@ export default function SettingsPage() {
           department: profileData.department,
           major: profileData.major,
           bio: profileData.bio,
-          // Use expertise_skills column (knowledge_areas doesn't exist in DB)
           expertise_skills: profileData.knowledgeAreas || [],
           availability: {
             slots: profileData.availabilitySlots,
@@ -173,298 +161,222 @@ export default function SettingsPage() {
         .eq('user_id', user.id);
 
       if (error) throw error;
-
       setSaveStatus('saved');
       lastSavedRef.current = JSON.stringify(profileData);
-
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
       console.error("Error saving profile:", error);
       setSaveStatus('error');
-      toast.error("Failed to save", {
-        description: "Please try again."
-      });
+      toast.error("Failed to save");
     }
   }, [supabase]);
 
-  // Auto-save profile with debounce
   useEffect(() => {
-    // Skip during initial load
     if (loading || isInitialLoad.current) return;
-
     const currentData = JSON.stringify(profile);
     if (currentData === lastSavedRef.current) return;
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    saveTimeoutRef.current = setTimeout(() => {
-      saveProfile(profile);
-    }, 1000);
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => saveProfile(profile), 1000);
 
     return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
   }, [profile, loading, saveProfile]);
 
-  // Update profile field helper
   const updateProfile = (updates: Partial<ProfileData>) => {
     setProfile(prev => ({ ...prev, ...updates }));
   };
 
-  // Handle looking to help toggle - uses consolidated state now
-  const handleLookingToHelpChange = (checked: boolean) => {
-    updateProfile({ lookingToHelp: checked });
-    toast.success(checked ? "You'll appear as 'looking to help'" : "Status updated");
-  };
-
   const addKnowledgeArea = (area?: string) => {
     const areaToAdd = area || knowledgeInput.trim();
-    if (!areaToAdd) return;
-
-    if (!profile.knowledgeAreas.includes(areaToAdd)) {
-      updateProfile({
-        knowledgeAreas: [...profile.knowledgeAreas, areaToAdd],
-      });
-    }
+    if (!areaToAdd || profile.knowledgeAreas.includes(areaToAdd)) return;
+    updateProfile({ knowledgeAreas: [...profile.knowledgeAreas, areaToAdd] });
     setKnowledgeInput("");
   };
 
   const removeKnowledgeArea = (area: string) => {
-    updateProfile({
-      knowledgeAreas: profile.knowledgeAreas.filter((a: string) => a !== area),
-    });
+    updateProfile({ knowledgeAreas: profile.knowledgeAreas.filter(a => a !== area) });
   };
 
-  // Connect to Slack via OAuth
   const connectSlack = () => {
     setSlackConnecting(true);
     window.location.href = '/api/slack/oauth';
   };
 
-  // Disconnect Slack
   const disconnectSlack = async () => {
     try {
       const response = await fetch('/api/slack/oauth', { method: 'POST' });
       if (response.ok) {
         updateProfile({ slackConnected: false, slackUserId: "", slackHandle: "" });
         toast.success("Slack disconnected");
-      } else {
-        toast.error("Failed to disconnect Slack");
       }
     } catch (error) {
-      console.error("Error disconnecting Slack:", error);
       toast.error("Failed to disconnect Slack");
     }
   };
 
-  // Get filtered suggestions (exclude already added)
   const filteredSuggestions = SUGGESTED_KNOWLEDGE_AREAS.filter(
-    area => !profile.knowledgeAreas.includes(area) &&
-            area.toLowerCase().includes(knowledgeInput.toLowerCase())
+    area => !profile.knowledgeAreas.includes(area) && area.toLowerCase().includes(knowledgeInput.toLowerCase())
   ).slice(0, 6);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
 
+  const tabs = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "availability", label: "Availability", icon: Clock },
+    { id: "notifications", label: "Notifications", icon: Mail },
+  ];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your profile and availability</p>
+          <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          {saveStatus === 'saving' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-2 text-muted-foreground"
-            >
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Saving...</span>
-            </motion.div>
-          )}
-          {saveStatus === 'saved' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 text-primary"
-            >
-              <Check className="h-4 w-4" />
-              <span>Saved</span>
-            </motion.div>
-          )}
-          {saveStatus === 'error' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-2 text-destructive"
-            >
-              <CloudOff className="h-4 w-4" />
-              <span>Error saving</span>
-            </motion.div>
-          )}
-          {saveStatus === 'idle' && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Cloud className="h-4 w-4" />
-              <span>Auto-save on</span>
-            </div>
-          )}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          {saveStatus === 'saving' && <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>}
+          {saveStatus === 'saved' && <><Check className="h-4 w-4 text-success" /> Saved</>}
+          {saveStatus === 'error' && <><CloudOff className="h-4 w-4 text-destructive" /> Error</>}
+          {saveStatus === 'idle' && <><Cloud className="h-4 w-4" /> Auto-save</>}
         </div>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="availability" className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span className="hidden sm:inline">Availability</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Mail className="w-4 h-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Tab Navigation */}
+      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === tab.id
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="profile" className="space-y-6">
+      {/* Profile Tab */}
+      {activeTab === "profile" && (
+        <div className="space-y-6">
+          {/* Basic Info */}
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>How teammates will see you</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Basic Information</CardTitle>
+              <CardDescription>Your personal details visible to teammates</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">First Name</Label>
                   <Input
-                    id="firstName"
-                    placeholder="Enter your first name"
                     value={profile.firstName}
                     onChange={(e) => updateProfile({ firstName: e.target.value })}
-                    className="h-9"
+                    placeholder="John"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Last Name</Label>
                   <Input
-                    id="lastName"
-                    placeholder="Enter your last name"
                     value={profile.lastName}
                     onChange={(e) => updateProfile({ lastName: e.target.value })}
-                    className="h-9"
+                    placeholder="Doe"
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="department" className="text-sm font-medium">Department</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Department</Label>
                   <Input
-                    id="department"
-                    placeholder="e.g. Engineering, Sales"
                     value={profile.department}
                     onChange={(e) => updateProfile({ department: e.target.value })}
-                    className="h-9"
+                    placeholder="Engineering"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="major" className="text-sm font-medium">Job Title</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Job Title</Label>
                   <Input
-                    id="major"
-                    placeholder="e.g. Senior Account Executive"
                     value={profile.major}
                     onChange={(e) => updateProfile({ major: e.target.value })}
-                    className="h-9"
+                    placeholder="Software Engineer"
                   />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="bio" className="text-sm font-medium">Bio / Working Style</Label>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Bio</Label>
                 <Textarea
-                  id="bio"
-                  rows={2}
-                  placeholder="Tell your team how you work best..."
                   value={profile.bio}
                   onChange={(e) => updateProfile({ bio: e.target.value })}
+                  placeholder="Tell your team about yourself..."
+                  rows={3}
                   className="resize-none"
                 />
               </div>
             </CardContent>
           </Card>
 
+          {/* Knowledge Areas */}
           <Card>
-            <CardHeader>
-              <CardTitle>Knowledge Areas</CardTitle>
-              <CardDescription>Topics you can help with or want to learn about</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Knowledge Areas</CardTitle>
+              <CardDescription>Skills you can help teammates with</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Input
-                  placeholder="Add a topic (e.g. React, Sales, Data Analysis)"
                   value={knowledgeInput}
                   onChange={(e) => setKnowledgeInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addKnowledgeArea();
-                    }
-                  }}
-                  className="h-9"
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addKnowledgeArea())}
+                  placeholder="Add a skill..."
+                  className="flex-1"
                 />
-                <Button onClick={() => addKnowledgeArea()} disabled={!knowledgeInput.trim()} size="sm" className="h-9">
+                <Button
+                  onClick={() => addKnowledgeArea()}
+                  disabled={!knowledgeInput.trim()}
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90"
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Suggestions */}
               {knowledgeInput && filteredSuggestions.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs text-muted-foreground">Suggestions:</span>
-                  {filteredSuggestions.map((area) => (
-                    <Badge
+                <div className="flex flex-wrap gap-1.5">
+                  {filteredSuggestions.map(area => (
+                    <button
                       key={area}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-secondary/80"
                       onClick={() => addKnowledgeArea(area)}
+                      className="px-2.5 py-1 text-xs bg-muted hover:bg-accent text-muted-foreground hover:text-accent-foreground rounded-md transition-colors"
                     >
                       {area}
-                    </Badge>
+                    </button>
                   ))}
                 </div>
               )}
 
-              {/* Current knowledge areas */}
-              <div className="flex flex-wrap gap-2 min-h-[48px] p-3 bg-muted/50 rounded-xl">
+              <div className="flex flex-wrap gap-1.5 min-h-[40px]">
                 {profile.knowledgeAreas.length === 0 ? (
-                  <span className="text-sm text-muted-foreground italic">No topics added yet...</span>
+                  <span className="text-sm text-muted-foreground">No skills added yet</span>
                 ) : (
-                  profile.knowledgeAreas.map((area: string) => (
+                  profile.knowledgeAreas.map(area => (
                     <Badge
                       key={area}
                       variant="secondary"
-                      className="bg-primary/10 text-primary hover:bg-primary/20 gap-1 pr-1"
+                      className="bg-primary/10 text-primary border-0 gap-1"
                     >
                       {area}
-                      <button
-                        onClick={() => removeKnowledgeArea(area)}
-                        className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
-                      >
-                        <X className="h-3 w-3" />
+                      <button onClick={() => removeKnowledgeArea(area)} className="hover:text-primary/70">
+                        <X className="w-3 h-3" />
                       </button>
                     </Badge>
                   ))
@@ -473,162 +385,140 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
+          {/* Status */}
           <Card>
-            <CardHeader>
-              <CardTitle>Collaboration Status</CardTitle>
-              <CardDescription>Let teammates know when you're open to helping</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5 text-accent" />
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <Label className="text-base font-semibold text-foreground">Looking to Help</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Show a badge on your profile indicating you're open to helping others
-                    </p>
+                    <p className="font-medium text-foreground">Looking to Help</p>
+                    <p className="text-sm text-muted-foreground">Show others you're available to assist</p>
                   </div>
                 </div>
                 <Switch
                   checked={profile.lookingToHelp}
-                  onCheckedChange={handleLookingToHelpChange}
-                  className="data-[state=checked]:bg-accent"
+                  onCheckedChange={(checked) => {
+                    updateProfile({ lookingToHelp: checked });
+                    toast.success(checked ? "Status updated" : "Status removed");
+                  }}
                 />
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="availability" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Availability</CardTitle>
-              <CardDescription>Set when you're available for meetings so teammates can find the best time</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Availability Grid - includes timezone and currently available toggle */}
-              <AvailabilityGrid
-                value={{
-                  timezone: profile.timezone,
-                  slots: profile.availabilitySlots,
-                  currentlyAvailable: profile.currentlyAvailable,
-                }}
-                onChange={(val) => {
-                  updateProfile({
-                    timezone: val.timezone,
-                    availabilitySlots: val.slots,
-                    currentlyAvailable: val.currentlyAvailable,
-                  });
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {/* Availability Tab */}
+      {activeTab === "availability" && (
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base font-semibold">Weekly Availability</CardTitle>
+            <CardDescription>Set when you're free to help teammates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AvailabilityGrid
+              value={{
+                timezone: profile.timezone,
+                slots: profile.availabilitySlots,
+                currentlyAvailable: profile.currentlyAvailable,
+              }}
+              onChange={(val) => updateProfile({
+                timezone: val.timezone,
+                availabilitySlots: val.slots,
+                currentlyAvailable: val.currentlyAvailable,
+              })}
+            />
+          </CardContent>
+        </Card>
+      )}
 
-        <TabsContent value="notifications" className="space-y-6">
+      {/* Notifications Tab */}
+      {activeTab === "notifications" && (
+        <div className="space-y-6">
+          {/* Email */}
           <Card>
-            <CardHeader>
-              <CardTitle>Email Notifications</CardTitle>
-              <CardDescription>Receive meeting invites and updates via email</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Email Notifications</CardTitle>
+              <CardDescription>How you receive updates via email</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Email Address</Label>
                 <Input
-                  id="email"
                   type="email"
-                  placeholder="you@company.com"
                   value={profile.email}
                   onChange={(e) => updateProfile({ email: e.target.value })}
-                  className="h-9"
+                  placeholder="you@company.com"
+                  className="max-w-md"
                 />
               </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                     <Mail className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <Label className="text-base font-semibold text-foreground">Email Notifications</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Receive email notifications for nudges and meeting invites
-                    </p>
+                    <p className="font-medium text-foreground">Email Notifications</p>
+                    <p className="text-sm text-muted-foreground">Receive nudges and meeting invites</p>
                   </div>
                 </div>
                 <Switch
                   checked={profile.emailNotifications}
                   onCheckedChange={(checked) => updateProfile({ emailNotifications: checked })}
-                  className="data-[state=checked]:bg-primary"
                 />
               </div>
             </CardContent>
           </Card>
 
+          {/* Slack */}
           <Card>
-            <CardHeader>
-              <CardTitle>Slack Integration</CardTitle>
-              <CardDescription>Receive nudges directly in Slack DMs</CardDescription>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Slack Integration</CardTitle>
+              <CardDescription>Get notified directly in Slack</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               {profile.slackConnected ? (
-                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/30 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center shrink-0">
+                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
                       <Check className="w-5 h-5 text-success" />
                     </div>
                     <div>
-                      <Label className="text-base font-semibold text-foreground">Slack Connected</Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {profile.slackHandle
-                          ? `Connected as ${profile.slackHandle}`
-                          : "You'll receive nudges as direct messages"}
+                      <p className="font-medium text-foreground">Connected</p>
+                      <p className="text-sm text-muted-foreground">
+                        {profile.slackHandle ? `@${profile.slackHandle}` : "Receiving DMs"}
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={disconnectSlack}
-                    className="text-destructive hover:text-destructive"
-                  >
+                  <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10">
                     <Unlink className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                      <MessageCircle className="w-5 h-5 text-primary" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-[#4A154B]" />
                     </div>
                     <div>
-                      <Label className="text-base font-semibold text-foreground">Connect Slack</Label>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Get nudges sent directly to your Slack DMs
-                      </p>
+                      <p className="font-medium text-foreground">Connect Slack</p>
+                      <p className="text-sm text-muted-foreground">Get nudges as direct messages</p>
                     </div>
                   </div>
-                  <Button
-                    onClick={connectSlack}
-                    disabled={slackConnecting}
-                    className="bg-[#4A154B] hover:bg-[#3a1139] text-white"
-                  >
-                    {slackConnecting ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Link2 className="w-4 h-4 mr-2" />
-                    )}
-                    Connect to Slack
+                  <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69]">
+                    {slackConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4 mr-2" />}
+                    Connect
                   </Button>
                 </div>
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </motion.div>
   );
 }
