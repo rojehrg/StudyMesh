@@ -163,20 +163,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-4">
-          <Link href="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
-            <span className={cn(
-              "text-xl font-bold shrink-0 transition-all duration-300 text-primary",
-              isCollapsed ? "w-12 text-center" : ""
-            )}>
-              M
-            </span>
+          <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <img src="/icon.svg" alt="Attunly" className={cn(
+              "shrink-0 transition-all duration-300",
+              isCollapsed ? "w-10 h-10" : "w-7 h-7"
+            )} />
             <motion.span
               initial={false}
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
               className="whitespace-nowrap overflow-hidden text-xl font-bold"
             >
-              <span className="text-primary">esh</span>
-              <span className="text-foreground">flow</span>
+              <span className="text-foreground">Attun</span>
+              <span className="text-primary">ly</span>
             </motion.span>
           </Link>
         </div>
@@ -249,7 +247,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
               <List className="w-6 h-6 text-foreground" weight="duotone" />
             </Button>
-            <span className="ml-3 font-bold text-lg md:hidden text-foreground">Attunly</span>
+            <span className="ml-3 font-bold text-lg md:hidden">
+              <span className="text-foreground">Attun</span>
+              <span className="text-primary">ly</span>
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />

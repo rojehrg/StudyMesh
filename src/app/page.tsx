@@ -92,9 +92,12 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-0.5">
-            <span className="font-bold text-xl text-violet-600">Attun</span>
-            <span className="font-bold text-xl text-gray-900">ly</span>
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/icon.svg" alt="Attunly" className="w-7 h-7" />
+            <span className="font-bold text-xl">
+              <span className="text-gray-900">Attun</span>
+              <span className="text-violet-600">ly</span>
+            </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -682,9 +685,12 @@ export default function LandingPage() {
       <footer className="py-12 px-6 bg-gray-50 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-0.5">
-              <span className="font-bold text-xl text-violet-600">Attun</span>
-              <span className="font-bold text-xl text-gray-900">ly</span>
+            <div className="flex items-center gap-2">
+              <img src="/icon.svg" alt="Attunly" className="w-6 h-6" />
+              <span className="font-bold text-xl">
+                <span className="text-gray-900">Attun</span>
+                <span className="text-violet-600">ly</span>
+              </span>
             </div>
             <div className="flex items-center gap-8 text-sm text-gray-500">
               <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
