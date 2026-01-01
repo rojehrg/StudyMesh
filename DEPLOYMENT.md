@@ -1,6 +1,6 @@
 # Deployment Guide
 
-Complete guide for deploying Meshflow to Vercel with all integrations.
+Complete guide for deploying Attunly to Vercel with all integrations.
 
 ## Quick Deploy (10 minutes)
 
@@ -33,7 +33,7 @@ In Vercel Dashboard → Project → Settings → Environment Variables:
 |----------|-------------|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJhbGc...` |
-| `NEXT_PUBLIC_APP_URL` | Your deployed URL | `https://meshflow.vercel.app` |
+| `NEXT_PUBLIC_APP_URL` | Your deployed URL | `https://attunly.vercel.app` |
 | `DATABASE_URL` | Postgres connection (use Transaction Pooler) | `postgresql://postgres.xxx:...@pooler.supabase.com:6543/postgres` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | `eyJhbGc...` |
 
@@ -281,7 +281,7 @@ echo "ENCRYPTION_KEY=$(openssl rand -hex 32)"
 ## Custom Domain
 
 1. Vercel Dashboard → Project → Settings → Domains
-2. Add your domain (e.g., `app.meshflow.com`)
+2. Add your domain (e.g., `app.attunly.com`)
 3. Configure DNS as instructed
 4. Update all OAuth redirect URLs with new domain:
    - Supabase URL Configuration

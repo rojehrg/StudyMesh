@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       : `isn't available right now, but thanks for reaching out.`;
 
     const actionText = accepted
-      ? "Head to Meshflow to schedule a meeting!"
+      ? "Head to Attunly to schedule a meeting!"
       : "";
 
     const blocks = [
@@ -87,8 +87,8 @@ export async function POST(req: Request) {
         {
           type: "mrkdwn",
           text: podCode
-            ? `📁 Pod: *${podCode}* • <${process.env.NEXT_PUBLIC_APP_URL || 'https://meshflow.app'}/classes/${podCode}|Open in Meshflow>`
-            : `<${process.env.NEXT_PUBLIC_APP_URL || 'https://meshflow.app'}/notifications|View in Meshflow>`
+            ? `📁 Pod: *${podCode}* • <${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/classes/${podCode}|Open in Attunly>`
+            : `<${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/notifications|View in Attunly>`
         }
       ]
     } as any);

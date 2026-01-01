@@ -68,7 +68,7 @@ export function OnboardingTour() {
       if (!user) return;
 
       // Check localStorage first for faster response
-      const localKey = `meshflow_tour_seen_${user.id}`;
+      const localKey = `attunly_tour_seen_${user.id}`;
       const localSeen = localStorage.getItem(localKey);
 
       if (localSeen === 'true') {
@@ -122,7 +122,7 @@ export function OnboardingTour() {
       if (!user) return;
 
       // Save to localStorage for immediate future checks
-      localStorage.setItem(`meshflow_tour_seen_${user.id}`, 'true');
+      localStorage.setItem(`attunly_tour_seen_${user.id}`, 'true');
 
       // Save to database
       await supabase
@@ -187,7 +187,7 @@ export function OnboardingTour() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    <span className="font-semibold text-foreground">Welcome to Meshflow</span>
+                    <span className="font-semibold text-foreground">Welcome to Attunly</span>
                   </div>
                   <button
                     onClick={skipTour}

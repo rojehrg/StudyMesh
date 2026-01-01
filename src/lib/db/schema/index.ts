@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time } from "drizzle-orm/pg-core";
 
 /**
- * MESHFLOW DATABASE SCHEMA
+ * ATTUNLY DATABASE SCHEMA
  *
  * Availability-First Coordination Platform
  *

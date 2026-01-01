@@ -1,4 +1,4 @@
-# Meshflow Test Script v2
+# Attunly Test Script v2
 ## Testing All Recent Fixes
 
 Use this script with Claude Chrome extension for dual-account testing.

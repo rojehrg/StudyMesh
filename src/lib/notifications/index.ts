@@ -96,7 +96,7 @@ function buildSlackMeetingBlocks(meeting: MeetingNotificationData) {
     elements: [
       {
         type: "mrkdwn",
-        text: `Sent via Meshflow • <${process.env.NEXT_PUBLIC_APP_URL || 'https://meshflow.app'}/meetings|View all meetings>`
+        text: `Sent via Attunly • <${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/meetings|View all meetings>`
       }
     ]
   });
@@ -302,12 +302,12 @@ export async function sendEmailMeetingNotification(
       ` : ''}
 
       <div style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://meshflow.app'}/meetings" style="color: #6366f1; text-decoration: none; font-size: 14px;">View all your meetings on Meshflow →</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/meetings" style="color: #6366f1; text-decoration: none; font-size: 14px;">View all your meetings on Attunly →</a>
       </div>
     </div>
 
     <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Meshflow</p>
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
     </div>
   </div>
 </body>
@@ -321,7 +321,7 @@ export async function sendEmailMeetingNotification(
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'Meshflow <notifications@meshflow.app>',
+        from: process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.app>',
         to: participant.email,
         subject: `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`,
         html: emailHtml

@@ -1,4 +1,4 @@
-# Meshflow Testing Guide - Spec 007 Implementation
+# Attunly Testing Guide - Spec 007 Implementation
 
 This guide covers testing for the new scheduling, availability, and meeting features implemented in Spec 007.
 
@@ -155,7 +155,7 @@ curl -X POST http://localhost:3000/api/slack/nudge \
    - Professional HTML email
    - Meeting details
    - "Join Meeting" button (if link provided)
-   - Link back to Meshflow
+   - Link back to Attunly
 
 ## 6. UI/UX Testing
 
@@ -178,7 +178,7 @@ curl -X POST http://localhost:3000/api/slack/nudge \
 
 1. Set theme to "System"
 2. Toggle your OS dark/light mode
-3. Verify Meshflow follows the system preference
+3. Verify Attunly follows the system preference
 
 ### 6.4 Keyboard Shortcuts
 

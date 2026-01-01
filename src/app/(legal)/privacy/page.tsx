@@ -34,10 +34,10 @@ export default function PrivacyPolicyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
             <p className="text-gray-600 mb-4">
-              Meshflow (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our team collaboration and skill-matching platform.
+              Attunly (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our team collaboration and skill-matching platform.
             </p>
             <p className="text-gray-600">
-              Please read this privacy policy carefully. By using Meshflow, you agree to the collection and use of information in accordance with this policy.
+              Please read this privacy policy carefully. By using Attunly, you agree to the collection and use of information in accordance with this policy.
             </p>
           </section>
 
@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. How We Use Your Information</h2>
             <p className="text-gray-600 mb-4">We use the information we collect to:</p>
             <ul className="list-disc pl-6 text-gray-600 space-y-2">
-              <li>Provide, maintain, and improve Meshflow</li>
+              <li>Provide, maintain, and improve Attunly</li>
               <li>Create and manage your account</li>
               <li>Match you with teammates based on skills and availability</li>
               <li>Send nudge notifications and meeting invitations</li>
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">4.1 Within Your Organization</h3>
             <p className="text-gray-600 mb-4">
-              Your profile information, skills, and availability are visible to other members of your organization on Meshflow. This is essential for the team collaboration features to work.
+              Your profile information, skills, and availability are visible to other members of your organization on Attunly. This is essential for the team collaboration features to work.
             </p>
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">4.2 Service Providers</h3>
@@ -149,7 +149,7 @@ export default function PrivacyPolicyPage() {
               We use essential cookies to maintain your session and remember your preferences. These are necessary for the service to function properly. We do not use advertising or tracking cookies.
             </p>
             <p className="text-gray-600">
-              You can configure your browser to refuse cookies, but this may affect your ability to use Meshflow.
+              You can configure your browser to refuse cookies, but this may affect your ability to use Attunly.
             </p>
           </section>
 
@@ -163,14 +163,14 @@ export default function PrivacyPolicyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Children&apos;s Privacy</h2>
             <p className="text-gray-600">
-              Meshflow is not intended for children under 16 years of age. We do not knowingly collect personal information from children under 16. If we become aware that we have collected data from a child under 16, we will take steps to delete that information.
+              Attunly is not intended for children under 16 years of age. We do not knowingly collect personal information from children under 16. If we become aware that we have collected data from a child under 16, we will take steps to delete that information.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to This Policy</h2>
             <p className="text-gray-600">
-              We may update this privacy policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the &quot;Last updated&quot; date. Your continued use of Meshflow after changes constitutes acceptance of the updated policy.
+              We may update this privacy policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the &quot;Last updated&quot; date. Your continued use of Attunly after changes constitutes acceptance of the updated policy.
             </p>
           </section>
 
@@ -180,8 +180,8 @@ export default function PrivacyPolicyPage() {
               If you have questions about this Privacy Policy or our data practices, please contact us:
             </p>
             <ul className="list-none text-gray-600 space-y-2">
-              <li><strong>Email:</strong> privacy@meshflow.app</li>
-              <li><strong>Website:</strong> meshflow.app</li>
+              <li><strong>Email:</strong> privacy@attunly.app</li>
+              <li><strong>Website:</strong> attunly.app</li>
             </ul>
           </section>
 
@@ -227,7 +227,7 @@ export default function PrivacyPolicyPage() {
             <Link href="/" className="hover:text-gray-900 transition-colors">Home</Link>
           </div>
           <div className="text-sm text-gray-400">
-            © 2025 Meshflow. All rights reserved.
+            © 2025 Attunly. All rights reserved.
           </div>
         </div>
       </footer>

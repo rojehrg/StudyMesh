@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Meshflow, please report it responsibly:
+If you discover a security vulnerability in Attunly, please report it responsibly:
 
 1. **Do NOT** open a public GitHub issue for security vulnerabilities
 2. Email security concerns to the repository owner

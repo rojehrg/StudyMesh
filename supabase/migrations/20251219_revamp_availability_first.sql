@@ -1,7 +1,7 @@
--- Meshflow Revamp: Availability-First Coordination Platform
+-- Attunly Revamp: Availability-First Coordination Platform
 -- Migration: 20251219_revamp_availability_first.sql
 --
--- This migration transforms Meshflow from a skill-matching platform
+-- This migration transforms Attunly from a skill-matching platform
 -- to an availability-first coordination tool for remote teams.
 --
 -- Key changes:

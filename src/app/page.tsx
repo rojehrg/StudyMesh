@@ -93,8 +93,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-0.5">
-            <span className="font-bold text-xl text-violet-600">Mesh</span>
-            <span className="font-bold text-xl text-gray-900">flow</span>
+            <span className="font-bold text-xl text-violet-600">Attun</span>
+            <span className="font-bold text-xl text-gray-900">ly</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -153,7 +153,7 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Stop the endless "when are you free?" messages. Meshflow shows real-time
+              Stop the endless "when are you free?" messages. Attunly shows real-time
               team availability so you coordinate meetings, not calendars.
             </motion.p>
 
@@ -197,7 +197,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex-1 flex justify-center">
                   <div className="px-4 py-1 bg-white rounded-md text-xs text-gray-500 font-medium border border-gray-100">
-                    meshflow.space/dashboard
+                    attunly.com/dashboard
                   </div>
                 </div>
               </div>
@@ -683,16 +683,16 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-0.5">
-              <span className="font-bold text-xl text-violet-600">Mesh</span>
-              <span className="font-bold text-xl text-gray-900">flow</span>
+              <span className="font-bold text-xl text-violet-600">Attun</span>
+              <span className="font-bold text-xl text-gray-900">ly</span>
             </div>
             <div className="flex items-center gap-8 text-sm text-gray-500">
               <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms</Link>
-              <Link href="mailto:support@meshflow.app" className="hover:text-gray-900 transition-colors">Contact</Link>
+              <Link href="mailto:support@attunly.com" className="hover:text-gray-900 transition-colors">Contact</Link>
             </div>
             <div className="text-sm text-gray-400">
-              © 2025 Meshflow. All rights reserved.
+              © 2025 Attunly. All rights reserved.
             </div>
           </div>
         </div>

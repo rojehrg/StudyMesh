@@ -13,24 +13,24 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Meshflow - Coordinate Help Across Time Zones for Remote Teams",
+  title: "Attunly - Coordinate Help Across Time Zones for Remote Teams",
   description: "Visual team availability, contextual help requests, and Slack integration. Free alternative to Calendly for small remote teams. Built for distributed startups and support teams.",
   keywords: ["remote team coordination", "time zone scheduling", "team availability", "Slack integration", "distributed teams", "remote work tools"],
-  authors: [{ name: "Meshflow" }],
+  authors: [{ name: "Attunly" }],
   icons: {
     icon: "/icon.svg",
     apple: "/apple-icon.svg",
   },
   openGraph: {
-    title: "Meshflow - Remote Team Coordination Made Simple",
+    title: "Attunly - Remote Team Coordination Made Simple",
     description: "Know who to ask, when they're free, and coordinate help in seconds. Built for distributed startups and support teams.",
     type: "website",
     locale: "en_US",
-    siteName: "Meshflow",
+    siteName: "Attunly",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Meshflow - Coordinate Help Across Time Zones",
+    title: "Attunly - Coordinate Help Across Time Zones",
     description: "Visual team availability + contextual nudges + Slack integration. Free for small remote teams.",
   },
   robots: {

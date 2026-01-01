@@ -9,7 +9,7 @@
 
 ## 📋 Overview
 
-Complete implementation of all core Meshflow features: Pods management, Working Circles, Settings, and Notifications system. This spec covers the full user journey from onboarding to daily usage.
+Complete implementation of all core Attunly features: Pods management, Working Circles, Settings, and Notifications system. This spec covers the full user journey from onboarding to daily usage.
 
 ---
 

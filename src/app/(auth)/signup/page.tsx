@@ -124,8 +124,8 @@ export default function SignupPage() {
           {/* Logo */}
           <div className="h-16 px-8 flex items-center">
             <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-              <span className="font-bold text-xl text-violet-600">Mesh</span>
-              <span className="font-bold text-xl text-gray-900">flow</span>
+              <span className="font-bold text-xl text-violet-600">Attun</span>
+              <span className="font-bold text-xl text-gray-900">ly</span>
             </Link>
           </div>
 
@@ -169,8 +169,8 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="h-16 px-8 flex items-center">
           <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-            <span className="font-bold text-xl text-violet-600">Mesh</span>
-            <span className="font-bold text-xl text-gray-900">flow</span>
+            <span className="font-bold text-xl text-violet-600">Attun</span>
+            <span className="font-bold text-xl text-gray-900">ly</span>
           </Link>
         </div>
 
@@ -181,7 +181,7 @@ export default function SignupPage() {
               Create your account
               <span className="inline-block animate-[wave_1s_ease-in-out_infinite]">🚀</span>
             </h1>
-            <p className="mt-3 text-gray-500 text-lg">Get started with Meshflow in seconds.</p>
+            <p className="mt-3 text-gray-500 text-lg">Get started with Attunly in seconds.</p>
 
             {error && (
               <div className="mt-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">

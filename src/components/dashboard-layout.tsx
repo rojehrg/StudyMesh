@@ -140,7 +140,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: SignIn, label: "Join Pod", href: "/classes/join" },
     { icon: Gear, label: "Settings", href: "/settings" },
-    { icon: Info, label: "About Meshflow", href: "/about" },
+    { icon: Info, label: "About Attunly", href: "/about" },
   ];
 
   return (
@@ -249,7 +249,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
               <List className="w-6 h-6 text-foreground" weight="duotone" />
             </Button>
-            <span className="ml-3 font-bold text-lg md:hidden text-foreground">Meshflow</span>
+            <span className="ml-3 font-bold text-lg md:hidden text-foreground">Attunly</span>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />

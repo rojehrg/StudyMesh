@@ -127,8 +127,8 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="h-16 px-8 flex items-center">
           <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-            <span className="font-bold text-xl text-violet-600">Mesh</span>
-            <span className="font-bold text-xl text-gray-900">flow</span>
+            <span className="font-bold text-xl text-violet-600">Attun</span>
+            <span className="font-bold text-xl text-gray-900">ly</span>
           </Link>
         </div>
 

@@ -198,7 +198,7 @@ export default function OnboardingPage() {
 
       if (profile?.organization_id) {
         toast.success("Profile completed!", {
-          description: "Welcome to Meshflow!"
+          description: "Welcome to Attunly!"
         });
         router.push("/dashboard");
       } else {

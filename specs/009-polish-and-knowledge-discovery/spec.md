@@ -501,7 +501,7 @@ POST /api/notifications/email
 
 ```
 RESEND_API_KEY=re_xxxxxxx
-EMAIL_FROM=notifications@meshflow.app
+EMAIL_FROM=notifications@attunly.app
 ```
 
 ---

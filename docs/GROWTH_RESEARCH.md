@@ -191,7 +191,7 @@ Generate beautiful cards for LinkedIn/Twitter:
 After scheduling via MeshFlow:
 ```
 "This meeting was scheduled with MeshFlow
-Find help faster: meshflow.app"
+Find help faster: attunly.app"
 ```
 
 ### Referral Program Ideas
@@ -507,7 +507,7 @@ Knowledge gaps still open:
 
 **6. Slack Bot Enhancement**
 ```
-/meshflow help react
+/attunly help react
 → "3 people can help with React:"
   @sarah (Expert) - Free now
   @mike (Intermediate) - Free 2pm

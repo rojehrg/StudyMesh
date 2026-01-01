@@ -1,4 +1,4 @@
-# StudyMesh / Meshflow - Project Summary
+# StudyMesh / Attunly - Project Summary
 
 **Last Updated:** January 2025  
 **Status:** Production-ready, deployed to Vercel
@@ -7,7 +7,7 @@
 
 ## 🎯 What This Project Is
 
-**Meshflow** (formerly StudyMesh) is an intelligent B2B team enablement platform that helps organizations:
+**Attunly** (formerly StudyMesh) is an intelligent B2B team enablement platform that helps organizations:
 - **Close knowledge gaps** by matching employees based on skill expertise and growth areas
 - **Enable collaboration** through contextual nudges and "Looking to Help" status
 - **Organize teams** with "Pods" (focused groups by project/department)

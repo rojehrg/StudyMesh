@@ -37,7 +37,7 @@ export default function AboutPage() {
       <motion.div variants={itemVariants} className="text-center py-8">
         <div className="inline-flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full mb-6">
           <Sparkles className="w-4 h-4 text-accent" />
-          <span className="text-accent font-medium text-sm">About Meshflow</span>
+          <span className="text-accent font-medium text-sm">About Attunly</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           The Intelligent Enablement Platform
@@ -59,7 +59,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-3">Our Mission</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Meshflow helps teams <strong className="text-accent">outperform by filling knowledge gaps</strong>.
+              Attunly helps teams <strong className="text-accent">outperform by filling knowledge gaps</strong>.
               The best teams aren't just skilled—they're connected. When expertise flows freely between
               teammates, blockers disappear, delivery accelerates, and everyone grows.
             </p>
@@ -94,7 +94,7 @@ export default function AboutPage() {
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">Our Solution</h3>
           <p className="text-muted-foreground leading-relaxed">
-            Meshflow uses intelligent matching to connect knowledge holders with knowledge seekers.
+            Attunly uses intelligent matching to connect knowledge holders with knowledge seekers.
             You list what you know and what you want to learn—we handle the rest.
           </p>
         </motion.div>

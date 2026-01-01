@@ -1,4 +1,4 @@
-# Meshflow Matching Philosophy
+# Attunly Matching Philosophy
 
 ## 🧠 Core Principle: Human-Centric, Not Algorithm-Centric
 

@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `🔔 *Meshflow Nudge*\n\n${mention} — *${senderName}* ${actionText}`
+          text: `🔔 *Attunly Nudge*\n\n${mention} — *${senderName}* ${actionText}`
         }
       },
       {
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: `Meshflow Nudge: ${senderName} ${actionText}`,
+        text: `Attunly Nudge: ${senderName} ${actionText}`,
         blocks
       }),
     });
