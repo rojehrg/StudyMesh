@@ -12,16 +12,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-// Generate a random invite code
-function generateInviteCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
 export default function OrgSetupPage() {
   const [mode, setMode] = useState<'choose' | 'create' | 'join'>('choose');
   const [loading, setLoading] = useState(false);
@@ -67,34 +57,20 @@ export default function OrgSetupPage() {
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const response = await fetch('/api/organizations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: orgName.trim() })
+      });
 
-      const inviteCode = generateInviteCode();
+      const data = await response.json();
 
-      // Create organization
-      const { data: org, error: orgError } = await supabase
-        .from('organizations')
-        .insert({
-          name: orgName.trim(),
-          invite_code: inviteCode,
-          owner_id: user.id,
-        })
-        .select()
-        .single();
-
-      if (orgError) throw orgError;
-
-      // Update user's profile with org
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ organization_id: org.id })
-        .eq('user_id', user.id);
-
-      if (profileError) throw profileError;
+      if (!response.ok) {
+        throw new Error(data.error || data.details || 'Failed to create organization');
+      }
 
       toast.success("Organization created!", {
-        description: `Invite code: ${inviteCode}`
+        description: `Invite code: ${data.inviteCode}`
       });
 
       router.push('/dashboard');
@@ -116,33 +92,30 @@ export default function OrgSetupPage() {
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const response = await fetch('/api/organizations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'join',
+          inviteCode: inviteCode.trim().toUpperCase()
+        })
+      });
 
-      // Find organization by invite code
-      const { data: org, error: orgError } = await supabase
-        .from('organizations')
-        .select('id, name')
-        .eq('invite_code', inviteCode.trim().toUpperCase())
-        .single();
+      const data = await response.json();
 
-      if (orgError || !org) {
-        toast.error("Invalid invite code", {
-          description: "Please check the code and try again"
-        });
+      if (!response.ok) {
+        if (data.error === "Invalid invite code") {
+          toast.error("Invalid invite code", {
+            description: "Please check the code and try again"
+          });
+        } else {
+          throw new Error(data.error || 'Failed to join organization');
+        }
         setLoading(false);
         return;
       }
 
-      // Update user's profile with org
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ organization_id: org.id })
-        .eq('user_id', user.id);
-
-      if (profileError) throw profileError;
-
-      toast.success(`Joined ${org.name}!`);
+      toast.success(data.message || `Joined ${data.organization?.name}!`);
       router.push('/dashboard');
     } catch (error: any) {
       console.error("Error joining org:", error);
