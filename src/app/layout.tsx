@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   keywords: ["remote team coordination", "time zone scheduling", "team availability", "Slack integration", "distributed teams", "remote work tools"],
   authors: [{ name: "Attunly" }],
   icons: {
-    icon: "/icon.svg",
-    apple: "/apple-icon.svg",
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
   },
   openGraph: {
     title: "Attunly - Remote Team Coordination Made Simple",

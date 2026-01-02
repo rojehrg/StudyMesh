@@ -164,7 +164,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="h-16 flex items-center px-4">
           <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/icon.svg" alt="Attunly" className={cn(
+            <img src="/icon.png" alt="Attunly" className={cn(
               "shrink-0 transition-all duration-300",
               isCollapsed ? "w-10 h-10" : "w-7 h-7"
             )} />

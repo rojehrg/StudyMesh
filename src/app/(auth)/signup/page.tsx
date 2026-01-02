@@ -124,7 +124,7 @@ export default function SignupPage() {
           {/* Logo */}
           <div className="h-16 px-8 flex items-center">
             <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-              <img src="/icon.svg" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
+              <img src="/icon.png" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
               <span className="text-violet-600">ly</span></span>
             </Link>
           </div>
@@ -169,7 +169,7 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="h-16 px-8 flex items-center">
           <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-            <img src="/icon.svg" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
+            <img src="/icon.png" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
             <span className="text-violet-600">ly</span></span>
           </Link>
         </div>
