@@ -1,4 +1,5 @@
 // Notification service for Slack and Email
+import { decryptToken } from "@/lib/encryption";
 
 interface MeetingNotificationData {
   meetingId: string;
@@ -228,7 +229,19 @@ export async function sendEmailMeetingNotification(
 ): Promise<boolean> {
   const resendApiKey = process.env.RESEND_API_KEY;
 
-  if (!resendApiKey || !participant.email || participant.emailNotifications === false) {
+  // Check prerequisites and log why we're skipping
+  if (!resendApiKey) {
+    console.log('[Email] Skipping: RESEND_API_KEY not configured');
+    return false;
+  }
+
+  if (!participant.email) {
+    console.log('[Email] Skipping: No email address for participant', participant.userId);
+    return false;
+  }
+
+  if (participant.emailNotifications === false) {
+    console.log('[Email] Skipping: User has disabled email notifications', participant.email);
     return false;
   }
 
@@ -314,6 +327,11 @@ export async function sendEmailMeetingNotification(
 </html>
     `;
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.app>';
+    const subject = `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`;
+
+    console.log('[Email] Sending to:', participant.email, 'Subject:', subject);
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -321,16 +339,24 @@ export async function sendEmailMeetingNotification(
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.app>',
+        from: fromEmail,
         to: participant.email,
-        subject: `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`,
+        subject,
         html: emailHtml
       })
     });
 
-    return response.ok;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email] Resend API error:', response.status, errorData);
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    console.log('[Email] Sent successfully, ID:', result.id);
+    return true;
   } catch (error) {
-    console.error('Failed to send email notification:', error);
+    console.error('[Email] Failed to send notification:', error);
     return false;
   }
 }
@@ -362,4 +388,230 @@ export async function notifyParticipant(
   }
 
   return notifiedVia;
+}
+
+// ==========================================
+// NUDGE NOTIFICATIONS (Slack DM)
+// ==========================================
+
+interface NudgeData {
+  senderName: string;
+  topic: string;
+  podCode?: string;
+  nudgeType: 'ask' | 'offer';
+}
+
+interface NudgeResponseData {
+  responderName: string;
+  accepted: boolean;
+  topic?: string;
+  podCode?: string;
+}
+
+// Build Slack blocks for nudge notification
+function buildNudgeBlocks(nudge: NudgeData): any[] {
+  const actionText = nudge.nudgeType === 'offer'
+    ? `wants to help you with *${nudge.topic}*`
+    : `is looking for help with *${nudge.topic}*`;
+
+  const blocks: any[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `🔔 *Attunly Nudge*\n\n*${nudge.senderName}* ${actionText}`
+      }
+    }
+  ];
+
+  if (nudge.podCode) {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `📁 Pod: *${nudge.podCode}* • <${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/classes/${nudge.podCode}|View in Attunly>`
+        }
+      ]
+    });
+  } else {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `<${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/notifications|Reply in Attunly>`
+        }
+      ]
+    });
+  }
+
+  return blocks;
+}
+
+// Build Slack blocks for nudge response notification
+function buildNudgeResponseBlocks(response: NudgeResponseData): any[] {
+  const emoji = response.accepted ? "✅" : "⏰";
+  const statusText = response.accepted
+    ? `accepted your nudge and wants to connect!`
+    : `isn't available right now, but thanks for reaching out.`;
+
+  const blocks: any[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `${emoji} *Nudge Response*\n\n*${response.responderName}* ${statusText}`
+      }
+    }
+  ];
+
+  if (response.topic) {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `📝 Topic: *${response.topic}*`
+        }
+      ]
+    });
+  }
+
+  if (response.accepted) {
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `👉 Head to Attunly to schedule a meeting!`
+      }
+    });
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app';
+  blocks.push({
+    type: "context",
+    elements: [
+      {
+        type: "mrkdwn",
+        text: response.podCode
+          ? `📁 Pod: *${response.podCode}* • <${appUrl}/classes/${response.podCode}|Open in Attunly>`
+          : `<${appUrl}/notifications|View in Attunly>`
+      }
+    ]
+  });
+
+  return blocks;
+}
+
+// Send nudge notification via Slack DM (using OAuth token)
+export async function sendNudgeSlackDM(
+  accessToken: string,
+  recipientSlackUserId: string,
+  nudge: NudgeData
+): Promise<boolean> {
+  try {
+    // Open DM channel
+    const openResponse = await fetch('https://slack.com/api/conversations.open', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ users: recipientSlackUserId }),
+    });
+
+    const openData = await openResponse.json();
+    if (!openData.ok) {
+      console.error('[Nudge] Failed to open Slack DM channel:', openData.error);
+      return false;
+    }
+
+    const channelId = openData.channel.id;
+    const blocks = buildNudgeBlocks(nudge);
+
+    const actionText = nudge.nudgeType === 'offer'
+      ? `wants to help you with ${nudge.topic}`
+      : `is looking for help with ${nudge.topic}`;
+
+    // Send the message
+    const messageResponse = await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        channel: channelId,
+        text: `Attunly Nudge: ${nudge.senderName} ${actionText}`,
+        blocks,
+      }),
+    });
+
+    const messageData = await messageResponse.json();
+    if (!messageData.ok) {
+      console.error('[Nudge] Failed to send Slack message:', messageData.error);
+      return false;
+    }
+
+    console.log('[Nudge] Slack DM sent successfully');
+    return true;
+  } catch (error) {
+    console.error('[Nudge] Failed to send Slack DM:', error);
+    return false;
+  }
+}
+
+// Send nudge response notification via Slack DM
+export async function sendNudgeResponseSlackDM(
+  accessToken: string,
+  recipientSlackUserId: string,
+  response: NudgeResponseData
+): Promise<boolean> {
+  try {
+    // Open DM channel
+    const openResponse = await fetch('https://slack.com/api/conversations.open', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ users: recipientSlackUserId }),
+    });
+
+    const openData = await openResponse.json();
+    if (!openData.ok) {
+      console.error('[NudgeResponse] Failed to open Slack DM channel:', openData.error);
+      return false;
+    }
+
+    const channelId = openData.channel.id;
+    const blocks = buildNudgeResponseBlocks(response);
+
+    // Send the message
+    const messageResponse = await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        channel: channelId,
+        text: `Nudge Response: ${response.responderName} ${response.accepted ? 'accepted' : 'declined'} your nudge`,
+        blocks,
+      }),
+    });
+
+    const messageData = await messageResponse.json();
+    if (!messageData.ok) {
+      console.error('[NudgeResponse] Failed to send Slack message:', messageData.error);
+      return false;
+    }
+
+    console.log('[NudgeResponse] Slack DM sent successfully');
+    return true;
+  } catch (error) {
+    console.error('[NudgeResponse] Failed to send Slack DM:', error);
+    return false;
+  }
 }

@@ -22,7 +22,8 @@ export const organizations = pgTable("organizations", {
   // Slack workspace integration
   slackTeamId: text("slack_team_id"),
   slackTeamName: text("slack_team_name"),
-  slackAccessToken: text("slack_access_token"),
+  slackAccessToken: text("slack_access_token"), // Bot token for the workspace
+  slackWebhookUrl: text("slack_webhook_url"), // Optional: legacy webhook URL
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
