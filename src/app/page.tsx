@@ -47,45 +47,45 @@ const availabilityPattern: Record<number, number[]> = {
 // Features for accordion
 const features = [
   {
+    id: "skills",
+    title: "Expertise Directory",
+    description: "Everyone tags what they know. When you need help with billing systems or React hooks, instantly see who has that expertise—across all teams.",
+    icon: Target,
+  },
+  {
     id: "pods",
-    title: "Enablement Pods",
-    description: "Create focused workspaces for your team. Invite members with a simple code and see everyone's availability in one place.",
+    title: "Cross-Team Pods",
+    description: "Group people across departments, orgs, and timezones. Internal teams, external contractors, offshore partners—all in one view.",
     icon: UsersThree,
   },
   {
     id: "availability",
     title: "Visual Availability Grid",
-    description: "GitHub-style heatmap shows your entire team's weekly availability. Set your hours once, update your real-time status with one click.",
+    description: "See when everyone's free at a glance. No more guessing who's online in which timezone. Find the 2-hour overlap that actually works.",
     icon: CalendarBlank,
   },
   {
     id: "nudges",
-    title: "Smart Nudges",
-    description: "Send contextual help requests to the right teammate. \"Need help with React\" or \"Can assist with Python\" — nudge and connect.",
+    title: "Contextual Nudges",
+    description: "\"Need 15 min on the payment API\" — ping the right person with context. They accept, you schedule. No Slack threads that go nowhere.",
     icon: Bell,
   },
   {
     id: "slack",
-    title: "Slack Integration",
-    description: "Get nudge notifications directly in Slack. When someone accepts, you're prompted to schedule a meeting instantly.",
+    title: "Native Slack Integration",
+    description: "Nudges land in Slack DMs. Accept with one click, schedule instantly. No new app for your team to check—it meets them where they work.",
     icon: ChatCircle,
   },
   {
     id: "timezones",
-    title: "Timezone-Aware Scheduling",
-    description: "Automatic timezone detection and conversion. Find overlapping hours across distributed teams without the mental math.",
+    title: "Timezone Intelligence",
+    description: "Automatic detection across your distributed team. See overlapping hours instantly. Stop doing timezone math in your head.",
     icon: GlobeHemisphereWest,
-  },
-  {
-    id: "skills",
-    title: "Skill & Expertise Matching",
-    description: "Tag what you know and what you want to learn. Find the teammate who can actually help with your specific problem.",
-    icon: Target,
   },
 ];
 
 export default function LandingPage() {
-  const [activeFeature, setActiveFeature] = useState("pods");
+  const [activeFeature, setActiveFeature] = useState("skills");
 
   return (
     <div className="min-h-screen bg-white text-gray-900 antialiased">
@@ -137,7 +137,7 @@ export default function LandingPage() {
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
                 <UsersThree className="w-4 h-4" weight="duotone" />
-                Built for distributed teams
+                For teams with knowledge spread across people and timezones
               </span>
             </motion.div>
 
@@ -146,9 +146,9 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
             >
-              See when your team
+              Find who knows what.
               <br />
-              <span className="text-violet-600">is available. Instantly.</span>
+              <span className="text-violet-600">Connect instantly.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -156,8 +156,8 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Stop the endless "when are you free?" messages. Attunly shows real-time
-              team availability so you coordinate meetings, not calendars.
+              Your team's expertise is scattered across people, timezones, and Slack channels.
+              Attunly maps who knows what—so you find the right person, not dead ends.
             </motion.p>
 
             {/* CTAs */}
@@ -179,7 +179,7 @@ export default function LandingPage() {
 
             {/* Objection Handler */}
             <motion.p variants={fadeIn} className="text-sm text-gray-400">
-              Free forever for small teams. Setup takes 2 minutes.
+              Free forever for teams up to 10. Works with Slack. Setup takes 2 minutes.
             </motion.p>
           </motion.div>
 
@@ -341,11 +341,11 @@ export default function LandingPage() {
             <div>
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                Coordination is killing your team's productivity
+                Your team's knowledge is trapped in silos
               </h2>
               <p className="text-xl text-gray-500">
-                Distributed teams waste hours every week just trying to find time to meet.
-                There's a better way.
+                Contractors come and go. Teams span timezones. Expertise is scattered across departments.
+                When you need an answer, you're stuck asking "who knows about this?"
               </p>
             </div>
             <motion.div
@@ -367,19 +367,19 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: ChatCircle,
-                title: "Endless back-and-forth",
-                description: "\"When works for you?\" messages ping-ponging across Slack, email, and DMs.",
+                icon: MagnifyingGlass,
+                title: "Knowledge walks out the door",
+                description: "When contractors leave or teams change, critical expertise disappears. Nobody documented who built what.",
               },
               {
                 icon: GlobeHemisphereWest,
-                title: "Time zone chaos",
-                description: "Distributed teams struggle to find overlapping hours across different locations.",
+                title: "Silos across timezones",
+                description: "Your engineering team in one timezone, ops in another. Finding overlap feels impossible.",
               },
               {
-                icon: MagnifyingGlass,
-                title: "Who knows what?",
-                description: "Someone on your team has the answer, but who? And are they even available?",
+                icon: ChatCircle,
+                title: "Slack threads go nowhere",
+                description: "You ask \"who knows about X?\" and get silence. The one person who could help is in a meeting—or left 6 months ago.",
               },
             ].map((problem, i) => (
               <motion.div
@@ -422,10 +422,10 @@ export default function LandingPage() {
             <div className="order-1 md:order-2">
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
-                Everything you need to coordinate
+                Break down silos. Connect the right people.
               </h2>
               <p className="text-xl text-gray-500">
-                See who's available, find the right expert, and connect — all without the scheduling chaos.
+                Map your team's expertise, see who's available across timezones, and schedule time with the person who can actually help.
               </p>
             </div>
           </div>
@@ -489,11 +489,27 @@ export default function LandingPage() {
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                   <div className="p-8">
                     <AnimatePresence mode="wait">
+                      {activeFeature === "skills" && (
+                        <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                          <Target className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Who knows what? Now you know.</h4>
+                          <p className="text-gray-500 mb-4">Everyone tags their expertise. Search "payment API" or "Kubernetes" and find the right person instantly.</p>
+                          <div className="flex justify-center py-4">
+                            <Image
+                              src="/images/skills-illustration.svg"
+                              alt="Skills and expertise matching illustration"
+                              width={300}
+                              height={200}
+                              className="object-contain"
+                            />
+                          </div>
+                        </motion.div>
+                      )}
                       {activeFeature === "pods" && (
                         <motion.div key="pods" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                           <UsersThree className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Your team, organized</h4>
-                          <p className="text-gray-500 mb-4">Create pods for different teams or projects. Share a simple code to invite members.</p>
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">One view across all teams</h4>
+                          <p className="text-gray-500 mb-4">Internal, external, contractors—group everyone who needs to collaborate, regardless of org structure.</p>
                           <div className="flex justify-center py-4">
                             <Image
                               src="/images/pods-illustration.svg"
@@ -508,8 +524,8 @@ export default function LandingPage() {
                       {activeFeature === "availability" && (
                         <motion.div key="availability" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                           <CalendarBlank className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">See everyone at a glance</h4>
-                          <p className="text-gray-500 mb-4">Set your weekly availability once. Toggle "available now" with one click.</p>
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Find the overlap that works</h4>
+                          <p className="text-gray-500 mb-4">Visual grid shows when everyone's free. No calendar permissions needed—just set your hours once.</p>
                           <div className="grid grid-cols-5 gap-1">
                             {[...Array(25)].map((_, i) => (
                               <div key={i} className={`h-8 rounded ${[0,1,5,6,10,11,15,20].includes(i) ? "bg-violet-500" : [2,7,12,16,21].includes(i) ? "bg-violet-300" : "bg-gray-100"}`} />
@@ -520,11 +536,11 @@ export default function LandingPage() {
                       {activeFeature === "nudges" && (
                         <motion.div key="nudges" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                           <Bell className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Request help, contextually</h4>
-                          <p className="text-gray-500 mb-4">Nudge a teammate about a specific topic. They accept, you schedule a meeting.</p>
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Request help with context</h4>
+                          <p className="text-gray-500 mb-4">No more vague Slack messages. Send a focused request, they accept, you're on a call in minutes.</p>
                           <div className="bg-violet-50 rounded-xl p-4 border border-violet-100">
-                            <p className="text-sm font-medium text-gray-900">New nudge from Mike</p>
-                            <p className="text-sm text-gray-500 mt-1">"Need help with React hooks - 15 min?"</p>
+                            <p className="text-sm font-medium text-gray-900">New nudge from Sarah</p>
+                            <p className="text-sm text-gray-500 mt-1">"Quick question on the billing migration - 15 min?"</p>
                             <div className="flex gap-2 mt-3">
                               <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white text-xs">Accept</Button>
                               <Button size="sm" variant="outline" className="text-xs" style={{ color: '#4B5563', borderColor: '#D1D5DB', backgroundColor: 'white' }}>Later</Button>
@@ -535,8 +551,8 @@ export default function LandingPage() {
                       {activeFeature === "slack" && (
                         <motion.div key="slack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                           <ChatCircle className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Notifications where you work</h4>
-                          <p className="text-gray-500 mb-4">Get nudges in Slack. When accepted, automatically prompted to schedule.</p>
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Lives in Slack, not another tab</h4>
+                          <p className="text-gray-500 mb-4">Your team already lives in Slack. Nudges arrive as DMs. One click to accept, then schedule.</p>
                           <div className="flex justify-center py-4">
                             <Image
                               src="/images/slack-illustration.svg"
@@ -551,28 +567,12 @@ export default function LandingPage() {
                       {activeFeature === "timezones" && (
                         <motion.div key="timezones" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                           <GlobeHemisphereWest className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">No more timezone math</h4>
-                          <p className="text-gray-500 mb-4">See everyone's availability in your local time. Find overlap instantly.</p>
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Timezones, handled</h4>
+                          <p className="text-gray-500 mb-4">Team in Manila? London? SF? See everyone's availability in your local time. Overlap found automatically.</p>
                           <div className="flex justify-center py-4">
                             <Image
                               src="/images/timezone-illustration.svg"
                               alt="Global timezone coordination illustration"
-                              width={300}
-                              height={200}
-                              className="object-contain"
-                            />
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "skills" && (
-                        <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Target className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Find the right expert</h4>
-                          <p className="text-gray-500 mb-4">Tag your skills. See what teammates know and what they want to learn.</p>
-                          <div className="flex justify-center py-4">
-                            <Image
-                              src="/images/skills-illustration.svg"
-                              alt="Skills and expertise matching illustration"
                               width={300}
                               height={200}
                               className="object-contain"
@@ -596,10 +596,10 @@ export default function LandingPage() {
             <div>
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                Up and running in 2 minutes
+                Set up in 2 minutes. Start connecting.
               </h2>
               <p className="text-xl text-gray-500">
-                No complex setup. No calendar permissions required. Just instant team visibility.
+                No calendar permissions. No complex integrations. Just add your team and start breaking down silos.
               </p>
             </div>
             <motion.div
@@ -622,18 +622,18 @@ export default function LandingPage() {
             {[
               {
                 step: "01",
-                title: "Create your pod",
-                description: "Set up a workspace for your team in seconds. Invite members with a simple code.",
+                title: "Create a pod, invite your team",
+                description: "Internal team, contractors, cross-functional partners—add everyone with a simple invite code.",
               },
               {
                 step: "02",
-                title: "Set your availability",
-                description: "Mark when you're typically free. Update your real-time status with one click.",
+                title: "Tag expertise & availability",
+                description: "Everyone adds what they know. Set typical hours. Now the whole team is searchable.",
               },
               {
                 step: "03",
-                title: "Start coordinating",
-                description: "See who's available, find the right expert, and connect without the chaos.",
+                title: "Nudge, connect, collaborate",
+                description: "Find the right expert, send a contextual request, schedule time—all in one flow.",
               },
             ].map((item, i) => (
               <motion.div
@@ -657,10 +657,10 @@ export default function LandingPage() {
       <section className="py-16 px-6 bg-violet-600">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to end coordination chaos?
+            Stop losing knowledge. Start connecting.
           </h2>
           <p className="text-xl text-violet-100 mb-10">
-            Start free, no credit card required. Your team will thank you.
+            Your team's expertise shouldn't disappear when people leave or switch timezones. Map it. Share it. Use it.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
@@ -676,7 +676,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mt-6 text-sm text-violet-200">
-            Free forever for small teams • No credit card required • Setup in 2 minutes
+            Free for teams up to 10 • Works with Slack • Setup in 2 minutes
           </p>
         </div>
       </section>
