@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendEmailMeetingRsvpNotification } from "@/lib/notifications";
 
 export async function POST(
   request: Request,
@@ -54,7 +55,7 @@ export async function POST(
     // Get meeting details for notification
     const { data: meeting } = await supabase
       .from('scheduled_meetings')
-      .select('title, organizer_id')
+      .select('title, organizer_id, scheduled_time, meeting_link')
       .eq('id', meetingId)
       .single();
 
@@ -71,6 +72,7 @@ export async function POST(
 
     // Notify organizer of RSVP
     if (meeting && meeting.organizer_id !== user.id) {
+      // In-app notification
       await supabase.from('notifications').insert({
         recipient_id: meeting.organizer_id,
         sender_id: user.id,
@@ -82,6 +84,25 @@ export async function POST(
         },
         read: false
       });
+
+      // Email notification
+      const { data: organizerProfile } = await supabase
+        .from('profiles')
+        .select('email, first_name, email_notifications')
+        .eq('user_id', meeting.organizer_id)
+        .single();
+
+      if (organizerProfile?.email && organizerProfile.email_notifications !== false) {
+        await sendEmailMeetingRsvpNotification({
+          organizerEmail: organizerProfile.email,
+          organizerName: organizerProfile.first_name || undefined,
+          responderName: userName,
+          meetingTitle: meeting.title,
+          scheduledTime: new Date(meeting.scheduled_time),
+          status: status as 'accepted' | 'declined',
+          meetingLink: meeting.meeting_link || undefined
+        });
+      }
     }
 
     return NextResponse.json({

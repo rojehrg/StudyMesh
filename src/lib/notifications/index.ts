@@ -399,6 +399,13 @@ interface NudgeData {
   topic: string;
   podCode?: string;
   nudgeType: 'ask' | 'offer';
+  meetingLength?: string;
+  message?: string;
+}
+
+interface NudgeEmailData extends NudgeData {
+  recipientEmail: string;
+  recipientName?: string;
 }
 
 interface NudgeResponseData {
@@ -406,6 +413,11 @@ interface NudgeResponseData {
   accepted: boolean;
   topic?: string;
   podCode?: string;
+}
+
+interface NudgeResponseEmailData extends NudgeResponseData {
+  recipientEmail: string;
+  recipientName?: string;
 }
 
 // Build Slack blocks for nudge notification
@@ -612,6 +624,396 @@ export async function sendNudgeResponseSlackDM(
     return true;
   } catch (error) {
     console.error('[NudgeResponse] Failed to send Slack DM:', error);
+    return false;
+  }
+}
+
+// ==========================================
+// EMAIL NOTIFICATIONS FOR NUDGES
+// ==========================================
+
+// Send email notification when someone receives a nudge
+export async function sendEmailNudgeNotification(
+  data: NudgeEmailData
+): Promise<boolean> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+
+  if (!resendApiKey) {
+    console.log('[Email Nudge] Skipping: RESEND_API_KEY not configured');
+    return false;
+  }
+
+  if (!data.recipientEmail) {
+    console.log('[Email Nudge] Skipping: No recipient email');
+    return false;
+  }
+
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+    const recipientName = data.recipientName || 'there';
+
+    const actionText = data.nudgeType === 'offer'
+      ? `wants to help you with`
+      : `is looking for help with`;
+
+    const actionEmoji = data.nudgeType === 'offer' ? '🤝' : '💡';
+    const headerText = data.nudgeType === 'offer'
+      ? 'Someone wants to help!'
+      : 'Someone needs your help!';
+
+    const meetingLengthText = data.meetingLength && data.meetingLength !== 'async'
+      ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Suggested meeting length: <strong>${data.meetingLength}</strong></p>`
+      : '';
+
+    const podLink = data.podCode
+      ? `<a href="${appUrl}/classes/${data.podCode}" style="color: #7c3aed; text-decoration: none;">View in ${data.podCode}</a>`
+      : `<a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View in Attunly</a>`;
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Nudge</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); padding: 32px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">${actionEmoji} ${headerText}</h1>
+    </div>
+
+    <div style="padding: 32px;">
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${recipientName},</p>
+
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
+        <strong>${data.senderName}</strong> ${actionText} <strong>${data.topic}</strong>.
+      </p>
+
+      <div style="background: #faf5ff; border-radius: 8px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #7c3aed;">
+        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 8px;">Topic</p>
+        <p style="color: #1f2937; font-size: 18px; font-weight: 600; margin: 0;">${data.topic}</p>
+        ${meetingLengthText}
+        ${data.podCode ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Pod: <strong>${data.podCode}</strong></p>` : ''}
+      </div>
+
+      ${data.message ? `
+      <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 8px;">Message</p>
+        <p style="color: #374151; font-size: 14px; margin: 0; white-space: pre-wrap;">${data.message}</p>
+      </div>
+      ` : ''}
+
+      <div style="text-align: center; margin-bottom: 24px;">
+        <a href="${appUrl}/notifications" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Respond to Nudge</a>
+      </div>
+
+      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
+        ${podLink}
+      </p>
+    </div>
+
+    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • You can manage notification preferences in Settings</p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
+    const subject = data.nudgeType === 'offer'
+      ? `${data.senderName} wants to help you with ${data.topic}`
+      : `${data.senderName} needs help with ${data.topic}`;
+
+    console.log('[Email Nudge] Sending to:', data.recipientEmail, 'Subject:', subject);
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: data.recipientEmail,
+        subject,
+        html: emailHtml
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email Nudge] Resend API error:', response.status, errorData);
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    console.log('[Email Nudge] Sent successfully, ID:', result.id);
+    return true;
+  } catch (error) {
+    console.error('[Email Nudge] Failed to send:', error);
+    return false;
+  }
+}
+
+// ==========================================
+// EMAIL NOTIFICATIONS FOR MEETING RSVP
+// ==========================================
+
+interface MeetingRsvpEmailData {
+  organizerEmail: string;
+  organizerName?: string;
+  responderName: string;
+  meetingTitle: string;
+  scheduledTime: Date;
+  status: 'accepted' | 'declined';
+  meetingLink?: string;
+}
+
+// Send email notification to organizer when someone RSVPs to their meeting
+export async function sendEmailMeetingRsvpNotification(
+  data: MeetingRsvpEmailData
+): Promise<boolean> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+
+  if (!resendApiKey) {
+    console.log('[Email MeetingRSVP] Skipping: RESEND_API_KEY not configured');
+    return false;
+  }
+
+  if (!data.organizerEmail) {
+    console.log('[Email MeetingRSVP] Skipping: No organizer email');
+    return false;
+  }
+
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+    const organizerName = data.organizerName || 'there';
+
+    const formattedDate = new Date(data.scheduledTime).toLocaleString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    const emoji = data.status === 'accepted' ? '✅' : '❌';
+    const headerText = data.status === 'accepted' ? 'Meeting Accepted!' : 'Meeting Declined';
+    const headerColor = data.status === 'accepted'
+      ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
+      : 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)';
+
+    const statusText = data.status === 'accepted'
+      ? `has accepted your meeting invitation`
+      : `has declined your meeting invitation`;
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting RSVP</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: ${headerColor}; padding: 32px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">${emoji} ${headerText}</h1>
+    </div>
+
+    <div style="padding: 32px;">
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${organizerName},</p>
+
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
+        <strong>${data.responderName}</strong> ${statusText}.
+      </p>
+
+      <div style="background: #f8fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="color: #1f2937; font-size: 18px; margin: 0 0 16px;">${data.meetingTitle}</h2>
+        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Scheduled for</p>
+        <p style="color: #1f2937; font-size: 14px; margin: 0;">${formattedDate}</p>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 24px;">
+        <a href="${appUrl}/meetings" style="display: inline-block; background: #6366f1; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">View Meeting Details</a>
+      </div>
+
+      ${data.status === 'accepted' ? `
+      <p style="color: #059669; font-size: 14px; text-align: center; margin: 0;">
+        Great news! Your meeting is confirmed.
+      </p>
+      ` : `
+      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
+        You may want to reach out to reschedule or find another time that works.
+      </p>
+      `}
+    </div>
+
+    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • <a href="${appUrl}/meetings" style="color: #6366f1; text-decoration: none;">View all meetings</a></p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
+    const subject = data.status === 'accepted'
+      ? `${data.responderName} accepted: ${data.meetingTitle}`
+      : `${data.responderName} declined: ${data.meetingTitle}`;
+
+    console.log('[Email MeetingRSVP] Sending to:', data.organizerEmail, 'Subject:', subject);
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: data.organizerEmail,
+        subject,
+        html: emailHtml
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email MeetingRSVP] Resend API error:', response.status, errorData);
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    console.log('[Email MeetingRSVP] Sent successfully, ID:', result.id);
+    return true;
+  } catch (error) {
+    console.error('[Email MeetingRSVP] Failed to send:', error);
+    return false;
+  }
+}
+
+// Send email notification when someone responds to a nudge
+export async function sendEmailNudgeResponseNotification(
+  data: NudgeResponseEmailData
+): Promise<boolean> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+
+  if (!resendApiKey) {
+    console.log('[Email NudgeResponse] Skipping: RESEND_API_KEY not configured');
+    return false;
+  }
+
+  if (!data.recipientEmail) {
+    console.log('[Email NudgeResponse] Skipping: No recipient email');
+    return false;
+  }
+
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+    const recipientName = data.recipientName || 'there';
+
+    const emoji = data.accepted ? '✅' : '⏰';
+    const headerText = data.accepted ? 'Nudge Accepted!' : 'Nudge Response';
+    const headerColor = data.accepted
+      ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
+      : 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)';
+
+    const statusText = data.accepted
+      ? `accepted your nudge and wants to connect!`
+      : `isn't available right now, but thanks for reaching out.`;
+
+    const ctaButton = data.accepted
+      ? `<div style="text-align: center; margin-bottom: 24px;">
+          <a href="${appUrl}/meetings" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Schedule a Meeting</a>
+        </div>`
+      : '';
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nudge Response</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: ${headerColor}; padding: 32px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">${emoji} ${headerText}</h1>
+    </div>
+
+    <div style="padding: 32px;">
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${recipientName},</p>
+
+      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
+        <strong>${data.responderName}</strong> ${statusText}
+      </p>
+
+      ${data.topic ? `
+      <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Original Topic</p>
+        <p style="color: #1f2937; font-size: 16px; font-weight: 500; margin: 0;">${data.topic}</p>
+      </div>
+      ` : ''}
+
+      ${ctaButton}
+
+      ${data.accepted ? `
+      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
+        Head to Attunly to schedule a time that works for both of you.
+      </p>
+      ` : `
+      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
+        No worries — try reaching out to someone else or check back later.
+      </p>
+      `}
+    </div>
+
+    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • <a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View all notifications</a></p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
+    const subject = data.accepted
+      ? `${data.responderName} accepted your nudge!`
+      : `${data.responderName} responded to your nudge`;
+
+    console.log('[Email NudgeResponse] Sending to:', data.recipientEmail, 'Subject:', subject);
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: data.recipientEmail,
+        subject,
+        html: emailHtml
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email NudgeResponse] Resend API error:', response.status, errorData);
+      return false;
+    }
+
+    const result = await response.json().catch(() => ({}));
+    console.log('[Email NudgeResponse] Sent successfully, ID:', result.id);
+    return true;
+  } catch (error) {
+    console.error('[Email NudgeResponse] Failed to send:', error);
     return false;
   }
 }
