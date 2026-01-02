@@ -137,7 +137,7 @@ export default function LandingPage() {
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
                 <UsersThree className="w-4 h-4" weight="duotone" />
-                For teams with knowledge spread across people and timezones
+                For teams spread across timezones and orgs
               </span>
             </motion.div>
 
@@ -146,9 +146,9 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
             >
-              Find who knows what.
+              Find the right person.
               <br />
-              <span className="text-violet-600">Connect instantly.</span>
+              <span className="text-violet-600">Find the right time.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -156,8 +156,7 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Your team's expertise is scattered across people, timezones, and Slack channels.
-              Attunly maps who knows what—so you find the right person, not dead ends.
+              Your team spans timezones, departments, and Slack channels. Attunly shows who has the expertise you need and when they're free—so you connect in minutes, not days.
             </motion.p>
 
             {/* CTAs */}
@@ -341,11 +340,10 @@ export default function LandingPage() {
             <div>
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                Your team's knowledge is trapped in silos
+                Coordination shouldn't be this hard
               </h2>
               <p className="text-xl text-gray-500">
-                Contractors come and go. Teams span timezones. Expertise is scattered across departments.
-                When you need an answer, you're stuck asking "who knows about this?"
+                Teams span timezones. Knowledge is scattered. You waste hours finding who can help and when they're free. There's a better way.
               </p>
             </div>
             <motion.div
@@ -367,19 +365,19 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: MagnifyingGlass,
-                title: "Knowledge walks out the door",
-                description: "When contractors leave or teams change, critical expertise disappears. Nobody documented who built what.",
+                icon: GlobeHemisphereWest,
+                title: "Timezone math is exhausting",
+                description: "SF, London, Manila—finding a 30-minute overlap across three timezones shouldn't take longer than the meeting itself.",
               },
               {
-                icon: GlobeHemisphereWest,
-                title: "Silos across timezones",
-                description: "Your engineering team in one timezone, ops in another. Finding overlap feels impossible.",
+                icon: MagnifyingGlass,
+                title: "Who even knows about this?",
+                description: "Someone on your team has the answer. But who? Contractors come and go, teams change, and expertise gets buried.",
               },
               {
                 icon: ChatCircle,
-                title: "Slack threads go nowhere",
-                description: "You ask \"who knows about X?\" and get silence. The one person who could help is in a meeting—or left 6 months ago.",
+                title: "Endless back-and-forth",
+                description: "\"When are you free?\" \"How about Tuesday?\" \"Can't, I'm in meetings.\" Three days later, you still haven't connected.",
               },
             ].map((problem, i) => (
               <motion.div
@@ -422,10 +420,10 @@ export default function LandingPage() {
             <div className="order-1 md:order-2">
               <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
-                Break down silos. Connect the right people.
+                See who can help. See when they're free.
               </h2>
               <p className="text-xl text-gray-500">
-                Map your team's expertise, see who's available across timezones, and schedule time with the person who can actually help.
+                Attunly maps your team's expertise and availability in one place—so you find the right person and schedule time without the chaos.
               </p>
             </div>
           </div>
@@ -657,10 +655,10 @@ export default function LandingPage() {
       <section className="py-16 px-6 bg-violet-600">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Stop losing knowledge. Start connecting.
+            Stop wasting time coordinating. Start connecting.
           </h2>
           <p className="text-xl text-violet-100 mb-10">
-            Your team's expertise shouldn't disappear when people leave or switch timezones. Map it. Share it. Use it.
+            Find who has the expertise. See when they're available. Schedule in seconds. Your team will thank you.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
