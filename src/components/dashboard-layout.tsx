@@ -29,7 +29,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
 import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
-import { RealtimeProvider } from "@/components/realtime-provider";
+import { RealtimeProvider, useRealtime } from "@/components/realtime-provider";
 import { CelebrationProvider } from "@/components/celebration-provider";
 
 interface SidebarItemProps {
@@ -58,14 +58,14 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
         <Icon className="w-5 h-5 shrink-0" weight="duotone" />
         {badge ? (
           <span className={cn(
-            "absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10",
+            "absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full z-10 shadow-sm",
             !isCollapsed && "hidden"
           )}>
-            {badge}
+            {badge > 9 ? '9+' : badge}
           </span>
         ) : null}
       </div>
-      
+
       <motion.span
         initial={false}
         animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
@@ -74,68 +74,71 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       >
         {label}
       </motion.span>
-      
+
       {!isCollapsed && badge ? (
-        <span className="ml-auto bg-accent/20 text-accent text-xs font-bold px-2 py-0.5 rounded-full">
-          {badge}
+        <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold min-w-[22px] h-[22px] flex items-center justify-center px-1.5 rounded-full shadow-sm">
+          {badge > 9 ? '9+' : badge}
         </span>
       ) : null}
     </Link>
   );
 }
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const pathname = usePathname();
-  const router = useRouter();
+// Inner component that uses the realtime context
+function DashboardLayoutInner({
+  children,
+  profile,
+  isCollapsed,
+  setIsCollapsed,
+  isMobileOpen,
+  setIsMobileOpen,
+  pathname,
+  handleLogout
+}: {
+  children: React.ReactNode;
+  profile: any;
+  isCollapsed: boolean;
+  setIsCollapsed: (v: boolean) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (v: boolean) => void;
+  pathname: string;
+  handleLogout: () => void;
+}) {
+  // Get notification count from realtime context
+  const { newNotificationCount } = useRealtime();
+  const [unreadCount, setUnreadCount] = useState(0);
   const supabase = createClient();
 
-  // Enable global keyboard shortcuts
-  useGlobalShortcuts();
-
+  // Load initial unread count
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  const loadProfile = async () => {
-    try {
+    const loadUnreadCount = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      setUserId(user.id);
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', user.id)
+        .eq('read', false);
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      setUnreadCount(count || 0);
+    };
+    loadUnreadCount();
+  }, [supabase]);
 
-      if (error) {
-        console.warn("Could not load profile:", error.message);
-        return;
-      }
-
-      if (data) {
-        setProfile(data);
-      }
-    } catch (error) {
-      console.error("Error loading profile:", error);
+  // Update count when new notifications arrive
+  useEffect(() => {
+    if (newNotificationCount > 0) {
+      setUnreadCount(prev => prev + newNotificationCount);
     }
-  };
+  }, [newNotificationCount]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    // Force a hard navigation to clear any cached state
-    window.location.href = "/login";
-  };
+  const totalUnread = unreadCount;
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: SquaresFour, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
-    { icon: Bell, label: "Nudges", href: "/notifications" },
+    { icon: Bell, label: "Nudges", href: "/notifications", badge: totalUnread > 0 ? totalUnread : undefined },
     { icon: CalendarBlank, label: "Meetings", href: "/meetings" },
     { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: SignIn, label: "Join Pod", href: "/classes/join" },
@@ -147,7 +150,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-background">
       {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
@@ -188,7 +191,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               label={item.label}
               href={item.href}
               isCollapsed={isCollapsed}
-              isActive={pathname === item.href}
+              isActive={pathname === item.href || (item.href === "/notifications" && pathname === "/notifications")}
               badge={item.badge}
             />
           ))}
@@ -261,13 +264,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Page Content - Add top margin for fixed header */}
         <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-14 pt-6">
           <CelebrationProvider>
-            {userId ? (
-              <RealtimeProvider userId={userId}>
-                {children}
-              </RealtimeProvider>
-            ) : (
-              children
-            )}
+            {children}
           </CelebrationProvider>
         </main>
       </div>
@@ -295,6 +292,89 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsHelp />
     </div>
+  );
+}
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  // Enable global keyboard shortcuts
+  useGlobalShortcuts();
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      setUserId(user.id);
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.warn("Could not load profile:", error.message);
+        return;
+      }
+
+      if (data) {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    // Force a hard navigation to clear any cached state
+    window.location.href = "/login";
+  };
+
+  // Wrap everything in RealtimeProvider when userId is available
+  if (userId) {
+    return (
+      <RealtimeProvider userId={userId}>
+        <DashboardLayoutInner
+          profile={profile}
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
+          pathname={pathname}
+          handleLogout={handleLogout}
+        >
+          {children}
+        </DashboardLayoutInner>
+      </RealtimeProvider>
+    );
+  }
+
+  // Render without RealtimeProvider while loading
+  return (
+    <DashboardLayoutInner
+      profile={profile}
+      isCollapsed={isCollapsed}
+      setIsCollapsed={setIsCollapsed}
+      isMobileOpen={isMobileOpen}
+      setIsMobileOpen={setIsMobileOpen}
+      pathname={pathname}
+      handleLogout={handleLogout}
+    >
+      {children}
+    </DashboardLayoutInner>
   );
 }
 

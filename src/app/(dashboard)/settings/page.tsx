@@ -486,15 +486,20 @@ export default function SettingsPage() {
           {/* Slack */}
           <Card>
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Slack Integration</CardTitle>
-              <CardDescription>Get notified directly in Slack</CardDescription>
+              <div className="flex items-center gap-3">
+                <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
+                <div>
+                  <CardTitle className="text-base font-semibold">Slack Integration</CardTitle>
+                  <CardDescription>Get notified directly in Slack</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {profile.slackConnected ? (
                 <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                      <Check className="w-5 h-5 text-success" weight="duotone" />
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                      <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Connected</p>
@@ -509,18 +514,22 @@ export default function SettingsPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
-                      <ChatCircle className="w-5 h-5 text-[#4A154B]" weight="duotone" />
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                      <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Connect Slack</p>
                       <p className="text-sm text-muted-foreground">Get nudges as direct messages</p>
                     </div>
                   </div>
-                  <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69]">
-                    {slackConnecting ? <CircleNotch className="w-4 h-4 animate-spin" weight="duotone" /> : <Link className="w-4 h-4 mr-2" weight="duotone" />}
+                  <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69] gap-2">
+                    {slackConnecting ? (
+                      <CircleNotch className="w-4 h-4 animate-spin" weight="duotone" />
+                    ) : (
+                      <img src="/slack-logo.png" alt="" className="w-4 h-4" />
+                    )}
                     Connect
                   </Button>
                 </div>

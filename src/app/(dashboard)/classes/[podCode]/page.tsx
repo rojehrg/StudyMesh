@@ -194,11 +194,13 @@ export default function PodDetailPage() {
 
       const { data: senderProfile } = await supabase
         .from('profiles')
-        .select('major')
+        .select('first_name, last_name')
         .eq('user_id', user.id)
         .single();
 
-      const senderName = senderProfile?.major || "A teammate";
+      const senderName = senderProfile
+        ? `${senderProfile.first_name || ''} ${senderProfile.last_name || ''}`.trim() || "A teammate"
+        : "A teammate";
 
       const { error } = await supabase.from('notifications').insert({
         recipient_id: data.recipientId,
@@ -218,24 +220,22 @@ export default function PodDetailPage() {
 
       if (error) throw error;
 
-      // Optional Slack webhook
-      const slackHandle = selectedMember?.slackHandle;
-      if (slackHandle) {
-        fetch('/api/slack/nudge', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recipientSlackHandle: slackHandle,
-            senderName,
-            topic: data.topic,
-            podCode: pod?.pod_code,
-            nudgeType: data.type,
-            meetingLength: data.meetingLength,
-            suggestedTime: data.suggestedTime,
-            message: data.message,
-          }),
-        }).catch(() => {});
-      }
+      // Send Slack/email notifications via API
+      fetch('/api/slack/nudge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientUserId: data.recipientId,
+          recipientSlackHandle: selectedMember?.slackHandle,
+          senderName,
+          topic: data.topic,
+          podCode: pod?.pod_code,
+          nudgeType: data.type,
+          meetingLength: data.meetingLength,
+          suggestedTime: data.suggestedTime,
+          message: data.message,
+        }),
+      }).catch((err) => console.error('[Nudge] Failed to send external notification:', err));
 
       toast.success("Nudge sent!", {
         description: data.type === 'ask' ? `Asked for help with ${data.topic}` : `Offered help with ${data.topic}`

@@ -195,56 +195,54 @@ export default function MeetingsPage() {
               </CardContent>
             </Card>
           ) : (
-            upcomingMeetings.map((meeting) => {
-              const { date, time, timezone, full } = formatDateTime(meeting.scheduled_time);
-              return (
-                <motion.div
-                  key={meeting.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-lg text-foreground">{meeting.title}</h3>
-                            {getStatusBadge(meeting)}
-                          </div>
-
-                          {meeting.description && (
-                            <p className="text-muted-foreground text-sm mb-3">{meeting.description}</p>
-                          )}
-
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                              <CalendarBlank className="w-4 h-4" weight="duotone" />
-                              {date}
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Clock className="w-4 h-4" weight="duotone" />
-                              {time} {timezone} ({meeting.duration_minutes} min)
-                            </div>
-                            {meeting.participants && (
-                              <div className="flex items-center gap-1.5">
-                                <UsersThree className="w-4 h-4" weight="duotone" />
-                                {meeting.participants.length} participant{meeting.participants.length !== 1 ? 's' : ''}
-                              </div>
-                            )}
-                            {meeting.role === 'participant' && meeting.organizer && (
-                              <div className="flex items-center gap-1.5">
-                                <span>Organized by</span>
-                                <span className="text-foreground font-medium">
-                                  {meeting.organizer.first_name} {meeting.organizer.last_name}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {upcomingMeetings.map((meeting) => {
+                const { date, time, timezone, full } = formatDateTime(meeting.scheduled_time);
+                return (
+                  <motion.div
+                    key={meeting.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <Card className="hover:shadow-lg transition-all h-full bg-card border-2 border-border/50 dark:border-border">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        {/* Header with title and status */}
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <h3 className="font-semibold text-base text-foreground line-clamp-2 flex-1">{meeting.title}</h3>
+                          {getStatusBadge(meeting)}
                         </div>
 
-                        <div className="flex flex-col gap-2 shrink-0">
+                        {meeting.description && (
+                          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{meeting.description}</p>
+                        )}
+
+                        {/* Meeting details */}
+                        <div className="space-y-2 text-sm text-muted-foreground flex-1">
+                          <div className="flex items-center gap-2">
+                            <CalendarBlank className="w-4 h-4 text-primary/70" weight="duotone" />
+                            <span>{date}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-primary/70" weight="duotone" />
+                            <span>{time} {timezone} · {meeting.duration_minutes} min</span>
+                          </div>
+                          {meeting.participants && (
+                            <div className="flex items-center gap-2">
+                              <UsersThree className="w-4 h-4 text-primary/70" weight="duotone" />
+                              <span>{meeting.participants.length} participant{meeting.participants.length !== 1 ? 's' : ''}</span>
+                            </div>
+                          )}
+                          {meeting.role === 'participant' && meeting.organizer && (
+                            <p className="text-xs pt-1 border-t border-border/50">
+                              By <span className="text-foreground font-medium">{meeting.organizer.first_name}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
                           {meeting.meeting_link && (
-                            <Button size="sm" asChild className="gap-2">
+                            <Button size="sm" asChild className="gap-2 flex-1">
                               <a href={meeting.meeting_link} target="_blank" rel="noopener noreferrer">
                                 <VideoCamera className="w-4 h-4" weight="duotone" />
                                 Join
@@ -253,32 +251,33 @@ export default function MeetingsPage() {
                           )}
 
                           {meeting.role === 'participant' && meeting.myRsvp === 'pending' && (
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-1">
                               <Button
                                 size="sm"
-                                variant="outline"
-                                className="text-success hover:bg-success/10"
+                                className="flex-1 bg-success hover:bg-success/90 text-success-foreground gap-1.5"
                                 onClick={() => handleRsvp(meeting.id, 'accepted')}
                               >
-                                <Check className="w-4 h-4" weight="duotone" />
+                                <Check className="w-5 h-5" weight="bold" />
+                                Accept
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-destructive hover:bg-destructive/10"
+                                className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10 gap-1.5"
                                 onClick={() => handleRsvp(meeting.id, 'declined')}
                               >
-                                <X className="w-4 h-4" weight="duotone" />
+                                <X className="w-5 h-5" weight="bold" />
+                                Decline
                               </Button>
                             </div>
                           )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
           )}
         </TabsContent>
 
@@ -295,26 +294,32 @@ export default function MeetingsPage() {
               </CardContent>
             </Card>
           ) : (
-            pastMeetings.map((meeting) => {
-              const { date, time } = formatDateTime(meeting.scheduled_time);
-              return (
-                <Card key={meeting.id} className="opacity-75">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-foreground">{meeting.title}</h3>
-                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
-                          <span>{date}</span>
-                          <span>{time}</span>
-                          <span>{meeting.duration_minutes} min</span>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pastMeetings.map((meeting) => {
+                const { date, time } = formatDateTime(meeting.scheduled_time);
+                return (
+                  <Card key={meeting.id} className="bg-muted/30 border border-border/50">
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <h3 className="font-semibold text-base text-foreground/80 line-clamp-2 flex-1">{meeting.title}</h3>
+                        <Badge variant="outline" className="bg-muted text-muted-foreground shrink-0">Completed</Badge>
                       </div>
-                      <Badge variant="outline">Completed</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
+                      <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <CalendarBlank className="w-4 h-4" weight="duotone" />
+                          {date}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-4 h-4" weight="duotone" />
+                          {time}
+                        </div>
+                        <span>· {meeting.duration_minutes} min</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           )}
         </TabsContent>
       </Tabs>

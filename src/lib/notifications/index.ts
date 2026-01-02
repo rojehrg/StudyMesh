@@ -371,8 +371,14 @@ export async function notifyParticipant(
   // Always create in-app notification (handled separately via database insert)
   notifiedVia.push('in_app');
 
-  // Try Slack first (faster delivery)
-  if (participant.slackHandle) {
+  // Try Slack first (faster delivery) - check slackConnected and slackUserId for OAuth DMs
+  if (participant.slackConnected && participant.slackUserId) {
+    const slackSent = await sendSlackMeetingNotification(participant, meeting);
+    if (slackSent) {
+      notifiedVia.push('slack');
+    }
+  } else if (participant.slackHandle) {
+    // Fallback to webhook if user has handle but not OAuth connected
     const slackSent = await sendSlackMeetingNotification(participant, meeting);
     if (slackSent) {
       notifiedVia.push('slack');

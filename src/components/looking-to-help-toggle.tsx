@@ -54,12 +54,12 @@ export function LookingToHelpToggle({ initialValue, userId }: LookingToHelpToggl
   return (
     <div className={`flex items-center gap-3 px-4 py-2.5 rounded-lg border transition-colors ${
       isLooking
-        ? 'bg-accent/10 border-accent/30'
-        : 'bg-muted/50 border-border'
+        ? 'bg-success/10 border-success/30'
+        : 'bg-card border-border'
     }`}>
-      <HandHelping className={`w-5 h-5 ${isLooking ? 'text-accent' : 'text-muted-foreground'}`} />
+      <HandHelping className={`w-5 h-5 ${isLooking ? 'text-success' : 'text-foreground/70'}`} />
       <div className="flex-1">
-        <p className={`text-sm font-medium ${isLooking ? 'text-accent' : 'text-muted-foreground'}`}>
+        <p className={`text-sm font-medium ${isLooking ? 'text-success' : 'text-foreground'}`}>
           {isLooking ? "Looking to help" : "Not looking to help"}
         </p>
       </div>
@@ -69,7 +69,7 @@ export function LookingToHelpToggle({ initialValue, userId }: LookingToHelpToggl
         <Switch
           checked={isLooking}
           onCheckedChange={handleToggle}
-          className="data-[state=checked]:bg-accent"
+          className="data-[state=checked]:bg-success"
         />
       )}
     </div>

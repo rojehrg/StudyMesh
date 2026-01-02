@@ -217,26 +217,18 @@ export default function NotificationsPage() {
             }
           });
 
-          // Send Slack notification to original sender
-          const { data: senderProfile } = await supabase
-            .from('profiles')
-            .select('slack_handle')
-            .eq('user_id', originalSenderId)
-            .single();
-
-          if (senderProfile?.slack_handle) {
-            fetch('/api/slack/nudge-response', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                recipientSlackHandle: senderProfile.slack_handle,
-                responderName: senderName,
-                accepted,
-                topic: metadata.topic,
-                podCode: metadata.pod_code
-              }),
-            }).catch(() => {}); // Fire and forget
-          }
+          // Send Slack/email notification to original sender
+          fetch('/api/slack/nudge-response', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipientUserId: originalSenderId,
+              responderName: senderName,
+              accepted,
+              topic: metadata.topic,
+              podCode: metadata.pod_code
+            }),
+          }).catch((err) => console.error('[NudgeResponse] Failed to send notification:', err));
         }
       }
 

@@ -10,7 +10,8 @@ import {
   Sparkles,
   ArrowRight,
   X,
-  CheckCircle2
+  CheckCircle2,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -20,6 +21,12 @@ interface TourStep {
   title: string;
   description: string;
   tip?: string;
+  customIcon?: string;
+}
+
+// Custom Slack icon component
+function SlackIcon({ className }: { className?: string }) {
+  return <img src="/slack-logo.png" alt="Slack" className={className} />;
 }
 
 const tourSteps: TourStep[] = [
@@ -43,6 +50,13 @@ const tourSteps: TourStep[] = [
     title: "Send & Receive Nudges",
     description: "Nudges are contextual requests to connect. Ask for help or offer your expertise. Recipients get notified instantly.",
     tip: "Check the bell icon in the header for nudges"
+  },
+  {
+    icon: MessageSquare,
+    title: "Connect Slack for Notifications",
+    description: "Get nudges and meeting invites delivered directly to your Slack DMs. Never miss an opportunity to connect with teammates.",
+    tip: "Go to Settings → Notifications to connect Slack",
+    customIcon: "/slack-logo.png"
   },
   {
     icon: Sparkles,
@@ -224,7 +238,15 @@ export function OnboardingTour() {
                   className="p-6"
                 >
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                    <CurrentIcon className="w-7 h-7 text-primary" />
+                    {tourSteps[currentStep].customIcon ? (
+                      <img
+                        src={tourSteps[currentStep].customIcon}
+                        alt=""
+                        className="w-8 h-8 object-contain"
+                      />
+                    ) : (
+                      <CurrentIcon className="w-7 h-7 text-primary" />
+                    )}
                   </div>
 
                   <h3 className="text-xl font-bold text-foreground mb-2">

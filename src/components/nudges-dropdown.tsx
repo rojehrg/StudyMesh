@@ -172,6 +172,7 @@ export function NudgesDropdown() {
         // Send response notification to original sender
         const originalSenderId = (notification as any).sender_id;
         if (originalSenderId) {
+          // Create in-app notification
           await supabase.from('notifications').insert({
             recipient_id: originalSenderId,
             sender_id: user.id,
@@ -185,6 +186,19 @@ export function NudgesDropdown() {
               original_nudge_id: notification.id
             }
           });
+
+          // Send Slack/email notification
+          fetch('/api/slack/nudge-response', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              recipientUserId: originalSenderId,
+              responderName: senderName,
+              accepted,
+              topic: metadata.topic,
+              podCode: metadata.pod_code
+            }),
+          }).catch((err) => console.error('[NudgeResponse] Failed to send notification:', err));
         }
       }
 
