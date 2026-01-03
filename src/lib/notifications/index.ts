@@ -20,9 +20,7 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
     return false;
   }
 
-  // Use trial domain or custom domain
-  // Trial domain format: trial-xxxxx.mlsender.net
-  const fromEmail = process.env.MAILERSEND_FROM_EMAIL || 'notifications@trial-v69oxl5qq17g785k.mlsender.net';
+  const fromEmail = process.env.MAILERSEND_FROM_EMAIL || 'notifications@attunly.com';
   const fromName = process.env.MAILERSEND_FROM_NAME || 'Attunly';
 
   try {
@@ -54,7 +52,6 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
       return false;
     }
 
-    // MailerSend returns 202 with x-message-id header on success
     const messageId = response.headers.get('x-message-id');
     console.log('[Email] Sent successfully, Message ID:', messageId);
     return true;
@@ -62,6 +59,61 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
     console.error('[Email] Failed to send via MailerSend:', error);
     return false;
   }
+}
+
+// ==========================================
+// EMAIL TEMPLATE WRAPPER
+// ==========================================
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+const LOGO_URL = 'https://attunly.com/icon.png';
+
+function wrapEmailTemplate(content: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          <!-- Header with Logo -->
+          <tr>
+            <td style="padding: 32px 40px 24px; text-align: center; border-bottom: 1px solid #f3f4f6;">
+              <a href="${APP_URL}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
+                <img src="${LOGO_URL}" alt="Attunly" width="36" height="36" style="border-radius: 8px;" />
+                <span style="font-size: 22px; font-weight: 700; color: #111827;">Attunly</span>
+              </a>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px 40px;">
+              ${content}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px 40px; background-color: #f9fafb; text-align: center; border-top: 1px solid #f3f4f6;">
+              <p style="margin: 0 0 8px; font-size: 13px; color: #6b7280;">
+                <a href="${APP_URL}/settings" style="color: #7c3aed; text-decoration: none;">Manage notifications</a>
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                Sent with love from Attunly
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
 }
 
 interface MeetingNotificationData {
@@ -302,92 +354,66 @@ export async function sendEmailMeetingNotification(
 
   const formattedDate = new Date(meeting.scheduledTime).toLocaleString('en-US', {
     weekday: 'long',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    year: 'numeric',
     hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short'
+    minute: '2-digit'
   });
 
   const participantName = participant.firstName || 'there';
 
-  const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meeting Invite</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">Meeting Invite</h1>
-    </div>
+  const content = `
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #111827;">You're invited! 🎉</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #6b7280;">
+      ${meeting.organizerName} wants to meet with you
+    </p>
 
-    <div style="padding: 32px;">
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${participantName},</p>
+    <div style="background: linear-gradient(135deg, #ede9fe 0%, #faf5ff 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; font-weight: 600; color: #5b21b6;">${meeting.title}</h2>
 
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
-        <strong>${meeting.organizerName}</strong> has invited you to a meeting.
-      </p>
+      <table cellpadding="0" cellspacing="0" style="width: 100%;">
+        <tr>
+          <td style="padding-bottom: 12px;">
+            <span style="font-size: 13px; color: #7c3aed; font-weight: 600;">WHEN</span><br/>
+            <span style="font-size: 15px; color: #374151;">${formattedDate}</span>
+          </td>
+          <td style="padding-bottom: 12px;">
+            <span style="font-size: 13px; color: #7c3aed; font-weight: 600;">DURATION</span><br/>
+            <span style="font-size: 15px; color: #374151;">${meeting.durationMinutes} min</span>
+          </td>
+        </tr>
+      </table>
 
-      <div style="background: #f8fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
-        <h2 style="color: #1f2937; font-size: 20px; margin: 0 0 16px;">${meeting.title}</h2>
-
-        <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-          <div style="flex: 1; min-width: 200px;">
-            <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">When</p>
-            <p style="color: #1f2937; font-size: 14px; margin: 0;">${formattedDate}</p>
-          </div>
-          <div style="flex: 1; min-width: 200px;">
-            <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Duration</p>
-            <p style="color: #1f2937; font-size: 14px; margin: 0;">${meeting.durationMinutes} minutes</p>
-          </div>
-        </div>
-
-        ${meeting.description ? `
-        <div style="margin-top: 16px;">
-          <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Description</p>
-          <p style="color: #1f2937; font-size: 14px; margin: 0;">${meeting.description}</p>
-        </div>
-        ` : ''}
-
-        ${meeting.podName ? `
-        <div style="margin-top: 16px;">
-          <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Pod</p>
-          <p style="color: #1f2937; font-size: 14px; margin: 0;">${meeting.podName}</p>
-        </div>
-        ` : ''}
-      </div>
-
-      ${meeting.meetingLink ? `
-      <div style="text-align: center; margin-bottom: 24px;">
-        <a href="${meeting.meetingLink}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Join Meeting</a>
+      ${meeting.description ? `
+      <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid rgba(124, 58, 237, 0.2);">
+        <span style="font-size: 13px; color: #7c3aed; font-weight: 600;">ABOUT</span><br/>
+        <span style="font-size: 14px; color: #374151;">${meeting.description}</span>
       </div>
       ` : ''}
 
-      <div style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/meetings" style="color: #6366f1; text-decoration: none; font-size: 14px;">View all your meetings on Attunly</a>
+      ${meeting.podName ? `
+      <div style="margin-top: 12px;">
+        <span style="display: inline-block; background: #7c3aed; color: white; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;">${meeting.podName}</span>
       </div>
+      ` : ''}
     </div>
 
-    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/meetings" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">View Meeting Details</a>
     </div>
-  </div>
-</body>
-</html>
+
+    <p style="margin: 24px 0 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      Check your calendar and respond when you can!
+    </p>
   `;
 
-  const subject = `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`;
+  const subject = `${meeting.organizerName} invited you: ${meeting.title}`;
 
   return sendEmailViaMailerSend({
     to: participant.email,
     toName: participantName,
     subject,
-    html: emailHtml
+    html: wrapEmailTemplate(content)
   });
 }
 
@@ -677,78 +703,58 @@ export async function sendEmailNudgeNotification(
     return false;
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
   const recipientName = data.recipientName || 'there';
 
-  const actionText = data.nudgeType === 'offer'
-    ? `wants to help you with`
-    : `is looking for help with`;
+  const isOffer = data.nudgeType === 'offer';
+  const emoji = isOffer ? '🙌' : '💡';
+  const headline = isOffer
+    ? `${data.senderName} wants to help you!`
+    : `${data.senderName} could use your help!`;
+  const subtext = isOffer
+    ? `They noticed you might need a hand with something`
+    : `They're working on something you might know about`;
 
-  const headerText = data.nudgeType === 'offer'
-    ? 'Someone wants to help!'
-    : 'Someone needs your help!';
+  const content = `
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #111827;">${emoji} ${headline}</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #6b7280;">
+      ${subtext}
+    </p>
 
-  const meetingLengthText = data.meetingLength && data.meetingLength !== 'async'
-    ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Suggested meeting length: <strong>${data.meetingLength}</strong></p>`
-    : '';
+    <div style="background: linear-gradient(135deg, #ede9fe 0%, #faf5ff 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <span style="font-size: 13px; color: #7c3aed; font-weight: 600;">TOPIC</span>
+      <h2 style="margin: 4px 0 0; font-size: 20px; font-weight: 600; color: #5b21b6;">${data.topic}</h2>
 
-  const podLink = data.podCode
-    ? `<a href="${appUrl}/classes/${data.podCode}" style="color: #7c3aed; text-decoration: none;">View in ${data.podCode}</a>`
-    : `<a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View in Attunly</a>`;
-
-  const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Nudge</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
-    </div>
-
-    <div style="padding: 32px;">
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${recipientName},</p>
-
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
-        <strong>${data.senderName}</strong> ${actionText} <strong>${data.topic}</strong>.
-      </p>
-
-      <div style="background: #faf5ff; border-radius: 8px; padding: 24px; margin-bottom: 24px; border-left: 4px solid #7c3aed;">
-        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 8px;">Topic</p>
-        <p style="color: #1f2937; font-size: 18px; font-weight: 600; margin: 0;">${data.topic}</p>
-        ${meetingLengthText}
-        ${data.podCode ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Pod: <strong>${data.podCode}</strong></p>` : ''}
-      </div>
-
-      ${data.message ? `
-      <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 8px;">Message</p>
-        <p style="color: #374151; font-size: 14px; margin: 0; white-space: pre-wrap;">${data.message}</p>
+      ${data.meetingLength && data.meetingLength !== 'async' ? `
+      <div style="margin-top: 16px;">
+        <span style="font-size: 13px; color: #7c3aed; font-weight: 600;">SUGGESTED TIME</span><br/>
+        <span style="font-size: 15px; color: #374151;">${data.meetingLength}</span>
       </div>
       ` : ''}
 
-      <div style="text-align: center; margin-bottom: 24px;">
-        <a href="${appUrl}/notifications" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Respond to Nudge</a>
+      ${data.podCode ? `
+      <div style="margin-top: 12px;">
+        <span style="display: inline-block; background: #7c3aed; color: white; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;">${data.podCode}</span>
       </div>
-
-      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
-        ${podLink}
-      </p>
+      ` : ''}
     </div>
 
-    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
+    ${data.message ? `
+    <div style="background: #f9fafb; border-radius: 10px; padding: 16px; margin-bottom: 24px; border-left: 3px solid #d1d5db;">
+      <span style="font-size: 12px; color: #6b7280; font-weight: 600;">MESSAGE</span>
+      <p style="margin: 4px 0 0; font-size: 14px; color: #374151; white-space: pre-wrap;">${data.message}</p>
     </div>
-  </div>
-</body>
-</html>
+    ` : ''}
+
+    <div style="text-align: center;">
+      <a href="${APP_URL}/notifications" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">Respond to ${data.senderName}</a>
+    </div>
+
+    <p style="margin: 24px 0 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      ${isOffer ? 'Good things happen when we help each other out!' : "Your expertise could make someone's day!"}
+    </p>
   `;
 
-  const subject = data.nudgeType === 'offer'
+  const subject = isOffer
     ? `${data.senderName} wants to help you with ${data.topic}`
     : `${data.senderName} needs help with ${data.topic}`;
 
@@ -756,7 +762,7 @@ export async function sendEmailNudgeNotification(
     to: data.recipientEmail,
     toName: recipientName,
     subject,
-    html: emailHtml
+    html: wrapEmailTemplate(content)
   });
 }
 
@@ -783,79 +789,55 @@ export async function sendEmailMeetingRsvpNotification(
     return false;
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
   const organizerName = data.organizerName || 'there';
 
   const formattedDate = new Date(data.scheduledTime).toLocaleString('en-US', {
     weekday: 'long',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    year: 'numeric',
     hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short'
+    minute: '2-digit'
   });
 
-  const headerText = data.status === 'accepted' ? 'Meeting Accepted!' : 'Meeting Declined';
-  const headerColor = data.status === 'accepted'
-    ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
-    : 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)';
+  const isAccepted = data.status === 'accepted';
+  const emoji = isAccepted ? '✅' : '😔';
+  const headline = isAccepted
+    ? `${data.responderName} is in!`
+    : `${data.responderName} can't make it`;
+  const bgColor = isAccepted
+    ? 'linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%)'
+    : 'linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%)';
+  const accentColor = isAccepted ? '#059669' : '#dc2626';
 
-  const statusText = data.status === 'accepted'
-    ? `has accepted your meeting invitation`
-    : `has declined your meeting invitation`;
+  const content = `
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #111827;">${emoji} ${headline}</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #6b7280;">
+      ${isAccepted ? "You're all set for your meeting" : "They won't be able to join this one"}
+    </p>
 
-  const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meeting RSVP</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="background: ${headerColor}; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
+    <div style="background: ${bgColor}; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 600; color: ${accentColor};">${data.meetingTitle}</h2>
+
+      <table cellpadding="0" cellspacing="0" style="width: 100%;">
+        <tr>
+          <td>
+            <span style="font-size: 13px; color: ${accentColor}; font-weight: 600;">WHEN</span><br/>
+            <span style="font-size: 15px; color: #374151;">${formattedDate}</span>
+          </td>
+        </tr>
+      </table>
     </div>
 
-    <div style="padding: 32px;">
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${organizerName},</p>
-
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
-        <strong>${data.responderName}</strong> ${statusText}.
-      </p>
-
-      <div style="background: #f8fafc; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
-        <h2 style="color: #1f2937; font-size: 18px; margin: 0 0 16px;">${data.meetingTitle}</h2>
-        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Scheduled for</p>
-        <p style="color: #1f2937; font-size: 14px; margin: 0;">${formattedDate}</p>
-      </div>
-
-      <div style="text-align: center; margin-bottom: 24px;">
-        <a href="${appUrl}/meetings" style="display: inline-block; background: #6366f1; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">View Meeting Details</a>
-      </div>
-
-      ${data.status === 'accepted' ? `
-      <p style="color: #059669; font-size: 14px; text-align: center; margin: 0;">
-        Great news! Your meeting is confirmed.
-      </p>
-      ` : `
-      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
-        You may want to reach out to reschedule or find another time that works.
-      </p>
-      `}
+    <div style="text-align: center;">
+      <a href="${APP_URL}/meetings" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">View Meeting</a>
     </div>
 
-    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
-    </div>
-  </div>
-</body>
-</html>
+    <p style="margin: 24px 0 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      ${isAccepted ? 'Looking forward to a great session!' : "No worries - maybe next time!"}
+    </p>
   `;
 
-  const subject = data.status === 'accepted'
+  const subject = isAccepted
     ? `${data.responderName} accepted: ${data.meetingTitle}`
     : `${data.responderName} declined: ${data.meetingTitle}`;
 
@@ -863,7 +845,7 @@ export async function sendEmailMeetingRsvpNotification(
     to: data.organizerEmail,
     toName: organizerName,
     subject,
-    html: emailHtml
+    html: wrapEmailTemplate(content)
   });
 }
 
@@ -876,74 +858,51 @@ export async function sendEmailNudgeResponseNotification(
     return false;
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
   const recipientName = data.recipientName || 'there';
 
-  const headerText = data.accepted ? 'Nudge Accepted!' : 'Nudge Response';
-  const headerColor = data.accepted
-    ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
-    : 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)';
+  const isAccepted = data.accepted;
+  const emoji = isAccepted ? '🎉' : '⏰';
+  const headline = isAccepted
+    ? `${data.responderName} is down to connect!`
+    : `${data.responderName} is busy right now`;
+  const bgColor = isAccepted
+    ? 'linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%)'
+    : 'linear-gradient(135deg, #f3f4f6 0%, #f9fafb 100%)';
+  const accentColor = isAccepted ? '#059669' : '#6b7280';
 
-  const statusText = data.accepted
-    ? `accepted your nudge and wants to connect!`
-    : `isn't available right now, but thanks for reaching out.`;
+  const content = `
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: #111827;">${emoji} ${headline}</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #6b7280;">
+      ${isAccepted ? 'Great news! They want to help out.' : "They can't make it work right now, but don't give up!"}
+    </p>
 
-  const ctaButton = data.accepted
-    ? `<div style="text-align: center; margin-bottom: 24px;">
-        <a href="${appUrl}/meetings" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Schedule a Meeting</a>
-      </div>`
-    : '';
+    ${data.topic ? `
+    <div style="background: ${bgColor}; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <span style="font-size: 13px; color: ${accentColor}; font-weight: 600;">YOUR TOPIC</span>
+      <h2 style="margin: 4px 0 0; font-size: 18px; font-weight: 600; color: #374151;">${data.topic}</h2>
+    </div>
+    ` : ''}
 
-  const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nudge Response</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="background: ${headerColor}; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
+    ${isAccepted ? `
+    <div style="text-align: center;">
+      <a href="${APP_URL}/classes/${data.podCode || ''}" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">Schedule a Time</a>
     </div>
 
-    <div style="padding: 32px;">
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">Hi ${recipientName},</p>
-
-      <p style="color: #374151; font-size: 16px; margin: 0 0 24px;">
-        <strong>${data.responderName}</strong> ${statusText}
-      </p>
-
-      ${data.topic ? `
-      <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin: 0 0 4px;">Original Topic</p>
-        <p style="color: #1f2937; font-size: 16px; font-weight: 500; margin: 0;">${data.topic}</p>
-      </div>
-      ` : ''}
-
-      ${ctaButton}
-
-      ${data.accepted ? `
-      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
-        Head to Attunly to schedule a time that works for both of you.
-      </p>
-      ` : `
-      <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
-        No worries - try reaching out to someone else or check back later.
-      </p>
-      `}
+    <p style="margin: 24px 0 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      Pick a time that works and make it happen!
+    </p>
+    ` : `
+    <div style="text-align: center;">
+      <a href="${APP_URL}/classes/${data.podCode || ''}" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">Find Someone Else</a>
     </div>
 
-    <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
-    </div>
-  </div>
-</body>
-</html>
+    <p style="margin: 24px 0 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      There are plenty of others who might be able to help!
+    </p>
+    `}
   `;
 
-  const subject = data.accepted
+  const subject = isAccepted
     ? `${data.responderName} accepted your nudge!`
     : `${data.responderName} responded to your nudge`;
 
@@ -951,6 +910,6 @@ export async function sendEmailNudgeResponseNotification(
     to: data.recipientEmail,
     toName: recipientName,
     subject,
-    html: emailHtml
+    html: wrapEmailTemplate(content)
   });
 }
