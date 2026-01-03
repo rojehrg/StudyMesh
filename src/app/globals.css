@@ -45,12 +45,12 @@
     --muted: 240 5% 94%;
     --muted-foreground: 240 5% 45%;
 
-    /* Destructive - Clean red */
-    --destructive: 0 70% 50%;
+    /* Destructive - Soft coral */
+    --destructive: 0 45% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Green */
-    --success: 142 70% 40%;
+    /* Success - Muted sage */
+    --success: 145 35% 45%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Amber */
@@ -108,12 +108,12 @@
     --muted: 220 8% 16%;
     --muted-foreground: 220 5% 55%;
 
-    /* Destructive - Clear red */
-    --destructive: 0 72% 51%;
+    /* Destructive - Soft coral */
+    --destructive: 0 50% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Vibrant green */
-    --success: 142 71% 45%;
+    /* Success - Muted sage */
+    --success: 145 40% 50%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Bright amber */
