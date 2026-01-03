@@ -1,5 +1,10 @@
 // Notification service for Slack and Email (using MailerSend)
 import { decryptToken } from "@/lib/encryption";
+import { createLogger } from "@/lib/logger";
+
+// Create service-specific loggers
+const emailLog = createLogger({ service: 'email' });
+const slackLog = createLogger({ service: 'slack' });
 
 // ==========================================
 // MAILERSEND EMAIL HELPER
@@ -16,7 +21,7 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
   const apiKey = process.env.MAILERSEND_API_KEY;
 
   if (!apiKey) {
-    console.log('[Email] Skipping: MAILERSEND_API_KEY not configured');
+    emailLog.warn('Skipping: MAILERSEND_API_KEY not configured');
     return false;
   }
 
@@ -24,7 +29,7 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
   const fromName = process.env.MAILERSEND_FROM_NAME || 'Attunly';
 
   try {
-    console.log('[Email] Sending via MailerSend to:', email.to, 'Subject:', email.subject);
+    emailLog.info('Sending email', { to: email.to, subject: email.subject, action: 'send' });
 
     const response = await fetch('https://api.mailersend.com/v1/email', {
       method: 'POST',
@@ -48,15 +53,19 @@ async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> 
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('[Email] MailerSend API error:', response.status, errorData);
+      emailLog.error('MailerSend API error', {
+        status: response.status,
+        error: errorData,
+        to: email.to
+      });
       return false;
     }
 
     const messageId = response.headers.get('x-message-id');
-    console.log('[Email] Sent successfully, Message ID:', messageId);
+    emailLog.info('Sent successfully', { messageId, to: email.to });
     return true;
-  } catch (error) {
-    console.error('[Email] Failed to send via MailerSend:', error);
+  } catch (error: any) {
+    emailLog.error('Failed to send via MailerSend', { error: error.message, to: email.to });
     return false;
   }
 }
@@ -227,6 +236,8 @@ async function sendSlackDM(
   meeting: MeetingNotificationData
 ): Promise<boolean> {
   try {
+    slackLog.info('Opening DM channel', { slackUserId, action: 'conversations.open' });
+
     // First, open a DM channel with the user
     const openResponse = await fetch('https://slack.com/api/conversations.open', {
       method: 'POST',
@@ -239,12 +250,14 @@ async function sendSlackDM(
 
     const openData = await openResponse.json();
     if (!openData.ok) {
-      console.error('Failed to open Slack DM channel:', openData.error);
+      slackLog.error('Failed to open DM channel', { slackUserId, error: openData.error });
       return false;
     }
 
     const channelId = openData.channel.id;
     const blocks = buildSlackMeetingBlocks(meeting);
+
+    slackLog.info('Sending meeting invite', { channelId, meetingTitle: meeting.title, action: 'chat.postMessage' });
 
     // Send the message
     const messageResponse = await fetch('https://slack.com/api/chat.postMessage', {
@@ -262,13 +275,14 @@ async function sendSlackDM(
 
     const messageData = await messageResponse.json();
     if (!messageData.ok) {
-      console.error('Failed to send Slack message:', messageData.error);
+      slackLog.error('Failed to send message', { channelId, error: messageData.error });
       return false;
     }
 
+    slackLog.info('Meeting invite sent successfully', { channelId, messageTs: messageData.ts });
     return true;
-  } catch (error) {
-    console.error('Failed to send Slack DM:', error);
+  } catch (error: any) {
+    slackLog.error('Failed to send DM', { slackUserId, error: error.message });
     return false;
   }
 }
@@ -280,6 +294,8 @@ async function sendSlackWebhook(
   meeting: MeetingNotificationData
 ): Promise<boolean> {
   try {
+    slackLog.info('Sending via webhook', { slackHandle, meetingTitle: meeting.title, action: 'webhook' });
+
     const blocks = buildSlackMeetingBlocks(meeting);
 
     // Format recipient mention
@@ -304,9 +320,15 @@ async function sendSlackWebhook(
       body: JSON.stringify(payload)
     });
 
+    if (response.ok) {
+      slackLog.info('Webhook sent successfully', { slackHandle });
+    } else {
+      slackLog.error('Webhook failed', { slackHandle, status: response.status });
+    }
+
     return response.ok;
-  } catch (error) {
-    console.error('Failed to send Slack webhook:', error);
+  } catch (error: any) {
+    slackLog.error('Failed to send webhook', { slackHandle, error: error.message });
     return false;
   }
 }
@@ -343,12 +365,12 @@ export async function sendEmailMeetingNotification(
   meeting: MeetingNotificationData
 ): Promise<boolean> {
   if (!participant.email) {
-    console.log('[Email] Skipping: No email address for participant', participant.userId);
+    emailLog.info('Skipping: No email address', { userId: participant.userId });
     return false;
   }
 
   if (participant.emailNotifications === false) {
-    console.log('[Email] Skipping: User has disabled email notifications', participant.email);
+    emailLog.info('Skipping: Notifications disabled', { email: participant.email });
     return false;
   }
 
@@ -585,6 +607,8 @@ export async function sendNudgeSlackDM(
   nudge: NudgeData
 ): Promise<boolean> {
   try {
+    slackLog.info('Opening DM for nudge', { recipientSlackUserId, topic: nudge.topic, action: 'nudge' });
+
     // Open DM channel
     const openResponse = await fetch('https://slack.com/api/conversations.open', {
       method: 'POST',
@@ -597,7 +621,7 @@ export async function sendNudgeSlackDM(
 
     const openData = await openResponse.json();
     if (!openData.ok) {
-      console.error('[Nudge] Failed to open Slack DM channel:', openData.error);
+      slackLog.error('Failed to open DM channel for nudge', { recipientSlackUserId, error: openData.error });
       return false;
     }
 
@@ -624,14 +648,14 @@ export async function sendNudgeSlackDM(
 
     const messageData = await messageResponse.json();
     if (!messageData.ok) {
-      console.error('[Nudge] Failed to send Slack message:', messageData.error);
+      slackLog.error('Failed to send nudge message', { channelId, error: messageData.error });
       return false;
     }
 
-    console.log('[Nudge] Slack DM sent successfully');
+    slackLog.info('Nudge DM sent successfully', { channelId, topic: nudge.topic });
     return true;
-  } catch (error) {
-    console.error('[Nudge] Failed to send Slack DM:', error);
+  } catch (error: any) {
+    slackLog.error('Failed to send nudge DM', { recipientSlackUserId, error: error.message });
     return false;
   }
 }
@@ -643,6 +667,12 @@ export async function sendNudgeResponseSlackDM(
   response: NudgeResponseData
 ): Promise<boolean> {
   try {
+    slackLog.info('Opening DM for nudge response', {
+      recipientSlackUserId,
+      accepted: response.accepted,
+      action: 'nudge_response'
+    });
+
     // Open DM channel
     const openResponse = await fetch('https://slack.com/api/conversations.open', {
       method: 'POST',
@@ -655,7 +685,7 @@ export async function sendNudgeResponseSlackDM(
 
     const openData = await openResponse.json();
     if (!openData.ok) {
-      console.error('[NudgeResponse] Failed to open Slack DM channel:', openData.error);
+      slackLog.error('Failed to open DM channel for response', { recipientSlackUserId, error: openData.error });
       return false;
     }
 
@@ -678,14 +708,14 @@ export async function sendNudgeResponseSlackDM(
 
     const messageData = await messageResponse.json();
     if (!messageData.ok) {
-      console.error('[NudgeResponse] Failed to send Slack message:', messageData.error);
+      slackLog.error('Failed to send response message', { channelId, error: messageData.error });
       return false;
     }
 
-    console.log('[NudgeResponse] Slack DM sent successfully');
+    slackLog.info('Nudge response DM sent successfully', { channelId, accepted: response.accepted });
     return true;
-  } catch (error) {
-    console.error('[NudgeResponse] Failed to send Slack DM:', error);
+  } catch (error: any) {
+    slackLog.error('Failed to send nudge response DM', { recipientSlackUserId, error: error.message });
     return false;
   }
 }
@@ -699,7 +729,7 @@ export async function sendEmailNudgeNotification(
   data: NudgeEmailData
 ): Promise<boolean> {
   if (!data.recipientEmail) {
-    console.log('[Email Nudge] Skipping: No recipient email');
+    emailLog.info('Skipping nudge email: No recipient', { action: 'nudge' });
     return false;
   }
 
@@ -785,7 +815,7 @@ export async function sendEmailMeetingRsvpNotification(
   data: MeetingRsvpEmailData
 ): Promise<boolean> {
   if (!data.organizerEmail) {
-    console.log('[Email MeetingRSVP] Skipping: No organizer email');
+    emailLog.info('Skipping RSVP email: No organizer email', { action: 'rsvp' });
     return false;
   }
 
@@ -854,7 +884,7 @@ export async function sendEmailNudgeResponseNotification(
   data: NudgeResponseEmailData
 ): Promise<boolean> {
   if (!data.recipientEmail) {
-    console.log('[Email NudgeResponse] Skipping: No recipient email');
+    emailLog.info('Skipping nudge response email: No recipient', { action: 'nudge_response' });
     return false;
   }
 

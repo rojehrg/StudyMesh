@@ -2,13 +2,17 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendNudgeResponseSlackDM, sendEmailNudgeResponseNotification } from "@/lib/notifications";
 import { decryptToken } from "@/lib/encryption";
+import { createLogger } from "@/lib/logger";
 
 export async function POST(req: Request) {
+  const log = createLogger({ service: 'slack', action: 'nudge_response' });
+
   try {
     // Authentication check
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      log.warn('Unauthorized access attempt');
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,7 +25,15 @@ export async function POST(req: Request) {
       podCode
     } = await req.json();
 
+    log.info('Processing nudge response', {
+      userId: user.id,
+      recipientUserId,
+      accepted,
+      topic
+    });
+
     if (!responderName) {
+      log.warn('Missing responderName');
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
@@ -51,8 +63,8 @@ export async function POST(req: Request) {
             if (org?.slack_access_token) {
               try {
                 botToken = decryptToken(org.slack_access_token);
-              } catch (e) {
-                console.error('[NudgeResponse] Failed to decrypt org token:', e);
+              } catch (e: any) {
+                log.error('Failed to decrypt org token', { error: e.message });
               }
             }
           }
@@ -61,8 +73,8 @@ export async function POST(req: Request) {
           if (!botToken && recipientProfile.slack_access_token) {
             try {
               botToken = decryptToken(recipientProfile.slack_access_token);
-            } catch (e) {
-              console.error('[NudgeResponse] Failed to decrypt user token:', e);
+            } catch (e: any) {
+              log.error('Failed to decrypt user token', { error: e.message });
             }
           }
 
@@ -176,18 +188,19 @@ export async function POST(req: Request) {
       });
 
       if (resp.ok) {
+        log.info('Webhook sent successfully', { recipientSlackHandle, accepted });
         return NextResponse.json({ ok: true, notifiedVia: ['webhook'] });
       }
 
-      console.error("[NudgeResponse] Slack webhook failed");
+      log.error('Webhook failed', { recipientSlackHandle, status: resp.status });
     }
 
     // No notification method available
-    console.log('[NudgeResponse] No notification method available');
+    log.info('No notification method available', { recipientUserId });
     return NextResponse.json({ skipped: true, reason: "No notification method available" }, { status: 200 });
 
-  } catch (error) {
-    console.error("[NudgeResponse] Error:", error);
+  } catch (error: any) {
+    log.error('Unexpected error', { error: error.message });
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
