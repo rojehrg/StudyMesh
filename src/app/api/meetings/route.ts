@@ -137,6 +137,48 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check scheduling permissions for each participant
+    // This ensures only nudge receivers (not senders) can schedule meetings
+    const permissionIds: string[] = [];
+    for (const participantId of participantIds) {
+      const { data: permission, error: permError } = await supabase
+        .from('scheduling_permissions')
+        .select('id, used, expires_at')
+        .eq('authorized_user_id', user.id) // Current user must be authorized
+        .eq('with_user_id', participantId) // To schedule with this participant
+        .eq('used', false) // Not already used
+        .gte('expires_at', new Date().toISOString()) // Not expired
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!permission) {
+        // Check if user was the nudge SENDER (not receiver) - they shouldn't be able to schedule
+        const { data: reversePermission } = await supabase
+          .from('scheduling_permissions')
+          .select('id')
+          .eq('authorized_user_id', participantId) // Other person was authorized
+          .eq('with_user_id', user.id) // To schedule with current user
+          .eq('used', false)
+          .gte('expires_at', new Date().toISOString())
+          .limit(1)
+          .maybeSingle();
+
+        if (reversePermission) {
+          // User was the nudge sender - they need to wait for the recipient to schedule
+          return NextResponse.json(
+            { error: "Waiting for the other person to schedule. Only the nudge recipient can create the meeting." },
+            { status: 403 }
+          );
+        }
+
+        // No permission exists at all - this is allowed (direct meeting creation without nudge)
+        // This maintains backward compatibility for meetings without nudge context
+      } else {
+        permissionIds.push(permission.id);
+      }
+    }
+
     // Create the meeting
     const { data: meeting, error: meetingError } = await supabase
       .from('scheduled_meetings')
@@ -155,6 +197,14 @@ export async function POST(request: Request) {
 
     if (meetingError) {
       throw meetingError;
+    }
+
+    // Mark scheduling permissions as used
+    if (permissionIds.length > 0) {
+      await supabase
+        .from('scheduling_permissions')
+        .update({ used: true })
+        .in('id', permissionIds);
     }
 
     // Get organizer profile

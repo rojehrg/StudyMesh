@@ -159,6 +159,19 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Scheduling permissions - controls who can create meetings after nudge acceptance
+// Only the nudge RECEIVER gets permission to schedule with the SENDER
+export const schedulingPermissions = pgTable("scheduling_permissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  nudgeId: uuid("nudge_id").references(() => notifications.id, { onDelete: "cascade" }),
+  authorizedUserId: uuid("authorized_user_id").notNull(), // Nudge RECEIVER - can schedule
+  withUserId: uuid("with_user_id").notNull(), // Nudge SENDER - other party
+  podId: uuid("pod_id").references(() => pods.id, { onDelete: "set null" }),
+  used: boolean("used").default(false).notNull(), // Marked true after meeting created
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(), // 7 day expiry
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
@@ -171,3 +184,4 @@ export type Notification = typeof notifications.$inferSelect;
 export type AvailabilitySchedule = typeof availabilitySchedules.$inferSelect;
 export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
 export type MeetingParticipant = typeof meetingParticipants.$inferSelect;
+export type SchedulingPermission = typeof schedulingPermissions.$inferSelect;

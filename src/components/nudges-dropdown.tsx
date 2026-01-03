@@ -172,6 +172,32 @@ export function NudgesDropdown() {
         // Send response notification to original sender
         const originalSenderId = (notification as any).sender_id;
         if (originalSenderId) {
+          // If accepted, create scheduling permission for the RECEIVER (current user)
+          // This ensures only the nudge receiver can schedule a meeting
+          if (accepted) {
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7); // 7 day expiry
+
+            // Get pod_id from pod_code if available
+            let podId = null;
+            if (metadata.pod_code) {
+              const { data: pod } = await supabase
+                .from('pods')
+                .select('id')
+                .eq('pod_code', metadata.pod_code)
+                .single();
+              podId = pod?.id;
+            }
+
+            await supabase.from('scheduling_permissions').insert({
+              nudge_id: notification.id,
+              authorized_user_id: user.id, // Receiver can schedule
+              with_user_id: originalSenderId, // With the sender
+              pod_id: podId,
+              expires_at: expiresAt.toISOString()
+            });
+          }
+
           // Create in-app notification
           await supabase.from('notifications').insert({
             recipient_id: originalSenderId,
@@ -365,6 +391,12 @@ export function NudgesDropdown() {
                             : "bg-muted text-muted-foreground"
                         )}>
                           {notification.metadata.accepted ? "Accepted" : "Declined"}
+                        </span>
+                      )}
+                      {/* Show waiting indicator for sent nudges that haven't been responded to */}
+                      {activeTab === 'sent' && notification.type === 'nudge' && !notification.metadata?.responded && (
+                        <span className="text-xs bg-warning/15 text-warning px-1.5 py-0.5 rounded animate-pulse">
+                          Waiting...
                         </span>
                       )}
                     </div>

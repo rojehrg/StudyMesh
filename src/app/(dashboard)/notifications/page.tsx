@@ -202,6 +202,32 @@ export default function NotificationsPage() {
 
           const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Someone';
 
+          // If accepted, create scheduling permission for the RECEIVER (current user)
+          // This ensures only the nudge receiver can schedule a meeting
+          if (accepted) {
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7); // 7 day expiry
+
+            // Get pod_id from pod_code if available
+            let podId = null;
+            if (metadata.pod_code) {
+              const { data: pod } = await supabase
+                .from('pods')
+                .select('id')
+                .eq('pod_code', metadata.pod_code)
+                .single();
+              podId = pod?.id;
+            }
+
+            await supabase.from('scheduling_permissions').insert({
+              nudge_id: notification.id,
+              authorized_user_id: user.id, // Receiver can schedule
+              with_user_id: originalSenderId, // With the sender
+              pod_id: podId,
+              expires_at: expiresAt.toISOString()
+            });
+          }
+
           // Create in-app notification
           await supabase.from('notifications').insert({
             recipient_id: originalSenderId,
@@ -376,6 +402,12 @@ export default function NotificationsPage() {
                         {notification.type === 'nudge' && notification.metadata?.responded && (
                           <Badge variant={notification.metadata.accepted ? "default" : "secondary"} className="text-xs">
                             {notification.metadata.accepted ? "Accepted" : "Declined"}
+                          </Badge>
+                        )}
+                        {/* Show waiting indicator for sent nudges that haven't been responded to */}
+                        {isSent && notification.type === 'nudge' && !notification.metadata?.responded && (
+                          <Badge variant="outline" className="text-xs bg-warning/15 text-warning border-warning/30 animate-pulse">
+                            Waiting for response...
                           </Badge>
                         )}
                       </div>
