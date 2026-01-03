@@ -23,9 +23,18 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Users, Calendar, Clock, Video, Search, Check } from "lucide-react";
+import { Loader2, Users, Calendar, Clock, Video, Search, Check, Link2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+
+type MeetingProvider = 'zoom' | 'google' | 'custom';
+
+interface ConnectedProviders {
+  zoom: boolean;
+  google: boolean;
+  zoomEmail?: string;
+  googleEmail?: string;
+}
 
 interface Pod {
   id: string;
@@ -79,6 +88,11 @@ export function ScheduleMeetingDialog({
   const [useManualTime, setUseManualTime] = useState(false);
   const [manualTime, setManualTime] = useState("");
 
+  // Meeting provider
+  const [selectedProvider, setSelectedProvider] = useState<MeetingProvider>('custom');
+  const [connectedProviders, setConnectedProviders] = useState<ConnectedProviders>({ zoom: false, google: false });
+  const [loadingProviders, setLoadingProviders] = useState(false);
+
   const supabase = createClient();
 
   // Day names matching availability format: 0=Monday, 6=Sunday
@@ -87,10 +101,34 @@ export function ScheduleMeetingDialog({
   useEffect(() => {
     if (open) {
       loadPods();
+      loadConnectedProviders();
       setStep(1);
       resetForm();
     }
   }, [open]);
+
+  const loadConnectedProviders = async () => {
+    setLoadingProviders(true);
+    try {
+      const response = await fetch('/api/user/providers');
+      const data = await response.json();
+      if (data.success) {
+        setConnectedProviders(data.providers);
+        // Default to first connected provider if any
+        if (data.providers.zoom) {
+          setSelectedProvider('zoom');
+        } else if (data.providers.google) {
+          setSelectedProvider('google');
+        } else {
+          setSelectedProvider('custom');
+        }
+      }
+    } catch (error) {
+      console.error("Error loading providers:", error);
+    } finally {
+      setLoadingProviders(false);
+    }
+  };
 
   useEffect(() => {
     if (selectedPod) {
@@ -118,6 +156,7 @@ export function ScheduleMeetingDialog({
     setOverlap({});
     setUseManualTime(false);
     setManualTime("");
+    // Provider will be set by loadConnectedProviders
   };
 
   const loadPods = async () => {
@@ -248,9 +287,10 @@ export function ScheduleMeetingDialog({
           description: description || null,
           scheduledTime: meetingDate.toISOString(),
           durationMinutes: parseInt(duration),
-          meetingLink: meetingLink || null,
+          meetingLink: selectedProvider === 'custom' ? (meetingLink || null) : null,
           participantIds: selectedMembers,
-          podId: selectedPod
+          podId: selectedPod,
+          provider: selectedProvider
         })
       });
 
@@ -578,19 +618,135 @@ export function ScheduleMeetingDialog({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="link">Meeting Link (optional)</Label>
-                <div className="relative">
-                  <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="link"
-                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
-                    value={meetingLink}
-                    onChange={(e) => setMeetingLink(e.target.value)}
-                    className="pl-9"
-                  />
+              {/* Meeting Provider Selection */}
+              <div className="space-y-3">
+                <Label>Video Platform</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Zoom Option */}
+                  <button
+                    type="button"
+                    onClick={() => connectedProviders.zoom && setSelectedProvider('zoom')}
+                    disabled={!connectedProviders.zoom}
+                    className={`relative p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedProvider === 'zoom'
+                        ? 'border-primary bg-primary/5'
+                        : connectedProviders.zoom
+                        ? 'border-border hover:border-primary/50 hover:bg-muted/50'
+                        : 'border-border/50 bg-muted/30 opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center">
+                        <Video className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground">Zoom</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {connectedProviders.zoom
+                            ? connectedProviders.zoomEmail || 'Connected'
+                            : 'Not connected'}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedProvider === 'zoom' && (
+                      <div className="absolute top-2 right-2">
+                        <Check className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Google Meet Option */}
+                  <button
+                    type="button"
+                    onClick={() => connectedProviders.google && setSelectedProvider('google')}
+                    disabled={!connectedProviders.google}
+                    className={`relative p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedProvider === 'google'
+                        ? 'border-primary bg-primary/5'
+                        : connectedProviders.google
+                        ? 'border-border hover:border-primary/50 hover:bg-muted/50'
+                        : 'border-border/50 bg-muted/30 opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded bg-green-500 flex items-center justify-center">
+                        <Video className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground">Google Meet</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {connectedProviders.google
+                            ? connectedProviders.googleEmail || 'Connected'
+                            : 'Not connected'}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedProvider === 'google' && (
+                      <div className="absolute top-2 right-2">
+                        <Check className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Custom Link Option */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProvider('custom')}
+                    className={`relative p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedProvider === 'custom'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                        <Link2 className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground">Custom</p>
+                        <p className="text-xs text-muted-foreground">Paste your link</p>
+                      </div>
+                    </div>
+                    {selectedProvider === 'custom' && (
+                      <div className="absolute top-2 right-2">
+                        <Check className="w-4 h-4 text-primary" />
+                      </div>
+                    )}
+                  </button>
                 </div>
+
+                {/* Info text based on selection */}
+                {selectedProvider !== 'custom' && (
+                  <p className="text-xs text-muted-foreground">
+                    A {selectedProvider === 'zoom' ? 'Zoom' : 'Google Meet'} link will be created automatically
+                  </p>
+                )}
+
+                {(!connectedProviders.zoom || !connectedProviders.google) && (
+                  <p className="text-xs text-muted-foreground">
+                    Connect Zoom or Google in{' '}
+                    <a href="/settings" className="text-primary hover:underline">Settings</a>
+                    {' '}for auto-generated links
+                  </p>
+                )}
               </div>
+
+              {/* Custom Meeting Link - only show when custom provider selected */}
+              {selectedProvider === 'custom' && (
+                <div className="space-y-2">
+                  <Label htmlFor="link">Meeting Link (optional)</Label>
+                  <div className="relative">
+                    <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="link"
+                      placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                      value={meetingLink}
+                      onChange={(e) => setMeetingLink(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Summary */}
               <div className="p-4 bg-muted/50 rounded-lg space-y-2">

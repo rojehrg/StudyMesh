@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { notifyParticipant } from "@/lib/notifications";
 import { decryptToken } from "@/lib/encryption";
+import { createZoomMeeting, createGoogleMeet, MeetingProvider } from "@/lib/meeting-providers";
 
 export async function GET(request: Request) {
   try {
@@ -127,7 +128,8 @@ export async function POST(request: Request) {
       durationMinutes = 30,
       meetingLink,
       participantIds,
-      podId
+      podId,
+      provider = 'custom' as MeetingProvider, // 'zoom', 'google', or 'custom'
     } = body;
 
     if (!title || !scheduledTime || !participantIds || participantIds.length === 0) {
@@ -179,6 +181,57 @@ export async function POST(request: Request) {
       }
     }
 
+    // Create meeting via provider if specified
+    let finalMeetingLink = meetingLink;
+    let providerMeetingId: string | null = null;
+    let providerHostUrl: string | null = null;
+    let actualProvider: MeetingProvider = provider;
+
+    if (provider === 'zoom') {
+      const zoomMeeting = await createZoomMeeting(user.id, {
+        title,
+        description,
+        startTime: new Date(scheduledTime),
+        durationMinutes,
+      });
+
+      if (zoomMeeting) {
+        finalMeetingLink = zoomMeeting.meetingLink;
+        providerMeetingId = zoomMeeting.providerMeetingId;
+        providerHostUrl = zoomMeeting.hostUrl || null;
+      } else {
+        // Zoom creation failed - fall back to custom or return error
+        if (!meetingLink) {
+          return NextResponse.json(
+            { error: "Failed to create Zoom meeting. Please connect Zoom in Settings or provide a custom link." },
+            { status: 400 }
+          );
+        }
+        actualProvider = 'custom';
+      }
+    } else if (provider === 'google') {
+      const googleMeeting = await createGoogleMeet(user.id, {
+        title,
+        description,
+        startTime: new Date(scheduledTime),
+        durationMinutes,
+      });
+
+      if (googleMeeting) {
+        finalMeetingLink = googleMeeting.meetingLink;
+        providerMeetingId = googleMeeting.providerMeetingId;
+      } else {
+        // Google Meet creation failed - fall back to custom or return error
+        if (!meetingLink) {
+          return NextResponse.json(
+            { error: "Failed to create Google Meet. Please connect Google in Settings or provide a custom link." },
+            { status: 400 }
+          );
+        }
+        actualProvider = 'custom';
+      }
+    }
+
     // Create the meeting
     const { data: meeting, error: meetingError } = await supabase
       .from('scheduled_meetings')
@@ -189,7 +242,10 @@ export async function POST(request: Request) {
         description: description || null,
         scheduled_time: scheduledTime,
         duration_minutes: durationMinutes,
-        meeting_link: meetingLink || null,
+        meeting_link: finalMeetingLink || null,
+        meeting_provider: actualProvider,
+        provider_meeting_id: providerMeetingId,
+        provider_host_url: providerHostUrl,
         status: 'scheduled'
       })
       .select()
@@ -261,7 +317,7 @@ export async function POST(request: Request) {
           description,
           scheduledTime: new Date(scheduledTime),
           durationMinutes,
-          meetingLink,
+          meetingLink: finalMeetingLink,
           organizerName,
           podName
         }

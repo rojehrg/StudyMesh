@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy } from "@phosphor-icons/react";
+import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy, VideoCamera, Plugs } from "@phosphor-icons/react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -77,6 +77,13 @@ export default function SettingsPage() {
   const [slackConnecting, setSlackConnecting] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [copiedInvite, setCopiedInvite] = useState(false);
+  const [meetingProviders, setMeetingProviders] = useState<{
+    zoom: boolean;
+    google: boolean;
+    zoomEmail?: string;
+    googleEmail?: string;
+  }>({ zoom: false, google: false });
+  const [providersLoading, setProvidersLoading] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
   const isInitialLoad = useRef(true);
@@ -84,7 +91,11 @@ export default function SettingsPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    // Handle OAuth callbacks
     const slackStatus = searchParams.get('slack');
+    const successParam = searchParams.get('success');
+    const errorParam = searchParams.get('error');
+
     if (slackStatus === 'success') {
       toast.success("Slack connected successfully!");
       window.history.replaceState({}, '', '/settings');
@@ -97,11 +108,83 @@ export default function SettingsPage() {
       toast.error("Failed to connect Slack", { description: message });
       window.history.replaceState({}, '', '/settings');
     }
+
+    // Handle Zoom/Google OAuth callbacks
+    if (successParam === 'zoom_connected') {
+      toast.success("Zoom connected successfully!");
+      window.history.replaceState({}, '', '/settings');
+      loadMeetingProviders();
+      setActiveTab("notifications");
+    } else if (successParam === 'google_connected') {
+      toast.success("Google Meet connected successfully!");
+      window.history.replaceState({}, '', '/settings');
+      loadMeetingProviders();
+      setActiveTab("notifications");
+    }
+
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        'zoom_denied': 'Zoom authorization was denied',
+        'zoom_invalid_response': 'Invalid response from Zoom',
+        'zoom_token_exchange_failed': 'Failed to connect Zoom account',
+        'zoom_callback_failed': 'Zoom connection failed',
+        'google_denied': 'Google authorization was denied',
+        'google_invalid_response': 'Invalid response from Google',
+        'google_token_exchange_failed': 'Failed to connect Google account',
+        'google_callback_failed': 'Google connection failed',
+      };
+      toast.error(errorMessages[errorParam] || 'Connection failed');
+      window.history.replaceState({}, '', '/settings');
+    }
   }, [searchParams]);
 
   useEffect(() => {
     loadProfile();
+    loadMeetingProviders();
   }, []);
+
+  const loadMeetingProviders = async () => {
+    setProvidersLoading(true);
+    try {
+      const response = await fetch('/api/user/providers');
+      const data = await response.json();
+      if (data.success) {
+        setMeetingProviders(data.providers);
+      }
+    } catch (error) {
+      console.error("Error loading providers:", error);
+    } finally {
+      setProvidersLoading(false);
+    }
+  };
+
+  const connectZoom = () => {
+    window.location.href = '/api/auth/zoom';
+  };
+
+  const connectGoogle = () => {
+    window.location.href = '/api/auth/google';
+  };
+
+  const disconnectProvider = async (provider: 'zoom' | 'google') => {
+    try {
+      const response = await fetch('/api/user/providers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider }),
+      });
+      if (response.ok) {
+        setMeetingProviders(prev => ({
+          ...prev,
+          [provider]: false,
+          [`${provider}Email`]: undefined,
+        }));
+        toast.success(`${provider === 'zoom' ? 'Zoom' : 'Google'} disconnected`);
+      }
+    } catch (error) {
+      toast.error(`Failed to disconnect ${provider === 'zoom' ? 'Zoom' : 'Google'}`);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -530,6 +613,104 @@ export default function SettingsPage() {
                     ) : (
                       <img src="/slack-logo.png" alt="" className="w-4 h-4" />
                     )}
+                    Connect
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Video Conferencing */}
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <VideoCamera className="w-6 h-6 text-primary" weight="duotone" />
+                <div>
+                  <CardTitle className="text-base font-semibold">Video Conferencing</CardTitle>
+                  <CardDescription>Auto-generate meeting links when scheduling</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Zoom */}
+              {meetingProviders.zoom ? (
+                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                      <VideoCamera className="w-5 h-5 text-white" weight="fill" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Zoom Connected</p>
+                      <p className="text-sm text-muted-foreground">
+                        {meetingProviders.zoomEmail || "Ready to create meetings"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => disconnectProvider('zoom')}
+                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  >
+                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                      <VideoCamera className="w-5 h-5 text-blue-500" weight="duotone" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Zoom</p>
+                      <p className="text-sm text-muted-foreground">Create Zoom meetings automatically</p>
+                    </div>
+                  </div>
+                  <Button onClick={connectZoom} className="bg-blue-500 hover:bg-blue-600 gap-2">
+                    <Plugs className="w-4 h-4" weight="duotone" />
+                    Connect
+                  </Button>
+                </div>
+              )}
+
+              {/* Google Meet */}
+              {meetingProviders.google ? (
+                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                      <VideoCamera className="w-5 h-5 text-white" weight="fill" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Google Meet Connected</p>
+                      <p className="text-sm text-muted-foreground">
+                        {meetingProviders.googleEmail || "Ready to create meetings"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => disconnectProvider('google')}
+                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  >
+                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+                      <VideoCamera className="w-5 h-5 text-green-500" weight="duotone" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Google Meet</p>
+                      <p className="text-sm text-muted-foreground">Create Google Meet links automatically</p>
+                    </div>
+                  </div>
+                  <Button onClick={connectGoogle} className="bg-green-500 hover:bg-green-600 gap-2">
+                    <Plugs className="w-4 h-4" weight="duotone" />
                     Connect
                   </Button>
                 </div>

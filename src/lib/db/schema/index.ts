@@ -122,8 +122,14 @@ export const scheduledMeetings = pgTable("scheduled_meetings", {
   description: text("description"),
   scheduledTime: timestamp("scheduled_time", { withTimezone: true }).notNull(),
   durationMinutes: integer("duration_minutes").default(30).notNull(),
-  meetingLink: text("meeting_link"), // Zoom, Google Meet, etc.
+  meetingLink: text("meeting_link"), // Zoom, Google Meet, or custom link
   status: text("status").default("scheduled").notNull(), // scheduled, completed, cancelled
+
+  // Meeting provider integration
+  meetingProvider: text("meeting_provider").default("custom"), // 'zoom', 'google', 'custom'
+  providerMeetingId: text("provider_meeting_id"), // ID from Zoom/Google
+  providerHostUrl: text("provider_host_url"), // Host-specific join URL (for Zoom host controls)
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -172,6 +178,20 @@ export const schedulingPermissions = pgTable("scheduling_permissions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// User provider credentials - OAuth tokens for Zoom/Google Meet
+export const userProviderCredentials = pgTable("user_provider_credentials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull(),
+  provider: text("provider").notNull(), // 'zoom', 'google'
+  accessToken: text("access_token"), // Encrypted
+  refreshToken: text("refresh_token"), // Encrypted
+  tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+  providerUserId: text("provider_user_id"), // User's ID in the provider system
+  providerEmail: text("provider_email"), // User's email in the provider
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
@@ -185,3 +205,4 @@ export type AvailabilitySchedule = typeof availabilitySchedules.$inferSelect;
 export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
 export type MeetingParticipant = typeof meetingParticipants.$inferSelect;
 export type SchedulingPermission = typeof schedulingPermissions.$inferSelect;
+export type UserProviderCredential = typeof userProviderCredentials.$inferSelect;
