@@ -1,5 +1,68 @@
-// Notification service for Slack and Email
+// Notification service for Slack and Email (using MailerSend)
 import { decryptToken } from "@/lib/encryption";
+
+// ==========================================
+// MAILERSEND EMAIL HELPER
+// ==========================================
+
+interface MailerSendEmail {
+  to: string;
+  toName?: string;
+  subject: string;
+  html: string;
+}
+
+async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> {
+  const apiKey = process.env.MAILERSEND_API_KEY;
+
+  if (!apiKey) {
+    console.log('[Email] Skipping: MAILERSEND_API_KEY not configured');
+    return false;
+  }
+
+  // Use trial domain or custom domain
+  // Trial domain format: trial-xxxxx.mlsender.net
+  const fromEmail = process.env.MAILERSEND_FROM_EMAIL || 'notifications@trial-v69oxl5qq17g785k.mlsender.net';
+  const fromName = process.env.MAILERSEND_FROM_NAME || 'Attunly';
+
+  try {
+    console.log('[Email] Sending via MailerSend to:', email.to, 'Subject:', email.subject);
+
+    const response = await fetch('https://api.mailersend.com/v1/email', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: {
+          email: fromEmail,
+          name: fromName
+        },
+        to: [{
+          email: email.to,
+          name: email.toName || email.to.split('@')[0]
+        }],
+        subject: email.subject,
+        html: email.html
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[Email] MailerSend API error:', response.status, errorData);
+      return false;
+    }
+
+    // MailerSend returns 202 with x-message-id header on success
+    const messageId = response.headers.get('x-message-id');
+    console.log('[Email] Sent successfully, Message ID:', messageId);
+    return true;
+  } catch (error) {
+    console.error('[Email] Failed to send via MailerSend:', error);
+    return false;
+  }
+}
 
 interface MeetingNotificationData {
   meetingId: string;
@@ -227,14 +290,6 @@ export async function sendEmailMeetingNotification(
   participant: ParticipantData,
   meeting: MeetingNotificationData
 ): Promise<boolean> {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  // Check prerequisites and log why we're skipping
-  if (!resendApiKey) {
-    console.log('[Email] Skipping: RESEND_API_KEY not configured');
-    return false;
-  }
-
   if (!participant.email) {
     console.log('[Email] Skipping: No email address for participant', participant.userId);
     return false;
@@ -245,20 +300,19 @@ export async function sendEmailMeetingNotification(
     return false;
   }
 
-  try {
-    const formattedDate = new Date(meeting.scheduledTime).toLocaleString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
+  const formattedDate = new Date(meeting.scheduledTime).toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  });
 
-    const participantName = participant.firstName || 'there';
+  const participantName = participant.firstName || 'there';
 
-    const emailHtml = `
+  const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -269,7 +323,7 @@ export async function sendEmailMeetingNotification(
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <div style="background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">📅 Meeting Invite</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">Meeting Invite</h1>
     </div>
 
     <div style="padding: 32px;">
@@ -315,7 +369,7 @@ export async function sendEmailMeetingNotification(
       ` : ''}
 
       <div style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/meetings" style="color: #6366f1; text-decoration: none; font-size: 14px;">View all your meetings on Attunly →</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.app'}/meetings" style="color: #6366f1; text-decoration: none; font-size: 14px;">View all your meetings on Attunly</a>
       </div>
     </div>
 
@@ -325,40 +379,16 @@ export async function sendEmailMeetingNotification(
   </div>
 </body>
 </html>
-    `;
+  `;
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.app>';
-    const subject = `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`;
+  const subject = `Meeting Invite: ${meeting.title} - ${new Date(meeting.scheduledTime).toLocaleDateString()}`;
 
-    console.log('[Email] Sending to:', participant.email, 'Subject:', subject);
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: participant.email,
-        subject,
-        html: emailHtml
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Email] Resend API error:', response.status, errorData);
-      return false;
-    }
-
-    const result = await response.json().catch(() => ({}));
-    console.log('[Email] Sent successfully, ID:', result.id);
-    return true;
-  } catch (error) {
-    console.error('[Email] Failed to send notification:', error);
-    return false;
-  }
+  return sendEmailViaMailerSend({
+    to: participant.email,
+    toName: participantName,
+    subject,
+    html: emailHtml
+  });
 }
 
 // Send all notifications for a meeting participant
@@ -642,40 +672,31 @@ export async function sendNudgeResponseSlackDM(
 export async function sendEmailNudgeNotification(
   data: NudgeEmailData
 ): Promise<boolean> {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    console.log('[Email Nudge] Skipping: RESEND_API_KEY not configured');
-    return false;
-  }
-
   if (!data.recipientEmail) {
     console.log('[Email Nudge] Skipping: No recipient email');
     return false;
   }
 
-  try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
-    const recipientName = data.recipientName || 'there';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+  const recipientName = data.recipientName || 'there';
 
-    const actionText = data.nudgeType === 'offer'
-      ? `wants to help you with`
-      : `is looking for help with`;
+  const actionText = data.nudgeType === 'offer'
+    ? `wants to help you with`
+    : `is looking for help with`;
 
-    const actionEmoji = data.nudgeType === 'offer' ? '🤝' : '💡';
-    const headerText = data.nudgeType === 'offer'
-      ? 'Someone wants to help!'
-      : 'Someone needs your help!';
+  const headerText = data.nudgeType === 'offer'
+    ? 'Someone wants to help!'
+    : 'Someone needs your help!';
 
-    const meetingLengthText = data.meetingLength && data.meetingLength !== 'async'
-      ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Suggested meeting length: <strong>${data.meetingLength}</strong></p>`
-      : '';
+  const meetingLengthText = data.meetingLength && data.meetingLength !== 'async'
+    ? `<p style="color: #6b7280; font-size: 14px; margin: 8px 0 0;">Suggested meeting length: <strong>${data.meetingLength}</strong></p>`
+    : '';
 
-    const podLink = data.podCode
-      ? `<a href="${appUrl}/classes/${data.podCode}" style="color: #7c3aed; text-decoration: none;">View in ${data.podCode}</a>`
-      : `<a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View in Attunly</a>`;
+  const podLink = data.podCode
+    ? `<a href="${appUrl}/classes/${data.podCode}" style="color: #7c3aed; text-decoration: none;">View in ${data.podCode}</a>`
+    : `<a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View in Attunly</a>`;
 
-    const emailHtml = `
+  const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -686,7 +707,7 @@ export async function sendEmailNudgeNotification(
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <div style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${actionEmoji} ${headerText}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
     </div>
 
     <div style="padding: 32px;">
@@ -720,47 +741,23 @@ export async function sendEmailNudgeNotification(
     </div>
 
     <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • You can manage notification preferences in Settings</p>
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
     </div>
   </div>
 </body>
 </html>
-    `;
+  `;
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
-    const subject = data.nudgeType === 'offer'
-      ? `${data.senderName} wants to help you with ${data.topic}`
-      : `${data.senderName} needs help with ${data.topic}`;
+  const subject = data.nudgeType === 'offer'
+    ? `${data.senderName} wants to help you with ${data.topic}`
+    : `${data.senderName} needs help with ${data.topic}`;
 
-    console.log('[Email Nudge] Sending to:', data.recipientEmail, 'Subject:', subject);
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: data.recipientEmail,
-        subject,
-        html: emailHtml
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Email Nudge] Resend API error:', response.status, errorData);
-      return false;
-    }
-
-    const result = await response.json().catch(() => ({}));
-    console.log('[Email Nudge] Sent successfully, ID:', result.id);
-    return true;
-  } catch (error) {
-    console.error('[Email Nudge] Failed to send:', error);
-    return false;
-  }
+  return sendEmailViaMailerSend({
+    to: data.recipientEmail,
+    toName: recipientName,
+    subject,
+    html: emailHtml
+  });
 }
 
 // ==========================================
@@ -781,43 +778,34 @@ interface MeetingRsvpEmailData {
 export async function sendEmailMeetingRsvpNotification(
   data: MeetingRsvpEmailData
 ): Promise<boolean> {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    console.log('[Email MeetingRSVP] Skipping: RESEND_API_KEY not configured');
-    return false;
-  }
-
   if (!data.organizerEmail) {
     console.log('[Email MeetingRSVP] Skipping: No organizer email');
     return false;
   }
 
-  try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
-    const organizerName = data.organizerName || 'there';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+  const organizerName = data.organizerName || 'there';
 
-    const formattedDate = new Date(data.scheduledTime).toLocaleString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
+  const formattedDate = new Date(data.scheduledTime).toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  });
 
-    const emoji = data.status === 'accepted' ? '✅' : '❌';
-    const headerText = data.status === 'accepted' ? 'Meeting Accepted!' : 'Meeting Declined';
-    const headerColor = data.status === 'accepted'
-      ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
-      : 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)';
+  const headerText = data.status === 'accepted' ? 'Meeting Accepted!' : 'Meeting Declined';
+  const headerColor = data.status === 'accepted'
+    ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
+    : 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)';
 
-    const statusText = data.status === 'accepted'
-      ? `has accepted your meeting invitation`
-      : `has declined your meeting invitation`;
+  const statusText = data.status === 'accepted'
+    ? `has accepted your meeting invitation`
+    : `has declined your meeting invitation`;
 
-    const emailHtml = `
+  const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -828,7 +816,7 @@ export async function sendEmailMeetingRsvpNotification(
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <div style="background: ${headerColor}; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${emoji} ${headerText}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
     </div>
 
     <div style="padding: 32px;">
@@ -860,86 +848,53 @@ export async function sendEmailMeetingRsvpNotification(
     </div>
 
     <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • <a href="${appUrl}/meetings" style="color: #6366f1; text-decoration: none;">View all meetings</a></p>
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
     </div>
   </div>
 </body>
 </html>
-    `;
+  `;
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
-    const subject = data.status === 'accepted'
-      ? `${data.responderName} accepted: ${data.meetingTitle}`
-      : `${data.responderName} declined: ${data.meetingTitle}`;
+  const subject = data.status === 'accepted'
+    ? `${data.responderName} accepted: ${data.meetingTitle}`
+    : `${data.responderName} declined: ${data.meetingTitle}`;
 
-    console.log('[Email MeetingRSVP] Sending to:', data.organizerEmail, 'Subject:', subject);
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: data.organizerEmail,
-        subject,
-        html: emailHtml
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Email MeetingRSVP] Resend API error:', response.status, errorData);
-      return false;
-    }
-
-    const result = await response.json().catch(() => ({}));
-    console.log('[Email MeetingRSVP] Sent successfully, ID:', result.id);
-    return true;
-  } catch (error) {
-    console.error('[Email MeetingRSVP] Failed to send:', error);
-    return false;
-  }
+  return sendEmailViaMailerSend({
+    to: data.organizerEmail,
+    toName: organizerName,
+    subject,
+    html: emailHtml
+  });
 }
 
 // Send email notification when someone responds to a nudge
 export async function sendEmailNudgeResponseNotification(
   data: NudgeResponseEmailData
 ): Promise<boolean> {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    console.log('[Email NudgeResponse] Skipping: RESEND_API_KEY not configured');
-    return false;
-  }
-
   if (!data.recipientEmail) {
     console.log('[Email NudgeResponse] Skipping: No recipient email');
     return false;
   }
 
-  try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
-    const recipientName = data.recipientName || 'there';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://attunly.com';
+  const recipientName = data.recipientName || 'there';
 
-    const emoji = data.accepted ? '✅' : '⏰';
-    const headerText = data.accepted ? 'Nudge Accepted!' : 'Nudge Response';
-    const headerColor = data.accepted
-      ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
-      : 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)';
+  const headerText = data.accepted ? 'Nudge Accepted!' : 'Nudge Response';
+  const headerColor = data.accepted
+    ? 'linear-gradient(135deg, #059669 0%, #34d399 100%)'
+    : 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)';
 
-    const statusText = data.accepted
-      ? `accepted your nudge and wants to connect!`
-      : `isn't available right now, but thanks for reaching out.`;
+  const statusText = data.accepted
+    ? `accepted your nudge and wants to connect!`
+    : `isn't available right now, but thanks for reaching out.`;
 
-    const ctaButton = data.accepted
-      ? `<div style="text-align: center; margin-bottom: 24px;">
-          <a href="${appUrl}/meetings" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Schedule a Meeting</a>
-        </div>`
-      : '';
+  const ctaButton = data.accepted
+    ? `<div style="text-align: center; margin-bottom: 24px;">
+        <a href="${appUrl}/meetings" style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">Schedule a Meeting</a>
+      </div>`
+    : '';
 
-    const emailHtml = `
+  const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -950,7 +905,7 @@ export async function sendEmailNudgeResponseNotification(
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; padding: 40px 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
     <div style="background: ${headerColor}; padding: 32px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 24px;">${emoji} ${headerText}</h1>
+      <h1 style="color: white; margin: 0; font-size: 24px;">${headerText}</h1>
     </div>
 
     <div style="padding: 32px;">
@@ -975,51 +930,27 @@ export async function sendEmailNudgeResponseNotification(
       </p>
       ` : `
       <p style="color: #6b7280; font-size: 14px; text-align: center; margin: 0;">
-        No worries — try reaching out to someone else or check back later.
+        No worries - try reaching out to someone else or check back later.
       </p>
       `}
     </div>
 
     <div style="background: #f8fafc; padding: 16px 32px; text-align: center;">
-      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly • <a href="${appUrl}/notifications" style="color: #7c3aed; text-decoration: none;">View all notifications</a></p>
+      <p style="color: #9ca3af; font-size: 12px; margin: 0;">Sent via Attunly</p>
     </div>
   </div>
 </body>
 </html>
-    `;
+  `;
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'Attunly <notifications@attunly.com>';
-    const subject = data.accepted
-      ? `${data.responderName} accepted your nudge!`
-      : `${data.responderName} responded to your nudge`;
+  const subject = data.accepted
+    ? `${data.responderName} accepted your nudge!`
+    : `${data.responderName} responded to your nudge`;
 
-    console.log('[Email NudgeResponse] Sending to:', data.recipientEmail, 'Subject:', subject);
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: data.recipientEmail,
-        subject,
-        html: emailHtml
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Email NudgeResponse] Resend API error:', response.status, errorData);
-      return false;
-    }
-
-    const result = await response.json().catch(() => ({}));
-    console.log('[Email NudgeResponse] Sent successfully, ID:', result.id);
-    return true;
-  } catch (error) {
-    console.error('[Email NudgeResponse] Failed to send:', error);
-    return false;
-  }
+  return sendEmailViaMailerSend({
+    to: data.recipientEmail,
+    toName: recipientName,
+    subject,
+    html: emailHtml
+  });
 }
