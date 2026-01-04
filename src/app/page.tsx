@@ -107,6 +107,9 @@ export default function LandingPage() {
             <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               How it works
             </Link>
+            <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              Pricing
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -691,6 +694,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex items-center gap-8 text-sm text-gray-500">
+              <Link href="/pricing" className="hover:text-gray-900 transition-colors">Pricing</Link>
               <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms</Link>
               <Link href="mailto:support@attunly.com" className="hover:text-gray-900 transition-colors">Contact</Link>

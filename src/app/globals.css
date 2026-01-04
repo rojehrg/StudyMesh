@@ -145,6 +145,15 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* SVG rendering optimization for crisp scaling */
+  svg {
+    shape-rendering: geometricPrecision;
+  }
+  img[src$=".svg"] {
+    image-rendering: optimizeQuality;
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 /* Animations */

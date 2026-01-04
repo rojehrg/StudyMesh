@@ -372,7 +372,7 @@ function SettingsContent() {
   const baseTabs = [
     { id: "profile", label: "Profile", icon: User01 },
     { id: "availability", label: "Availability", icon: Clock },
-    { id: "notifications", label: "Notifications", icon: Mail },
+    { id: "integrations", label: "Integrations", icon: LinkIcon },
     { id: "organization", label: "Organization", icon: Building01 },
   ];
 
@@ -537,8 +537,8 @@ function SettingsContent() {
         </Card>
       )}
 
-      {/* Notifications Tab */}
-      {activeTab === "notifications" && (
+      {/* Integrations Tab */}
+      {activeTab === "integrations" && (
         <div className="space-y-6">
           {/* Email */}
           <Card>
@@ -579,7 +579,7 @@ function SettingsContent() {
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
-                <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
+                <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
                 <div>
                   <CardTitle className="text-base font-semibold">Slack Integration</CardTitle>
                   <CardDescription>Get notified directly in Slack</CardDescription>
@@ -609,7 +609,7 @@ function SettingsContent() {
                 <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
-                      <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
+                      <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Connect Slack</p>
@@ -620,7 +620,7 @@ function SettingsContent() {
                     {slackConnecting ? (
                       <Loading className="w-4 h-4 animate-spin" />
                     ) : (
-                      <img src="/slack-logo.png" alt="" className="w-4 h-4" />
+                      <img src="/slack-icon.svg" alt="" className="w-4 h-4" />
                     )}
                     Connect
                   </Button>
@@ -633,7 +633,7 @@ function SettingsContent() {
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
-                <Camera className="w-6 h-6 text-primary" />
+                <img src="/zoom-icon.svg" alt="Video" className="w-6 h-6" />
                 <div>
                   <CardTitle className="text-base font-semibold">Video Conferencing</CardTitle>
                   <CardDescription>Auto-generate meeting links when scheduling</CardDescription>
@@ -645,8 +645,8 @@ function SettingsContent() {
               {meetingProviders.zoom ? (
                 <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-                      <Camera className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                      <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Zoom Connected</p>
@@ -668,16 +668,16 @@ function SettingsContent() {
               ) : (
                 <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                      <Camera className="w-5 h-5 text-blue-500" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                      <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Zoom</p>
                       <p className="text-sm text-muted-foreground">Create Zoom meetings automatically</p>
                     </div>
                   </div>
-                  <Button onClick={connectZoom} className="bg-blue-500 hover:bg-blue-600 gap-2">
-                    <Instance className="w-4 h-4" />
+                  <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681F2] gap-2">
+                    <img src="/zoom-icon.svg" alt="" className="w-4 h-4" />
                     Connect
                   </Button>
                 </div>
@@ -999,31 +999,43 @@ function SettingsContent() {
 
           {/* Usage Stats */}
           <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Usage</CardTitle>
-              <CardDescription>Your current plan limits</CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold">Usage Overview</CardTitle>
+              <CardDescription>Your current usage vs plan limits</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/50 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
+            <CardContent className="space-y-4">
+              {/* Seats Usage */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <User01 className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">Seats</span>
+                    <span className="text-sm font-medium text-foreground">Team Seats</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">{subscription?.seats || 1}</p>
-                  <p className="text-xs text-muted-foreground">
-                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}`} available
-                  </p>
+                  <span className="text-sm text-muted-foreground">
+                    {subscription?.seats || 1} / {plan === 'enterprise' ? '∞' : plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}
+                  </span>
                 </div>
-                <div className="p-4 bg-muted/50 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${Math.min(((subscription?.seats || 1) / (plan === 'free' ? 5 : plan === 'starter' ? 20 : 100)) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Pods Usage */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <Building01 className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">Pods</span>
+                    <span className="text-sm font-medium text-foreground">Active Pods</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">-</p>
-                  <p className="text-xs text-muted-foreground">
-                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}`} available
-                  </p>
+                  <span className="text-sm text-muted-foreground">
+                    - / {plan === 'enterprise' ? '∞' : plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary/50 rounded-full" style={{ width: '0%' }} />
                 </div>
               </div>
             </CardContent>

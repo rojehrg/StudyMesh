@@ -255,7 +255,7 @@ export default function MeetingsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="gap-2 border-border/60 hover:bg-accent hover:border-primary/30 dark:border-border/40 dark:hover:bg-accent/80 transition-colors"
+                            className="gap-2 bg-card hover:bg-accent border-border hover:border-primary/40 transition-colors"
                             onClick={() => {
                               const url = generateGoogleCalendarUrl({
                                 title: meeting.title,
@@ -274,9 +274,9 @@ export default function MeetingsPage() {
                             <img
                               src="/google-calendar-icon.svg"
                               alt=""
-                              className="w-4 h-4"
+                              className="w-5 h-5"
                             />
-                            <span className="hidden sm:inline">Add to Calendar</span>
+                            <span className="hidden sm:inline text-foreground">Calendar</span>
                           </Button>
 
                           {meeting.role === 'participant' && meeting.myRsvp === 'pending' && (

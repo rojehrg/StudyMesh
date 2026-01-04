@@ -27,6 +27,14 @@ import { Loader2, Users, Calendar, Clock, Video, Search, Check, Link2 } from "lu
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
+// Convert 24-hour time string (HH:MM) to 12-hour format
+function formatTimeTo12Hour(time: string): string {
+  const [hours, minutes] = time.split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  return `${displayHour}:${minutes.toString().padStart(2, '0')}${period}`;
+}
+
 type MeetingProvider = 'zoom' | 'custom';
 
 interface ConnectedProviders {
@@ -521,7 +529,7 @@ export function ScheduleMeetingDialog({
                                   className="gap-1"
                                 >
                                   <Clock className="w-3 h-3" />
-                                  {slot.start} - {slot.end}
+                                  {formatTimeTo12Hour(slot.start)} - {formatTimeTo12Hour(slot.end)}
                                 </Button>
                               );
                             })}
@@ -578,7 +586,7 @@ export function ScheduleMeetingDialog({
               {selectedDay !== null && selectedTime && (
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <p className="text-sm text-primary font-medium">
-                    Selected: {dayNames[selectedDay]} at {selectedTime} ({duration} min)
+                    Selected: {dayNames[selectedDay]} at {formatTimeTo12Hour(selectedTime)} ({duration} min)
                   </p>
                 </div>
               )}
@@ -715,7 +723,7 @@ export function ScheduleMeetingDialog({
               <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                 <p className="font-medium text-foreground">Meeting Summary</p>
                 <div className="text-sm text-muted-foreground space-y-1">
-                  <p><strong>When:</strong> {selectedDay !== null ? dayNames[selectedDay] : ''} at {selectedTime} ({duration} min)</p>
+                  <p><strong>When:</strong> {selectedDay !== null ? dayNames[selectedDay] : ''} at {selectedTime ? formatTimeTo12Hour(selectedTime) : ''} ({duration} min)</p>
                   <p><strong>Participants:</strong> {selectedMembers.length} people</p>
                   {selectedPod && (
                     <p><strong>Pod:</strong> {pods.find(p => p.id === selectedPod)?.pod_name}</p>
