@@ -16,7 +16,7 @@ import {
   ArrowRightMd,
   ChevronLeft,
   Shield,
-  Zap,
+  TrendingUp,
   Clock,
 } from "react-coolicons";
 
@@ -312,7 +312,7 @@ export default function PricingPage() {
               <span className="text-sm font-medium">SOC 2 Compliant</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
-              <Zap className="w-5 h-5 text-violet-500" />
+              <TrendingUp className="w-5 h-5 text-violet-500" />
               <span className="text-sm font-medium">99.9% Uptime SLA</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
