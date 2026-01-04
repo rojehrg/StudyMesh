@@ -85,8 +85,8 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
   );
 }
 
-// Inner component that uses the realtime context
-function DashboardLayoutInner({
+// Base layout component (doesn't use realtime hooks)
+function DashboardLayoutBase({
   children,
   profile,
   isCollapsed,
@@ -94,7 +94,8 @@ function DashboardLayoutInner({
   isMobileOpen,
   setIsMobileOpen,
   pathname,
-  handleLogout
+  handleLogout,
+  unreadCount = 0
 }: {
   children: React.ReactNode;
   profile: any;
@@ -104,36 +105,8 @@ function DashboardLayoutInner({
   setIsMobileOpen: (v: boolean) => void;
   pathname: string;
   handleLogout: () => void;
+  unreadCount?: number;
 }) {
-  // Get notification count from realtime context
-  const { newNotificationCount } = useRealtime();
-  const [unreadCount, setUnreadCount] = useState(0);
-  const supabase = createClient();
-
-  // Load initial unread count
-  useEffect(() => {
-    const loadUnreadCount = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('recipient_id', user.id)
-        .eq('read', false);
-
-      setUnreadCount(count || 0);
-    };
-    loadUnreadCount();
-  }, [supabase]);
-
-  // Update count when new notifications arrive
-  useEffect(() => {
-    if (newNotificationCount > 0) {
-      setUnreadCount(prev => prev + newNotificationCount);
-    }
-  }, [newNotificationCount]);
-
   const totalUnread = unreadCount;
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
@@ -297,6 +270,70 @@ function DashboardLayoutInner({
   );
 }
 
+// Wrapper that uses realtime context (only rendered when provider exists)
+function DashboardLayoutWithRealtime({
+  children,
+  profile,
+  isCollapsed,
+  setIsCollapsed,
+  isMobileOpen,
+  setIsMobileOpen,
+  pathname,
+  handleLogout
+}: {
+  children: React.ReactNode;
+  profile: any;
+  isCollapsed: boolean;
+  setIsCollapsed: (v: boolean) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (v: boolean) => void;
+  pathname: string;
+  handleLogout: () => void;
+}) {
+  const { newNotificationCount } = useRealtime();
+  const [unreadCount, setUnreadCount] = useState(0);
+  const supabase = createClient();
+
+  // Load initial unread count
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', user.id)
+        .eq('read', false);
+
+      setUnreadCount(count || 0);
+    };
+    loadUnreadCount();
+  }, [supabase]);
+
+  // Update count when new notifications arrive
+  useEffect(() => {
+    if (newNotificationCount > 0) {
+      setUnreadCount(prev => prev + newNotificationCount);
+    }
+  }, [newNotificationCount]);
+
+  return (
+    <DashboardLayoutBase
+      profile={profile}
+      isCollapsed={isCollapsed}
+      setIsCollapsed={setIsCollapsed}
+      isMobileOpen={isMobileOpen}
+      setIsMobileOpen={setIsMobileOpen}
+      pathname={pathname}
+      handleLogout={handleLogout}
+      unreadCount={unreadCount}
+    >
+      {children}
+    </DashboardLayoutBase>
+  );
+}
+
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -349,7 +386,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (userId) {
     return (
       <RealtimeProvider userId={userId}>
-        <DashboardLayoutInner
+        <DashboardLayoutWithRealtime
           profile={profile}
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
@@ -359,14 +396,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           handleLogout={handleLogout}
         >
           {children}
-        </DashboardLayoutInner>
+        </DashboardLayoutWithRealtime>
       </RealtimeProvider>
     );
   }
 
-  // Render without RealtimeProvider while loading
+  // Render without RealtimeProvider while loading (no realtime hooks)
   return (
-    <DashboardLayoutInner
+    <DashboardLayoutBase
       profile={profile}
       isCollapsed={isCollapsed}
       setIsCollapsed={setIsCollapsed}
@@ -374,9 +411,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       setIsMobileOpen={setIsMobileOpen}
       pathname={pathname}
       handleLogout={handleLogout}
+      unreadCount={0}
     >
       {children}
-    </DashboardLayoutInner>
+    </DashboardLayoutBase>
   );
 }
 

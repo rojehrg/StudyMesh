@@ -61,16 +61,21 @@ export default function FindHelpPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_id, knowledge_areas, expertise_skills, expertise_text, timezone, availability')
+        .select('user_id, expertise_skills, expertise_text, timezone, availability')
         .eq('user_id', user.id)
         .single();
+
+      if (profileError) {
+        console.error('Error loading profile:', profileError);
+        return;
+      }
 
       if (profile) {
         setCurrentUser({
           userId: profile.user_id,
-          knowledgeAreas: profile.knowledge_areas || profile.expertise_skills || [],
+          knowledgeAreas: profile.expertise_skills || [],
           timezone: profile.timezone,
           availabilitySlots: profile.availability?.slots || [],
         });
