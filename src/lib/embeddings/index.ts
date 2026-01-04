@@ -6,25 +6,21 @@
  * Dimensions: 384
  */
 
-import { pipeline, env } from '@xenova/transformers';
-
-// Configure for browser usage
-env.allowLocalModels = false;
-env.useBrowserCache = true;
-
-// Pipeline type for feature extraction
-type FeatureExtractionPipeline = Awaited<ReturnType<typeof pipeline<'feature-extraction'>>>;
-
 // Singleton embedder instance
-let embedder: FeatureExtractionPipeline | null = null;
+let embedder: any = null;
 let isLoading = false;
-let loadPromise: Promise<FeatureExtractionPipeline> | null = null;
+let loadPromise: Promise<any> | null = null;
 
 /**
  * Get or initialize the embedding model
  * Model downloads once and is cached in IndexedDB
  */
-export async function getEmbedder(): Promise<FeatureExtractionPipeline> {
+export async function getEmbedder(): Promise<any> {
+  // Only run in browser
+  if (typeof window === 'undefined') {
+    throw new Error('Embeddings can only be generated in the browser');
+  }
+
   if (embedder) {
     return embedder;
   }
@@ -34,13 +30,25 @@ export async function getEmbedder(): Promise<FeatureExtractionPipeline> {
   }
 
   isLoading = true;
-  loadPromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
-    progress_callback: (progress: { status: string; progress?: number }) => {
-      if (progress.status === 'progress' && progress.progress) {
-        console.log(`Loading embedding model: ${Math.round(progress.progress)}%`);
-      }
-    },
-  });
+
+  // Dynamic import to avoid SSR issues
+  loadPromise = (async () => {
+    const { pipeline, env } = await import('@xenova/transformers');
+
+    // Configure for browser usage
+    env.allowLocalModels = false;
+    env.useBrowserCache = true;
+
+    const model = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+      progress_callback: (progress: { status: string; progress?: number }) => {
+        if (progress.status === 'progress' && progress.progress) {
+          console.log(`Loading embedding model: ${Math.round(progress.progress)}%`);
+        }
+      },
+    });
+
+    return model;
+  })();
 
   try {
     embedder = await loadPromise;
@@ -58,6 +66,10 @@ export async function getEmbedder(): Promise<FeatureExtractionPipeline> {
  * Returns a 384-dimensional vector
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
+  if (typeof window === 'undefined') {
+    throw new Error('Embeddings can only be generated in the browser');
+  }
+
   if (!text || text.trim().length === 0) {
     throw new Error('Text cannot be empty');
   }
@@ -92,5 +104,8 @@ export function isModelReady(): boolean {
  * Preload the model (call early to reduce latency)
  */
 export async function preloadModel(): Promise<void> {
+  if (typeof window === 'undefined') {
+    return; // Skip on server
+  }
   await getEmbedder();
 }
