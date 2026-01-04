@@ -55,7 +55,7 @@ export default function FindHelpPage() {
   const { embed, ready: embeddingReady, generating: embeddingGenerating } = useEmbeddings();
   const supabase = createClient();
 
-  // Load current user profile for nudge dialog
+  // Load current user profile and generate their expertise embedding if needed
   useEffect(() => {
     const loadCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -63,7 +63,7 @@ export default function FindHelpPage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('user_id, knowledge_areas, expertise_skills, timezone, availability')
+        .select('user_id, knowledge_areas, expertise_skills, expertise_text, timezone, availability')
         .eq('user_id', user.id)
         .single();
 
@@ -74,11 +74,27 @@ export default function FindHelpPage() {
           timezone: profile.timezone,
           availabilitySlots: profile.availability?.slots || [],
         });
+
+        // Generate and save expertise embedding if user has expertise text but embedding might be missing
+        if (profile.expertise_text && embeddingReady) {
+          try {
+            const embedding = await embed(profile.expertise_text);
+            await fetch('/api/profile/expertise', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ expertiseText: profile.expertise_text, embedding }),
+            });
+          } catch (err) {
+            console.error('Failed to generate expertise embedding:', err);
+          }
+        }
       }
     };
 
-    loadCurrentUser();
-  }, [supabase]);
+    if (embeddingReady) {
+      loadCurrentUser();
+    }
+  }, [supabase, embeddingReady, embed]);
 
   const handleSearch = useCallback(async () => {
     if (!query.trim() || !embeddingReady) return;

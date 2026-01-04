@@ -17,7 +17,6 @@ import { AvailabilityGrid, type AvailabilitySlot } from "@/components/availabili
 import { usePlanFeatures, getPlanDisplayName, getPlanPricing, type PlanName } from "@/hooks/use-plan-features";
 import { useThemeCustomization } from "@/contexts/theme-customization-context";
 import { ThemeColorPicker } from "@/components/theme-color-picker";
-import { useEmbeddings } from "@/hooks/use-embeddings";
 
 const SUGGESTED_KNOWLEDGE_AREAS = [
   "JavaScript", "TypeScript", "Python", "React", "Node.js", "SQL", "AWS",
@@ -95,7 +94,6 @@ export default function SettingsPage() {
   const [expertiseSaving, setExpertiseSaving] = useState(false);
 
   const supabase = createClient();
-  const { embed, ready: embeddingReady, generating: embeddingGenerating } = useEmbeddings();
 
   useEffect(() => {
     // Handle OAuth callbacks
@@ -313,37 +311,19 @@ export default function SettingsPage() {
     }
   };
 
-  // Save expertise text with embedding (separate from auto-save to handle async embedding)
+  // Save expertise text (embedding generated on Find Help page)
   const saveExpertise = useCallback(async (text: string) => {
     if (expertiseTimeoutRef.current) {
       clearTimeout(expertiseTimeoutRef.current);
     }
 
     expertiseTimeoutRef.current = setTimeout(async () => {
-      if (!text.trim()) {
-        // Clear expertise if empty
-        try {
-          await fetch('/api/profile/expertise', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ expertiseText: '', embedding: null }),
-          });
-        } catch {
-          console.error('Failed to clear expertise');
-        }
-        return;
-      }
-
       setExpertiseSaving(true);
       try {
-        // Generate embedding client-side
-        const embedding = await embed(text);
-
-        // Save both text and embedding
         const response = await fetch('/api/profile/expertise', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expertiseText: text, embedding }),
+          body: JSON.stringify({ expertiseText: text, embedding: null }),
         });
 
         if (!response.ok) {
@@ -355,8 +335,8 @@ export default function SettingsPage() {
       } finally {
         setExpertiseSaving(false);
       }
-    }, 1500); // 1.5s debounce for expertise (longer because of embedding generation)
-  }, [embed]);
+    }, 1000);
+  }, []);
 
   // Handle expertise text changes
   const handleExpertiseChange = (text: string) => {
@@ -499,15 +479,9 @@ export default function SettingsPage() {
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
                 <CardTitle className="text-base font-semibold">What can you help with?</CardTitle>
-                {!embeddingReady && (
-                  <Badge variant="secondary" className="text-xs bg-muted">
-                    <CircleNotch className="w-3 h-3 animate-spin mr-1" weight="duotone" />
-                    Loading AI
-                  </Badge>
-                )}
                 {expertiseSaving && (
                   <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    <Sparkle className="w-3 h-3 mr-1" weight="duotone" />
+                    <CircleNotch className="w-3 h-3 animate-spin mr-1" weight="duotone" />
                     Saving...
                   </Badge>
                 )}
@@ -528,10 +502,10 @@ export default function SettingsPage() {
               />
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>{profile.expertiseText?.length || 0}/500 characters</span>
-                {embeddingReady && profile.expertiseText && !expertiseSaving && (
+                {profile.expertiseText && !expertiseSaving && (
                   <span className="flex items-center gap-1 text-success">
                     <Check className="w-3 h-3" weight="bold" />
-                    AI-indexed
+                    Saved
                   </span>
                 )}
               </div>
