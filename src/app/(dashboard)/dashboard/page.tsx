@@ -146,20 +146,31 @@ export default async function DashboardPage() {
   // Gamified onboarding checklist items
   const onboardingItems = [
     {
+      id: "profile",
+      label: "Complete your profile",
+      description: "Add your title and department to help teammates know you.",
+      done: !!profile.department && !!profile.major,
+      href: "/settings",
+      action: "Complete",
+      priority: 1,
+    },
+    {
       id: "skills",
-      label: "Add your skills",
+      label: "Add your expertise",
       description: "Tell us what you're great at so teammates can find you.",
-      done: knowledgeAreas.length > 0,
+      done: knowledgeAreas.length > 0 || !!profile.expertise_text,
       href: "/settings",
       action: "Add skills",
+      priority: 2,
     },
     {
       id: "availability",
       label: "Set your availability",
       description: "Let others know when you're free to help.",
       done: !!profile.availability?.slots?.length,
-      href: "/settings",
+      href: "/settings?tab=availability",
       action: "Set times",
+      priority: 3,
     },
     {
       id: "pod",
@@ -168,6 +179,16 @@ export default async function DashboardPage() {
       done: podIds.length > 0,
       href: "/classes",
       action: "Get started",
+      priority: 4,
+    },
+    {
+      id: "slack",
+      label: "Connect Slack",
+      description: "Get nudge notifications directly in Slack DMs.",
+      done: !!profile.slack_connected,
+      href: "/settings?tab=integrations",
+      action: "Connect",
+      priority: 5,
     },
     {
       id: "nudge",
@@ -175,17 +196,10 @@ export default async function DashboardPage() {
       description: hasTeammates
         ? "Reach out to a teammate for help or offer your expertise."
         : "Invite teammates to your pod first, then you can nudge them.",
-      done: hasSentFirstNudge || (podIds.length > 0 && !hasTeammates),
-      href: pods.length > 0 ? `/classes/${pods[0]?.pod_code}` : "/classes",
-      action: hasTeammates ? "Nudge" : "Invite",
-    },
-    {
-      id: "profile",
-      label: "Complete your profile",
-      description: "Add your title and department to help teammates know you.",
-      done: !!profile.department && !!profile.major,
-      href: "/settings",
-      action: "Complete",
+      done: hasSentFirstNudge,
+      href: hasTeammates && pods.length > 0 ? `/classes/${pods[0]?.pod_code}` : "/find-help",
+      action: hasTeammates ? "Nudge someone" : "Find help",
+      priority: 6,
     },
   ];
 

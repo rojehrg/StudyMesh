@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Circle, ChevronDown, ChevronUp, Sparkles, ArrowRight, X } from "lucide-react";
+import { Check, Circle, ChevronDown, ChevronUp, Sparkles, ArrowRight, X, Trophy, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface ChecklistItem {
@@ -16,6 +15,7 @@ interface ChecklistItem {
   done: boolean;
   href?: string;
   action?: string;
+  priority?: number; // Lower = more important
 }
 
 interface OnboardingChecklistProps {
@@ -24,19 +24,32 @@ interface OnboardingChecklistProps {
   className?: string;
 }
 
+const STORAGE_KEY = "onboarding-checklist-dismissed";
+const CELEBRATION_KEY = "onboarding-celebration-shown";
+
 export function OnboardingChecklist({ items, onDismiss, className }: OnboardingChecklistProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [dismissed, setDismissed] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Check localStorage on mount
+  useEffect(() => {
+    setMounted(true);
+    const wasDismissed = localStorage.getItem(STORAGE_KEY) === "true";
+    setDismissed(wasDismissed);
+  }, []);
 
   // Add "Account created" as first item (always done - Endowed Progress Effect)
   const allItems: ChecklistItem[] = [
     {
       id: "account",
       label: "Create your account",
-      description: "You're in! Welcome to MeshFlow.",
+      description: "You're in! Welcome to Attunly.",
       done: true,
+      priority: 0,
     },
-    ...items,
+    ...items.map((item, idx) => ({ ...item, priority: item.priority ?? idx + 1 })),
   ];
 
   const completedCount = allItems.filter(item => item.done).length;
@@ -44,7 +57,107 @@ export function OnboardingChecklist({ items, onDismiss, className }: OnboardingC
   const progress = Math.round((completedCount / totalCount) * 100);
   const allComplete = completedCount === totalCount;
 
-  // Don't show if dismissed or all complete
+  // Show celebration when all complete (only once)
+  useEffect(() => {
+    if (allComplete && mounted) {
+      const celebrationShown = localStorage.getItem(CELEBRATION_KEY) === "true";
+      if (!celebrationShown) {
+        setShowCelebration(true);
+        localStorage.setItem(CELEBRATION_KEY, "true");
+        // Auto-hide celebration after 5 seconds
+        const timer = setTimeout(() => setShowCelebration(false), 5000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [allComplete, mounted]);
+
+  const handleDismiss = useCallback(() => {
+    setDismissed(true);
+    localStorage.setItem(STORAGE_KEY, "true");
+    onDismiss?.();
+  }, [onDismiss]);
+
+  // Don't render until mounted (prevents hydration mismatch)
+  if (!mounted) return null;
+
+  // Show celebration screen when all complete
+  if (allComplete && showCelebration) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={cn("relative", className)}
+      >
+        <Card className="border-success/30 bg-gradient-to-br from-success/10 to-primary/10 overflow-hidden">
+          <CardContent className="py-8 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 10 }}
+              className="w-20 h-20 mx-auto mb-4 rounded-full bg-success/20 flex items-center justify-center"
+            >
+              <Trophy className="w-10 h-10 text-success" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                You're all set!
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                You've completed all the setup steps. Time to start collaborating!
+              </p>
+              <div className="flex justify-center gap-3">
+                <Button asChild>
+                  <Link href="/find-help">
+                    Find Help
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" onClick={() => setShowCelebration(false)}>
+                  Dismiss
+                </Button>
+              </div>
+            </motion.div>
+            {/* Confetti-like particles */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{
+                    opacity: 1,
+                    y: "50%",
+                    x: `${50 + (Math.random() - 0.5) * 20}%`,
+                    scale: 0
+                  }}
+                  animate={{
+                    opacity: 0,
+                    y: "-100%",
+                    x: `${50 + (Math.random() - 0.5) * 100}%`,
+                    scale: 1,
+                    rotate: Math.random() * 360
+                  }}
+                  transition={{
+                    duration: 2 + Math.random(),
+                    delay: i * 0.1,
+                    ease: "easeOut"
+                  }}
+                  className={cn(
+                    "absolute w-3 h-3 rounded-full",
+                    i % 3 === 0 ? "bg-success" : i % 3 === 1 ? "bg-primary" : "bg-accent"
+                  )}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  // Don't show if dismissed or all complete (and celebration already shown)
   if (dismissed || allComplete) {
     return null;
   }
@@ -97,19 +210,15 @@ export function OnboardingChecklist({ items, onDismiss, className }: OnboardingC
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              {onDismiss && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={() => {
-                    setDismissed(true);
-                    onDismiss();
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={handleDismiss}
+                title="Dismiss checklist"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </CardHeader>
