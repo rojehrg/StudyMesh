@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-const HF_API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2";
+// Use the Hugging Face router for inference
+const HF_API_URL = "https://router.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2";
 
 export async function POST(request: Request) {
   try {
@@ -27,10 +28,8 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Hugging Face API error:", response.status, errorText);
-      return NextResponse.json(
-        { error: "Failed to generate embedding" },
-        { status: 500 }
-      );
+      // Return empty embedding to allow text search fallback
+      return NextResponse.json({ embedding: null, fallback: true });
     }
 
     const embedding = await response.json();
@@ -42,9 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ embedding: vector });
   } catch (error) {
     console.error("Embedding generation error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    // Return null to allow text search fallback instead of 500
+    return NextResponse.json({ embedding: null, fallback: true });
   }
 }

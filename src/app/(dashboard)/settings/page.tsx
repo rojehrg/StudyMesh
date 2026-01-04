@@ -1089,6 +1089,102 @@ function SettingsContent() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Leave Organization - For non-owners */}
+              {!org.isOwner && (
+                <Card className="border-destructive/30">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-base font-semibold">Leave Organization</CardTitle>
+                    <CardDescription>Remove yourself from {org.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        You'll lose access to all pods and data in this organization.
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={async () => {
+                          if (!confirm('Are you sure you want to leave this organization? This cannot be undone.')) return;
+                          try {
+                            const { error } = await supabase
+                              .from('profiles')
+                              .update({ organization_id: null })
+                              .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+                            if (error) throw error;
+                            toast.success('Left organization');
+                            window.location.href = '/org-setup';
+                          } catch (err) {
+                            toast.error('Failed to leave organization');
+                          }
+                        }}
+                      >
+                        Leave Organization
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Delete Organization - For owners */}
+              {org.isOwner && (
+                <Card className="border-destructive/30">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-base font-semibold text-destructive">Danger Zone</CardTitle>
+                    <CardDescription>Irreversible actions for {org.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-xl">
+                      <div>
+                        <p className="font-medium text-foreground">Delete Organization</p>
+                        <p className="text-sm text-muted-foreground">
+                          Permanently delete this organization and all its data
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={async () => {
+                          const confirmText = prompt(
+                            `This will permanently delete "${org.name}" and all its pods, members data, and settings.\n\nType the organization name to confirm:`
+                          );
+                          if (confirmText !== org.name) {
+                            if (confirmText !== null) {
+                              toast.error('Organization name did not match');
+                            }
+                            return;
+                          }
+                          try {
+                            // First remove all members from org
+                            const { error: memberError } = await supabase
+                              .from('profiles')
+                              .update({ organization_id: null })
+                              .eq('organization_id', org.id);
+                            if (memberError) throw memberError;
+
+                            // Then delete the organization
+                            const { error: orgError } = await supabase
+                              .from('organizations')
+                              .delete()
+                              .eq('id', org.id);
+                            if (orgError) throw orgError;
+
+                            toast.success('Organization deleted');
+                            window.location.href = '/org-setup';
+                          } catch (err) {
+                            console.error('Delete org error:', err);
+                            toast.error('Failed to delete organization');
+                          }
+                        }}
+                      >
+                        <TrashFull className="w-4 h-4 mr-2" />
+                        Delete Organization
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </>
           ) : (
             <Card>

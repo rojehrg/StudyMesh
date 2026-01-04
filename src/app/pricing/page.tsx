@@ -122,7 +122,7 @@ export default function PricingPage() {
               </span>
             </Link>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" className="text-gray-600 hover:text-gray-900" asChild>
+              <Button variant="ghost" className="font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50" asChild>
                 <Link href="/login">Log in</Link>
               </Button>
               <Button className="bg-violet-600 hover:bg-violet-700 text-white" asChild>

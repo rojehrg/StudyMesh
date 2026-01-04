@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { serverAnalytics } from "@/lib/analytics";
+import { semanticMatch } from "@/lib/ai/semantic-search";
 
 /**
  * POST /api/find-help
  *
- * Find people with matching expertise using vector similarity search.
- * Falls back to text search if embedding is not provided.
+ * Find people with matching expertise using AI-powered semantic search.
+ * Uses Groq (free) for intelligent matching.
+ * Falls back to text search if AI is not configured.
  */
 export async function POST(request: Request) {
   try {
@@ -18,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { queryEmbedding, queryText, limit = 10 } = body;
+    const { queryText, limit = 10 } = body;
 
     // Get user's organization
     const { data: profile } = await supabase
@@ -34,38 +36,110 @@ export async function POST(request: Request) {
       );
     }
 
-    // Try vector search if embedding is provided
-    if (queryEmbedding && Array.isArray(queryEmbedding)) {
-      const { data: matches, error } = await supabase.rpc('find_similar_expertise', {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
-        org_id: profile.organization_id,
-        current_user_id: user.id,
-        match_count: limit,
-      });
+    // Fetch all profiles with expertise in the org (excluding current user)
+    const { data: allProfiles, error: fetchError } = await supabase
+      .from('profiles')
+      .select(`
+        user_id,
+        first_name,
+        last_name,
+        expertise_text,
+        major,
+        department,
+        timezone,
+        availability,
+        slack_user_id
+      `)
+      .eq('organization_id', profile.organization_id)
+      .neq('user_id', user.id)
+      .not('expertise_text', 'is', null);
 
-      if (!error && matches && matches.length > 0) {
-        // Track search
-        serverAnalytics.findHelpSearched(user.id, queryText || 'embedding', matches.length);
+    if (fetchError) {
+      console.error('Failed to fetch profiles:', fetchError);
+      return NextResponse.json({ error: "Search failed" }, { status: 500 });
+    }
+
+    if (!allProfiles || allProfiles.length === 0) {
+      return NextResponse.json({
+        success: true,
+        matches: [],
+        searchType: 'none',
+        message: 'No teammates with expertise found',
+      });
+    }
+
+    // Try AI-powered semantic search first (Groq - free)
+    if (queryText && queryText.trim() && process.env.GROQ_API_KEY) {
+      const aiMatches = await semanticMatch(queryText, allProfiles.map(p => ({
+        user_id: p.user_id,
+        first_name: p.first_name || '',
+        last_name: p.last_name || '',
+        expertise_text: p.expertise_text || '',
+        department: p.department || undefined,
+        major: p.major || undefined,
+      })));
+
+      // Check for rate limit marker
+      const rateLimited = aiMatches.find(m => m.user_id === '__RATE_LIMITED__');
+      if (rateLimited) {
+        // Fall through to text search, but we'll add a warning
+        console.warn('AI rate limited, using text search fallback');
+      } else if (aiMatches.length > 0) {
+        // Map AI results back to full profiles
+        const profileMap = new Map(allProfiles.map(p => [p.user_id, p]));
+        const matches = aiMatches.slice(0, limit).map(match => {
+          const p = profileMap.get(match.user_id)!;
+          return {
+            user_id: p.user_id,
+            first_name: p.first_name,
+            last_name: p.last_name,
+            expertise_text: p.expertise_text,
+            similarity: match.score / 100,
+            match_reason: match.reason,
+            currently_available: p.availability?.currentlyAvailable || false,
+            major: p.major,
+            department: p.department,
+            timezone: p.timezone,
+            availability_slots: p.availability?.slots || [],
+            slack_connected: !!p.slack_user_id,
+          };
+        });
+
+        serverAnalytics.findHelpSearched(user.id, queryText, matches.length);
         return NextResponse.json({
           success: true,
-          matches: matches,
+          matches,
           searchType: 'ai',
         });
-      }
-
-      // If vector search returns no results or fails, fall through to text search
-      if (error) {
-        console.error('Vector search error, falling back to text:', error.message);
       }
     }
 
     // Fallback: Text search using ILIKE on expertise_text
     if (queryText && queryText.trim()) {
-      const searchTerms = queryText.toLowerCase().split(/\s+/).filter((t: string) => t.length > 2);
+      // Common stop words to filter out
+      const stopWords = new Set([
+        'i', 'me', 'my', 'we', 'our', 'you', 'your', 'the', 'a', 'an',
+        'is', 'are', 'was', 'were', 'be', 'been', 'being',
+        'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should',
+        'can', 'may', 'might', 'must', 'shall',
+        'need', 'want', 'looking', 'find', 'help', 'with', 'for', 'about',
+        'someone', 'anybody', 'anyone', 'something', 'some', 'any',
+        'who', 'what', 'where', 'when', 'why', 'how',
+        'and', 'or', 'but', 'if', 'then', 'than', 'that', 'this', 'these', 'those',
+        'of', 'in', 'on', 'at', 'to', 'from', 'by', 'as', 'into', 'like',
+        'know', 'knows', 'good', 'well', 'get', 'got', 'make', 'made',
+      ]);
+
+      const searchTerms = queryText
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((t: string) => t.length > 1 && !stopWords.has(t));
 
       if (searchTerms.length > 0) {
-        // Build search pattern for ILIKE
-        const searchPattern = `%${searchTerms.join('%')}%`;
+        // Build OR conditions - match ANY of the search terms
+        const orConditions = searchTerms
+          .map(term => `expertise_text.ilike.%${term}%`)
+          .join(',');
 
         const { data: textMatches, error: textError } = await supabase
           .from('profiles')
@@ -74,7 +148,6 @@ export async function POST(request: Request) {
             first_name,
             last_name,
             expertise_text,
-            currently_available,
             major,
             department,
             timezone,
@@ -84,8 +157,8 @@ export async function POST(request: Request) {
           .eq('organization_id', profile.organization_id)
           .neq('user_id', user.id)
           .not('expertise_text', 'is', null)
-          .ilike('expertise_text', searchPattern)
-          .limit(limit);
+          .or(orConditions)
+          .limit(limit * 2); // Fetch more to allow for scoring
 
         if (textError) {
           console.error('Text search error:', textError);
@@ -95,20 +168,31 @@ export async function POST(request: Request) {
           );
         }
 
-        // Transform results to match the expected format
-        const matches = (textMatches || []).map((p) => ({
-          user_id: p.user_id,
-          first_name: p.first_name,
-          last_name: p.last_name,
-          expertise_text: p.expertise_text,
-          similarity: 0.5, // Default similarity for text matches
-          currently_available: p.currently_available,
-          major: p.major,
-          department: p.department,
-          timezone: p.timezone,
-          availability_slots: p.availability?.slots || [],
-          slack_connected: !!p.slack_user_id,
-        }));
+        // Score and sort results by number of matching terms
+        const scoredMatches = (textMatches || []).map((p: any) => {
+          const expertiseLower = (p.expertise_text || '').toLowerCase();
+          const matchCount = searchTerms.filter(term => expertiseLower.includes(term)).length;
+          const similarity = Math.min(0.5 + (matchCount / searchTerms.length) * 0.5, 1);
+
+          return {
+            user_id: p.user_id,
+            first_name: p.first_name,
+            last_name: p.last_name,
+            expertise_text: p.expertise_text,
+            similarity,
+            matchCount,
+            currently_available: p.availability?.currentlyAvailable || false,
+            major: p.major,
+            department: p.department,
+            timezone: p.timezone,
+            availability_slots: p.availability?.slots || [],
+            slack_connected: !!p.slack_user_id,
+          };
+        });
+
+        // Sort by match count (most relevant first), then limit
+        scoredMatches.sort((a, b) => b.matchCount - a.matchCount);
+        const matches = scoredMatches.slice(0, limit).map(({ matchCount, ...rest }) => rest);
 
         // Track text search
         serverAnalytics.findHelpSearched(user.id, queryText, matches.length);
