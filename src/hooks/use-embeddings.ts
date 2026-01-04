@@ -1,12 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  generateEmbedding,
-  preloadModel,
-  isModelReady,
-  isModelLoading,
-} from '@/lib/embeddings';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UseEmbeddingsReturn {
   /** Whether the model is ready to use */
@@ -32,32 +26,57 @@ export function useEmbeddings(): UseEmbeddingsReturn {
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const embeddingsModuleRef = useRef<typeof import('@/lib/embeddings') | null>(null);
 
-  // Check if already ready
+  // Lazy load the embeddings module
   useEffect(() => {
-    if (isModelReady()) {
-      setReady(true);
-      return;
-    }
+    // Only run in browser
+    if (typeof window === 'undefined') return;
 
-    if (isModelLoading()) {
+    let cancelled = false;
+
+    const loadEmbeddings = async () => {
       setLoading(true);
-    }
+      try {
+        // Dynamic import to avoid SSR issues
+        const embeddingsModule = await import('@/lib/embeddings');
+        embeddingsModuleRef.current = embeddingsModule;
 
-    // Preload the model
-    setLoading(true);
-    preloadModel()
-      .then(() => {
+        if (cancelled) return;
+
+        // Check if already ready
+        if (embeddingsModule.isModelReady()) {
+          setReady(true);
+          setLoading(false);
+          return;
+        }
+
+        // Preload the model
+        await embeddingsModule.preloadModel();
+
+        if (cancelled) return;
+
         setReady(true);
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err : new Error('Failed to load embeddings'));
         setLoading(false);
-      });
+      }
+    };
+
+    loadEmbeddings();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const embed = useCallback(async (text: string): Promise<number[]> => {
+    if (typeof window === 'undefined') {
+      throw new Error('Embeddings can only be generated in the browser');
+    }
+
     if (!text || text.trim().length === 0) {
       throw new Error('Text cannot be empty');
     }
@@ -66,7 +85,12 @@ export function useEmbeddings(): UseEmbeddingsReturn {
     setError(null);
 
     try {
-      const embedding = await generateEmbedding(text);
+      // Ensure module is loaded
+      if (!embeddingsModuleRef.current) {
+        embeddingsModuleRef.current = await import('@/lib/embeddings');
+      }
+
+      const embedding = await embeddingsModuleRef.current.generateEmbedding(text);
       return embedding;
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to generate embedding');

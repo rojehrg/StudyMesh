@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Exclude transformers.js from server-side bundling (browser-only library)
+  serverExternalPackages: ['@xenova/transformers', 'onnxruntime-node'],
+
   // Security headers
   async headers() {
     return [
