@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,7 @@ const DEFAULT_PROFILE: ProfileData = {
   slackUserId: "",
 };
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -1025,5 +1025,17 @@ export default function SettingsPage() {
         </div>
       )}
     </motion.div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <CircleNotch className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <SettingsContent />
+    </Suspense>
   );
 }
