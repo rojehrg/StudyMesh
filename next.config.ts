@@ -1,8 +1,33 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  // Exclude transformers.js from server-side bundling (browser-only library)
-  serverExternalPackages: ['@xenova/transformers', 'onnxruntime-node'],
+  // Use Webpack instead of Turbopack (needed for transformers.js compatibility)
+  // Run with: next build --webpack
+
+  // Exclude transformers.js dependencies from server-side bundling
+  serverExternalPackages: ['@xenova/transformers', 'onnxruntime-node', 'sharp'],
+
+  // Empty turbopack config to satisfy Next.js 16
+  turbopack: {},
+
+  // Webpack configuration for transformers.js compatibility
+  webpack: (config, { isServer }) => {
+    // Disable onnxruntime-node (we only use browser version)
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "sharp$": false,
+      "onnxruntime-node$": false,
+    };
+
+    // Prevent multiple React instances (fixes invalid hook call error)
+    if (!isServer) {
+      config.resolve.alias["react"] = path.resolve("./node_modules/react");
+      config.resolve.alias["react-dom"] = path.resolve("./node_modules/react-dom");
+    }
+
+    return config;
+  },
 
   // Security headers
   async headers() {
