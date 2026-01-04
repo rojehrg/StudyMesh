@@ -25,6 +25,14 @@ export const organizations = pgTable("organizations", {
   slackAccessToken: text("slack_access_token"), // Bot token for the workspace
   slackWebhookUrl: text("slack_webhook_url"), // Optional: legacy webhook URL
 
+  // Stripe billing integration
+  stripeCustomerId: text("stripe_customer_id").unique(),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  subscriptionStatus: text("subscription_status").default("inactive"), // inactive, active, past_due, canceled
+  subscriptionPlan: text("subscription_plan").default("free"), // free, starter, pro, enterprise
+  subscriptionSeats: integer("subscription_seats").default(1),
+  subscriptionPeriodEnd: timestamp("subscription_period_end", { withTimezone: true }),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -192,6 +200,16 @@ export const userProviderCredentials = pgTable("user_provider_credentials", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Billing events - audit log for subscription changes
+export const billingEvents = pgTable("billing_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }).notNull(),
+  stripeEventId: text("stripe_event_id").unique(), // Stripe event ID for deduplication
+  eventType: text("event_type").notNull(), // checkout.session.completed, invoice.paid, customer.subscription.updated, etc.
+  eventData: jsonb("event_data").default({}), // Full Stripe event data
+  processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
@@ -206,3 +224,4 @@ export type ScheduledMeeting = typeof scheduledMeetings.$inferSelect;
 export type MeetingParticipant = typeof meetingParticipants.$inferSelect;
 export type SchedulingPermission = typeof schedulingPermissions.$inferSelect;
 export type UserProviderCredential = typeof userProviderCredentials.$inferSelect;
+export type BillingEvent = typeof billingEvents.$inferSelect;

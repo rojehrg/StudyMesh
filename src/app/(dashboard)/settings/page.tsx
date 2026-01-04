@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy, VideoCamera, Plugs } from "@phosphor-icons/react";
+import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy, VideoCamera, Plugs, CreditCard, ArrowRight, Crown } from "@phosphor-icons/react";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { AvailabilityGrid, type AvailabilitySlot } from "@/components/availability-grid";
+import { usePlanFeatures, getPlanDisplayName, getPlanPricing, type PlanName } from "@/hooks/use-plan-features";
 
 const SUGGESTED_KNOWLEDGE_AREAS = [
   "JavaScript", "TypeScript", "Python", "React", "Node.js", "SQL", "AWS",
@@ -343,12 +344,20 @@ export default function SettingsPage() {
     }
   };
 
-  const tabs = [
+  // Get plan features for billing
+  const { subscription, plan, isOwner: isBillingOwner, loading: billingLoading } = usePlanFeatures();
+
+  const baseTabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "availability", label: "Availability", icon: Clock },
     { id: "notifications", label: "Notifications", icon: Envelope },
     { id: "organization", label: "Organization", icon: Buildings },
   ];
+
+  // Add billing tab only for org owners
+  const tabs = org?.isOwner
+    ? [...baseTabs, { id: "billing", label: "Billing", icon: CreditCard }]
+    : baseTabs;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6">
@@ -825,6 +834,207 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           )}
+        </div>
+      )}
+
+      {/* Billing Tab - Only for org owners */}
+      {activeTab === "billing" && org?.isOwner && (
+        <div className="space-y-6">
+          {/* Current Plan */}
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold">Current Plan</CardTitle>
+                  <CardDescription>Manage your organization's subscription</CardDescription>
+                </div>
+                {subscription?.hasActiveSubscription && (
+                  <Badge variant="secondary" className="bg-success/10 text-success border-0">
+                    <Check className="w-3 h-3 mr-1" weight="bold" />
+                    Active
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    {plan === 'free' ? (
+                      <Buildings className="w-6 h-6 text-primary" weight="duotone" />
+                    ) : (
+                      <Crown className="w-6 h-6 text-primary" weight="fill" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground text-lg">{getPlanDisplayName(plan)} Plan</p>
+                    <p className="text-sm text-muted-foreground">
+                      {plan === 'free' ? (
+                        'Free forever with basic features'
+                      ) : (
+                        <>
+                          {subscription?.seats || 1} seat{(subscription?.seats || 1) > 1 ? 's' : ''} &middot;{' '}
+                          {subscription?.periodEnd
+                            ? `Renews ${new Date(subscription.periodEnd).toLocaleDateString()}`
+                            : 'Active subscription'}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                {subscription?.hasActiveSubscription && (
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/billing/portal', { method: 'POST' });
+                        const data = await response.json();
+                        if (data.url) {
+                          window.location.href = data.url;
+                        }
+                      } catch {
+                        toast.error('Failed to open billing portal');
+                      }
+                    }}
+                  >
+                    Manage Subscription
+                  </Button>
+                )}
+              </div>
+
+              {/* Subscription status warnings */}
+              {subscription?.status === 'past_due' && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+                  <p className="text-sm text-destructive font-medium">
+                    Payment past due - please update your payment method to avoid service interruption.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upgrade Options - Show if on free plan */}
+          {plan === 'free' && (
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Upgrade Your Plan</CardTitle>
+                <CardDescription>Unlock more features for your team</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Starter Plan */}
+                  <div className="p-4 border rounded-xl hover:border-primary/50 transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-foreground">Starter</h3>
+                      <p className="text-sm text-muted-foreground">
+                        ${getPlanPricing('starter').monthly}/seat/mo
+                      </p>
+                    </div>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                      <li>Up to 20 seats</li>
+                      <li>Up to 10 pods</li>
+                      <li>Advanced analytics</li>
+                    </ul>
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/billing/checkout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ plan: 'starter', billingPeriod: 'monthly', seats: 5 }),
+                          });
+                          const data = await response.json();
+                          if (data.url) {
+                            window.location.href = data.url;
+                          } else {
+                            toast.error(data.error || 'Failed to start checkout');
+                          }
+                        } catch {
+                          toast.error('Failed to start checkout');
+                        }
+                      }}
+                    >
+                      Upgrade to Starter
+                      <ArrowRight className="w-4 h-4 ml-2" weight="bold" />
+                    </Button>
+                  </div>
+
+                  {/* Pro Plan */}
+                  <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 relative">
+                    <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
+                      Popular
+                    </Badge>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-foreground">Pro</h3>
+                      <p className="text-sm text-muted-foreground">
+                        ${getPlanPricing('pro').monthly}/seat/mo
+                      </p>
+                    </div>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                      <li>Up to 100 seats</li>
+                      <li>Up to 50 pods</li>
+                      <li>Custom branding</li>
+                      <li>Priority support</li>
+                      <li>API access</li>
+                    </ul>
+                    <Button
+                      className="w-full"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/billing/checkout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ plan: 'pro', billingPeriod: 'monthly', seats: 5 }),
+                          });
+                          const data = await response.json();
+                          if (data.url) {
+                            window.location.href = data.url;
+                          } else {
+                            toast.error(data.error || 'Failed to start checkout');
+                          }
+                        } catch {
+                          toast.error('Failed to start checkout');
+                        }
+                      }}
+                    >
+                      Upgrade to Pro
+                      <ArrowRight className="w-4 h-4 ml-2" weight="bold" />
+                    </Button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-center text-muted-foreground mt-4">
+                  Need more? <a href="mailto:support@attunly.com" className="text-primary hover:underline">Contact us</a> for Enterprise pricing.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Usage Stats */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Usage</CardTitle>
+              <CardDescription>Your current plan limits</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-muted/50 rounded-xl">
+                  <p className="text-2xl font-bold text-foreground">{subscription?.seats || 1}</p>
+                  <p className="text-sm text-muted-foreground">
+                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}`} seats
+                  </p>
+                </div>
+                <div className="p-4 bg-muted/50 rounded-xl">
+                  <p className="text-2xl font-bold text-foreground">-</p>
+                  <p className="text-sm text-muted-foreground">
+                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}`} pods
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </motion.div>
