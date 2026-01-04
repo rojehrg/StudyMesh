@@ -38,8 +38,8 @@
     --secondary-foreground: 240 10% 30%;
 
     /* Accent - Light violet for hover states */
-    --accent: 262 50% 95%;
-    --accent-foreground: 262 60% 45%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 10% 15%;
 
     /* Muted - Neutral gray */
     --muted: 240 5% 94%;
