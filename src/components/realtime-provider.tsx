@@ -21,7 +21,17 @@ const RealtimeContext = createContext<RealtimeContextType>({
 });
 
 export function useRealtime() {
-  return useContext(RealtimeContext);
+  const context = useContext(RealtimeContext);
+  // Return safe defaults if used outside provider (e.g., during loading)
+  if (!context) {
+    return {
+      isConnected: false,
+      newNotificationCount: 0,
+      clearNotificationCount: () => {},
+      triggerRefresh: () => {},
+    };
+  }
+  return context;
 }
 
 interface RealtimeProviderProps {
