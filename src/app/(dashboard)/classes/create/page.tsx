@@ -2,25 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Loading, ChevronLeft, Star, Globe } from "react-coolicons";
+import { Loading, ChevronLeft, Star, Globe, TrendingUp } from "react-coolicons";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-
-function generatePodCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed ambiguous chars
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
 
 export default function CreatePodPage() {
   const [loading, setLoading] = useState(false);
@@ -29,57 +19,51 @@ export default function CreatePodPage() {
   const [initiativeOwner, setInitiativeOwner] = useState("");
   const [term, setTerm] = useState("");
   const [allowCrossPodHelp, setAllowCrossPodHelp] = useState(true);
-  
+
   const router = useRouter();
-  const supabase = createClient();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const podCode = generatePodCode();
-
-      // Create pod with manager (creator is manager by default)
-      const { data: pod, error: podError } = await supabase
-        .from('pods')
-        .insert({
-          pod_code: podCode,
-          pod_name: podName,
-          business_unit: businessUnit,
-          initiative_owner: initiativeOwner,
+      const response = await fetch('/api/pods', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          podName,
+          businessUnit,
+          initiativeOwner,
           term: term || null,
-          created_by: user.id,
-          manager_id: user.id,
-          allow_cross_pod_help: allowCrossPodHelp,
-        })
-        .select()
-        .single();
+          allowCrossPodHelp,
+        }),
+      });
 
-      if (podError) throw podError;
+      const data = await response.json();
 
-      // Add creator as first member
-      const { error: memberError } = await supabase
-        .from('pod_members')
-        .insert({
-          pod_id: pod.id,
-          user_id: user.id,
-        });
-
-      if (memberError) throw memberError;
+      if (!response.ok) {
+        // Handle pod limit reached
+        if (data.code === 'POD_LIMIT_REACHED') {
+          toast.error("Pod limit reached", {
+            description: data.message,
+            action: {
+              label: "Upgrade",
+              onClick: () => router.push(data.upgradeUrl),
+            },
+          });
+          return;
+        }
+        throw new Error(data.error || "Failed to create pod");
+      }
 
       toast.success("Pod created successfully!", {
-        description: `Share code: ${podCode}`
+        description: `Share code: ${data.podCode}`
       });
-      router.push(`/classes/${podCode}`);
+      router.push(`/classes/${data.podCode}`);
     } catch (error: any) {
       console.error("Error creating pod:", error);
-      const errorMessage = error?.message || error?.error_description || (typeof error === 'string' ? error : "Please try again.");
       toast.error("Failed to create pod", {
-        description: errorMessage
+        description: error.message || "Please try again."
       });
     } finally {
       setLoading(false);

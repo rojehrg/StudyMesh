@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { enforceSeatLimit } from "@/lib/billing/enforcement";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger({ service: 'organizations-api' });
 
 // Generate a random invite code
 function generateInviteCode(): string {
@@ -42,6 +46,29 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid invite code" }, { status: 400 });
       }
 
+      // Enforce seat limit before allowing join
+      const enforcement = await enforceSeatLimit(org.id, 1);
+      if (!enforcement.allowed) {
+        log.info('Join blocked - seat limit reached', {
+          userId: user.id,
+          organizationId: org.id,
+          current: enforcement.current,
+          limit: enforcement.limit,
+          plan: enforcement.plan,
+        });
+
+        return NextResponse.json(
+          {
+            error: enforcement.message,
+            code: 'SEAT_LIMIT_REACHED',
+            current: enforcement.current,
+            limit: enforcement.limit,
+            plan: enforcement.plan,
+          },
+          { status: 402 } // Payment Required
+        );
+      }
+
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ organization_id: org.id })
@@ -51,6 +78,12 @@ export async function POST(request: Request) {
         console.error("Error updating profile:", profileError);
         return NextResponse.json({ error: "Failed to join organization" }, { status: 500 });
       }
+
+      log.info('User joined organization', {
+        userId: user.id,
+        organizationId: org.id,
+        seatCount: enforcement.current + 1,
+      });
 
       return NextResponse.json({
         success: true,
