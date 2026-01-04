@@ -93,6 +93,10 @@ function SettingsContent() {
   const expertiseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [expertiseSaving, setExpertiseSaving] = useState(false);
 
+  // These hooks MUST be called before any early returns
+  const { subscription, plan, isOwner: isBillingOwner, loading: billingLoading } = usePlanFeatures();
+  const { themeSettings, canCustomize, applyTheme, saveTheme } = useThemeCustomization();
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -364,12 +368,6 @@ function SettingsContent() {
       setTimeout(() => setCopiedInvite(false), 2000);
     }
   };
-
-  // Get plan features for billing
-  const { subscription, plan, isOwner: isBillingOwner, loading: billingLoading } = usePlanFeatures();
-
-  // Theme customization
-  const { themeSettings, canCustomize, applyTheme, saveTheme } = useThemeCustomization();
 
   const baseTabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -1028,6 +1026,7 @@ function SettingsContent() {
   );
 }
 
+// Settings page wrapper with Suspense for useSearchParams
 export default function SettingsPage() {
   return (
     <Suspense fallback={
