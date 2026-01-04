@@ -10,7 +10,7 @@ import { createLogger } from "@/lib/logger";
 
 const log = createLogger({ service: 'meetings' });
 
-export type MeetingProvider = 'zoom' | 'custom';
+export type MeetingProvider = 'zoom' | 'google_calendar' | 'custom';
 
 export interface MeetingDetails {
   title: string;
@@ -206,6 +206,8 @@ export async function createZoomMeeting(
 export async function getUserProviders(userId: string): Promise<{
   zoom: boolean;
   zoomEmail?: string;
+  googleCalendar: boolean;
+  googleCalendarEmail?: string;
 }> {
   const supabase = await createClient();
 
@@ -217,6 +219,8 @@ export async function getUserProviders(userId: string): Promise<{
   const result = {
     zoom: false,
     zoomEmail: undefined as string | undefined,
+    googleCalendar: false,
+    googleCalendarEmail: undefined as string | undefined,
   };
 
   if (creds) {
@@ -224,6 +228,10 @@ export async function getUserProviders(userId: string): Promise<{
       if (cred.provider === 'zoom') {
         result.zoom = true;
         result.zoomEmail = cred.provider_email || undefined;
+      }
+      if (cred.provider === 'google_calendar') {
+        result.googleCalendar = true;
+        result.googleCalendarEmail = cred.provider_email || undefined;
       }
     }
   }

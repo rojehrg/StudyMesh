@@ -85,7 +85,9 @@ function SettingsContent() {
   const [meetingProviders, setMeetingProviders] = useState<{
     zoom: boolean;
     zoomEmail?: string;
-  }>({ zoom: false });
+    googleCalendar: boolean;
+    googleCalendarEmail?: string;
+  }>({ zoom: false, googleCalendar: false });
   const [providersLoading, setProvidersLoading] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
@@ -127,7 +129,15 @@ function SettingsContent() {
       toast.success("Zoom connected successfully!");
       window.history.replaceState({}, '', '/settings');
       loadMeetingProviders();
-      setActiveTab("notifications");
+      setActiveTab("integrations");
+    }
+
+    // Handle Google Calendar OAuth callbacks
+    if (successParam === 'google_connected') {
+      toast.success("Google Calendar connected successfully!");
+      window.history.replaceState({}, '', '/settings');
+      loadMeetingProviders();
+      setActiveTab("availability");
     }
 
     if (errorParam) {
@@ -136,6 +146,10 @@ function SettingsContent() {
         'zoom_invalid_response': 'Invalid response from Zoom',
         'zoom_token_exchange_failed': 'Failed to connect Zoom account',
         'zoom_callback_failed': 'Zoom connection failed',
+        'google_denied': 'Google authorization was denied',
+        'google_invalid_response': 'Invalid response from Google',
+        'google_token_exchange_failed': 'Failed to connect Google account',
+        'google_callback_failed': 'Google connection failed',
       };
       toast.error(errorMessages[errorParam] || 'Connection failed');
       window.history.replaceState({}, '', '/settings');
@@ -174,11 +188,31 @@ function SettingsContent() {
         body: JSON.stringify({ provider: 'zoom' }),
       });
       if (response.ok) {
-        setMeetingProviders({ zoom: false, zoomEmail: undefined });
+        setMeetingProviders(prev => ({ ...prev, zoom: false, zoomEmail: undefined }));
         toast.success('Zoom disconnected');
       }
     } catch {
       toast.error('Failed to disconnect Zoom');
+    }
+  };
+
+  const connectGoogleCalendar = () => {
+    window.location.href = '/api/auth/google';
+  };
+
+  const disconnectGoogleCalendar = async () => {
+    try {
+      const response = await fetch('/api/user/providers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider: 'google_calendar' }),
+      });
+      if (response.ok) {
+        setMeetingProviders(prev => ({ ...prev, googleCalendar: false, googleCalendarEmail: undefined }));
+        toast.success('Google Calendar disconnected');
+      }
+    } catch {
+      toast.error('Failed to disconnect Google Calendar');
     }
   };
 
@@ -689,26 +723,101 @@ function SettingsContent() {
 
       {/* Availability Tab */}
       {activeTab === "availability" && (
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Weekly Availability</CardTitle>
-            <CardDescription>Set when you're free to help teammates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AvailabilityGrid
-              value={{
-                timezone: profile.timezone,
-                slots: profile.availabilitySlots,
-                currentlyAvailable: profile.currentlyAvailable,
-              }}
-              onChange={(val) => updateProfile({
-                timezone: val.timezone,
-                availabilitySlots: val.slots,
-                currentlyAvailable: val.currentlyAvailable,
-              })}
-            />
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {/* Google Calendar Sync */}
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                </div>
+                <div>
+                  <CardTitle className="text-base font-semibold">Google Calendar</CardTitle>
+                  <CardDescription>Sync your calendar to show when you're busy</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {meetingProviders.googleCalendar ? (
+                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
+                      <CheckBig className="w-5 h-5 text-success" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Calendar Connected</p>
+                      <p className="text-sm text-muted-foreground">
+                        {meetingProviders.googleCalendarEmail || "Syncing busy times"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={disconnectGoogleCalendar}
+                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  >
+                    <LinkBreak className="w-4 h-4 mr-2" />
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Connect Google Calendar</p>
+                      <p className="text-sm text-muted-foreground">Auto-sync busy times from your calendar</p>
+                    </div>
+                  </div>
+                  <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6] gap-2">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4">
+                      <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                      <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Connect
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Weekly Availability Grid */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Weekly Availability</CardTitle>
+              <CardDescription>Set when you're free to help teammates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AvailabilityGrid
+                value={{
+                  timezone: profile.timezone,
+                  slots: profile.availabilitySlots,
+                  currentlyAvailable: profile.currentlyAvailable,
+                }}
+                onChange={(val) => updateProfile({
+                  timezone: val.timezone,
+                  availabilitySlots: val.slots,
+                  currentlyAvailable: val.currentlyAvailable,
+                })}
+              />
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Integrations Tab */}
