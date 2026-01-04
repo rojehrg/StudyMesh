@@ -15,6 +15,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { AvailabilityGrid, type AvailabilitySlot } from "@/components/availability-grid";
 import { usePlanFeatures, getPlanDisplayName, getPlanPricing, type PlanName } from "@/hooks/use-plan-features";
+import { useThemeCustomization } from "@/contexts/theme-customization-context";
+import { ThemeColorPicker } from "@/components/theme-color-picker";
 
 const SUGGESTED_KNOWLEDGE_AREAS = [
   "JavaScript", "TypeScript", "Python", "React", "Node.js", "SQL", "AWS",
@@ -346,6 +348,9 @@ export default function SettingsPage() {
 
   // Get plan features for billing
   const { subscription, plan, isOwner: isBillingOwner, loading: billingLoading } = usePlanFeatures();
+
+  // Theme customization
+  const { themeSettings, canCustomize, applyTheme, saveTheme } = useThemeCustomization();
 
   const baseTabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -821,6 +826,33 @@ export default function SettingsPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Theme Customization - Pro+ feature */}
+              {org.isOwner && (
+                <Card>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-base font-semibold">Brand Colors</CardTitle>
+                        <CardDescription>Customize your team's color theme</CardDescription>
+                      </div>
+                      {!canCustomize && (
+                        <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                          Pro
+                        </Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ThemeColorPicker
+                      currentSettings={themeSettings}
+                      onPreview={applyTheme}
+                      onSave={saveTheme}
+                      disabled={!canCustomize}
+                    />
+                  </CardContent>
+                </Card>
+              )}
             </>
           ) : (
             <Card>

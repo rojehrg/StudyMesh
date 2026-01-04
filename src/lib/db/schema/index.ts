@@ -33,6 +33,10 @@ export const organizations = pgTable("organizations", {
   subscriptionSeats: integer("subscription_seats").default(1),
   subscriptionPeriodEnd: timestamp("subscription_period_end", { withTimezone: true }),
 
+  // Theme customization (Pro+ feature)
+  themeSettings: jsonb("theme_settings").default({}),
+  // Structure: { preset: 'violet', primary: '262 60% 50%', ... }
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
