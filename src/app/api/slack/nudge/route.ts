@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendNudgeSlackDM, sendEmailNudgeNotification } from "@/lib/notifications";
 import { decryptToken } from "@/lib/encryption";
 import { createLogger } from "@/lib/logger";
+import { serverAnalytics } from "@/lib/analytics";
 
 export async function POST(req: Request) {
   const log = createLogger({ service: 'slack', action: 'nudge' });
@@ -121,6 +122,8 @@ export async function POST(req: Request) {
 
     // If we got at least one notification through, return success
     if (notifiedVia.length > 0) {
+      // Track nudge sent
+      serverAnalytics.nudgeSent(user.id, nudgeType || 'ask', topic);
       return NextResponse.json({ ok: true, notifiedVia });
     }
 

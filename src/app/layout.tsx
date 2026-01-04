@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PostHogProvider } from "@/components/posthog-provider";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -52,15 +53,17 @@ export default function RootLayout({
           roboto.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="bottom-right" richColors />
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster position="bottom-right" richColors />
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

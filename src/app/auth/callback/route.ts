@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { serverAnalytics, EVENTS } from '@/lib/analytics'
+import { sendWelcomeEmail } from '@/lib/notifications'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -83,7 +85,27 @@ export async function GET(request: Request) {
 
     if (!profile) {
       console.log('[OAuth Callback] New user, redirecting to onboarding');
+      // Track new signup
+      serverAnalytics.track({
+        userId: data.user.id,
+        event: EVENTS.USER_SIGNED_UP,
+        properties: { method: 'google' }
+      });
+      // Send welcome email (don't await - fire and forget)
+      if (data.user.email) {
+        sendWelcomeEmail({
+          email: data.user.email,
+          name: data.user.user_metadata?.full_name?.split(' ')[0] || undefined,
+        }).catch((err) => console.error('[OAuth Callback] Welcome email failed:', err));
+      }
       redirectUrl = `${origin}/onboarding`
+    } else {
+      // Track returning login
+      serverAnalytics.track({
+        userId: data.user.id,
+        event: EVENTS.USER_LOGGED_IN,
+        properties: { method: 'google' }
+      });
     }
   }
 

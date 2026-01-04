@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { enforcePodLimit } from "@/lib/billing/enforcement";
 import { createLogger } from "@/lib/logger";
+import { serverAnalytics } from "@/lib/analytics";
 
 const log = createLogger({ service: 'pods-api' });
 
@@ -161,6 +162,9 @@ export async function POST(request: Request) {
       organizationId,
       podCount: enforcement.current + 1,
     });
+
+    // Track pod creation
+    serverAnalytics.podCreated(user.id, pod.id, podName.trim());
 
     return NextResponse.json({
       success: true,

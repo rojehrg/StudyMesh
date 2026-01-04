@@ -17,6 +17,11 @@ interface MailerSendEmail {
   html: string;
 }
 
+interface WelcomeEmailData {
+  email: string;
+  name?: string;
+}
+
 async function sendEmailViaMailerSend(email: MailerSendEmail): Promise<boolean> {
   const apiKey = process.env.MAILERSEND_API_KEY;
 
@@ -940,6 +945,84 @@ export async function sendEmailNudgeResponseNotification(
     to: data.recipientEmail,
     toName: recipientName,
     subject,
+    html: wrapEmailTemplate(content)
+  });
+}
+
+// ==========================================
+// WELCOME EMAIL (on signup)
+// ==========================================
+
+export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
+  if (!data.email) {
+    emailLog.info('Skipping welcome email: No email', { action: 'welcome' });
+    return false;
+  }
+
+  const firstName = data.name?.split(' ')[0] || 'there';
+
+  const content = `
+    <h1 style="margin: 0 0 8px; font-size: 28px; font-weight: 700; color: #111827;">Welcome to Attunly! 🎉</h1>
+    <p style="margin: 0 0 24px; font-size: 16px; color: #6b7280;">
+      Hey ${firstName}, we're excited to have you!
+    </p>
+
+    <p style="margin: 0 0 16px; font-size: 16px; color: #374151; line-height: 1.6;">
+      Attunly helps your team share expertise and connect more effectively. Here's how to get started:
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px;">
+      <tr>
+        <td style="padding: 12px 0; vertical-align: top; width: 40px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #ede9fe; color: #7c3aed; border-radius: 50%; font-weight: 600; font-size: 14px;">1</span>
+        </td>
+        <td style="padding: 12px 0; vertical-align: top;">
+          <strong style="color: #111827;">Complete your profile</strong><br/>
+          <span style="color: #6b7280; font-size: 14px;">Add your skills and expertise areas</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0; vertical-align: top; width: 40px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #ede9fe; color: #7c3aed; border-radius: 50%; font-weight: 600; font-size: 14px;">2</span>
+        </td>
+        <td style="padding: 12px 0; vertical-align: top;">
+          <strong style="color: #111827;">Set your availability</strong><br/>
+          <span style="color: #6b7280; font-size: 14px;">Let teammates know when you're free</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0; vertical-align: top; width: 40px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #ede9fe; color: #7c3aed; border-radius: 50%; font-weight: 600; font-size: 14px;">3</span>
+        </td>
+        <td style="padding: 12px 0; vertical-align: top;">
+          <strong style="color: #111827;">Join or create a pod</strong><br/>
+          <span style="color: #6b7280; font-size: 14px;">Collaborate with your team</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0; vertical-align: top; width: 40px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #ede9fe; color: #7c3aed; border-radius: 50%; font-weight: 600; font-size: 14px;">4</span>
+        </td>
+        <td style="padding: 12px 0; vertical-align: top;">
+          <strong style="color: #111827;">Connect Slack</strong><br/>
+          <span style="color: #6b7280; font-size: 14px;">Get nudge notifications instantly</span>
+        </td>
+      </tr>
+    </table>
+
+    <div style="text-align: center; margin-bottom: 24px;">
+      <a href="${APP_URL}/dashboard" style="display: inline-block; background: #7c3aed; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">Go to Dashboard</a>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; color: #9ca3af; text-align: center;">
+      Questions? Reply to this email - we'd love to hear from you!
+    </p>
+  `;
+
+  return sendEmailViaMailerSend({
+    to: data.email,
+    toName: firstName,
+    subject: 'Welcome to Attunly! 🎉',
     html: wrapEmailTemplate(content)
   });
 }

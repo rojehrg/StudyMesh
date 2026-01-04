@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loading, CheckBig } from "react-coolicons";
 import dynamic from "next/dynamic";
+import { useAnalytics } from "@/components/posthog-provider";
+import { EVENTS } from "@/lib/analytics/events";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import startupMeeting from "../../../../public/animations/startup-meeting.json";
@@ -19,6 +21,7 @@ export default function SignupPage() {
   const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+  const { track } = useAnalytics();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -103,10 +106,12 @@ export default function SignupPage() {
       if (error) throw error;
 
       if (data.session) {
+        track(EVENTS.USER_SIGNED_UP, { method: 'email' });
         router.push('/onboarding');
         return;
       }
 
+      track(EVENTS.USER_SIGNED_UP, { method: 'email', requires_confirmation: true });
       setSuccess(true);
     } catch (err: any) {
       setError(err.message);

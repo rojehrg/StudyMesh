@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { serverAnalytics } from "@/lib/analytics";
 
 /**
  * POST /api/find-help
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
       });
 
       if (!error && matches && matches.length > 0) {
+        // Track search
+        serverAnalytics.findHelpSearched(user.id, queryText || 'embedding', matches.length);
         return NextResponse.json({
           success: true,
           matches: matches,
@@ -107,6 +110,8 @@ export async function POST(request: Request) {
           slack_connected: !!p.slack_user_id,
         }));
 
+        // Track text search
+        serverAnalytics.findHelpSearched(user.id, queryText, matches.length);
         return NextResponse.json({
           success: true,
           matches,
