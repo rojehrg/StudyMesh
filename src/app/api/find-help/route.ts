@@ -171,7 +171,7 @@ export async function POST(request: Request) {
         // Score and sort results by number of matching terms
         const scoredMatches = (textMatches || []).map((p: any) => {
           const expertiseLower = (p.expertise_text || '').toLowerCase();
-          const matchCount = searchTerms.filter(term => expertiseLower.includes(term)).length;
+          const matchCount = searchTerms.filter((term: string) => expertiseLower.includes(term)).length;
           const similarity = Math.min(0.5 + (matchCount / searchTerms.length) * 0.5, 1);
 
           return {
