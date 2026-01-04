@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { ScheduleMeetingDialog } from "@/components/schedule-meeting-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { PageLoader } from "@/components/loading-states";
+import { generateGoogleCalendarUrl } from "@/lib/calendar-utils";
 
 interface Meeting {
   id: string;
@@ -249,6 +250,34 @@ export default function MeetingsPage() {
                               </a>
                             </Button>
                           )}
+
+                          {/* Add to Google Calendar */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-2 border-border/60 hover:bg-accent hover:border-primary/30 dark:border-border/40 dark:hover:bg-accent/80 transition-colors"
+                            onClick={() => {
+                              const url = generateGoogleCalendarUrl({
+                                title: meeting.title,
+                                startTime: new Date(meeting.scheduled_time),
+                                durationMinutes: meeting.duration_minutes,
+                                description: meeting.description
+                                  ? `${meeting.description}${meeting.meeting_link ? `\n\nJoin: ${meeting.meeting_link}` : ''}`
+                                  : meeting.meeting_link
+                                    ? `Join: ${meeting.meeting_link}`
+                                    : '',
+                                location: meeting.meeting_link || '',
+                              });
+                              window.open(url, '_blank');
+                            }}
+                          >
+                            <img
+                              src="/google-calendar-icon.svg"
+                              alt=""
+                              className="w-4 h-4"
+                            />
+                            <span className="hidden sm:inline">Add to Calendar</span>
+                          </Button>
 
                           {meeting.role === 'participant' && meeting.myRsvp === 'pending' && (
                             <div className="flex gap-2 flex-1">

@@ -1,7 +1,7 @@
 /**
  * Meeting Provider Service
  *
- * Handles creating meetings via Zoom and Google Meet APIs.
+ * Handles creating meetings via Zoom API.
  */
 
 import { createClient } from "@/lib/supabase/server";
@@ -10,7 +10,7 @@ import { createLogger } from "@/lib/logger";
 
 const log = createLogger({ service: 'meetings' });
 
-export type MeetingProvider = 'zoom' | 'google' | 'custom';
+export type MeetingProvider = 'zoom' | 'custom';
 
 export interface MeetingDetails {
   title: string;
@@ -136,35 +136,6 @@ async function refreshProviderToken(
       };
     }
 
-    if (provider === 'google') {
-      const clientId = process.env.GOOGLE_CLIENT_ID!;
-      const clientSecret = process.env.GOOGLE_CLIENT_SECRET!;
-
-      const response = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'refresh_token',
-          refresh_token: refreshToken,
-          client_id: clientId,
-          client_secret: clientSecret,
-        }),
-      });
-
-      if (!response.ok) {
-        log.error('Failed to refresh Google token', { status: response.status });
-        return null;
-      }
-
-      const data = await response.json();
-      return {
-        accessToken: data.access_token,
-        expiresIn: data.expires_in,
-      };
-    }
-
     return null;
   } catch (error: any) {
     log.error('Token refresh failed', { provider, error: error.message });
@@ -228,87 +199,13 @@ export async function createZoomMeeting(
   }
 }
 
-/**
- * Create a Google Meet via Calendar API
- */
-export async function createGoogleMeet(
-  userId: string,
-  meeting: MeetingDetails
-): Promise<CreatedMeeting | null> {
-  const creds = await getProviderCredentials(userId, 'google');
-  if (!creds) {
-    log.error('No Google credentials', { userId });
-    return null;
-  }
-
-  try {
-    const endTime = new Date(meeting.startTime.getTime() + meeting.durationMinutes * 60 * 1000);
-
-    const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${creds.accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        summary: meeting.title,
-        description: meeting.description || '',
-        start: {
-          dateTime: meeting.startTime.toISOString(),
-          timeZone: 'UTC',
-        },
-        end: {
-          dateTime: endTime.toISOString(),
-          timeZone: 'UTC',
-        },
-        conferenceData: {
-          createRequest: {
-            requestId: `attunly-${Date.now()}`,
-            conferenceSolutionKey: {
-              type: 'hangoutsMeet',
-            },
-          },
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      log.error('Failed to create Google Meet', { status: response.status, error });
-      return null;
-    }
-
-    const data = await response.json();
-    const meetLink = data.conferenceData?.entryPoints?.find(
-      (ep: any) => ep.entryPointType === 'video'
-    )?.uri;
-
-    if (!meetLink) {
-      log.error('No Meet link in response', { userId, eventId: data.id });
-      return null;
-    }
-
-    log.info('Google Meet created', { userId, eventId: data.id });
-
-    return {
-      provider: 'google',
-      meetingLink: meetLink,
-      providerMeetingId: data.id,
-    };
-  } catch (error: any) {
-    log.error('Google Calendar API error', { userId, error: error.message });
-    return null;
-  }
-}
 
 /**
  * Get user's connected providers
  */
 export async function getUserProviders(userId: string): Promise<{
   zoom: boolean;
-  google: boolean;
   zoomEmail?: string;
-  googleEmail?: string;
 }> {
   const supabase = await createClient();
 
@@ -319,9 +216,7 @@ export async function getUserProviders(userId: string): Promise<{
 
   const result = {
     zoom: false,
-    google: false,
     zoomEmail: undefined as string | undefined,
-    googleEmail: undefined as string | undefined,
   };
 
   if (creds) {
@@ -329,10 +224,6 @@ export async function getUserProviders(userId: string): Promise<{
       if (cred.provider === 'zoom') {
         result.zoom = true;
         result.zoomEmail = cred.provider_email || undefined;
-      }
-      if (cred.provider === 'google') {
-        result.google = true;
-        result.googleEmail = cred.provider_email || undefined;
       }
     }
   }

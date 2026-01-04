@@ -60,6 +60,12 @@ export const profiles = pgTable("profiles", {
   // Legacy: kept for backward compatibility during migration
   expertiseSkills: text("expertise_skills").array(),
 
+  // AI-powered expertise matching (free-text + embeddings)
+  // User describes what they can help with in natural language
+  expertiseText: text("expertise_text"),
+  // Note: expertise_embedding vector(384) column exists in DB but not in Drizzle
+  // (Drizzle doesn't have native vector type - handled via raw SQL)
+
   // Availability
   timezone: text("timezone").default("America/New_York"),
   availability: jsonb("availability").default({}), // Legacy JSONB format

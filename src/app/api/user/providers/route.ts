@@ -44,7 +44,7 @@ export async function DELETE(request: Request) {
 
     const { provider } = await request.json();
 
-    if (!provider || !['zoom', 'google'].includes(provider)) {
+    if (!provider || provider !== 'zoom') {
       return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
     }
 

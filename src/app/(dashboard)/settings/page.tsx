@@ -17,6 +17,7 @@ import { AvailabilityGrid, type AvailabilitySlot } from "@/components/availabili
 import { usePlanFeatures, getPlanDisplayName, getPlanPricing, type PlanName } from "@/hooks/use-plan-features";
 import { useThemeCustomization } from "@/contexts/theme-customization-context";
 import { ThemeColorPicker } from "@/components/theme-color-picker";
+import { useEmbeddings } from "@/hooks/use-embeddings";
 
 const SUGGESTED_KNOWLEDGE_AREAS = [
   "JavaScript", "TypeScript", "Python", "React", "Node.js", "SQL", "AWS",
@@ -32,6 +33,7 @@ interface ProfileData {
   major: string;
   bio: string;
   knowledgeAreas: string[];
+  expertiseText: string;
   timezone: string;
   availabilitySlots: AvailabilitySlot[];
   currentlyAvailable: boolean;
@@ -59,6 +61,7 @@ const DEFAULT_PROFILE: ProfileData = {
   major: "",
   bio: "",
   knowledgeAreas: [],
+  expertiseText: "",
   timezone: "America/New_York",
   availabilitySlots: [],
   currentlyAvailable: false,
@@ -82,16 +85,17 @@ export default function SettingsPage() {
   const [copiedInvite, setCopiedInvite] = useState(false);
   const [meetingProviders, setMeetingProviders] = useState<{
     zoom: boolean;
-    google: boolean;
     zoomEmail?: string;
-    googleEmail?: string;
-  }>({ zoom: false, google: false });
+  }>({ zoom: false });
   const [providersLoading, setProvidersLoading] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<string>("");
   const isInitialLoad = useRef(true);
+  const expertiseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [expertiseSaving, setExpertiseSaving] = useState(false);
 
   const supabase = createClient();
+  const { embed, ready: embeddingReady, generating: embeddingGenerating } = useEmbeddings();
 
   useEffect(() => {
     // Handle OAuth callbacks
@@ -112,14 +116,9 @@ export default function SettingsPage() {
       window.history.replaceState({}, '', '/settings');
     }
 
-    // Handle Zoom/Google OAuth callbacks
+    // Handle Zoom OAuth callbacks
     if (successParam === 'zoom_connected') {
       toast.success("Zoom connected successfully!");
-      window.history.replaceState({}, '', '/settings');
-      loadMeetingProviders();
-      setActiveTab("notifications");
-    } else if (successParam === 'google_connected') {
-      toast.success("Google Meet connected successfully!");
       window.history.replaceState({}, '', '/settings');
       loadMeetingProviders();
       setActiveTab("notifications");
@@ -131,10 +130,6 @@ export default function SettingsPage() {
         'zoom_invalid_response': 'Invalid response from Zoom',
         'zoom_token_exchange_failed': 'Failed to connect Zoom account',
         'zoom_callback_failed': 'Zoom connection failed',
-        'google_denied': 'Google authorization was denied',
-        'google_invalid_response': 'Invalid response from Google',
-        'google_token_exchange_failed': 'Failed to connect Google account',
-        'google_callback_failed': 'Google connection failed',
       };
       toast.error(errorMessages[errorParam] || 'Connection failed');
       window.history.replaceState({}, '', '/settings');
@@ -165,27 +160,19 @@ export default function SettingsPage() {
     window.location.href = '/api/auth/zoom';
   };
 
-  const connectGoogle = () => {
-    window.location.href = '/api/auth/google';
-  };
-
-  const disconnectProvider = async (provider: 'zoom' | 'google') => {
+  const disconnectZoom = async () => {
     try {
       const response = await fetch('/api/user/providers', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider }),
+        body: JSON.stringify({ provider: 'zoom' }),
       });
       if (response.ok) {
-        setMeetingProviders(prev => ({
-          ...prev,
-          [provider]: false,
-          [`${provider}Email`]: undefined,
-        }));
-        toast.success(`${provider === 'zoom' ? 'Zoom' : 'Google'} disconnected`);
+        setMeetingProviders({ zoom: false, zoomEmail: undefined });
+        toast.success('Zoom disconnected');
       }
-    } catch (error) {
-      toast.error(`Failed to disconnect ${provider === 'zoom' ? 'Zoom' : 'Google'}`);
+    } catch {
+      toast.error('Failed to disconnect Zoom');
     }
   };
 
@@ -208,6 +195,7 @@ export default function SettingsPage() {
           major: data.major || "",
           bio: data.bio || "",
           knowledgeAreas: data.knowledge_areas || data.expertise_skills || [],
+          expertiseText: data.expertise_text || "",
           timezone: data.timezone || "America/New_York",
           availabilitySlots: data.availability?.slots || [],
           currentlyAvailable: data.availability?.currentlyAvailable || false,
@@ -320,9 +308,60 @@ export default function SettingsPage() {
         updateProfile({ slackConnected: false, slackUserId: "", slackHandle: "" });
         toast.success("Slack disconnected");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to disconnect Slack");
     }
+  };
+
+  // Save expertise text with embedding (separate from auto-save to handle async embedding)
+  const saveExpertise = useCallback(async (text: string) => {
+    if (expertiseTimeoutRef.current) {
+      clearTimeout(expertiseTimeoutRef.current);
+    }
+
+    expertiseTimeoutRef.current = setTimeout(async () => {
+      if (!text.trim()) {
+        // Clear expertise if empty
+        try {
+          await fetch('/api/profile/expertise', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ expertiseText: '', embedding: null }),
+          });
+        } catch {
+          console.error('Failed to clear expertise');
+        }
+        return;
+      }
+
+      setExpertiseSaving(true);
+      try {
+        // Generate embedding client-side
+        const embedding = await embed(text);
+
+        // Save both text and embedding
+        const response = await fetch('/api/profile/expertise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ expertiseText: text, embedding }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save');
+        }
+      } catch (error) {
+        console.error('Failed to save expertise:', error);
+        toast.error('Failed to save expertise');
+      } finally {
+        setExpertiseSaving(false);
+      }
+    }, 1500); // 1.5s debounce for expertise (longer because of embedding generation)
+  }, [embed]);
+
+  // Handle expertise text changes
+  const handleExpertiseChange = (text: string) => {
+    updateProfile({ expertiseText: text });
+    saveExpertise(text);
   };
 
   const filteredSuggestions = SUGGESTED_KNOWLEDGE_AREAS.filter(
@@ -455,61 +494,45 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Knowledge Areas */}
+          {/* What Can You Help With - AI-powered expertise matching */}
           <Card>
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Knowledge Areas</CardTitle>
-              <CardDescription>Skills you can help teammates with</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  value={knowledgeInput}
-                  onChange={(e) => setKnowledgeInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addKnowledgeArea())}
-                  placeholder="Add a skill..."
-                  className="flex-1"
-                />
-                <Button
-                  onClick={() => addKnowledgeArea()}
-                  disabled={!knowledgeInput.trim()}
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4" weight="duotone" />
-                </Button>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base font-semibold">What can you help with?</CardTitle>
+                {!embeddingReady && (
+                  <Badge variant="secondary" className="text-xs bg-muted">
+                    <CircleNotch className="w-3 h-3 animate-spin mr-1" weight="duotone" />
+                    Loading AI
+                  </Badge>
+                )}
+                {expertiseSaving && (
+                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                    <Sparkle className="w-3 h-3 mr-1" weight="duotone" />
+                    Saving...
+                  </Badge>
+                )}
               </div>
-
-              {knowledgeInput && filteredSuggestions.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {filteredSuggestions.map(area => (
-                    <button
-                      key={area}
-                      onClick={() => addKnowledgeArea(area)}
-                      className="px-2.5 py-1 text-xs bg-muted hover:bg-accent text-muted-foreground hover:text-accent-foreground rounded-md transition-colors"
-                    >
-                      {area}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-1.5 min-h-[40px]">
-                {profile.knowledgeAreas.length === 0 ? (
-                  <span className="text-sm text-muted-foreground">No skills added yet</span>
-                ) : (
-                  profile.knowledgeAreas.map(area => (
-                    <Badge
-                      key={area}
-                      variant="secondary"
-                      className="bg-primary/10 text-primary border-0 gap-1"
-                    >
-                      {area}
-                      <button onClick={() => removeKnowledgeArea(area)} className="hover:text-primary/70">
-                        <X className="w-3 h-3" weight="duotone" />
-                      </button>
-                    </Badge>
-                  ))
+              <CardDescription>
+                Describe your expertise in your own words. Be specific about tools, processes, or domains you know well.
+                Our AI will match you with teammates who need your help.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Textarea
+                value={profile.expertiseText}
+                onChange={(e) => handleExpertiseChange(e.target.value)}
+                placeholder="Example: I've been doing sales ops for 5 years. Really good at Salesforce automation, building reports, and helping new reps get up to speed. Also know SQL for custom reporting."
+                rows={4}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{profile.expertiseText?.length || 0}/500 characters</span>
+                {embeddingReady && profile.expertiseText && !expertiseSaving && (
+                  <span className="flex items-center gap-1 text-success">
+                    <Check className="w-3 h-3" weight="bold" />
+                    AI-indexed
+                  </span>
                 )}
               </div>
             </CardContent>
@@ -663,7 +686,7 @@ export default function SettingsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => disconnectProvider('zoom')}
+                    onClick={disconnectZoom}
                     className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
                   >
                     <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
@@ -682,48 +705,6 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Button onClick={connectZoom} className="bg-blue-500 hover:bg-blue-600 gap-2">
-                    <Plugs className="w-4 h-4" weight="duotone" />
-                    Connect
-                  </Button>
-                </div>
-              )}
-
-              {/* Google Meet */}
-              {meetingProviders.google ? (
-                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-                      <VideoCamera className="w-5 h-5 text-white" weight="fill" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Google Meet Connected</p>
-                      <p className="text-sm text-muted-foreground">
-                        {meetingProviders.googleEmail || "Ready to create meetings"}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => disconnectProvider('google')}
-                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
-                  >
-                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
-                    Disconnect
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
-                      <VideoCamera className="w-5 h-5 text-green-500" weight="duotone" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Google Meet</p>
-                      <p className="text-sm text-muted-foreground">Create Google Meet links automatically</p>
-                    </div>
-                  </div>
-                  <Button onClick={connectGoogle} className="bg-green-500 hover:bg-green-600 gap-2">
                     <Plugs className="w-4 h-4" weight="duotone" />
                     Connect
                   </Button>

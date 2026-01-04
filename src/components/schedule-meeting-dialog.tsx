@@ -27,13 +27,11 @@ import { Loader2, Users, Calendar, Clock, Video, Search, Check, Link2 } from "lu
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-type MeetingProvider = 'zoom' | 'google' | 'custom';
+type MeetingProvider = 'zoom' | 'custom';
 
 interface ConnectedProviders {
   zoom: boolean;
-  google: boolean;
   zoomEmail?: string;
-  googleEmail?: string;
 }
 
 interface Pod {
@@ -90,7 +88,7 @@ export function ScheduleMeetingDialog({
 
   // Meeting provider
   const [selectedProvider, setSelectedProvider] = useState<MeetingProvider>('custom');
-  const [connectedProviders, setConnectedProviders] = useState<ConnectedProviders>({ zoom: false, google: false });
+  const [connectedProviders, setConnectedProviders] = useState<ConnectedProviders>({ zoom: false });
   const [loadingProviders, setLoadingProviders] = useState(false);
 
   const supabase = createClient();
@@ -114,11 +112,9 @@ export function ScheduleMeetingDialog({
       const data = await response.json();
       if (data.success) {
         setConnectedProviders(data.providers);
-        // Default to first connected provider if any
+        // Default to Zoom if connected
         if (data.providers.zoom) {
           setSelectedProvider('zoom');
-        } else if (data.providers.google) {
-          setSelectedProvider('google');
         } else {
           setSelectedProvider('custom');
         }
@@ -621,7 +617,7 @@ export function ScheduleMeetingDialog({
               {/* Meeting Provider Selection */}
               <div className="space-y-3">
                 <Label>Video Platform</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {/* Zoom Option */}
                   <button
                     type="button"
@@ -649,39 +645,6 @@ export function ScheduleMeetingDialog({
                       </div>
                     </div>
                     {selectedProvider === 'zoom' && (
-                      <div className="absolute top-2 right-2">
-                        <Check className="w-4 h-4 text-primary" />
-                      </div>
-                    )}
-                  </button>
-
-                  {/* Google Meet Option */}
-                  <button
-                    type="button"
-                    onClick={() => connectedProviders.google && setSelectedProvider('google')}
-                    disabled={!connectedProviders.google}
-                    className={`relative p-3 rounded-lg border-2 transition-all text-left ${
-                      selectedProvider === 'google'
-                        ? 'border-primary bg-primary/5'
-                        : connectedProviders.google
-                        ? 'border-border hover:border-primary/50 hover:bg-muted/50'
-                        : 'border-border/50 bg-muted/30 opacity-60 cursor-not-allowed'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded bg-green-500 flex items-center justify-center">
-                        <Video className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground">Google Meet</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {connectedProviders.google
-                            ? connectedProviders.googleEmail || 'Connected'
-                            : 'Not connected'}
-                        </p>
-                      </div>
-                    </div>
-                    {selectedProvider === 'google' && (
                       <div className="absolute top-2 right-2">
                         <Check className="w-4 h-4 text-primary" />
                       </div>
@@ -716,15 +679,15 @@ export function ScheduleMeetingDialog({
                 </div>
 
                 {/* Info text based on selection */}
-                {selectedProvider !== 'custom' && (
+                {selectedProvider === 'zoom' && (
                   <p className="text-xs text-muted-foreground">
-                    A {selectedProvider === 'zoom' ? 'Zoom' : 'Google Meet'} link will be created automatically
+                    A Zoom link will be created automatically
                   </p>
                 )}
 
-                {(!connectedProviders.zoom || !connectedProviders.google) && (
+                {!connectedProviders.zoom && (
                   <p className="text-xs text-muted-foreground">
-                    Connect Zoom or Google in{' '}
+                    Connect Zoom in{' '}
                     <a href="/settings" className="text-primary hover:underline">Settings</a>
                     {' '}for auto-generated links
                   </p>

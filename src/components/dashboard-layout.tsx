@@ -15,7 +15,8 @@ import {
   List,
   SignOut,
   CalendarBlank,
-  Bell
+  Bell,
+  MagnifyingGlass
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,7 @@ function DashboardLayoutInner({
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: SquaresFour, label: "Dashboard", href: "/dashboard" },
+    { icon: MagnifyingGlass, label: "Find Help", href: "/find-help" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
     { icon: Bell, label: "Nudges", href: "/notifications", badge: totalUnread > 0 ? totalUnread : undefined },
     { icon: CalendarBlank, label: "Meetings", href: "/meetings" },
