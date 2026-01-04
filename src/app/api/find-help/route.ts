@@ -208,7 +208,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       matches: [],
-      searchType: queryEmbedding ? 'ai' : 'text',
+      searchType: 'none',
     });
 
   } catch (error) {
