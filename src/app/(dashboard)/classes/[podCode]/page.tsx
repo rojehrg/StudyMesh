@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { CircleNotch, ArrowLeft, Users, Copy, Check, Bell, Sparkle, TrendUp, BookOpen, Globe, Shield, Lightning, Clock } from "@phosphor-icons/react";
+import { Loading, ChevronLeft, UsersGroup, Copy, CheckBig, Bell, Star, TrendingUp, BookOpen, Globe, Shield, WifiHigh, Clock } from "react-coolicons";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -275,7 +275,7 @@ function PodDetailContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <CircleNotch className="w-8 h-8 animate-spin text-primary" weight="duotone" />
+        <Loading className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -292,7 +292,7 @@ function PodDetailContent() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
             <Link href="/classes">
-              <ArrowLeft className="mr-2 h-4 w-4" weight="duotone" />
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Pods
             </Link>
           </Button>
@@ -318,7 +318,7 @@ function PodDetailContent() {
                   variant="outline"
                   className="hover:bg-primary/10 h-9 w-9"
                 >
-                  {copied ? <Check className="h-4 w-4 text-primary" weight="duotone" /> : <Copy className="h-4 w-4" weight="duotone" />}
+                  {copied ? <CheckBig className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -330,7 +330,7 @@ function PodDetailContent() {
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" weight="duotone" />
+                <Shield className="w-5 h-5 text-primary" />
                 Pod Manager Settings
               </CardTitle>
               <CardDescription>
@@ -341,7 +341,7 @@ function PodDetailContent() {
               <div className="flex items-center justify-between p-4 bg-card rounded-xl">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                    <Globe className="w-5 h-5 text-primary" weight="duotone" />
+                    <Globe className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <Label className="text-base font-semibold text-foreground">Allow Cross-Pod Help</Label>
@@ -365,7 +365,7 @@ function PodDetailContent() {
           <Card className="bg-success/5 border-success/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
-                <Lightning className="w-5 h-5" weight="duotone" />
+                <WifiHigh className="w-5 h-5" />
                 Available Now
               </CardTitle>
               <CardDescription>These teammates are online and ready to help</CardDescription>
@@ -388,7 +388,7 @@ function PodDetailContent() {
                       <div>
                         <p className="text-sm font-medium text-foreground">{member.name}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" weight="duotone" />
+                          <Clock className="w-3 h-3" />
                           Available now
                         </p>
                       </div>
@@ -406,7 +406,7 @@ function PodDetailContent() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
-                    <TrendUp className="w-4 h-4" weight="duotone" />
+                    <TrendingUp className="w-4 h-4" />
                     Top Skills in Pod
                   </CardTitle>
                 </CardHeader>
@@ -426,7 +426,7 @@ function PodDetailContent() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold flex items-center gap-2 text-success">
-                    <BookOpen className="w-4 h-4" weight="duotone" />
+                    <BookOpen className="w-4 h-4" />
                     People Want to Learn
                   </CardTitle>
                 </CardHeader>
@@ -450,7 +450,7 @@ function PodDetailContent() {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
+                <UsersGroup className="w-5 h-5 text-primary" />
                 Pod Members
               </CardTitle>
               <span className="text-sm text-muted-foreground">{members.length} {members.length === 1 ? 'member' : 'members'}</span>
@@ -487,13 +487,13 @@ function PodDetailContent() {
                         )}
                         {member.currentlyAvailable && member.userId !== currentUserId && (
                           <Badge className="bg-success/20 text-success text-xs px-1.5 border-0 gap-0.5">
-                            <Lightning className="w-3 h-3" />
+                            <WifiHigh className="w-3 h-3" />
                             Now
                           </Badge>
                         )}
                         {member.lookingToHelp && member.userId !== currentUserId && !member.currentlyAvailable && (
                           <span title="Looking to help">
-                            <Sparkle className="w-4 h-4 text-accent" weight="duotone" />
+                            <Star className="w-4 h-4 text-accent" />
                           </span>
                         )}
                       </div>
@@ -591,7 +591,7 @@ export default function PodDetailPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <CircleNotch className="h-8 w-8 animate-spin text-primary" />
+        <Loading className="h-8 w-8 animate-spin text-primary" />
       </div>
     }>
       <PodDetailContent />

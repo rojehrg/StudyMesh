@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { CircleNotch } from "@phosphor-icons/react";
+import { Loading } from "react-coolicons";
 import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
@@ -47,7 +47,7 @@ export default function LoginPage() {
   if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <CircleNotch className="h-8 w-8 animate-spin text-violet-600" weight="duotone" />
+        <Loading className="h-8 w-8 animate-spin text-violet-600" />
       </div>
     );
   }
@@ -190,7 +190,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
             >
-              {loading && <CircleNotch className="h-4 w-4 animate-spin" weight="duotone" />}
+              {loading && <Loading className="h-4 w-4 animate-spin" />}
               Sign in
             </button>
           </form>

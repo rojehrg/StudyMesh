@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { CircleNotch, CheckCircle, ArrowLeft } from "@phosphor-icons/react";
+import { Loading, CheckBig, ChevronLeft } from "react-coolicons";
 import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           <div className="flex-1 flex items-center justify-center px-8 md:px-16 lg:px-24">
             <div className="w-full max-w-md text-center">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600" weight="duotone" />
+                <CheckBig className="w-10 h-10 text-green-600" />
               </div>
               <h1 className="text-3xl font-bold text-gray-900">Check your email</h1>
               <p className="mt-4 text-lg text-gray-600">
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-8"
             >
-              <ArrowLeft className="w-4 h-4" weight="duotone" />
+              <ChevronLeft className="w-4 h-4" />
               Back to login
             </Link>
 
@@ -140,7 +140,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
               >
-                {loading && <CircleNotch className="h-4 w-4 animate-spin" weight="duotone" />}
+                {loading && <Loading className="h-4 w-4 animate-spin" />}
                 Send reset link
               </button>
             </form>

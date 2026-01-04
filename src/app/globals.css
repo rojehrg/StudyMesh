@@ -49,8 +49,8 @@
     --destructive: 0 45% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Muted sage */
-    --success: 145 35% 45%;
+    /* Success - Refined emerald green */
+    --success: 158 45% 42%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Amber */
@@ -73,7 +73,7 @@
     --chart-1: 262 60% 50%;
     --chart-2: 340 70% 55%;
     --chart-3: 210 90% 55%;
-    --chart-4: 142 70% 40%;
+    --chart-4: 152 50% 40%;
     --chart-5: 38 90% 50%;
   }
 
@@ -100,20 +100,20 @@
     --secondary: 220 8% 18%;
     --secondary-foreground: 0 0% 90%;
 
-    /* Accent - Subtle highlight */
-    --accent: 220 8% 20%;
+    /* Accent - Visible hover highlight (must contrast with card 12%) */
+    --accent: 220 8% 24%;
     --accent-foreground: 0 0% 95%;
 
-    /* Muted - For subtle text and backgrounds */
-    --muted: 220 8% 16%;
-    --muted-foreground: 220 5% 55%;
+    /* Muted - For subtle backgrounds (visibility on dark) */
+    --muted: 220 8% 20%;
+    --muted-foreground: 220 5% 70%;  /* High contrast for readable text */
 
     /* Destructive - Soft coral */
     --destructive: 0 50% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Muted sage */
-    --success: 145 40% 50%;
+    /* Success - Refined emerald green (sophisticated, modern) */
+    --success: 158 50% 48%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Bright amber */
@@ -124,16 +124,16 @@
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - Subtle but visible */
-    --border: 220 8% 20%;
-    --input: 220 8% 18%;
+    /* Borders - Visible for component separation */
+    --border: 220 8% 24%;
+    --input: 220 8% 20%;
     --ring: 262 83% 68%;
 
     /* Chart colors - Vibrant for visibility */
     --chart-1: 262 83% 68%;
     --chart-2: 340 75% 65%;
     --chart-3: 217 91% 60%;
-    --chart-4: 142 71% 45%;
+    --chart-4: 152 55% 45%;
     --chart-5: 38 92% 50%;
   }
 }

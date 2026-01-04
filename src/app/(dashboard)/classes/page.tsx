@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, SignIn, UsersThree, CircleNotch, MagnifyingGlass, Clock, Buildings } from "@phosphor-icons/react";
+import { AddPlusCircle, Exit, UsersGroup, Loading, SearchMagnifyingGlass, Clock, Building01 } from "react-coolicons";
 import { motion } from "framer-motion";
 import { EmptyState } from "@/components/empty-state";
 import { PageLoader } from "@/components/loading-states";
@@ -88,13 +88,13 @@ export default function ClassesPage() {
         <div className="flex gap-3">
           <Button variant="outline" asChild>
             <Link href="/classes/join">
-              <SignIn className="mr-2 h-4 w-4" weight="duotone" />
+              <Exit className="mr-2 h-4 w-4" />
               Join Pod
             </Link>
           </Button>
           <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
             <Link href="/classes/create">
-              <PlusCircle className="mr-2 h-4 w-4" weight="duotone" />
+              <AddPlusCircle className="mr-2 h-4 w-4" />
               Create Pod
             </Link>
           </Button>
@@ -103,7 +103,7 @@ export default function ClassesPage() {
 
       {pods.length > 0 && (
         <div className="relative">
-          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="duotone" />
+          <SearchMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search pods by name or business unit..."
             value={searchQuery}
@@ -114,47 +114,45 @@ export default function ClassesPage() {
       )}
 
       {filteredPods.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPods.map((pod, index) => (
             <motion.div
               key={pod.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
             >
               <Link href={`/classes/${pod.pod_code}`}>
-                <Card className="hover-lift cursor-pointer group h-full">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="group-hover:text-primary transition-colors">
+                <Card className="hover-lift cursor-pointer group h-full border border-border/50">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="group-hover:text-primary transition-colors text-base truncate">
                           {pod.pod_name}
                         </CardTitle>
-                        <CardDescription className="mt-2 flex items-center gap-1">
-                          <Buildings className="w-3 h-3" weight="duotone" />
-                          {pod.business_unit || "General"}
+                        <CardDescription className="mt-1 flex items-center gap-1 text-xs">
+                          <Building01 className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{pod.business_unit || "General"}</span>
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary" className="bg-primary/10 text-primary shadow-sm">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary text-xs shrink-0">
                         {pod.pod_code}
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <UsersThree className="w-4 h-4" weight="duotone" />
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <UsersGroup className="w-3.5 h-3.5" />
                         <span>{pod.memberCount} {pod.memberCount === 1 ? 'member' : 'members'}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-3 h-3" weight="duotone" />
-                        <span className="text-xs">
-                          {new Date(pod.created_at).toLocaleDateString()}
-                        </span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{new Date(pod.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     {pod.initiative_owner && (
-                      <div className="mt-3 pt-3 text-xs text-muted-foreground">
+                      <div className="mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground truncate">
                         Owner: {pod.initiative_owner}
                       </div>
                     )}
@@ -166,7 +164,7 @@ export default function ClassesPage() {
         </div>
       ) : pods.length === 0 ? (
         <EmptyState
-          icon={UsersThree}
+          icon={UsersGroup}
           title="No pods yet"
           description="Pods are where the magic happens. Create your own or join a team pod to start collaborating with teammates."
           action={{ label: "Create Pod", href: "/classes/create" }}
@@ -175,7 +173,7 @@ export default function ClassesPage() {
         />
       ) : (
         <EmptyState
-          icon={MagnifyingGlass}
+          icon={SearchMagnifyingGlass}
           title="No pods match your search"
           description="Try adjusting your search terms to find what you're looking for."
           variant="card"

@@ -8,15 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  MagnifyingGlass,
-  CircleNotch,
-  Lightning,
-  Sparkle,
+  SearchMagnifyingGlass,
+  Loading,
+  WifiHigh,
+  Star,
   UserCircle,
-  HandWaving,
-  ArrowRight,
+  PaperPlane,
+  ArrowRightMd,
   Info
-} from "@phosphor-icons/react";
+} from "react-coolicons";
 import { useEmbeddings } from "@/hooks/use-embeddings";
 import { createClient } from "@/lib/supabase/client";
 import { NudgeDialog } from "@/components/nudge-dialog";
@@ -51,6 +51,7 @@ export default function FindHelpPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedMember, setSelectedMember] = useState<MatchResult | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [searchType, setSearchType] = useState<'ai' | 'text' | null>(null);
 
   const { embed, ready: embeddingReady, generating: embeddingGenerating } = useEmbeddings();
   const supabase = createClient();
@@ -102,26 +103,40 @@ export default function FindHelpPage() {
   }, [supabase, embeddingReady, embed]);
 
   const handleSearch = useCallback(async () => {
-    if (!query.trim() || !embeddingReady) return;
+    if (!query.trim()) return;
 
     setSearching(true);
     setHasSearched(true);
+    setSearchType(null);
 
     try {
-      // Generate embedding for the search query
-      const queryEmbedding = await embed(query);
+      let queryEmbedding = null;
 
-      // Search for matches
+      // Try to generate embedding if ready
+      if (embeddingReady) {
+        try {
+          queryEmbedding = await embed(query);
+        } catch (err) {
+          console.warn('Embedding generation failed, using text search:', err);
+        }
+      }
+
+      // Search for matches - API will fall back to text search if no embedding
       const response = await fetch('/api/find-help', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ queryEmbedding, limit: 10 }),
+        body: JSON.stringify({
+          queryEmbedding,
+          queryText: query, // Always pass text for fallback
+          limit: 10,
+        }),
       });
 
       const data = await response.json();
 
-      if (data.success && data.matches) {
-        setResults(data.matches);
+      if (data.success) {
+        setResults(data.matches || []);
+        setSearchType(data.searchType || 'text');
       } else {
         toast.error('Failed to search');
         setResults([]);
@@ -169,7 +184,7 @@ export default function FindHelpPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <MagnifyingGlass className="w-7 h-7 text-primary" weight="duotone" />
+          <SearchMagnifyingGlass className="w-7 h-7 text-primary" />
           Find Help
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -184,7 +199,7 @@ export default function FindHelpPage() {
             <CardTitle className="text-base font-semibold">What do you need help with?</CardTitle>
             {!embeddingReady && (
               <Badge variant="secondary" className="text-xs bg-muted">
-                <CircleNotch className="w-3 h-3 animate-spin mr-1" weight="duotone" />
+                <Loading className="w-3 h-3 animate-spin mr-1" />
                 Loading AI
               </Badge>
             )}
@@ -212,17 +227,17 @@ export default function FindHelpPage() {
             </p>
             <Button
               onClick={handleSearch}
-              disabled={!query.trim() || !embeddingReady || searching}
+              disabled={!query.trim() || searching}
               className="gap-2"
             >
               {searching || embeddingGenerating ? (
                 <>
-                  <CircleNotch className="w-4 h-4 animate-spin" weight="duotone" />
+                  <Loading className="w-4 h-4 animate-spin" />
                   {embeddingGenerating ? "Analyzing..." : "Searching..."}
                 </>
               ) : (
                 <>
-                  <Sparkle className="w-4 h-4" weight="duotone" />
+                  <Star className="w-4 h-4" />
                   Find Matches
                 </>
               )}
@@ -235,9 +250,22 @@ export default function FindHelpPage() {
       {hasSearched && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">
-              {results.length > 0 ? "Best Matches" : "No Matches Found"}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-foreground">
+                {results.length > 0 ? "Best Matches" : "No Matches Found"}
+              </h2>
+              {searchType && results.length > 0 && (
+                <Badge variant="secondary" className={`text-xs border-0 ${
+                  searchType === 'ai' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {searchType === 'ai' ? (
+                    <><Star className="w-3 h-3 mr-1" />AI Match</>
+                  ) : (
+                    <><SearchMagnifyingGlass className="w-3 h-3 mr-1" />Text Search</>
+                  )}
+                </Badge>
+              )}
+            </div>
             {results.length > 0 && (
               <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
                 {results.length} {results.length === 1 ? 'person' : 'people'} found
@@ -248,11 +276,16 @@ export default function FindHelpPage() {
           {results.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <UserCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" weight="duotone" />
-                <h3 className="font-semibold text-foreground mb-2">No matches yet</h3>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  We couldn't find teammates with matching expertise. Try rephrasing your question or ask in a pod.
+                <UserCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-semibold text-foreground mb-2">No matches found</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">
+                  We match you with teammates based on their expertise profiles. If your team is new, ask teammates to fill in "What can you help with?" in their Settings.
                 </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button variant="outline" size="sm" asChild>
+                    <a href="/settings">Add your expertise</a>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
@@ -300,7 +333,7 @@ export default function FindHelpPage() {
                             </Badge>
                             {match.currently_available && (
                               <Badge className="bg-success/20 text-success border-0 text-xs">
-                                <Lightning className="w-3 h-3 mr-0.5" weight="fill" />
+                                <WifiHigh className="w-3 h-3 mr-0.5" />
                                 Available now
                               </Badge>
                             )}
@@ -328,7 +361,7 @@ export default function FindHelpPage() {
                             : 'bg-primary hover:bg-primary/90'
                           }
                         >
-                          <HandWaving className="w-4 h-4 mr-1" weight="duotone" />
+                          <PaperPlane className="w-4 h-4 mr-1" />
                           Nudge
                         </Button>
                       </div>
@@ -345,7 +378,7 @@ export default function FindHelpPage() {
       {!hasSearched && (
         <Card className="border-dashed">
           <CardContent className="py-8 text-center">
-            <Info className="w-10 h-10 text-muted-foreground mx-auto mb-3" weight="duotone" />
+            <Info className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <h3 className="font-medium text-foreground mb-1">How it works</h3>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               Our AI understands natural language. Just describe your problem and we'll find teammates
@@ -357,7 +390,7 @@ export default function FindHelpPage() {
                 Green = available now
               </span>
               <span className="flex items-center gap-1">
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRightMd className="w-3 h-3" />
                 Higher % = better match
               </span>
             </div>

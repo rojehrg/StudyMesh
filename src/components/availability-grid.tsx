@@ -667,7 +667,7 @@ export function AvailabilityGrid({
                   key={`${day}-${slotIdx}`}
                   variant="secondary"
                   className={cn(
-                    "font-normal gap-1 pr-1",
+                    "font-normal gap-1 pr-1 rounded bg-muted/80 text-muted-foreground border border-border/50",
                     !readOnly && "cursor-pointer hover:bg-destructive/20 hover:text-destructive"
                   )}
                   onClick={() => {

@@ -5,19 +5,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
-  UsersThree,
-  Lightning,
-  CalendarBlank,
-  GlobeHemisphereWest,
+  UsersGroup,
+  WifiHigh,
+  Calendar,
+  Globe,
   ChatCircle,
   Play,
-  MagnifyingGlass,
+  SearchMagnifyingGlass,
   Clock,
   Bell,
-  Target,
-  CaretDown,
-  ArrowRight,
-} from "@phosphor-icons/react";
+  Star,
+  ChevronDown,
+  ArrowRightMd,
+} from "react-coolicons";
 import { motion, AnimatePresence } from "framer-motion";
 
 const fadeIn = {
@@ -50,19 +50,19 @@ const features = [
     id: "skills",
     title: "Expertise Directory",
     description: "Everyone tags what they know. When you need help with billing systems or React hooks, instantly see who has that expertise—across all teams.",
-    icon: Target,
+    icon: Star,
   },
   {
     id: "pods",
     title: "Cross-Team Pods",
     description: "Group people across departments, orgs, and timezones. Internal teams, external contractors, offshore partners—all in one view.",
-    icon: UsersThree,
+    icon: UsersGroup,
   },
   {
     id: "availability",
     title: "Visual Availability Grid",
     description: "See when everyone's free at a glance. No more guessing who's online in which timezone. Find the 2-hour overlap that actually works.",
-    icon: CalendarBlank,
+    icon: Calendar,
   },
   {
     id: "nudges",
@@ -80,7 +80,7 @@ const features = [
     id: "timezones",
     title: "Timezone Intelligence",
     description: "Automatic detection across your distributed team. See overlapping hours instantly. Stop doing timezone math in your head.",
-    icon: GlobeHemisphereWest,
+    icon: Globe,
   },
 ];
 
@@ -136,7 +136,7 @@ export default function LandingPage() {
             {/* Social Proof Kicker */}
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
-                <UsersThree className="w-4 h-4" weight="duotone" />
+                <UsersGroup className="w-4 h-4" />
                 For teams spread across timezones and orgs
               </span>
             </motion.div>
@@ -164,14 +164,14 @@ export default function LandingPage() {
               <Link href="/signup">
                 <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
                   Start Free — No Credit Card
-                  <ArrowRight className="w-5 h-5" weight="duotone" />
+                  <ArrowRightMd className="w-5 h-5" />
                 </Button>
               </Link>
               <Button
                 variant="outline"
                 className="h-14 px-8 text-base font-semibold rounded-xl bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 gap-2"
               >
-                <Play className="w-5 h-5" weight="duotone" />
+                <Play className="w-5 h-5" />
                 Watch Demo
               </Button>
             </motion.div>
@@ -211,11 +211,11 @@ export default function LandingPage() {
                   <div className="md:col-span-2 bg-white rounded-xl p-6 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-500">
                     <div className="flex items-center justify-between mb-5">
                       <div className="flex items-center gap-2">
-                        <CalendarBlank className="w-5 h-5 text-violet-600" weight="duotone" />
+                        <Calendar className="w-5 h-5 text-violet-600" />
                         <span className="font-semibold text-gray-900">Team Availability</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Clock className="w-3.5 h-3.5" weight="duotone" />
+                        <Clock className="w-3.5 h-3.5" />
                         <span>Eastern Time (ET)</span>
                       </div>
                     </div>
@@ -276,7 +276,7 @@ export default function LandingPage() {
                     {/* Available Now */}
                     <div className="bg-white rounded-xl p-5 shadow-md shadow-gray-200/50 border-l-4 border-l-green-500">
                       <div className="flex items-center gap-2 mb-4">
-                        <Lightning className="w-5 h-5 text-green-500" weight="duotone" />
+                        <WifiHigh className="w-5 h-5 text-green-500" />
                         <span className="font-semibold text-gray-900">Available Now</span>
                       </div>
                       <div className="space-y-3">
@@ -325,7 +325,7 @@ export default function LandingPage() {
             {/* GIF Placeholder - Future Demo Video */}
             <div className="mt-8 text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-500 text-sm">
-                <Play className="w-4 h-4" weight="duotone" />
+                <Play className="w-4 h-4" />
                 <span>Demo video coming soon</span>
               </div>
             </div>
@@ -365,12 +365,12 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: GlobeHemisphereWest,
+                icon: Globe,
                 title: "Timezone math is exhausting",
                 description: "SF, London, Manila—finding a 30-minute overlap across three timezones shouldn't take longer than the meeting itself.",
               },
               {
-                icon: MagnifyingGlass,
+                icon: SearchMagnifyingGlass,
                 title: "Who even knows about this?",
                 description: "Someone on your team has the answer. But who? Contractors come and go, teams change, and expertise gets buried.",
               },
@@ -389,7 +389,7 @@ export default function LandingPage() {
                 className="bg-white rounded-2xl p-8 shadow-md shadow-gray-200/50 border-l-4 border-l-red-400"
               >
                 <div className="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center mb-5">
-                  <problem.icon className="w-6 h-6" weight="duotone" />
+                  <problem.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{problem.title}</h3>
                 <p className="text-gray-500">{problem.description}</p>
@@ -448,7 +448,7 @@ export default function LandingPage() {
                           ? "bg-violet-600 text-white"
                           : "bg-gray-100 text-gray-500"
                       }`}>
-                        <feature.icon className="w-5 h-5" weight="duotone" />
+                        <feature.icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
                         <h3 className={`font-semibold ${
@@ -457,9 +457,9 @@ export default function LandingPage() {
                           {feature.title}
                         </h3>
                       </div>
-                      <CaretDown className={`w-5 h-5 text-gray-400 transition-transform ${
+                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
                         activeFeature === feature.id ? "rotate-180" : ""
-                      }`} weight="duotone" />
+                      }`} />
                     </div>
                     <AnimatePresence>
                       {activeFeature === feature.id && (
@@ -489,7 +489,7 @@ export default function LandingPage() {
                     <AnimatePresence mode="wait">
                       {activeFeature === "skills" && (
                         <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Target className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <Star className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Who knows what? Now you know.</h4>
                           <p className="text-gray-500 mb-4">Everyone tags their expertise. Search "payment API" or "Kubernetes" and find the right person instantly.</p>
                           <div className="flex justify-center py-4">
@@ -505,7 +505,7 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "pods" && (
                         <motion.div key="pods" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <UsersThree className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <UsersGroup className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">One view across all teams</h4>
                           <p className="text-gray-500 mb-4">Internal, external, contractors—group everyone who needs to collaborate, regardless of org structure.</p>
                           <div className="flex justify-center py-4">
@@ -521,7 +521,7 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "availability" && (
                         <motion.div key="availability" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <CalendarBlank className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <Calendar className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Find the overlap that works</h4>
                           <p className="text-gray-500 mb-4">Visual grid shows when everyone's free. No calendar permissions needed—just set your hours once.</p>
                           <div className="grid grid-cols-5 gap-1">
@@ -533,7 +533,7 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "nudges" && (
                         <motion.div key="nudges" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Bell className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <Bell className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Request help with context</h4>
                           <p className="text-gray-500 mb-4">No more vague Slack messages. Send a focused request, they accept, you're on a call in minutes.</p>
                           <div className="bg-violet-50 rounded-xl p-4 border border-violet-100">
@@ -548,7 +548,7 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "slack" && (
                         <motion.div key="slack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <ChatCircle className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <ChatCircle className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Lives in Slack, not another tab</h4>
                           <p className="text-gray-500 mb-4">Your team already lives in Slack. Nudges arrive as DMs. One click to accept, then schedule.</p>
                           <div className="flex justify-center py-4">
@@ -564,7 +564,7 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "timezones" && (
                         <motion.div key="timezones" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <GlobeHemisphereWest className="w-12 h-12 text-violet-600 mb-4" weight="duotone" />
+                          <Globe className="w-12 h-12 text-violet-600 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Timezones, handled</h4>
                           <p className="text-gray-500 mb-4">Team in Manila? London? SF? See everyone's availability in your local time. Overlap found automatically.</p>
                           <div className="flex justify-center py-4">
@@ -664,7 +664,7 @@ export default function LandingPage() {
             <Link href="/signup">
               <Button className="h-14 px-8 text-base font-semibold bg-white text-violet-600 hover:bg-violet-50 rounded-xl shadow-lg gap-2">
                 Get Started Free
-                <ArrowRight className="w-5 h-5" weight="duotone" />
+                <ArrowRightMd className="w-5 h-5" />
               </Button>
             </Link>
             <Link href="/login">

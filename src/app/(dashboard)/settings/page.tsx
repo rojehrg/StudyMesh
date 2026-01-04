@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, X, Check, User, Clock, Envelope, Link, LinkBreak, ChatCircle, Cloud, CloudSlash, Sparkle, Plus, Buildings, Copy, VideoCamera, Plugs, CreditCard, ArrowRight, Crown } from "@phosphor-icons/react";
+import { Loading, CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd } from "react-coolicons";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -355,7 +355,7 @@ function SettingsContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <CircleNotch className="w-6 h-6 animate-spin text-primary" weight="duotone" />
+        <Loading className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -370,15 +370,15 @@ function SettingsContent() {
   };
 
   const baseTabs = [
-    { id: "profile", label: "Profile", icon: User },
+    { id: "profile", label: "Profile", icon: User01 },
     { id: "availability", label: "Availability", icon: Clock },
-    { id: "notifications", label: "Notifications", icon: Envelope },
-    { id: "organization", label: "Organization", icon: Buildings },
+    { id: "notifications", label: "Notifications", icon: Mail },
+    { id: "organization", label: "Organization", icon: Building01 },
   ];
 
   // Add billing tab only for org owners
   const tabs = org?.isOwner
-    ? [...baseTabs, { id: "billing", label: "Billing", icon: CreditCard }]
+    ? [...baseTabs, { id: "billing", label: "Billing", icon: CreditCard01 }]
     : baseTabs;
 
   return (
@@ -390,10 +390,10 @@ function SettingsContent() {
           <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {saveStatus === 'saving' && <><CircleNotch className="h-4 w-4 animate-spin" weight="duotone" /> Saving...</>}
-          {saveStatus === 'saved' && <><Check className="h-4 w-4 text-success" weight="duotone" /> Saved</>}
-          {saveStatus === 'error' && <><CloudSlash className="h-4 w-4 text-destructive" weight="duotone" /> Error</>}
-          {saveStatus === 'idle' && <><Cloud className="h-4 w-4" weight="duotone" /> Auto-save</>}
+          {saveStatus === 'saving' && <><Loading className="h-4 w-4 animate-spin" /> Saving...</>}
+          {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-success" /> Saved</>}
+          {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-destructive" /> Error</>}
+          {saveStatus === 'idle' && <><WifiHigh className="h-4 w-4" /> Auto-save</>}
         </div>
       </div>
 
@@ -409,7 +409,7 @@ function SettingsContent() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <tab.icon className="w-4 h-4" weight="duotone" />
+            <tab.icon className="w-4 h-4" />
             {tab.label}
           </button>
         ))}
@@ -479,7 +479,7 @@ function SettingsContent() {
                 <CardTitle className="text-base font-semibold">What can you help with?</CardTitle>
                 {expertiseSaving && (
                   <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    <CircleNotch className="w-3 h-3 animate-spin mr-1" weight="duotone" />
+                    <Loading className="w-3 h-3 animate-spin mr-1" />
                     Saving...
                   </Badge>
                 )}
@@ -502,7 +502,7 @@ function SettingsContent() {
                 <span>{profile.expertiseText?.length || 0}/500 characters</span>
                 {profile.expertiseText && !expertiseSaving && (
                   <span className="flex items-center gap-1 text-success">
-                    <Check className="w-3 h-3" weight="bold" />
+                    <CheckBig className="w-3 h-3" />
                     Saved
                   </span>
                 )}
@@ -560,7 +560,7 @@ function SettingsContent() {
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Envelope className="w-5 h-5 text-primary" weight="duotone" />
+                    <Mail className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Email Notifications</p>
@@ -590,25 +590,25 @@ function SettingsContent() {
               {profile.slackConnected ? (
                 <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-border/50">
-                      <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
+                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
+                      <CheckBig className="w-5 h-5 text-success" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Connected</p>
-                      <p className="text-sm text-muted-foreground">
-                        {profile.slackHandle ? `@${profile.slackHandle}` : "Receiving DMs"}
+                      <p className="font-medium text-foreground">
+                        {profile.slackHandle ? `@${profile.slackHandle}` : "Connected"}
                       </p>
+                      <p className="text-sm text-muted-foreground">Receiving direct messages</p>
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10">
-                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
+                    <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                    <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
                       <img src="/slack-logo.png" alt="Slack" className="w-6 h-6" />
                     </div>
                     <div>
@@ -618,7 +618,7 @@ function SettingsContent() {
                   </div>
                   <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69] gap-2">
                     {slackConnecting ? (
-                      <CircleNotch className="w-4 h-4 animate-spin" weight="duotone" />
+                      <Loading className="w-4 h-4 animate-spin" />
                     ) : (
                       <img src="/slack-logo.png" alt="" className="w-4 h-4" />
                     )}
@@ -633,7 +633,7 @@ function SettingsContent() {
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
-                <VideoCamera className="w-6 h-6 text-primary" weight="duotone" />
+                <Camera className="w-6 h-6 text-primary" />
                 <div>
                   <CardTitle className="text-base font-semibold">Video Conferencing</CardTitle>
                   <CardDescription>Auto-generate meeting links when scheduling</CardDescription>
@@ -646,7 +646,7 @@ function SettingsContent() {
                 <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-                      <VideoCamera className="w-5 h-5 text-white" weight="fill" />
+                      <Camera className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Zoom Connected</p>
@@ -661,7 +661,7 @@ function SettingsContent() {
                     onClick={disconnectZoom}
                     className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
                   >
-                    <LinkBreak className="w-4 h-4 mr-2" weight="duotone" />
+                    <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
                 </div>
@@ -669,7 +669,7 @@ function SettingsContent() {
                 <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                      <VideoCamera className="w-5 h-5 text-blue-500" weight="duotone" />
+                      <Camera className="w-5 h-5 text-blue-500" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Zoom</p>
@@ -677,7 +677,7 @@ function SettingsContent() {
                     </div>
                   </div>
                   <Button onClick={connectZoom} className="bg-blue-500 hover:bg-blue-600 gap-2">
-                    <Plugs className="w-4 h-4" weight="duotone" />
+                    <Instance className="w-4 h-4" />
                     Connect
                   </Button>
                 </div>
@@ -701,7 +701,7 @@ function SettingsContent() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <Buildings className="w-6 h-6 text-primary" weight="duotone" />
+                      <Building01 className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-foreground">{org.name}</p>
@@ -727,9 +727,9 @@ function SettingsContent() {
                       </div>
                       <Button onClick={copyInviteCode} variant="outline" size="icon">
                         {copiedInvite ? (
-                          <Check className="w-4 h-4 text-success" weight="duotone" />
+                          <CheckBig className="w-4 h-4 text-success" />
                         ) : (
-                          <Copy className="w-4 h-4" weight="duotone" />
+                          <Copy className="w-4 h-4" />
                         )}
                       </Button>
                     </div>
@@ -748,7 +748,7 @@ function SettingsContent() {
                     <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                          <Check className="w-5 h-5 text-success" weight="duotone" />
+                          <CheckBig className="w-5 h-5 text-success" />
                         </div>
                         <div>
                           <p className="font-medium text-foreground">Connected</p>
@@ -762,7 +762,7 @@ function SettingsContent() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
-                          <ChatCircle className="w-5 h-5 text-[#4A154B]" weight="duotone" />
+                          <ChatCircle className="w-5 h-5 text-[#4A154B]" />
                         </div>
                         <div>
                           <p className="font-medium text-foreground">Connect Workspace Slack</p>
@@ -771,7 +771,7 @@ function SettingsContent() {
                       </div>
                       {org.isOwner && (
                         <Button className="bg-[#4A154B] hover:bg-[#611f69]">
-                          <Link className="w-4 h-4 mr-2" weight="duotone" />
+                          <LinkIcon className="w-4 h-4 mr-2" />
                           Connect
                         </Button>
                       )}
@@ -810,7 +810,7 @@ function SettingsContent() {
           ) : (
             <Card>
               <CardContent className="py-12 text-center">
-                <Buildings className="w-12 h-12 text-muted-foreground mx-auto mb-4" weight="duotone" />
+                <Building01 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="font-semibold text-foreground mb-2">No Organization</h3>
                 <p className="text-sm text-muted-foreground mb-4">You're not part of an organization yet</p>
                 <Button asChild>
@@ -835,20 +835,20 @@ function SettingsContent() {
                 </div>
                 {subscription?.hasActiveSubscription && (
                   <Badge variant="secondary" className="bg-success/10 text-success border-0">
-                    <Check className="w-3 h-3 mr-1" weight="bold" />
+                    <CheckBig className="w-3 h-3 mr-1" />
                     Active
                   </Badge>
                 )}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/10">
+              <div className="flex items-center justify-between p-4 bg-primary/10 rounded-xl border border-primary/20">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
                     {plan === 'free' ? (
-                      <Buildings className="w-6 h-6 text-primary" weight="duotone" />
+                      <Building01 className="w-6 h-6 text-primary" />
                     ) : (
-                      <Crown className="w-6 h-6 text-primary" weight="fill" />
+                      <Star className="w-6 h-6 text-primary" />
                     )}
                   </div>
                   <div>
@@ -915,10 +915,10 @@ function SettingsContent() {
                         ${getPlanPricing('starter').monthly}/seat/mo
                       </p>
                     </div>
-                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <li>Up to 20 seats</li>
-                      <li>Up to 10 pods</li>
-                      <li>Advanced analytics</li>
+                    <ul className="text-sm text-muted-foreground space-y-2 mb-4">
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 seats</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 10 pods</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
                     </ul>
                     <Button
                       className="w-full"
@@ -942,12 +942,12 @@ function SettingsContent() {
                       }}
                     >
                       Upgrade to Starter
-                      <ArrowRight className="w-4 h-4 ml-2" weight="bold" />
+                      <ArrowRightMd className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
 
                   {/* Pro Plan */}
-                  <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 relative">
+                  <div className="p-4 border-2 border-primary rounded-xl bg-primary/10 relative">
                     <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
                       Popular
                     </Badge>
@@ -957,12 +957,12 @@ function SettingsContent() {
                         ${getPlanPricing('pro').monthly}/seat/mo
                       </p>
                     </div>
-                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <li>Up to 100 seats</li>
-                      <li>Up to 50 pods</li>
-                      <li>Custom branding</li>
-                      <li>Priority support</li>
-                      <li>API access</li>
+                    <ul className="text-sm text-muted-foreground space-y-2 mb-4">
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 100 seats</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 50 pods</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Custom branding</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Priority support</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />API access</li>
                     </ul>
                     <Button
                       className="w-full"
@@ -985,7 +985,7 @@ function SettingsContent() {
                       }}
                     >
                       Upgrade to Pro
-                      <ArrowRight className="w-4 h-4 ml-2" weight="bold" />
+                      <ArrowRightMd className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
                 </div>
@@ -1006,15 +1006,23 @@ function SettingsContent() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/50 rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User01 className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground">Seats</span>
+                  </div>
                   <p className="text-2xl font-bold text-foreground">{subscription?.seats || 1}</p>
-                  <p className="text-sm text-muted-foreground">
-                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}`} seats
+                  <p className="text-xs text-muted-foreground">
+                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}`} available
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building01 className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground">Pods</span>
+                  </div>
                   <p className="text-2xl font-bold text-foreground">-</p>
-                  <p className="text-sm text-muted-foreground">
-                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}`} pods
+                  <p className="text-xs text-muted-foreground">
+                    of {plan === 'enterprise' ? 'unlimited' : `${plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}`} available
                   </p>
                 </div>
               </div>
@@ -1031,7 +1039,7 @@ export default function SettingsPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <CircleNotch className="h-8 w-8 animate-spin text-primary" />
+        <Loading className="h-8 w-8 animate-spin text-primary" />
       </div>
     }>
       <SettingsContent />

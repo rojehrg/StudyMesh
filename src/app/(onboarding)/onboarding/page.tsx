@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { X, CircleNotch, ArrowRight, CheckCircle, GlobeHemisphereWest, CaretDown, MagnifyingGlass, SignOut } from "@phosphor-icons/react";
+import { CloseMd, Loading, ArrowRightMd, CheckBig, Globe, ChevronDown, SearchMagnifyingGlass, LogOut } from "react-coolicons";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              <SignOut className="w-4 h-4" weight="duotone" />
+              <LogOut className="w-4 h-4" />
               Log out
             </button>
           </div>
@@ -322,7 +322,7 @@ export default function OnboardingPage() {
                     disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
-                    Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
+                    Next <ArrowRightMd className="ml-2 h-4 w-4" />
                   </Button>
                 </CardFooter>
               </Card>
@@ -345,7 +345,7 @@ export default function OnboardingPage() {
                   {/* Expertise */}
                   <div className="space-y-3">
                     <Label className="text-success font-semibold flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" weight="duotone" /> Expertise (I can mentor others)
+                      <CheckBig className="w-4 h-4" /> Expertise (I can mentor others)
                     </Label>
                     <SkillAutocomplete
                       value={formData.skillInput}
@@ -362,7 +362,7 @@ export default function OnboardingPage() {
                         <Badge key={skill} variant="secondary" className="bg-success/15 text-success hover:bg-success/25 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
                           <button onClick={() => handleRemoveSkill('expertise', skill)} className="ml-2 hover:bg-success/30 rounded-full p-0.5 transition-colors">
-                            <X className="h-3.5 w-3.5" weight="duotone" />
+                            <CloseMd className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
                       ))}
@@ -372,7 +372,7 @@ export default function OnboardingPage() {
                   {/* Growth */}
                   <div className="space-y-3">
                     <Label className="text-primary font-semibold flex items-center gap-2">
-                      <ArrowRight className="w-4 h-4" weight="duotone" /> Growth Areas (I want to learn)
+                      <ArrowRightMd className="w-4 h-4" /> Growth Areas (I want to learn)
                     </Label>
                     <SkillAutocomplete
                       value={formData.growthInput}
@@ -389,7 +389,7 @@ export default function OnboardingPage() {
                         <Badge key={skill} variant="secondary" className="bg-primary/15 text-primary hover:bg-primary/25 pl-3 pr-1 py-1.5 text-sm">
                           {skill}
                           <button onClick={() => handleRemoveSkill('growth', skill)} className="ml-2 hover:bg-primary/30 rounded-full p-0.5 transition-colors">
-                            <X className="h-3.5 w-3.5" weight="duotone" />
+                            <CloseMd className="h-3.5 w-3.5" />
                           </button>
                         </Badge>
                       ))}
@@ -403,7 +403,7 @@ export default function OnboardingPage() {
                     disabled={formData.expertiseSkills.length === 0}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6"
                   >
-                    Next <ArrowRight className="ml-2 h-4 w-4" weight="duotone" />
+                    Next <ArrowRightMd className="ml-2 h-4 w-4" />
                   </Button>
                 </CardFooter>
               </Card>
@@ -426,7 +426,7 @@ export default function OnboardingPage() {
                   {/* Timezone */}
                   <div className="space-y-2">
                     <Label className="flex items-center gap-2 text-foreground">
-                      <GlobeHemisphereWest className="w-4 h-4 text-primary" weight="duotone" />
+                      <Globe className="w-4 h-4 text-primary" />
                       Your Timezone
                     </Label>
                     <p className="text-sm text-muted-foreground">
@@ -439,13 +439,13 @@ export default function OnboardingPage() {
                           className="w-full justify-between h-11 font-normal bg-background border-input text-foreground hover:bg-accent"
                         >
                           <span className="truncate">{selectedTimezoneLabel}</span>
-                          <CaretDown className="h-4 w-4 opacity-50 shrink-0" weight="duotone" />
+                          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[350px] p-0 bg-popover border-border" align="start">
                         <div className="p-2 border-b border-border">
                           <div className="relative">
-                            <MagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="duotone" />
+                            <SearchMagnifyingGlass className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               placeholder="Search timezone..."
                               value={timezoneSearch}
@@ -470,7 +470,7 @@ export default function OnboardingPage() {
                               >
                                 <span>{tz.label}</span>
                                 {formData.timezone === tz.value && (
-                                  <CheckCircle className="h-4 w-4 text-primary" weight="duotone" />
+                                  <CheckBig className="h-4 w-4 text-primary" />
                                 )}
                               </button>
                             ))}
@@ -499,7 +499,7 @@ export default function OnboardingPage() {
                     disabled={loading}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 transition-all active:scale-95"
                   >
-                    {loading && <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" />}
+                    {loading && <Loading className="mr-2 h-4 w-4 animate-spin" />}
                     Complete Profile
                   </Button>
                 </CardFooter>

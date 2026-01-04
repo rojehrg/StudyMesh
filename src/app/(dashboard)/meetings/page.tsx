@@ -7,17 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
-  CalendarBlank,
+  Calendar,
   Clock,
-  UsersThree,
-  VideoCamera,
-  Plus,
-  Check,
-  X,
-  CaretRight,
-  CircleNotch,
+  UsersGroup,
+  Camera,
+  AddPlus,
+  CheckBig,
+  CloseMd,
+  ChevronRight,
+  Loading,
   CalendarCheck
-} from "@phosphor-icons/react";
+} from "react-coolicons";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ScheduleMeetingDialog } from "@/components/schedule-meeting-dialog";
@@ -162,7 +162,7 @@ export default function MeetingsPage() {
           <p className="text-muted-foreground mt-1">Schedule and manage your team meetings</p>
         </div>
         <Button onClick={() => setShowScheduleDialog(true)} className="gap-2">
-          <Plus className="w-4 h-4" weight="duotone" />
+          <AddPlus className="w-4 h-4" />
           Schedule Meeting
         </Button>
       </div>
@@ -170,11 +170,11 @@ export default function MeetingsPage() {
       <Tabs defaultValue="upcoming" className="space-y-6">
         <TabsList>
           <TabsTrigger value="upcoming" className="gap-2">
-            <CalendarBlank className="w-4 h-4" weight="duotone" />
+            <Calendar className="w-4 h-4" />
             Upcoming ({upcomingMeetings.length})
           </TabsTrigger>
           <TabsTrigger value="past" className="gap-2">
-            <CalendarCheck className="w-4 h-4" weight="duotone" />
+            <CalendarCheck className="w-4 h-4" />
             Past ({pastMeetings.length})
           </TabsTrigger>
         </TabsList>
@@ -184,7 +184,7 @@ export default function MeetingsPage() {
             <Card className="border-dashed">
               <CardContent className="py-2">
                 <EmptyState
-                  icon={CalendarBlank}
+                  icon={Calendar}
                   title="No meetings scheduled"
                   description="Your calendar is clear! Schedule a meeting with teammates to collaborate in real-time."
                   action={{
@@ -205,47 +205,47 @@ export default function MeetingsPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <Card className="hover:shadow-lg transition-all h-full bg-card border-2 border-border/50 dark:border-border">
-                      <CardContent className="p-5 flex flex-col h-full">
+                    <Card className="hover:shadow-md transition-all h-full bg-card border border-border/50">
+                      <CardContent className="p-4 flex flex-col h-full">
                         {/* Header with title and status */}
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <h3 className="font-semibold text-base text-foreground line-clamp-2 flex-1">{meeting.title}</h3>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-sm text-foreground line-clamp-2 flex-1">{meeting.title}</h3>
                           {getStatusBadge(meeting)}
                         </div>
 
                         {meeting.description && (
-                          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{meeting.description}</p>
+                          <p className="text-muted-foreground text-xs mb-2 line-clamp-2">{meeting.description}</p>
                         )}
 
                         {/* Meeting details */}
-                        <div className="space-y-2 text-sm text-muted-foreground flex-1">
-                          <div className="flex items-center gap-2">
-                            <CalendarBlank className="w-4 h-4 text-primary/70" weight="duotone" />
+                        <div className="space-y-1.5 text-xs text-muted-foreground flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-primary/70" />
                             <span>{date}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary/70" weight="duotone" />
-                            <span>{time} {timezone} · {meeting.duration_minutes} min</span>
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-primary/70" />
+                            <span>{time} · {meeting.duration_minutes}m</span>
                           </div>
                           {meeting.participants && (
-                            <div className="flex items-center gap-2">
-                              <UsersThree className="w-4 h-4 text-primary/70" weight="duotone" />
+                            <div className="flex items-center gap-1.5">
+                              <UsersGroup className="w-3.5 h-3.5 text-primary/70" />
                               <span>{meeting.participants.length} participant{meeting.participants.length !== 1 ? 's' : ''}</span>
                             </div>
                           )}
                           {meeting.role === 'participant' && meeting.organizer && (
-                            <p className="text-xs pt-1 border-t border-border/50">
+                            <p className="text-xs pt-1">
                               By <span className="text-foreground font-medium">{meeting.organizer.first_name}</span>
                             </p>
                           )}
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/50">
                           {meeting.meeting_link && (
                             <Button size="sm" asChild className="gap-2 flex-1">
                               <a href={meeting.meeting_link} target="_blank" rel="noopener noreferrer">
-                                <VideoCamera className="w-4 h-4" weight="duotone" />
+                                <Camera className="w-4 h-4" />
                                 Join
                               </a>
                             </Button>
@@ -286,7 +286,7 @@ export default function MeetingsPage() {
                                 className="flex-1 bg-success hover:bg-success/90 text-success-foreground gap-1.5"
                                 onClick={() => handleRsvp(meeting.id, 'accepted')}
                               >
-                                <Check className="w-5 h-5" weight="bold" />
+                                <CheckBig className="w-5 h-5" />
                                 Accept
                               </Button>
                               <Button
@@ -295,7 +295,7 @@ export default function MeetingsPage() {
                                 className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10 gap-1.5"
                                 onClick={() => handleRsvp(meeting.id, 'declined')}
                               >
-                                <X className="w-5 h-5" weight="bold" />
+                                <CloseMd className="w-5 h-5" />
                                 Decline
                               </Button>
                             </div>
@@ -335,11 +335,11 @@ export default function MeetingsPage() {
                       </div>
                       <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1.5">
-                          <CalendarBlank className="w-4 h-4" weight="duotone" />
+                          <Calendar className="w-4 h-4" />
                           {date}
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <Clock className="w-4 h-4" weight="duotone" />
+                          <Clock className="w-4 h-4" />
                           {time}
                         </div>
                         <span>· {meeting.duration_minutes} min</span>

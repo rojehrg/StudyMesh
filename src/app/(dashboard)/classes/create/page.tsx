@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { CircleNotch, ArrowLeft, Sparkle, GlobeHemisphereWest } from "@phosphor-icons/react";
+import { Loading, ChevronLeft, Star, Globe } from "react-coolicons";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -94,7 +94,7 @@ export default function CreatePodPage() {
     >
       <Button variant="ghost" asChild className="mb-6">
         <Link href="/classes">
-          <ArrowLeft className="mr-2 h-4 w-4" weight="duotone" />
+          <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Pods
         </Link>
       </Button>
@@ -102,7 +102,7 @@ export default function CreatePodPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Sparkle className="w-6 h-6 text-accent" weight="duotone" />
+            <Star className="w-6 h-6 text-accent" />
             Create Enablement Pod
           </CardTitle>
           <CardDescription>
@@ -165,7 +165,7 @@ export default function CreatePodPage() {
             <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                  <GlobeHemisphereWest className="w-5 h-5 text-primary" weight="duotone" />
+                  <Globe className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <Label className="text-base font-semibold text-foreground">Allow Cross-Pod Help</Label>
@@ -200,7 +200,7 @@ export default function CreatePodPage() {
                 disabled={loading || !podName.trim()}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1"
               >
-                {loading ? <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" /> : null}
+                {loading ? <Loading className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Create Pod
               </Button>
             </div>

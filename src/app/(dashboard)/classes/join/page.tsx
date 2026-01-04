@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleNotch, ArrowLeft, UsersThree, Buildings, User } from "@phosphor-icons/react";
+import { Loading, ChevronLeft, UsersGroup, Building01, User01 } from "react-coolicons";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -189,7 +189,7 @@ export default function JoinPodPage() {
     >
       <Button variant="ghost" asChild className="mb-6">
         <Link href="/classes">
-          <ArrowLeft className="mr-2 h-4 w-4" weight="duotone" />
+          <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Pods
         </Link>
       </Button>
@@ -225,7 +225,7 @@ export default function JoinPodPage() {
                   disabled={checking || !podCode.trim() || loading}
                   variant="outline"
                 >
-                  {checking ? <CircleNotch className="h-4 w-4 animate-spin" weight="duotone" /> : "Check"}
+                  {checking ? <Loading className="h-4 w-4 animate-spin" /> : "Check"}
                 </Button>
               </div>
               {error && (
@@ -245,7 +245,7 @@ export default function JoinPodPage() {
                       {podPreview.pod_name}
                     </h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Buildings className="w-4 h-4" weight="duotone" />
+                      <Building01 className="w-4 h-4" />
                       {podPreview.business_unit || "General"}
                     </div>
                   </div>
@@ -257,12 +257,12 @@ export default function JoinPodPage() {
                 <div className="space-y-3 text-sm">
                   {podPreview.initiative_owner && (
                     <div className="flex items-center gap-2 text-foreground">
-                      <User className="w-4 h-4 text-muted-foreground" weight="duotone" />
+                      <User01 className="w-4 h-4 text-muted-foreground" />
                       <span className="font-medium">Owner:</span> {podPreview.initiative_owner}
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-foreground">
-                    <UsersThree className="w-4 h-4 text-muted-foreground" weight="duotone" />
+                    <UsersGroup className="w-4 h-4 text-muted-foreground" />
                     <span className="font-medium">Members:</span> {podPreview.memberCount}
                   </div>
                 </div>
@@ -289,7 +289,7 @@ export default function JoinPodPage() {
                     disabled={loading}
                     className="w-full mt-6 bg-accent hover:bg-accent/80"
                   >
-                    {loading ? <CircleNotch className="mr-2 h-4 w-4 animate-spin" weight="duotone" /> : null}
+                    {loading ? <Loading className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Join This Pod
                   </Button>
                 )}

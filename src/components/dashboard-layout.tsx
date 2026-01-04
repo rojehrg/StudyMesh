@@ -4,20 +4,20 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  SquaresFour,
+  MoreGridBig,
   BookOpen,
-  UsersThree,
-  PlusCircle,
-  SignIn,
-  Gear,
+  UsersGroup,
+  AddPlusCircle,
+  Exit,
+  Settings,
   Info,
-  CaretLeft,
-  List,
-  SignOut,
-  CalendarBlank,
+  ChevronLeft,
+  HamburgerLg,
+  LogOut,
+  Calendar,
   Bell,
-  MagnifyingGlass
-} from "@phosphor-icons/react";
+  SearchMagnifyingGlass
+} from "react-coolicons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,15 +48,15 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: 
       href={href}
       prefetch={true}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 overflow-hidden whitespace-nowrap group",
+        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group",
         isActive
-          ? "bg-primary/10 text-primary shadow-sm"
-          : "text-muted-foreground hover:bg-accent hover:text-foreground"
+          ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
       )}
       title={isCollapsed ? label : ""}
     >
       <div className="relative flex items-center">
-        <Icon className="w-5 h-5 shrink-0" weight="duotone" />
+        <Icon className="w-5 h-5 shrink-0" />
         {badge ? (
           <span className={cn(
             "absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full z-10 shadow-sm",
@@ -110,14 +110,14 @@ function DashboardLayoutBase({
   const totalUnread = unreadCount;
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
-    { icon: SquaresFour, label: "Dashboard", href: "/dashboard" },
-    { icon: MagnifyingGlass, label: "Find Help", href: "/find-help" },
+    { icon: MoreGridBig, label: "Dashboard", href: "/dashboard" },
+    { icon: SearchMagnifyingGlass, label: "Find Help", href: "/find-help" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
     { icon: Bell, label: "Nudges", href: "/notifications", badge: totalUnread > 0 ? totalUnread : undefined },
-    { icon: CalendarBlank, label: "Meetings", href: "/meetings" },
-    { icon: PlusCircle, label: "Create Pod", href: "/classes/create" },
-    { icon: SignIn, label: "Join Pod", href: "/classes/join" },
-    { icon: Gear, label: "Settings", href: "/settings" },
+    { icon: Calendar, label: "Meetings", href: "/meetings" },
+    { icon: AddPlusCircle, label: "Create Pod", href: "/classes/create" },
+    { icon: Exit, label: "Join Pod", href: "/classes/join" },
+    { icon: Settings, label: "Settings", href: "/settings" },
     { icon: Info, label: "About Attunly", href: "/about" },
   ];
 
@@ -174,7 +174,7 @@ function DashboardLayoutBase({
 
         {/* User Profile */}
         <div className="p-3">
-          <div className="flex items-center p-2 rounded-xl hover:bg-accent transition-colors cursor-pointer">
+          <div className="flex items-center p-2 rounded-xl hover:bg-accent/60 transition-colors cursor-pointer">
             <Avatar className="h-9 w-9">
               <AvatarImage src="" />
               <AvatarFallback className="bg-primary/10 text-primary font-medium">
@@ -205,7 +205,7 @@ function DashboardLayoutBase({
               className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95"
               title="Logout"
             >
-              <SignOut className="w-4 h-4" weight="duotone" />
+              <LogOut className="w-4 h-4" />
             </motion.button>
           </div>
         </div>
@@ -223,7 +223,7 @@ function DashboardLayoutBase({
         )}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
-              <List className="w-6 h-6 text-foreground" weight="duotone" />
+              <HamburgerLg className="w-6 h-6 text-foreground" />
             </Button>
             <span className="ml-3 font-bold text-lg md:hidden">
               <span className="text-foreground">Attun</span>
@@ -255,10 +255,10 @@ function DashboardLayoutBase({
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
       >
-        <CaretLeft className={cn(
+        <ChevronLeft className={cn(
           "w-4 h-4 transition-transform duration-300",
           isCollapsed && "rotate-180"
-        )} weight="duotone" />
+        )} />
       </button>
 
       {/* Onboarding Tour for New Users */}
