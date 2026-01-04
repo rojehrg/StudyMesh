@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -16,7 +16,7 @@ import { CircleNotch, ArrowLeft, Users, Copy, Check, Bell, Sparkle, TrendUp, Boo
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-export default function PodDetailPage() {
+function PodDetailContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -584,5 +584,17 @@ export default function PodDetailPage() {
         />
       )}
     </>
+  );
+}
+
+export default function PodDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <CircleNotch className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <PodDetailContent />
+    </Suspense>
   );
 }
