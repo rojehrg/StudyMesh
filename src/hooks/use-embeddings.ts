@@ -3,78 +3,88 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UseEmbeddingsReturn {
-  /** Whether the model is ready to use */
   ready: boolean;
-  /** Whether the model is currently loading */
   loading: boolean;
-  /** Whether an embedding is being generated */
   generating: boolean;
-  /** Generate an embedding for the given text */
   embed: (text: string) => Promise<number[]>;
-  /** Any error that occurred */
   error: Error | null;
 }
 
 /**
- * React hook for generating embeddings client-side
- *
- * The model (~23MB) is downloaded once and cached in IndexedDB.
- * First load takes a few seconds, subsequent loads are instant.
+ * React hook for generating embeddings client-side using Web Worker
+ * This isolates the transformers.js code from React to avoid hook conflicts
  */
 export function useEmbeddings(): UseEmbeddingsReturn {
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const embeddingsModuleRef = useRef<typeof import('@/lib/embeddings') | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const callbacksRef = useRef<Map<string, { resolve: (value: number[]) => void; reject: (error: Error) => void }>>(new Map());
 
-  // Lazy load the embeddings module
+  // Initialize worker
   useEffect(() => {
-    // Only run in browser
     if (typeof window === 'undefined') return;
 
-    let cancelled = false;
+    setLoading(true);
 
-    const loadEmbeddings = async () => {
-      setLoading(true);
-      try {
-        // Dynamic import to avoid SSR issues
-        const embeddingsModule = await import('@/lib/embeddings');
-        embeddingsModuleRef.current = embeddingsModule;
+    // Create worker
+    workerRef.current = new Worker(
+      new URL('../lib/embeddings/worker.ts', import.meta.url),
+      { type: 'module' }
+    );
 
-        if (cancelled) return;
+    // Handle messages from worker
+    workerRef.current.onmessage = (event) => {
+      const { type, id, embedding, error: errorMsg, progress } = event.data;
 
-        // Check if already ready
-        if (embeddingsModule.isModelReady()) {
-          setReady(true);
-          setLoading(false);
-          return;
-        }
-
-        // Preload the model
-        await embeddingsModule.preloadModel();
-
-        if (cancelled) return;
-
+      if (type === 'ready') {
         setReady(true);
         setLoading(false);
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err : new Error('Failed to load embeddings'));
+      }
+
+      if (type === 'progress' && progress?.status === 'progress') {
+        // Model loading progress
+        console.log(`Loading model: ${Math.round(progress.progress || 0)}%`);
+      }
+
+      if (type === 'result') {
+        const callback = callbacksRef.current.get(id);
+        if (callback) {
+          callback.resolve(embedding);
+          callbacksRef.current.delete(id);
+        }
+        setGenerating(false);
+      }
+
+      if (type === 'error') {
+        const callback = callbacksRef.current.get(id);
+        if (callback) {
+          callback.reject(new Error(errorMsg));
+          callbacksRef.current.delete(id);
+        }
+        setError(new Error(errorMsg));
+        setGenerating(false);
         setLoading(false);
       }
     };
 
-    loadEmbeddings();
+    // Preload the model
+    workerRef.current.postMessage({ type: 'preload', id: 'preload' });
 
     return () => {
-      cancelled = true;
+      workerRef.current?.terminate();
+      workerRef.current = null;
     };
   }, []);
 
   const embed = useCallback(async (text: string): Promise<number[]> => {
     if (typeof window === 'undefined') {
       throw new Error('Embeddings can only be generated in the browser');
+    }
+
+    if (!workerRef.current) {
+      throw new Error('Worker not initialized');
     }
 
     if (!text || text.trim().length === 0) {
@@ -84,21 +94,11 @@ export function useEmbeddings(): UseEmbeddingsReturn {
     setGenerating(true);
     setError(null);
 
-    try {
-      // Ensure module is loaded
-      if (!embeddingsModuleRef.current) {
-        embeddingsModuleRef.current = await import('@/lib/embeddings');
-      }
-
-      const embedding = await embeddingsModuleRef.current.generateEmbedding(text);
-      return embedding;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to generate embedding');
-      setError(error);
-      throw error;
-    } finally {
-      setGenerating(false);
-    }
+    return new Promise((resolve, reject) => {
+      const id = Math.random().toString(36).substring(7);
+      callbacksRef.current.set(id, { resolve, reject });
+      workerRef.current!.postMessage({ type: 'generate', text, id });
+    });
   }, []);
 
   return {
