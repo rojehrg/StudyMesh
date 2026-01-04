@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Exclude server-only packages
-  serverExternalPackages: ['sharp', 'onnxruntime-node'],
 
   // Security headers
   async headers() {
