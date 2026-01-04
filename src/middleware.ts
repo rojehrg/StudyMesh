@@ -66,22 +66,25 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Routes that require organization context
+  const orgRequiredRoutes = ['/dashboard', '/classes', '/meetings', '/groups', '/notifications']
+  const isOrgRequiredRoute = orgRequiredRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
+  // Routes exempt from org check (but still need auth)
+  const orgExemptRoutes = ['/onboarding', '/org-setup', '/settings']
+  const isOrgExemptRoute = orgExemptRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
   // Protected routes - redirect unauthenticated users to login
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
+  if ((isOrgRequiredRoute || isOrgExemptRoute) && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Onboarding and org-setup require auth
-  if ((request.nextUrl.pathname.startsWith('/onboarding') || request.nextUrl.pathname.startsWith('/org-setup')) && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  // Auth routes - redirect authenticated users to dashboard
+  // Auth routes - redirect authenticated users appropriately
   if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user) {
-    // Check if user has completed onboarding
+    // Check if user has completed onboarding and has org
     const { data: profile } = await supabase
       .from('profiles')
-      .select('expertise_skills')
+      .select('expertise_skills, organization_id')
       .eq('user_id', user.id)
       .maybeSingle();
 
@@ -91,7 +94,26 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/onboarding', request.url))
     }
 
+    // Check if user has organization
+    if (!profile?.organization_id) {
+      return NextResponse.redirect(new URL('/org-setup', request.url))
+    }
+
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // For org-required routes, check if user has an organization
+  if (isOrgRequiredRoute && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    // If no organization, redirect to org-setup
+    if (!profile?.organization_id) {
+      return NextResponse.redirect(new URL('/org-setup', request.url))
+    }
   }
 
   return response
