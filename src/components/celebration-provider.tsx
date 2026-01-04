@@ -22,8 +22,16 @@ const CelebrationContext = createContext<CelebrationContextType | null>(null);
 
 export function useCelebration() {
   const context = useContext(CelebrationContext);
+  // Return no-op functions if used outside provider
   if (!context) {
-    throw new Error("useCelebration must be used within a CelebrationProvider");
+    return {
+      celebrate: () => {},
+      celebrateFirstNudge: () => {},
+      celebrateFirstMeeting: () => {},
+      celebrateProfileComplete: () => {},
+      celebrateFirstPod: () => {},
+      celebrateMilestone: () => {},
+    };
   }
   return context;
 }
