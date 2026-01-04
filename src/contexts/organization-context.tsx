@@ -110,8 +110,15 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
 
 export function useOrganization() {
   const context = useContext(OrganizationContext);
+  // Return safe defaults if used outside provider
   if (!context) {
-    throw new Error('useOrganization must be used within an OrganizationProvider');
+    return {
+      organization: null,
+      loading: false,
+      error: null,
+      refresh: async () => {},
+      hasOrganization: false,
+    };
   }
   return context;
 }

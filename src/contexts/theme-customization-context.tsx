@@ -193,8 +193,16 @@ export function ThemeCustomizationProvider({ children }: { children: ReactNode }
 
 export function useThemeCustomization() {
   const context = useContext(ThemeCustomizationContext);
+  // Return safe defaults if used outside provider
   if (!context) {
-    throw new Error('useThemeCustomization must be used within a ThemeCustomizationProvider');
+    return {
+      themeSettings: { preset: 'violet' },
+      loading: false,
+      canCustomize: false,
+      applyTheme: () => {},
+      saveTheme: async () => false,
+      resetTheme: () => {},
+    };
   }
   return context;
 }
