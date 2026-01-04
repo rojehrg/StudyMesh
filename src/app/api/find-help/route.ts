@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       if (searchTerms.length > 0) {
         // Build OR conditions - match ANY of the search terms
         const orConditions = searchTerms
-          .map(term => `expertise_text.ilike.%${term}%`)
+          .map((term: string) => `expertise_text.ilike.%${term}%`)
           .join(',');
 
         const { data: textMatches, error: textError } = await supabase
