@@ -97,27 +97,6 @@ const plans: Plan[] = [
   },
 ];
 
-const testimonials = [
-  {
-    quote: "Attunly cut our meeting scheduling time by 70%. Game changer for distributed teams.",
-    author: "Sarah Chen",
-    role: "Engineering Manager",
-    company: "TechFlow",
-  },
-  {
-    quote: "Finally, a tool that understands timezone chaos. Our global team loves it.",
-    author: "Marcus Rodriguez",
-    role: "Head of Product",
-    company: "ScaleUp",
-  },
-  {
-    quote: "The expertise matching saved us from hiring. We found the skills we needed internally.",
-    author: "Emily Watson",
-    role: "VP Operations",
-    company: "GrowthCo",
-  },
-];
-
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);
 
@@ -323,37 +302,6 @@ export default function PricingPage() {
               <CheckBig className="w-5 h-5 text-emerald-500" />
               <span className="text-sm font-medium">Cancel Anytime</span>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-12">
-            Trusted by teams everywhere
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
-                className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4 leading-relaxed">"{testimonial.quote}"</p>
-                <div>
-                  <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role}, {testimonial.company}</p>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
