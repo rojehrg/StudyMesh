@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading, CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd } from "react-coolicons";
+import { Loading, CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd, Download, TrashFull } from "react-coolicons";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -92,6 +92,10 @@ function SettingsContent() {
   const isInitialLoad = useRef(true);
   const expertiseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [expertiseSaving, setExpertiseSaving] = useState(false);
+  const [exportingData, setExportingData] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // These hooks MUST be called before any early returns
   const { subscription, plan, isOwner: isBillingOwner, loading: billingLoading } = usePlanFeatures();
@@ -348,6 +352,67 @@ function SettingsContent() {
     saveExpertise(text);
   };
 
+  // Export user data (GDPR)
+  const handleExportData = async () => {
+    setExportingData(true);
+    try {
+      const response = await fetch('/api/user/export');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to export data');
+      }
+
+      // Get the blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `attunly-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Data export downloaded');
+    } catch (error: any) {
+      console.error('Export failed:', error);
+      toast.error(error.message || 'Failed to export data');
+    } finally {
+      setExportingData(false);
+    }
+  };
+
+  // Delete account (GDPR)
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') {
+      toast.error('Please type DELETE to confirm');
+      return;
+    }
+
+    setDeletingAccount(true);
+    try {
+      const response = await fetch('/api/user/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: 'DELETE_MY_ACCOUNT' }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to delete account');
+      }
+
+      toast.success('Account deleted successfully');
+      // Redirect to home page after deletion
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error('Delete failed:', error);
+      toast.error(error.message || 'Failed to delete account');
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
   const filteredSuggestions = SUGGESTED_KNOWLEDGE_AREAS.filter(
     area => !profile.knowledgeAreas.includes(area) && area.toLowerCase().includes(knowledgeInput.toLowerCase())
   ).slice(0, 6);
@@ -505,6 +570,115 @@ function SettingsContent() {
                     <CheckBig className="w-3 h-3" />
                     Saved
                   </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Privacy & Data - GDPR Compliance */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold">Privacy & Data</CardTitle>
+              <CardDescription>Manage your personal data and account</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Export Data */}
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Download className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Export Your Data</p>
+                    <p className="text-sm text-muted-foreground">Download all your personal data as JSON</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={handleExportData}
+                  disabled={exportingData}
+                >
+                  {exportingData ? (
+                    <>
+                      <Loading className="w-4 h-4 mr-2 animate-spin" />
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Delete Account */}
+              <div className="border-t border-border pt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+                      <TrashFull className="w-5 h-5 text-destructive" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Delete Account</p>
+                      <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                    onClick={() => setShowDeleteConfirm(true)}
+                  >
+                    <TrashFull className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+
+                {/* Delete Confirmation */}
+                {showDeleteConfirm && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-xl"
+                  >
+                    <p className="text-sm font-medium text-destructive mb-2">
+                      This action cannot be undone. All your data will be permanently deleted.
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Type <span className="font-mono font-bold text-foreground">DELETE</span> to confirm:
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="Type DELETE"
+                        className="max-w-[200px]"
+                      />
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteAccount}
+                        disabled={deletingAccount || deleteConfirmText !== 'DELETE'}
+                      >
+                        {deletingAccount ? (
+                          <>
+                            <Loading className="w-4 h-4 mr-2 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          'Confirm Delete'
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          setDeleteConfirmText('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </motion.div>
                 )}
               </div>
             </CardContent>
