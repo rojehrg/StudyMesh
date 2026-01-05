@@ -1,24 +1,27 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRightMd } from "react-coolicons";
 import {
-  UsersGroup,
-  WifiHigh,
-  Calendar,
-  Globe,
-  ChatCircle,
-  Play,
-  SearchMagnifyingGlass,
+  Sparkles,
+  Users,
   Clock,
-  Bell,
-  ChevronDown,
-  ArrowRightMd,
-} from "react-coolicons";
-import { Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+  Calendar,
+  MessageSquare,
+  Target,
+  Zap,
+  Globe,
+  Code,
+  Rocket,
+  Check,
+  HelpCircle,
+  Quote,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import Lottie from "lottie-react";
+import startupMeetingAnimation from "../../public/animations/startup-meeting.json";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -29,66 +32,14 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.1 } },
 };
 
-// Static availability data for visual preview (GitHub-style grid)
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
-
-// Availability pattern for demo
-const availabilityPattern: Record<number, number[]> = {
-  0: [9, 10, 11, 14, 15],      // Mon
-  1: [10, 11, 12, 13, 14],     // Tue
-  2: [9, 10, 15, 16, 17],      // Wed
-  3: [11, 12, 13, 14, 15, 16], // Thu
-  4: [9, 10, 11],              // Fri
-  5: [],                       // Sat
-  6: [],                       // Sun
+const cardHover = {
+  rest: { scale: 1, y: 0 },
+  hover: { scale: 1.02, y: -4, transition: { duration: 0.2 } },
 };
 
-// Features for accordion
-const features = [
-  {
-    id: "skills",
-    title: "AI-Powered Matching",
-    description: "Just describe what you need help with—\"I need someone who understands our payment API\" or \"Looking for React expertise.\" Our AI understands context and finds the perfect match instantly.",
-    icon: Sparkles,
-  },
-  {
-    id: "pods",
-    title: "Cross-Team Pods",
-    description: "Group people across departments, orgs, and timezones. Internal teams, external contractors, offshore partners—all in one view.",
-    icon: UsersGroup,
-  },
-  {
-    id: "availability",
-    title: "Visual Availability Grid",
-    description: "See when everyone's free at a glance. No more guessing who's online in which timezone. Find the 2-hour overlap that actually works.",
-    icon: Calendar,
-  },
-  {
-    id: "nudges",
-    title: "Contextual Nudges",
-    description: "\"Need 15 min on the payment API\" — ping the right person with context. They accept, you schedule. No Slack threads that go nowhere.",
-    icon: Bell,
-  },
-  {
-    id: "slack",
-    title: "Native Slack Integration",
-    description: "Nudges land in Slack DMs. Accept with one click, schedule instantly. No new app for your team to check—it meets them where they work.",
-    icon: ChatCircle,
-  },
-  {
-    id: "timezones",
-    title: "Timezone Intelligence",
-    description: "Automatic detection across your distributed team. See overlapping hours instantly. Stop doing timezone math in your head.",
-    icon: Globe,
-  },
-];
-
 export default function LandingPage() {
-  const [activeFeature, setActiveFeature] = useState("skills");
-
   return (
-    <div className="min-h-screen bg-white text-gray-900 antialiased">
+    <div className="min-h-screen bg-white text-gray-900 antialiased overflow-x-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -100,18 +51,6 @@ export default function LandingPage() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              How it works
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Pricing
-            </Link>
-          </div>
-
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" className="font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50">
@@ -120,650 +59,411 @@ export default function LandingPage() {
             </Link>
             <Link href="/signup">
               <Button className="font-medium bg-violet-600 text-white hover:bg-violet-700 rounded-lg px-4">
-                Get Started Free
+                Get Early Access
               </Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-28 pb-12 px-6">
+      {/* Hero Section - Split Layout */}
+      <section className="pt-28 pb-16 px-6 bg-gradient-to-b from-violet-50/50 to-white">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-            className="text-center max-w-4xl mx-auto"
-          >
-            {/* Social Proof Kicker */}
-            <motion.div variants={fadeIn} className="mb-8">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
-                <Sparkles className="w-4 h-4" />
-                AI-Powered Team Matching
-              </span>
-            </motion.div>
-
-            {/* Main Headline */}
-            <motion.h1
-              variants={fadeIn}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left - Copy */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={stagger}
             >
-              Know who to connect with.
-              <br />
-              <span className="text-violet-600">Know when they're free.</span>
-            </motion.h1>
+              {/* Badge */}
+              <motion.div variants={fadeIn} className="mb-6">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-100 text-violet-700 border border-violet-200">
+                  <Sparkles className="w-4 h-4" />
+                  AI-Powered Coordination
+                </span>
+              </motion.div>
 
-            {/* Subheadline */}
-            <motion.p
-              variants={fadeIn}
-              className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
-            >
-              Attunly helps teams instantly find the right person for help—without the back-and-forth.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-              <Link href="/signup">
-                <Button className="h-14 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
-                  Start Free — No Credit Card
-                  <ArrowRightMd className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Button
-                variant="outline"
-                className="h-14 px-8 text-base font-semibold rounded-xl bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 gap-2"
+              {/* Main Headline */}
+              <motion.h1
+                variants={fadeIn}
+                className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-6 leading-tight"
               >
-                <Play className="w-5 h-5" />
-                Watch Demo
-              </Button>
+                Know who to reach out to
+                <br />
+                <span className="text-violet-600">and when it actually makes sense.</span>
+              </motion.h1>
+
+              {/* Subheadline */}
+              <motion.p
+                variants={fadeIn}
+                className="text-xl text-gray-500 mb-4 leading-relaxed"
+              >
+                Attunly helps teams understand who's available, who's relevant, and when to connect—without scheduling friction or awkward back and forth.
+              </motion.p>
+
+              {/* Supporting line */}
+              <motion.p
+                variants={fadeIn}
+                className="text-sm text-gray-400 mb-8"
+              >
+                Built for modern teams that want clarity before they hit send.
+              </motion.p>
+
+              {/* CTA */}
+              <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-start gap-4">
+                <Link href="/signup">
+                  <Button className="h-12 px-8 text-base font-semibold bg-violet-600 text-white hover:bg-violet-700 rounded-xl shadow-lg shadow-violet-500/20 gap-2">
+                    Get Early Access
+                    <ArrowRightMd className="w-5 h-5" />
+                  </Button>
+                </Link>
+              </motion.div>
+
+              {/* Trust signals */}
+              <motion.div variants={fadeIn} className="mt-8 flex flex-wrap items-center gap-6 text-sm text-gray-500">
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  Free for small teams
+                </span>
+                <span className="flex items-center gap-2">
+                  <img src="/slack-icon.svg" alt="Slack" className="w-4 h-4" />
+                  Works with Slack
+                </span>
+                <span className="flex items-center gap-2">
+                  <img src="/google-calendar-icon.svg" alt="Google Calendar" className="w-4 h-4" />
+                  Google Calendar
+                </span>
+              </motion.div>
             </motion.div>
 
-            {/* Objection Handler */}
-            <motion.div variants={fadeIn} className="flex items-center justify-center gap-6 text-sm text-gray-400">
-              <span>Free forever for teams up to 10</span>
-              <span className="flex items-center gap-1.5">
-                <img src="/slack-icon.svg" alt="Slack" className="w-4 h-4" />
-                Works with Slack
-              </span>
-              <span>Setup takes 2 minutes</span>
+            {/* Right - Lottie Animation */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="hidden lg:block"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-100 to-violet-50 rounded-3xl blur-3xl opacity-50" />
+                <Lottie
+                  animationData={startupMeetingAnimation}
+                  loop
+                  className="relative w-full max-w-lg mx-auto"
+                />
+              </div>
             </motion.div>
-          </motion.div>
-
-          {/* App Preview - Static GitHub-style Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-12 max-w-5xl mx-auto"
-          >
-            <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl shadow-gray-300/30 overflow-hidden">
-              {/* Browser Chrome */}
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                </div>
-                <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 bg-white rounded-md text-xs text-gray-500 font-medium border border-gray-100">
-                    attunly.com/dashboard
-                  </div>
-                </div>
-              </div>
-
-              {/* App Preview Content */}
-              <div className="p-6 bg-gray-50">
-                <div className="grid md:grid-cols-3 gap-6">
-                  {/* Availability Grid - GitHub Contribution Style */}
-                  <div className="md:col-span-2 bg-white rounded-xl p-6 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-500">
-                    <div className="flex items-center justify-between mb-5">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-violet-600" />
-                        <span className="font-semibold text-gray-900">Team Availability</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>Eastern Time (ET)</span>
-                      </div>
-                    </div>
-
-                    {/* GitHub-style Grid */}
-                    <div className="space-y-1">
-                      {/* Hour labels */}
-                      <div className="flex items-center">
-                        <div className="w-10 shrink-0" />
-                        <div className="flex-1 flex justify-between px-1">
-                          {[9, 11, 13, 15, 17].map((hour) => (
-                            <span key={hour} className="text-[10px] text-gray-400 font-medium">
-                              {hour > 12 ? `${hour - 12}pm` : hour === 12 ? "12pm" : `${hour}am`}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Day rows with cells */}
-                      {DAYS.map((day, dayIndex) => (
-                        <div key={day} className="flex items-center gap-1">
-                          <div className="w-10 shrink-0 text-xs font-medium text-gray-500">{day}</div>
-                          <div className="flex-1 flex gap-1">
-                            {HOURS.map((hour) => {
-                              const isAvailable = availabilityPattern[dayIndex]?.includes(hour);
-                              return (
-                                <div
-                                  key={hour}
-                                  className={`flex-1 h-7 rounded-md transition-colors ${
-                                    isAvailable
-                                      ? "bg-violet-500 hover:bg-violet-600"
-                                      : "bg-gray-100 hover:bg-gray-200"
-                                  }`}
-                                />
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-3 h-3 rounded bg-violet-500" /> Available
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-3 h-3 rounded bg-gray-100 border border-gray-200" /> Busy
-                        </span>
-                      </div>
-                      <span className="text-xs text-violet-600 font-medium">18 hrs/week</span>
-                    </div>
-                  </div>
-
-                  {/* Right sidebar */}
-                  <div className="space-y-4">
-                    {/* Available Now */}
-                    <div className="bg-white rounded-xl p-5 shadow-md shadow-gray-200/50 border-l-4 border-l-green-500">
-                      <div className="flex items-center gap-2 mb-4">
-                        <WifiHigh className="w-5 h-5 text-green-500" />
-                        <span className="font-semibold text-gray-900">Available Now</span>
-                      </div>
-                      <div className="space-y-3">
-                        {[
-                          { initials: "SK", name: "Sarah K.", role: "Design", online: true },
-                          { initials: "MR", name: "Mike R.", role: "Engineering", online: true },
-                          { initials: "AT", name: "Alex T.", role: "Product", online: false },
-                        ].map((person, i) => (
-                          <div key={i} className="flex items-center gap-3">
-                            <div className="relative">
-                              <div className="w-8 h-8 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center text-xs font-semibold">
-                                {person.initials}
-                              </div>
-                              {person.online && (
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-gray-900">{person.name}</div>
-                              <div className="text-xs text-gray-400">{person.role}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="bg-white rounded-xl p-5 shadow-md shadow-gray-200/50 border-l-4 border-l-violet-400">
-                      <div className="text-xs text-gray-400 mb-3">This week</div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Overlap hours</span>
-                          <span className="text-sm font-semibold text-gray-900">12 hrs</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Best time</span>
-                          <span className="text-sm font-semibold text-violet-600">Tue 2pm</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* GIF Placeholder - Future Demo Video */}
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-500 text-sm">
-                <Play className="w-4 h-4" />
-                <span>Demo video coming soon</span>
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* AI Eliminates Friction Section */}
-      <section className="py-16 px-6 bg-gradient-to-b from-violet-50 to-white">
-        <div className="max-w-6xl mx-auto">
+      {/* Problem Section */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 mb-4">
-              <Sparkles className="w-3 h-3" />
-              AI THAT ELIMINATES FRICTION
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              What Attunly replaces
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Work has a coordination problem most tools ignore.
             </h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Stop wasting time on coordination. Let AI handle the busy work.
-            </p>
           </motion.div>
 
-          {/* What AI Eliminates */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
-            >
-              <div className="text-3xl mb-4">🔍</div>
-              <h3 className="font-semibold text-gray-900 mb-2">No more guessing who knows what</h3>
-              <p className="text-sm text-gray-500 mb-4">AI matches you based on context and expertise—not outdated skill tags.</p>
-              <div className="text-xs text-red-500 line-through opacity-60">"Does anyone know about the billing API?"</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
-            >
-              <div className="text-3xl mb-4">📅</div>
-              <h3 className="font-semibold text-gray-900 mb-2">No more "when are you free?" threads</h3>
-              <p className="text-sm text-gray-500 mb-4">AI shows availability instantly. See who's free now, not three days from now.</p>
-              <div className="text-xs text-red-500 line-through opacity-60">"How about Tuesday?" "Can't, in meetings all day"</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
-            >
-              <div className="text-3xl mb-4">💬</div>
-              <h3 className="font-semibold text-gray-900 mb-2">No more Slack chaos</h3>
-              <p className="text-sm text-gray-500 mb-4">AI surfaces the right person, not everyone. Direct nudges, not noisy channels.</p>
-              <div className="text-xs text-red-500 line-through opacity-60">@channel "Can someone help with this?"</div>
-            </motion.div>
+          {/* Problem Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            {[
+              {
+                icon: Calendar,
+                title: "Calendars",
+                desc: "Tell you when someone is free",
+                color: "text-blue-500",
+                bg: "bg-blue-50",
+              },
+              {
+                icon: MessageSquare,
+                title: "Chat tools",
+                desc: "Show who's online",
+                color: "text-green-500",
+                bg: "bg-green-50",
+              },
+              {
+                icon: HelpCircle,
+                title: "Neither",
+                desc: "Tells you if reaching out is a good idea",
+                color: "text-amber-500",
+                bg: "bg-amber-50",
+                highlighted: true,
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className={`h-full ${item.highlighted ? 'border-amber-200 bg-amber-50/50' : 'border-gray-200'}`}>
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                      <item.icon className={`w-6 h-6 ${item.color}`} />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
+                    <p className="text-gray-500 text-sm">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center space-y-4"
+          >
+            <p className="text-lg text-gray-500">
+              So people hesitate. They overthink. They wait. Or they interrupt the wrong person.
+            </p>
+            <p className="text-xl font-medium text-gray-900">
+              That moment adds more friction than meetings ever will.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Concrete Use Cases Section */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
+      {/* The Moment Section */}
+      <section className="py-20 px-6 bg-violet-600 text-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white" />
+          <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-white" />
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 rounded-full bg-white" />
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="mb-8"
+          >
+            <Quote className="w-12 h-12 mx-auto text-violet-300 mb-6" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-3 text-xl text-violet-100 mb-10"
+          >
+            {[
+              "You need quick input, not a meeting.",
+              "You're not sure who's free right now.",
+              "You don't want to bug the wrong person.",
+              "You pause before sending the message.",
+            ].map((line, i) => (
+              <motion.p
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+              >
+                {line}
+              </motion.p>
+            ))}
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold"
+          >
+            Attunly is built for that exact moment.
+          </motion.h2>
+        </div>
+      </section>
+
+      {/* What Attunly Does */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Real scenarios</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
-              See yourself in this?
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Attunly adds context to availability.
             </h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              If any of these sound familiar, Attunly is for you.
+            <p className="text-xl text-gray-500">
+              It helps teams understand:
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0 }}
-              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
-            >
-              <div className="text-sm font-medium text-violet-600 mb-3">Product Manager</div>
-              <p className="text-gray-900 font-medium mb-3">"I need a designer for a quick review—who's free in the next hour?"</p>
-              <p className="text-sm text-gray-500">Find the right person and their availability in seconds, not Slack threads.</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
-            >
-              <div className="text-sm font-medium text-violet-600 mb-3">Founder</div>
-              <p className="text-gray-900 font-medium mb-3">"I need someone who understands our payment flow—now, not tomorrow."</p>
-              <p className="text-sm text-gray-500">Stop waiting. See who has the expertise and is available right now.</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
-            >
-              <div className="text-sm font-medium text-violet-600 mb-3">Team Lead</div>
-              <p className="text-gray-900 font-medium mb-3">"Our team is spread across 4 timezones. Scheduling is a nightmare."</p>
-              <p className="text-sm text-gray-500">See overlapping hours instantly. No more timezone math.</p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Solution / Features Section - ACCORDION STYLE */}
-      <section id="features" className="py-16 px-6 bg-[#f5f5f5]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex justify-center order-2 md:order-1"
-            >
-              <Image
-                src="/images/teamwork-gears.svg"
-                alt="Team working together"
-                width={400}
-                height={400}
-                className="object-contain"
-              />
-            </motion.div>
-            <div className="order-1 md:order-2">
-              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Solution</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
-                See who can help. See when they're free.
-              </h2>
-              <p className="text-xl text-gray-500">
-                Attunly maps your team's expertise and availability in one place—so you find the right person and schedule time without the chaos.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-10 items-start">
-            {/* Left: Accordion */}
-            <div className="space-y-2">
-              {features.map((feature) => (
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Users,
+                title: "Who can help with what",
+                desc: "See expertise across your team",
+                color: "text-violet-600",
+                bg: "bg-violet-100",
+              },
+              {
+                icon: Clock,
+                title: "Who's actually available",
+                desc: "Right now, not three days from now",
+                color: "text-green-600",
+                bg: "bg-green-100",
+              },
+              {
+                icon: Zap,
+                title: "When reaching out makes sense",
+                desc: "Timing that respects focus time",
+                color: "text-amber-600",
+                bg: "bg-amber-100",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial="rest"
+                whileHover="hover"
+                variants={cardHover}
+              >
                 <motion.div
-                  key={feature.id}
-                  className={`rounded-xl border transition-all cursor-pointer ${
-                    activeFeature === feature.id
-                      ? "bg-white border-violet-200 shadow-lg shadow-violet-100/50"
-                      : "bg-white/50 border-gray-200 hover:bg-white/80"
-                  }`}
-                  onClick={() => setActiveFeature(feature.id)}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
                 >
-                  <div className="p-5">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        activeFeature === feature.id
-                          ? feature.id === "slack" ? "bg-[#4A154B]" : "bg-violet-600 text-white"
-                          : "bg-gray-100 text-gray-500"
-                      }`}>
-                        {feature.id === "slack" ? (
-                          <img src="/slack-icon.svg" alt="Slack" className="w-5 h-5" />
-                        ) : (
-                          <feature.icon className="w-5 h-5" />
-                        )}
+                  <Card className="h-full border-gray-200 hover:border-violet-200 hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-6 text-center">
+                      <div className={`w-14 h-14 ${item.bg} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                        <item.icon className={`w-7 h-7 ${item.color}`} />
                       </div>
-                      <div className="flex-1">
-                        <h3 className={`font-semibold ${
-                          activeFeature === feature.id ? "text-gray-900" : "text-gray-600"
-                        }`}>
-                          {feature.title}
-                        </h3>
-                      </div>
-                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
-                        activeFeature === feature.id ? "rotate-180" : ""
-                      }`} />
-                    </div>
-                    <AnimatePresence>
-                      {activeFeature === feature.id && (
-                        <motion.p
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="text-gray-500 mt-3 pl-14"
-                        >
-                          {feature.description}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-lg">{item.title}</h3>
+                      <p className="text-gray-500">{item.desc}</p>
+                    </CardContent>
+                  </Card>
                 </motion.div>
-              ))}
-            </div>
-
-            {/* Right: Feature visual */}
-            <div className="relative">
-              <div className="sticky top-24">
-                {/* Decorative blob */}
-                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-violet-100/50 rounded-full blur-3xl" />
-
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                  <div className="p-8">
-                    <AnimatePresence mode="wait">
-                      {activeFeature === "skills" && (
-                        <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Sparkles className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Describe it. We match it.</h4>
-                          <p className="text-gray-500 mb-4">No more tagging or searching. Just type what you need in plain English and let AI do the work.</p>
-                          {/* AI Matching Flow Visual */}
-                          <div className="space-y-3">
-                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                              <p className="text-xs text-gray-400 mb-1">You type:</p>
-                              <p className="text-sm text-gray-700 italic">"Need help with the Stripe webhook integration"</p>
-                            </div>
-                            <div className="flex justify-center">
-                              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-violet-600" />
-                              </div>
-                            </div>
-                            <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
-                              <p className="text-xs text-violet-500 mb-2">AI found 2 matches:</p>
-                              <div className="flex gap-2">
-                                <div className="flex items-center gap-2 bg-white rounded-md px-2 py-1.5 border border-violet-100">
-                                  <div className="w-6 h-6 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">MR</div>
-                                  <span className="text-xs font-medium text-gray-700">Mike R.</span>
-                                </div>
-                                <div className="flex items-center gap-2 bg-white rounded-md px-2 py-1.5 border border-violet-100">
-                                  <div className="w-6 h-6 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">SK</div>
-                                  <span className="text-xs font-medium text-gray-700">Sarah K.</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "pods" && (
-                        <motion.div key="pods" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <UsersGroup className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">One view across all teams</h4>
-                          <p className="text-gray-500 mb-4">Internal, external, contractors—group everyone who needs to collaborate, regardless of org structure.</p>
-                          <div className="flex justify-center py-4">
-                            <Image
-                              src="/images/pods-illustration.svg"
-                              alt="Team collaboration illustration"
-                              width={300}
-                              height={200}
-                              className="object-contain"
-                            />
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "availability" && (
-                        <motion.div key="availability" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Calendar className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Find the overlap that works</h4>
-                          <p className="text-gray-500 mb-4">Visual grid shows when everyone's free. No calendar permissions needed—just set your hours once.</p>
-                          <div className="grid grid-cols-5 gap-1">
-                            {[...Array(25)].map((_, i) => (
-                              <div key={i} className={`h-8 rounded ${[0,1,5,6,10,11,15,20].includes(i) ? "bg-violet-500" : [2,7,12,16,21].includes(i) ? "bg-violet-300" : "bg-gray-100"}`} />
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "nudges" && (
-                        <motion.div key="nudges" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Bell className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Request help with context</h4>
-                          <p className="text-gray-500 mb-4">No more vague Slack messages. Send a focused request, they accept, you're on a call in minutes.</p>
-                          <div className="bg-violet-50 rounded-xl p-4 border border-violet-100">
-                            <p className="text-sm font-medium text-gray-900">New nudge from Sarah</p>
-                            <p className="text-sm text-gray-500 mt-1">"Quick question on the billing migration - 15 min?"</p>
-                            <div className="flex gap-2 mt-3">
-                              <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white text-xs">Accept</Button>
-                              <Button size="sm" variant="outline" className="text-xs" style={{ color: '#4B5563', borderColor: '#D1D5DB', backgroundColor: 'white' }}>Later</Button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "slack" && (
-                        <motion.div key="slack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <img src="/slack-icon.svg" alt="Slack" className="w-12 h-12 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Lives in Slack, not another tab</h4>
-                          <p className="text-gray-500 mb-4">Your team already lives in Slack. Nudges arrive as DMs. One click to accept, then schedule.</p>
-                          {/* Slack DM Preview */}
-                          <div className="bg-[#4A154B] rounded-lg p-4 text-white">
-                            <div className="flex items-center gap-2 mb-3">
-                              <img src="/slack-icon.svg" alt="Slack" className="w-5 h-5" />
-                              <span className="text-sm font-medium">Attunly</span>
-                              <span className="text-xs text-white/60">12:34 PM</span>
-                            </div>
-                            <div className="bg-white/10 rounded-md p-3 text-sm">
-                              <p className="font-medium">New nudge from Sarah K.</p>
-                              <p className="text-white/80 mt-1">"Quick sync on the API migration? 15 min"</p>
-                              <div className="flex gap-2 mt-3">
-                                <button className="px-3 py-1.5 bg-[#007A5A] text-white text-xs font-medium rounded">Accept</button>
-                                <button className="px-3 py-1.5 bg-white/20 text-white text-xs font-medium rounded">Later</button>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                      {activeFeature === "timezones" && (
-                        <motion.div key="timezones" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Globe className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Timezones, handled</h4>
-                          <p className="text-gray-500 mb-4">Team in Manila? London? SF? See everyone's availability in your local time. Overlap found automatically.</p>
-                          <div className="flex justify-center py-4">
-                            <Image
-                              src="/images/timezone-illustration.svg"
-                              alt="Global timezone coordination illustration"
-                              width={300}
-                              height={200}
-                              className="object-contain"
-                            />
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-16 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
-            <div>
-              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">How It Works</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                Set up in 2 minutes. Start connecting.
-              </h2>
-              <p className="text-xl text-gray-500">
-                No calendar permissions. No complex integrations. Just add your team and start breaking down silos.
-              </p>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex justify-center"
-            >
-              <Image
-                src="/images/collaboration-colleagues.svg"
-                alt="Remote collaboration"
-                width={500}
-                height={400}
-                className="object-contain"
-              />
-            </motion.div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Create a pod, invite your team",
-                description: "Internal team, contractors, cross-functional partners—add everyone with a simple invite code.",
-              },
-              {
-                step: "02",
-                title: "Tag expertise & availability",
-                description: "Everyone adds what they know. Set typical hours. Now the whole team is searchable.",
-              },
-              {
-                step: "03",
-                title: "Nudge, connect, collaborate",
-                description: "Find the right expert, send a contextual request, schedule time—all in one flow.",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <div className="text-6xl font-bold text-violet-100 mb-4">{item.step}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-500">{item.description}</p>
               </motion.div>
             ))}
           </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12 text-xl text-gray-600 text-center"
+          >
+            So coordination feels natural instead of awkward.
+          </motion.p>
         </div>
       </section>
 
-      {/* Who It's For Section */}
-      <section className="py-16 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
+      {/* AI Value Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Built for</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
-              Modern distributed teams
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-violet-100 text-violet-700 mb-6">
+              <Sparkles className="w-4 h-4" />
+              AI that removes guessing
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+              Attunly uses AI to remove the guessing teams do every day.
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
+          {/* Glass Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="bg-white/80 backdrop-blur-xl border-violet-100 shadow-xl">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="flex-1 space-y-4 text-center md:text-left">
+                    {[
+                      "No more checking calendars.",
+                      "No more scanning Slack statuses.",
+                      "No more second-guessing if now is a bad time.",
+                    ].map((line, i) => (
+                      <motion.p
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        className="text-lg text-gray-600 flex items-center gap-3 justify-center md:justify-start"
+                      >
+                        <span className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-4 h-4 text-green-600" />
+                        </span>
+                        <span className="line-through text-gray-400 decoration-violet-400 decoration-2">{line.replace("No more ", "")}</span>
+                      </motion.p>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-10 text-xl text-gray-900 text-center font-medium"
+          >
+            The AI works quietly in the background to surface the right people at the right moment.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Differentiation Section */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xl text-gray-500 text-center mb-10"
+          >
+            Most tools focus on time.
+          </motion.p>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
-              { emoji: "🚀", title: "Startups", desc: "Moving fast with small, distributed teams" },
-              { emoji: "🌍", title: "Remote-first", desc: "Teams across multiple timezones" },
-              { emoji: "💬", title: "Slack-native", desc: "Teams that live in Slack all day" },
-              { emoji: "🔄", title: "Cross-functional", desc: "PMs, engineers, designers collaborating" },
+              {
+                icon: Calendar,
+                title: "Calendars",
+                desc: "Optimize schedules",
+                highlighted: false,
+              },
+              {
+                icon: MessageSquare,
+                title: "Chat tools",
+                desc: "Optimize communication",
+                highlighted: false,
+              },
+              {
+                icon: Target,
+                title: "Attunly",
+                desc: "Optimizes decisions",
+                highlighted: true,
+              },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -772,55 +472,229 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <div className="text-4xl mb-3">{item.emoji}</div>
-                <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+                <Card className={`h-full transition-all duration-300 ${
+                  item.highlighted
+                    ? 'border-violet-300 bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                    : 'border-gray-200 bg-gray-50'
+                }`}>
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${
+                      item.highlighted ? 'bg-white/20' : 'bg-gray-200'
+                    }`}>
+                      <item.icon className={`w-6 h-6 ${item.highlighted ? 'text-white' : 'text-gray-500'}`} />
+                    </div>
+                    <h3 className={`font-semibold mb-2 ${item.highlighted ? 'text-white' : 'text-gray-700'}`}>
+                      {item.title}
+                    </h3>
+                    <p className={`text-sm ${item.highlighted ? 'text-violet-100 font-medium' : 'text-gray-500'}`}>
+                      {item.desc}
+                    </p>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xl text-gray-600 text-center max-w-2xl mx-auto"
+          >
+            It helps you decide who to reach out to and when—without adding more noise or process.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* How It Fits */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                Fits into how teams already work.
+              </h2>
+
+              <div className="space-y-4 mb-8">
+                {[
+                  "Works alongside your existing tools",
+                  "No heavy setup",
+                  "No new habits to learn",
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <span className="text-lg text-gray-700">{item}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <p className="text-xl text-gray-900 font-medium mb-8">
+                Just clearer coordination when it matters.
+              </p>
+
+              {/* Integration logos */}
+              <div className="flex items-center gap-6">
+                <span className="text-sm text-gray-500">Integrates with:</span>
+                <div className="flex items-center gap-4">
+                  <img src="/slack-icon.svg" alt="Slack" className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity" />
+                  <img src="/google-calendar-icon.svg" alt="Google Calendar" className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity" />
+                  <img src="/zoom-icon.svg" alt="Zoom" className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Illustration */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="hidden lg:block"
+            >
+              <img
+                src="/images/teamwork-gears.svg"
+                alt="Team collaboration"
+                className="w-full max-w-md mx-auto"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Who It's For */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Built for
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-4 gap-4 mb-10">
+            {[
+              { icon: Code, label: "Product & engineering teams", color: "text-blue-600", bg: "bg-blue-50" },
+              { icon: Rocket, label: "Founders & operators", color: "text-violet-600", bg: "bg-violet-50" },
+              { icon: Globe, label: "Remote & async teams", color: "text-green-600", bg: "bg-green-50" },
+              { icon: Clock, label: "Anyone tired of coordination overhead", color: "text-amber-600", bg: "bg-amber-50" },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-300">
+                  <CardContent className="p-5 text-center">
+                    <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                      <item.icon className={`w-6 h-6 ${item.color}`} />
+                    </div>
+                    <p className="text-gray-700 font-medium text-sm">{item.label}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-lg text-gray-600 text-center max-w-2xl mx-auto"
+          >
+            If your team lives in Slack and still struggles to coordinate, Attunly is for you.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Solo Founder Signal */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            <Quote className="w-8 h-8 mx-auto text-gray-300 mb-4" />
+            <p className="text-lg text-gray-600 mb-3 italic">
+              Built by a solo founder who kept running into this problem himself.
+            </p>
+            <p className="text-sm text-gray-400">
+              It started as a personal frustration and turned into a product focused on making work feel a little more human.
+            </p>
+          </motion.div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 px-6 bg-violet-600">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Know who to connect with. Know when.
-          </h2>
-          <p className="text-xl text-violet-100 mb-10">
-            Stop wasting time on coordination. Start connecting with the right people, instantly.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <section className="py-20 px-6 bg-violet-600 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white transform translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white transform -translate-x-1/2 translate-y-1/2" />
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-2 text-xl text-violet-100 mb-8"
+          >
+            <p>Less hesitation.</p>
+            <p>Less back and forth.</p>
+            <p>More momentum.</p>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold text-white mb-10"
+          >
+            Attunly helps teams connect with clarity.
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             <Link href="/signup">
-              <Button className="h-14 px-8 text-base font-semibold bg-white text-violet-600 hover:bg-violet-50 rounded-xl shadow-lg gap-2">
-                Get Started Free
+              <Button className="h-14 px-10 text-lg font-semibold bg-white text-violet-600 hover:bg-violet-50 rounded-xl shadow-2xl shadow-violet-900/30 gap-2">
+                Get Early Access
                 <ArrowRightMd className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/login">
-              <Button variant="outline" className="h-14 px-8 text-base font-semibold rounded-xl bg-transparent border-white/30 text-white hover:bg-white/10">
-                Log in to your team
-              </Button>
-            </Link>
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-4 text-sm text-violet-200">
-            <span>Free for teams up to 10</span>
-            <span className="flex items-center gap-1.5">
-              <img src="/slack-icon.svg" alt="Slack" className="w-4 h-4 brightness-0 invert opacity-70" />
-              Works with Slack
-            </span>
-            <span>Setup in 2 minutes</span>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-[#f5f5f5] border-t border-gray-200">
-        <div className="max-w-6xl mx-auto">
+      <footer className="py-12 px-6 bg-white border-t border-gray-100">
+        <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <img src="/icon.png" alt="Attunly" className="w-6 h-6" />
-              <span className="font-bold text-xl">
+              <span className="font-bold text-lg">
                 <span className="text-gray-900">Attun</span>
                 <span className="text-violet-600">ly</span>
               </span>
@@ -832,7 +706,7 @@ export default function LandingPage() {
               <Link href="mailto:support@attunly.com" className="hover:text-gray-900 transition-colors">Contact</Link>
             </div>
             <div className="text-sm text-gray-400">
-              © 2025 Attunly. All rights reserved.
+              © 2025 Attunly
             </div>
           </div>
         </div>
