@@ -975,63 +975,76 @@ function SettingsContent() {
         <div className="space-y-6">
           {org ? (
             <>
-              {/* Org Info */}
+              {/* Organization Overview Card */}
               <Card>
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-base font-semibold">Organization</CardTitle>
-                  <CardDescription>Your team workspace</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <Building01 className="w-6 h-6 text-primary" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Building01 className="w-5 h-5 text-primary" />
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-foreground">{org.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {org.isOwner ? "Owner" : "Member"}
-                      </p>
+                    <div>
+                      <CardTitle className="text-base font-semibold">Organization Overview</CardTitle>
+                      <CardDescription>Your team workspace details</CardDescription>
                     </div>
                   </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Org Name & Role */}
+                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                        <span className="text-primary font-bold text-lg">{org.name?.[0]?.toUpperCase() || 'O'}</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">{org.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {org.isOwner ? "Owner" : "Member"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Invite Code - Inside Overview for owners */}
+                  {org.isOwner && org.inviteCode && (
+                    <div className="pt-2">
+                      <label className="text-sm font-medium text-muted-foreground mb-2 block">Invite Code</label>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 p-3 bg-muted/50 rounded-lg font-mono text-lg tracking-widest text-center border border-border/50">
+                          {org.inviteCode}
+                        </div>
+                        <Button onClick={copyInviteCode} variant="outline" size="icon" className="shrink-0">
+                          {copiedInvite ? (
+                            <CheckBig className="w-4 h-4 text-success" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">Share this code to invite teammates to your organization</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
-              {/* Invite Code */}
-              {org.isOwner && org.inviteCode && (
-                <Card>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-base font-semibold">Invite Code</CardTitle>
-                    <CardDescription>Share this code to invite teammates</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 p-3 bg-muted rounded-lg font-mono text-lg tracking-widest text-center">
-                        {org.inviteCode}
-                      </div>
-                      <Button onClick={copyInviteCode} variant="outline" size="icon">
-                        {copiedInvite ? (
-                          <CheckBig className="w-4 h-4 text-success" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Org Slack Integration */}
+              {/* Workspace Integrations Card */}
               <Card>
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-base font-semibold">Workspace Slack</CardTitle>
-                  <CardDescription>Connect your organization's Slack workspace</CardDescription>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                      <img src="/slack-icon.svg" alt="Slack" className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base font-semibold">Workspace Slack</CardTitle>
+                      <CardDescription>Connect your organization's Slack workspace</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {org.slackConnected ? (
                     <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                          <CheckBig className="w-5 h-5 text-success" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                          <img src="/slack-icon.svg" alt="Slack" className="w-10 h-10" />
                         </div>
                         <div>
                           <p className="font-medium text-foreground">Connected</p>
@@ -1044,8 +1057,8 @@ function SettingsContent() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#4A154B]/10 rounded-xl flex items-center justify-center">
-                          <ChatCircle className="w-5 h-5 text-[#4A154B]" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                          <img src="/slack-icon.svg" alt="Slack" className="w-10 h-10 opacity-60" />
                         </div>
                         <div>
                           <p className="font-medium text-foreground">Connect Workspace Slack</p>
@@ -1053,8 +1066,8 @@ function SettingsContent() {
                         </div>
                       </div>
                       {org.isOwner && (
-                        <Button className="bg-[#4A154B] hover:bg-[#611f69]">
-                          <LinkIcon className="w-4 h-4 mr-2" />
+                        <Button className="bg-[#4A154B] hover:bg-[#611f69] gap-2">
+                          <img src="/slack-icon.svg" alt="" className="w-4 h-4" />
                           Connect
                         </Button>
                       )}
@@ -1063,14 +1076,19 @@ function SettingsContent() {
                 </CardContent>
               </Card>
 
-              {/* Theme Customization - Pro+ feature */}
+              {/* Customization Card - Pro+ feature */}
               {org.isOwner && (
                 <Card>
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-base font-semibold">Brand Colors</CardTitle>
-                        <CardDescription>Customize your team's color theme</CardDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                          <Instance className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-base font-semibold">Brand Colors</CardTitle>
+                          <CardDescription>Customize your team's color theme</CardDescription>
+                        </div>
                       </div>
                       {!canCustomize && (
                         <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
@@ -1092,10 +1110,17 @@ function SettingsContent() {
 
               {/* Leave Organization - For non-owners */}
               {!org.isOwner && (
-                <Card className="border-destructive/30">
+                <Card className="border-destructive/20">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-base font-semibold">Leave Organization</CardTitle>
-                    <CardDescription>Remove yourself from {org.name}</CardDescription>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+                        <LinkBreak className="w-5 h-5 text-destructive" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base font-semibold">Leave Organization</CardTitle>
+                        <CardDescription>Remove yourself from {org.name}</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
@@ -1127,12 +1152,19 @@ function SettingsContent() {
                 </Card>
               )}
 
-              {/* Delete Organization - For owners */}
+              {/* Danger Zone - For owners */}
               {org.isOwner && (
-                <Card className="border-destructive/30">
+                <Card className="border-destructive/20">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-base font-semibold text-destructive">Danger Zone</CardTitle>
-                    <CardDescription>Irreversible actions for {org.name}</CardDescription>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+                        <TrashFull className="w-5 h-5 text-destructive" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base font-semibold text-destructive">Danger Zone</CardTitle>
+                        <CardDescription>Irreversible actions for {org.name}</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-xl">
@@ -1204,6 +1236,58 @@ function SettingsContent() {
       {/* Billing Tab - Only for org owners */}
       {activeTab === "billing" && org?.isOwner && (
         <div className="space-y-6">
+          {/* Trial Banner */}
+          {subscription?.isOnTrial && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        {subscription.trialDaysRemaining} days left in your {getPlanDisplayName(subscription.trialPlan || 'starter')} trial
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {(subscription.trialDaysRemaining || 0) <= 3
+                          ? "Add a payment method to keep your features"
+                          : "Enjoying Attunly? Add a payment method anytime to continue"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/billing/checkout', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            plan: subscription.trialPlan || 'starter',
+                            billingPeriod: 'monthly',
+                            seats: 5,
+                          }),
+                        });
+                        const data = await response.json();
+                        if (data.url) {
+                          window.location.href = data.url;
+                        } else {
+                          toast.error(data.error || 'Failed to start checkout');
+                        }
+                      } catch {
+                        toast.error('Failed to start checkout');
+                      }
+                    }}
+                  >
+                    Add Payment Method
+                    <ArrowRightMd className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Current Plan */}
           <Card>
             <CardHeader className="pb-4">
@@ -1212,7 +1296,12 @@ function SettingsContent() {
                   <CardTitle className="text-base font-semibold">Current Plan</CardTitle>
                   <CardDescription>Manage your organization's subscription</CardDescription>
                 </div>
-                {subscription?.hasActiveSubscription && (
+                {subscription?.isOnTrial ? (
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Trial
+                  </Badge>
+                ) : subscription?.hasActiveSubscription && (
                   <Badge variant="secondary" className="bg-success/10 text-success border-0">
                     <CheckBig className="w-3 h-3 mr-1" />
                     Active

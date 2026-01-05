@@ -98,14 +98,37 @@ export async function POST(request: Request) {
     }
 
     const inviteCode = generateInviteCode();
+    const { trialPlan } = body;
+
+    // Build organization insert data
+    const orgData: any = {
+      name: name.trim(),
+      invite_code: inviteCode,
+      owner_id: user.id,
+    };
+
+    // If a trial plan is specified, set up the 14-day trial
+    if (trialPlan && (trialPlan === 'starter' || trialPlan === 'pro')) {
+      const now = new Date();
+      const trialEnds = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 days
+
+      orgData.trial_plan = trialPlan;
+      orgData.trial_started_at = now.toISOString();
+      orgData.trial_ends_at = trialEnds.toISOString();
+      // Set subscription plan to trial plan so enforcement uses trial limits
+      orgData.subscription_plan = trialPlan;
+      orgData.subscription_status = 'trialing';
+
+      log.info('Creating organization with trial', {
+        userId: user.id,
+        trialPlan,
+        trialEndsAt: trialEnds.toISOString(),
+      });
+    }
 
     const { data: org, error: orgError } = await supabase
       .from('organizations')
-      .insert({
-        name: name.trim(),
-        invite_code: inviteCode,
-        owner_id: user.id,
-      })
+      .insert(orgData)
       .select()
       .single();
 

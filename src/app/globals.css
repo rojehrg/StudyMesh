@@ -16,36 +16,36 @@
 
 @layer base {
   :root {
-    /* ===== LIGHT MODE - Clean, easy on eyes ===== */
+    /* ===== LIGHT MODE - Clean, calm, easy on eyes ===== */
 
-    /* Background - Soft off-white, not harsh */
-    --background: 0 0% 98%;
-    --foreground: 240 10% 15%;
+    /* Background - Pure white, clean */
+    --background: 0 0% 100%;
+    --foreground: 220 13% 18%;
 
-    /* Cards - Pure white for contrast */
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    /* Cards - Very subtle off-white for depth */
+    --card: 0 0% 99%;
+    --card-foreground: 220 13% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
+    --popover-foreground: 220 13% 18%;
 
-    /* Primary - Rich violet */
-    --primary: 262 60% 50%;
+    /* Primary - Calm, soft violet (not too saturated) */
+    --primary: 262 45% 58%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light gray */
-    --secondary: 240 5% 94%;
-    --secondary-foreground: 240 10% 30%;
+    /* Secondary - Cool light gray */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 13% 30%;
 
-    /* Accent - Light violet for hover states */
-    --accent: 240 5% 92%;
-    --accent-foreground: 240 10% 15%;
+    /* Accent - Very subtle violet tint for hover states */
+    --accent: 262 20% 96%;
+    --accent-foreground: 220 13% 18%;
 
-    /* Muted - Neutral gray */
-    --muted: 240 5% 94%;
-    --muted-foreground: 240 5% 45%;
+    /* Muted - Light cool gray */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    /* Destructive - Soft coral */
+    /* Destructive - Soft red */
     --destructive: 0 45% 55%;
     --destructive-foreground: 0 0% 100%;
 
@@ -57,24 +57,24 @@
     --warning: 38 90% 50%;
     --warning-foreground: 38 90% 10%;
 
-    /* Info - Blue */
-    --info: 210 90% 55%;
+    /* Info - Calm blue (softer) */
+    --info: 210 70% 55%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - Subtle gray */
-    --border: 240 5% 90%;
-    --input: 240 5% 90%;
-    --ring: 262 60% 50%;
+    /* Borders - Lighter, subtle */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262 45% 58%;
 
     /* Radius */
     --radius: 0.625rem;
 
-    /* Chart colors - Vibrant mix */
-    --chart-1: 262 60% 50%;
-    --chart-2: 340 70% 55%;
-    --chart-3: 210 90% 55%;
-    --chart-4: 152 50% 40%;
-    --chart-5: 38 90% 50%;
+    /* Chart colors - Softer mix */
+    --chart-1: 262 45% 58%;
+    --chart-2: 340 55% 55%;
+    --chart-3: 210 70% 55%;
+    --chart-4: 152 45% 42%;
+    --chart-5: 38 80% 50%;
   }
 
   .dark {

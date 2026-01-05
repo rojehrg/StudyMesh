@@ -61,20 +61,36 @@ export async function POST(req: Request) {
         // Try Slack DM first
         if (recipientProfile.slack_connected && recipientProfile.slack_user_id) {
           let botToken: string | null = null;
+          let tokenSource: string = 'none';
+
+          log.info('Attempting Slack DM', {
+            recipientUserId,
+            slackConnected: recipientProfile.slack_connected,
+            hasSlackUserId: !!recipientProfile.slack_user_id,
+            hasOrgId: !!recipientProfile.organization_id,
+          });
 
           if (recipientProfile.organization_id) {
-            const { data: org } = await supabase
+            const { data: org, error: orgError } = await supabase
               .from('organizations')
               .select('slack_access_token')
               .eq('id', recipientProfile.organization_id)
               .single();
 
+            if (orgError) {
+              log.warn('Failed to fetch org for Slack token', { error: orgError.message });
+            }
+
             if (org?.slack_access_token) {
               try {
                 botToken = decryptToken(org.slack_access_token);
+                tokenSource = 'organization';
+                log.info('Using organization Slack token');
               } catch (e: any) {
                 log.error('Failed to decrypt org token', { error: e.message });
               }
+            } else {
+              log.warn('No org slack_access_token found', { orgId: recipientProfile.organization_id });
             }
           }
 
@@ -82,12 +98,20 @@ export async function POST(req: Request) {
           if (!botToken && recipientProfile.slack_access_token) {
             try {
               botToken = decryptToken(recipientProfile.slack_access_token);
+              tokenSource = 'user_profile';
+              log.info('Using user profile Slack token');
             } catch (e: any) {
               log.error('Failed to decrypt user token', { error: e.message });
             }
           }
 
           if (botToken) {
+            log.info('Sending Slack DM', {
+              slackUserId: recipientProfile.slack_user_id,
+              tokenSource,
+              topic
+            });
+
             const slackSent = await sendNudgeSlackDM(
               botToken,
               recipientProfile.slack_user_id,
@@ -96,8 +120,21 @@ export async function POST(req: Request) {
 
             if (slackSent) {
               notifiedVia.push('slack');
+              log.info('Slack DM sent successfully');
+            } else {
+              log.warn('Slack DM failed to send');
             }
+          } else {
+            log.warn('No Slack token available', {
+              hasOrgToken: false,
+              hasUserToken: !!recipientProfile.slack_access_token
+            });
           }
+        } else {
+          log.info('Slack not connected for recipient', {
+            slackConnected: recipientProfile.slack_connected,
+            hasSlackUserId: !!recipientProfile.slack_user_id,
+          });
         }
 
         // Send email notification (if user has email and hasn't disabled notifications)

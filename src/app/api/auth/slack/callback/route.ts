@@ -153,6 +153,18 @@ export async function GET(request: Request) {
     if (existingOrg) {
       organization = existingOrg;
       console.log("[Slack Auth] Found existing organization:", organization.name);
+
+      // Update the org's bot token if not already set (or if token has changed)
+      if (!existingOrg.slack_access_token || existingOrg.slack_access_token !== encryptToken(botAccessToken)) {
+        await supabaseAdmin
+          .from("organizations")
+          .update({
+            slack_access_token: encryptToken(botAccessToken),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingOrg.id);
+        console.log("[Slack Auth] Updated organization bot token");
+      }
     } else {
       // Get workspace icon
       let workspaceIcon = null;
@@ -178,6 +190,7 @@ export async function GET(request: Request) {
           name: workspaceName,
           slack_team_name: workspaceName,
           slack_team_icon: workspaceIcon,
+          slack_access_token: encryptToken(botAccessToken), // Store bot token for DMs
         })
         .select()
         .single();

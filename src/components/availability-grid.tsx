@@ -612,9 +612,9 @@ export function AvailabilityGrid({
                       className={cn(
                         "flex-1 h-6 rounded-[2px] transition-colors cursor-pointer select-none",
                         isSelected
-                          ? "bg-primary hover:bg-primary/80"
+                          ? "bg-primary/70 hover:bg-primary/60"
                           : "bg-muted hover:bg-accent",
-                        isCurrentSlot && !isSelected && "ring-1 ring-primary",
+                        isCurrentSlot && !isSelected && "ring-1 ring-primary/50",
                         readOnly && "cursor-default"
                       )}
                       onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
@@ -633,7 +633,7 @@ export function AvailabilityGrid({
       <div className="flex flex-col sm:flex-row gap-4 justify-between text-sm">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-[2px] bg-primary" />
+            <div className="w-3 h-3 rounded-[2px] bg-primary/70" />
             <span className="text-muted-foreground">Available</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -641,7 +641,7 @@ export function AvailabilityGrid({
             <span className="text-muted-foreground">Busy</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-[2px] bg-muted ring-1 ring-primary" />
+            <div className="w-3 h-3 rounded-[2px] bg-muted ring-1 ring-primary/50" />
             <span className="text-muted-foreground">Current time</span>
           </div>
         </div>

@@ -439,10 +439,10 @@ export default async function DashboardPage() {
                         <span className="font-medium text-foreground text-sm">
                           {isSent ? `You → ${otherName}` : `${otherName} → You`}
                         </span>
-                        <Badge className={`text-xs px-1.5 border-0 ${
+                        <Badge className={`text-xs px-1.5 border-0 hover:bg-opacity-30 ${
                           nudgeType === 'ask'
-                            ? "bg-info/20 text-info"
-                            : "bg-success/20 text-success"
+                            ? "bg-info/20 text-info hover:bg-info/25"
+                            : "bg-success/20 text-success hover:bg-success/25"
                         }`}>
                           {nudgeType === 'ask' ? (
                             <><CircleHelp className="w-3 h-3 mr-0.5" /> Asked</>

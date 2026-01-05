@@ -108,14 +108,14 @@ export const PLANS: Record<PlanName, PlanFeatures> = {
 };
 
 /**
- * Get organization's subscription details
+ * Get organization's subscription details (includes trial handling)
  */
 export async function getOrganizationSubscription(organizationId: string) {
   const supabase = await createClient();
 
   const { data: org, error } = await supabase
     .from('organizations')
-    .select('stripe_customer_id, stripe_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end')
+    .select('stripe_customer_id, stripe_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end, trial_plan, trial_started_at, trial_ends_at')
     .eq('id', organizationId)
     .single();
 
@@ -124,17 +124,48 @@ export async function getOrganizationSubscription(organizationId: string) {
     return null;
   }
 
-  const plan = (org.subscription_plan as PlanName) || 'free';
-  const features = PLANS[plan];
+  // Determine effective plan considering trial status
+  let effectivePlan: PlanName = 'free';
+  let isOnTrial = false;
+  let trialDaysRemaining = 0;
+
+  if (org.subscription_status === 'active' && org.subscription_plan) {
+    // Active paid subscription
+    effectivePlan = org.subscription_plan as PlanName;
+  } else if (org.subscription_status === 'trialing' && org.trial_ends_at) {
+    // Check if trial is still valid
+    const trialEnds = new Date(org.trial_ends_at);
+    const now = new Date();
+
+    if (now <= trialEnds) {
+      // Trial is active
+      effectivePlan = (org.trial_plan || org.subscription_plan || 'free') as PlanName;
+      isOnTrial = true;
+      trialDaysRemaining = Math.ceil((trialEnds.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+    } else {
+      // Trial expired - use free plan
+      effectivePlan = 'free';
+    }
+  } else if (org.subscription_plan) {
+    effectivePlan = org.subscription_plan as PlanName;
+  }
+
+  const features = PLANS[effectivePlan];
 
   return {
     stripeCustomerId: org.stripe_customer_id,
     stripeSubscriptionId: org.stripe_subscription_id,
     status: org.subscription_status || 'inactive',
-    plan,
+    plan: effectivePlan,
+    rawPlan: org.subscription_plan as PlanName,
     seats: org.subscription_seats || 1,
     periodEnd: org.subscription_period_end ? new Date(org.subscription_period_end) : null,
     features,
+    // Trial info
+    isOnTrial,
+    trialPlan: org.trial_plan as PlanName | null,
+    trialEndsAt: org.trial_ends_at ? new Date(org.trial_ends_at) : null,
+    trialDaysRemaining,
   };
 }
 

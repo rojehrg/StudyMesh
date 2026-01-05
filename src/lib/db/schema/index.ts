@@ -37,6 +37,11 @@ export const organizations = pgTable("organizations", {
   themeSettings: jsonb("theme_settings").default({}),
   // Structure: { preset: 'violet', primary: '262 60% 50%', ... }
 
+  // Trial system - 14-day free trial without credit card
+  trialPlan: text("trial_plan"), // 'starter' or 'pro' - the plan they're trialing
+  trialStartedAt: timestamp("trial_started_at", { withTimezone: true }),
+  trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

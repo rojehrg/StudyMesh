@@ -25,6 +25,11 @@ export interface Subscription {
   hasStripeCustomer: boolean;
   hasActiveSubscription: boolean;
   isOwner: boolean;
+  // Trial info
+  isOnTrial?: boolean;
+  trialPlan?: PlanName | null;
+  trialEndsAt?: string | null;
+  trialDaysRemaining?: number;
 }
 
 // Plan features definition (client-side copy)

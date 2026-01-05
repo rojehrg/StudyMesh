@@ -251,7 +251,13 @@ export default function PricingPage() {
                       }`}
                       asChild
                     >
-                      <Link href="/signup" className="gap-2">
+                      <Link
+                        href={plan.monthlyPrice === 0
+                          ? "/signup"
+                          : `/signup?plan=${plan.name.toLowerCase()}`
+                        }
+                        className="gap-2"
+                      >
                         {plan.cta}
                         <ArrowRightMd className="w-4 h-4" />
                       </Link>

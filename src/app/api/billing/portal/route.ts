@@ -96,10 +96,10 @@ export async function GET() {
       });
     }
 
-    // Get organization subscription details
+    // Get organization subscription details including trial info
     const { data: org } = await supabase
       .from('organizations')
-      .select('id, owner_id, stripe_customer_id, stripe_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end')
+      .select('id, owner_id, stripe_customer_id, stripe_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end, trial_plan, trial_started_at, trial_ends_at')
       .eq('id', profile.organization_id)
       .single();
 
@@ -110,16 +110,37 @@ export async function GET() {
       });
     }
 
+    // Calculate trial status
+    let isOnTrial = false;
+    let trialDaysRemaining = 0;
+    let effectivePlan = org.subscription_plan || 'free';
+
+    if (org.subscription_status === 'trialing' && org.trial_ends_at) {
+      const trialEnds = new Date(org.trial_ends_at);
+      const now = new Date();
+
+      if (now <= trialEnds) {
+        isOnTrial = true;
+        trialDaysRemaining = Math.ceil((trialEnds.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+        effectivePlan = org.trial_plan || org.subscription_plan || 'free';
+      }
+    }
+
     return NextResponse.json({
       success: true,
       subscription: {
-        plan: org.subscription_plan || 'free',
+        plan: effectivePlan,
         status: org.subscription_status || 'inactive',
         seats: org.subscription_seats || 1,
         periodEnd: org.subscription_period_end,
         hasStripeCustomer: !!org.stripe_customer_id,
-        hasActiveSubscription: !!org.stripe_subscription_id,
+        hasActiveSubscription: !!org.stripe_subscription_id && org.subscription_status === 'active',
         isOwner: org.owner_id === user.id,
+        // Trial info
+        isOnTrial,
+        trialPlan: org.trial_plan,
+        trialEndsAt: org.trial_ends_at,
+        trialDaysRemaining,
       },
     });
   } catch (error: any) {

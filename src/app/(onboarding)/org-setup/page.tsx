@@ -57,10 +57,16 @@ export default function OrgSetupPage() {
 
     setLoading(true);
     try {
+      // Check if user has a trial plan stored from signup
+      const trialPlan = localStorage.getItem('trial_plan');
+
       const response = await fetch('/api/organizations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: orgName.trim() })
+        body: JSON.stringify({
+          name: orgName.trim(),
+          trialPlan: trialPlan || undefined,
+        })
       });
 
       const data = await response.json();
@@ -68,6 +74,9 @@ export default function OrgSetupPage() {
       if (!response.ok) {
         throw new Error(data.error || data.details || 'Failed to create organization');
       }
+
+      // Clear trial plan from localStorage after successful org creation
+      localStorage.removeItem('trial_plan');
 
       toast.success("Organization created!", {
         description: `Invite code: ${data.inviteCode}`

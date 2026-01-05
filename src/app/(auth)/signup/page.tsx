@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loading, CheckBig } from "react-coolicons";
 import dynamic from "next/dynamic";
@@ -20,8 +20,17 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const { track } = useAnalytics();
+
+  // Store trial plan from URL in localStorage for persistence through OAuth flow
+  useEffect(() => {
+    const plan = searchParams.get('plan');
+    if (plan && (plan === 'starter' || plan === 'pro')) {
+      localStorage.setItem('trial_plan', plan);
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   useEffect(() => {
