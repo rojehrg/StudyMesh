@@ -80,9 +80,11 @@ const AVAILABILITY_PRESETS = [
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [timezoneSearch, setTimezoneSearch] = useState("");
   const [timezoneOpen, setTimezoneOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -104,8 +106,20 @@ export default function OnboardingPage() {
   useEffect(() => {
     const init = async () => {
       // Get user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.error('[Onboarding] Auth error:', userError);
+      }
+
+      if (!user) {
+        console.log('[Onboarding] No user found, redirecting to login');
+        router.push('/login');
+        return;
+      }
+
+      console.log('[Onboarding] User found:', user.id);
+      setUserId(user.id);
 
       if (user.email) {
         setUserEmail(user.email);
@@ -142,9 +156,10 @@ export default function OnboardingPage() {
         lastName,
         timezone,
       }));
+      setInitialLoading(false);
     };
     init();
-  }, [supabase]);
+  }, [supabase, router]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -162,15 +177,34 @@ export default function OnboardingPage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      // Use the userId we stored on page load
+      if (!userId) {
+        console.error('[Onboarding] No userId stored, attempting to fetch again');
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          console.error('[Onboarding] Auth error on submit:', userError);
+          toast.error("Session expired", {
+            description: "Please log in again"
+          });
+          router.push('/login');
+          return;
+        }
+        setUserId(user.id);
+      }
+
+      const currentUserId = userId;
+      if (!currentUserId) {
+        throw new Error("No user found");
+      }
+
+      console.log('[Onboarding] Saving profile for user:', currentUserId);
 
       // Insert into 'profiles' table using Supabase client
       // Store natural language descriptions - AI will process these for matching
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          user_id: user.id,
+          user_id: currentUserId,
           first_name: formData.firstName,
           last_name: formData.lastName,
           department: formData.department,
@@ -184,13 +218,18 @@ export default function OnboardingPage() {
           onConflict: 'user_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[Onboarding] Database error:', error);
+        throw error;
+      }
+
+      console.log('[Onboarding] Profile saved successfully');
 
       // Check if user has an organization
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('user_id', user.id)
+        .eq('user_id', currentUserId)
         .single();
 
       // Show celebration first
@@ -214,6 +253,15 @@ export default function OnboardingPage() {
       setLoading(false);
     }
   };
+
+  // Show loading while checking auth
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <LottieLoader size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
