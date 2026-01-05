@@ -1,8 +1,36 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Loader2, Sparkles } from "lucide-react";
+import Lottie from "lottie-react";
 import { cn } from "@/lib/utils";
+import loadingAnimation from "../../public/loading.json";
+
+// Lottie loader component
+export function LottieLoader({
+  size = "md",
+  className,
+}: {
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
+}) {
+  const sizeClasses = {
+    sm: "w-8 h-8",
+    md: "w-12 h-12",
+    lg: "w-16 h-16",
+    xl: "w-24 h-24",
+  };
+
+  return (
+    <div className={cn(sizeClasses[size], className)}>
+      <Lottie
+        animationData={loadingAnimation}
+        loop={true}
+        autoplay={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
+  );
+}
 
 // Animated loader with personality
 export function LoadingSpinner({
@@ -14,20 +42,11 @@ export function LoadingSpinner({
   text?: string;
   className?: string;
 }) {
-  const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6",
-    lg: "w-8 h-8",
-  };
+  const lottieSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "md";
 
   return (
     <div className={cn("flex flex-col items-center justify-center gap-3", className)}>
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      >
-        <Loader2 className={cn("text-primary", sizeClasses[size])} />
-      </motion.div>
+      <LottieLoader size={lottieSize} />
       {text && (
         <motion.p
           initial={{ opacity: 0 }}
@@ -59,14 +78,8 @@ export function PageLoader({ message }: { message?: string }) {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center"
       >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        >
-          <Sparkles className="w-8 h-8 text-primary" />
-        </motion.div>
+        <LottieLoader size="xl" />
       </motion.div>
       <motion.p
         initial={{ opacity: 0, y: 10 }}

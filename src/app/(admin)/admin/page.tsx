@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loading, Building01, UsersGroup, BookOpen, Bell, CreditCard01, TrendingUp } from "react-coolicons";
+import { Building01, UsersGroup, BookOpen, Bell, CreditCard01, TrendingUp } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import Link from "next/link";
 
 interface Stats {
@@ -155,7 +156,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loading className="w-8 h-8 animate-spin text-violet-600" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     );
   }

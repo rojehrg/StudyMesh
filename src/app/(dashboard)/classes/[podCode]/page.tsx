@@ -12,7 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loading, ChevronLeft, UsersGroup, Copy, CheckBig, Bell, Star, TrendingUp, BookOpen, Globe, Shield, WifiHigh, Clock } from "react-coolicons";
+import { ChevronLeft, UsersGroup, Copy, CheckBig, Bell, Star, TrendingUp, BookOpen, Globe, Shield, WifiHigh, Clock } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -275,7 +276,7 @@ function PodDetailContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loading className="w-8 h-8 animate-spin text-primary" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     );
   }
@@ -591,7 +592,7 @@ export default function PodDetailPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loading className="h-8 w-8 animate-spin text-primary" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     }>
       <PodDetailContent />

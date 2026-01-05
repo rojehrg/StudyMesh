@@ -18,12 +18,12 @@
   :root {
     /* ===== LIGHT MODE - Clean, calm, easy on eyes ===== */
 
-    /* Background - Pure white, clean */
-    --background: 0 0% 100%;
+    /* Background - Neutral off-white #f5f5f5 */
+    --background: 0 0% 96%;
     --foreground: 220 13% 18%;
 
-    /* Cards - Very subtle off-white for depth */
-    --card: 0 0% 99%;
+    /* Cards - Pure white for contrast against off-white bg */
+    --card: 0 0% 100%;
     --card-foreground: 220 13% 18%;
 
     --popover: 0 0% 100%;
@@ -33,16 +33,16 @@
     --primary: 262 45% 58%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Cool light gray */
-    --secondary: 220 14% 96%;
+    /* Secondary - Subtle off-white between bg and card */
+    --secondary: 0 0% 98%;
     --secondary-foreground: 220 13% 30%;
 
-    /* Accent - Very subtle violet tint for hover states */
-    --accent: 262 20% 96%;
+    /* Accent - Subtle hover state */
+    --accent: 0 0% 94%;
     --accent-foreground: 220 13% 18%;
 
-    /* Muted - Light cool gray */
-    --muted: 220 14% 96%;
+    /* Muted - Subtle section backgrounds */
+    --muted: 0 0% 98%;
     --muted-foreground: 220 9% 46%;
 
     /* Destructive - Soft red */
@@ -61,9 +61,9 @@
     --info: 210 70% 55%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders - Lighter, subtle */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    /* Borders - More visible for better contrast */
+    --border: 220 10% 88%;
+    --input: 220 10% 88%;
     --ring: 262 45% 58%;
 
     /* Radius */
@@ -240,6 +240,24 @@
   background: hsl(var(--muted-foreground) / 0.4);
 }
 
+/* Stable scrollbar - prevents layout shift */
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+.scrollbar-stable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-stable::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.scrollbar-stable:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+}
+
 /* Selection */
 ::selection {
   background: hsl(var(--primary) / 0.2);
@@ -297,15 +315,18 @@
   border-radius: var(--radius);
 }
 
-/* Enhanced focus states */
-button:focus-visible,
-a:focus-visible,
+/* Enhanced focus states - subtle, not distracting */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid hsl(var(--primary) / 0.3);
   outline-offset: 2px;
   border-radius: var(--radius);
+}
+
+/* Remove focus outlines from buttons - they have their own hover states */
+button:focus-visible {
+  outline: none;
 }
 
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { AddPlusCircle, Exit, UsersGroup, Loading, SearchMagnifyingGlass, Clock, Building01 } from "react-coolicons";
+import { AddPlusCircle, Exit, UsersGroup, SearchMagnifyingGlass, Clock, Building01 } from "react-coolicons";
 import { motion } from "framer-motion";
 import { EmptyState } from "@/components/empty-state";
 import { PageLoader } from "@/components/loading-states";
@@ -82,7 +82,7 @@ export default function ClassesPage() {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">My Enablement Pods</h1>
+          <h1 className="text-2xl font-bold text-foreground">My Pods</h1>
           <p className="text-muted-foreground mt-1">Collaborate with your team in focused pods</p>
         </div>
         <div className="flex gap-3">
@@ -92,9 +92,9 @@ export default function ClassesPage() {
               Join Pod
             </Link>
           </Button>
-          <Button className="bg-accent hover:bg-accent/80 text-accent-foreground" asChild>
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
             <Link href="/classes/create">
-              <AddPlusCircle className="mr-2 h-4 w-4" />
+              <AddPlusCircle className="mr-2 h-4 w-4 text-white" />
               Create Pod
             </Link>
           </Button>

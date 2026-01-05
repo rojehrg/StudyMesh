@@ -10,7 +10,6 @@ import {
   AddPlusCircle,
   Exit,
   Settings,
-  Info,
   ChevronLeft,
   HamburgerLg,
   LogOut,
@@ -18,9 +17,11 @@ import {
   Bell,
   SearchMagnifyingGlass
 } from "react-coolicons";
+import { HandHelping } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -39,24 +40,29 @@ interface SidebarItemProps {
   href: string;
   isCollapsed: boolean;
   isActive: boolean;
+  isPending?: boolean;
+  onClick?: () => void;
   badge?: number;
 }
 
-function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, badge }: SidebarItemProps) {
+function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending, onClick, badge }: SidebarItemProps) {
+  const showActive = isActive || isPending;
+
   return (
     <Link
       href={href}
       prefetch={true}
+      onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group",
-        isActive
-          ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
-          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-100 overflow-hidden whitespace-nowrap group",
+        showActive
+          ? "bg-muted text-foreground font-medium border-l-2 border-primary"
+          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-2 border-transparent"
       )}
       title={isCollapsed ? label : ""}
     >
       <div className="relative flex items-center">
-        <Icon className="w-5 h-5 shrink-0" />
+        <Icon className={cn("w-5 h-5 shrink-0", isPending && "animate-pulse")} />
         {badge ? (
           <span className={cn(
             "absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full z-10 shadow-sm",
@@ -95,7 +101,8 @@ function DashboardLayoutBase({
   setIsMobileOpen,
   pathname,
   handleLogout,
-  unreadCount = 0
+  unreadCount = 0,
+  userId
 }: {
   children: React.ReactNode;
   profile: any;
@@ -106,8 +113,53 @@ function DashboardLayoutBase({
   pathname: string;
   handleLogout: () => void;
   unreadCount?: number;
+  userId?: string;
 }) {
   const totalUnread = unreadCount;
+  const supabase = createClient();
+  const [isLookingToHelp, setIsLookingToHelp] = useState(profile?.availability?.lookingToHelp || false);
+  const [orgName, setOrgName] = useState<string | null>(null);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  // Clear pending path when pathname changes (navigation complete)
+  useEffect(() => {
+    setPendingPath(null);
+  }, [pathname]);
+
+  // Update looking to help status
+  const handleLookingToHelpToggle = async (checked: boolean) => {
+    if (!userId) return;
+    try {
+      const currentAvailability = profile?.availability || {};
+      await supabase
+        .from('profiles')
+        .update({
+          availability: { ...currentAvailability, lookingToHelp: checked }
+        })
+        .eq('user_id', userId);
+      setIsLookingToHelp(checked);
+      toast.success(checked ? "You're visible as looking to help!" : "Status updated");
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
+  // Fetch organization name
+  useEffect(() => {
+    const loadOrgName = async () => {
+      if (!userId) return;
+      const { data: orgMember } = await supabase
+        .from('organization_members')
+        .select('organization_id, organizations(name)')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (orgMember?.organizations) {
+        setOrgName((orgMember.organizations as any).name);
+      }
+    };
+    loadOrgName();
+  }, [userId, supabase]);
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: MoreGridBig, label: "Dashboard", href: "/dashboard" },
@@ -118,7 +170,6 @@ function DashboardLayoutBase({
     { icon: AddPlusCircle, label: "Create Pod", href: "/classes/create" },
     { icon: Exit, label: "Join Pod", href: "/classes/join" },
     { icon: Settings, label: "Settings", href: "/settings" },
-    { icon: Info, label: "About Attunly", href: "/about" },
   ];
 
   return (
@@ -167,46 +218,104 @@ function DashboardLayoutBase({
               href={item.href}
               isCollapsed={isCollapsed}
               isActive={pathname === item.href || (item.href === "/notifications" && pathname === "/notifications")}
+              isPending={pendingPath === item.href}
+              onClick={() => {
+                if (pathname !== item.href) {
+                  setPendingPath(item.href);
+                  setIsMobileOpen(false);
+                }
+              }}
               badge={item.badge}
             />
           ))}
         </nav>
 
+        {/* Sidebar Bottom Section - Org Name + Looking to Help */}
+        {userId && (
+          <div className={cn("pb-2 space-y-3", isCollapsed ? "px-2" : "px-3")}>
+            {/* Organization Name - only show when expanded */}
+            {orgName && !isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="px-3 py-2 rounded-xl bg-muted/50 border border-border/50"
+              >
+                <p className="text-xs text-muted-foreground">Organization</p>
+                <p className="text-sm font-medium text-foreground truncate">{orgName}</p>
+              </motion.div>
+            )}
+
+            {/* Looking to Help Toggle - smooth transition */}
+            <button
+              onClick={() => handleLookingToHelpToggle(!isLookingToHelp)}
+              className={cn(
+                "w-full flex items-center rounded-xl border transition-all duration-300",
+                isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                isLookingToHelp
+                  ? "bg-success/10 border-success/30"
+                  : "bg-card border-border hover:bg-muted/50"
+              )}
+              title={isCollapsed ? (isLookingToHelp ? "Looking to help" : "Not looking to help") : undefined}
+            >
+              <HandHelping className={cn("w-5 h-5 shrink-0 transition-colors", isLookingToHelp ? "text-success" : "text-muted-foreground")} />
+
+              <motion.div
+                initial={false}
+                animate={{
+                  width: isCollapsed ? 0 : "auto",
+                  opacity: isCollapsed ? 0 : 1,
+                }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className={cn("overflow-hidden flex items-center justify-between", !isCollapsed && "flex-1")}
+                style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
+              >
+                <p className={cn("text-sm font-medium whitespace-nowrap", isLookingToHelp ? "text-success" : "text-foreground")}>
+                  {isLookingToHelp ? "Helping" : "Not helping"}
+                </p>
+                <Switch
+                  checked={isLookingToHelp}
+                  onCheckedChange={handleLookingToHelpToggle}
+                  onClick={(e) => e.stopPropagation()}
+                  className="data-[state=checked]:bg-success ml-2"
+                />
+              </motion.div>
+            </button>
+          </div>
+        )}
+
         {/* User Profile */}
-        <div className="p-3">
-          <div className="flex items-center p-2 rounded-xl hover:bg-accent/60 transition-colors cursor-pointer">
-            <Avatar className="h-9 w-9">
+        <div className={cn("p-3", isCollapsed && "px-2")}>
+          <div className={cn(
+            "flex items-center p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer",
+            isCollapsed && "justify-center"
+          )}>
+            <Avatar className="h-9 w-9 shrink-0">
               <AvatarImage src="" />
               <AvatarFallback className="bg-primary/10 text-primary font-medium">
                 {profile?.first_name?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
 
-            <motion.div
-              initial={false}
-              animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
-              className="ml-3 overflow-hidden"
-            >
-              <p className="text-sm font-medium text-foreground truncate">
-                {profile?.first_name && profile?.last_name
-                  ? `${profile.first_name} ${profile.last_name}`
-                  : "User"}
-              </p>
-            </motion.div>
+            {!isCollapsed && (
+              <>
+                <div className="ml-3 overflow-hidden flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {profile?.first_name && profile?.last_name
+                      ? `${profile.first_name} ${profile.last_name}`
+                      : "User"}
+                  </p>
+                </div>
 
-            <motion.button
-              onClick={handleLogout}
-              initial={false}
-              animate={{
-                marginLeft: isCollapsed ? 0 : "auto",
-                opacity: isCollapsed ? 0 : 1,
-                width: isCollapsed ? 0 : "auto"
-              }}
-              className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </motion.button>
+                <button
+                  onClick={handleLogout}
+                  className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95 ml-auto shrink-0"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>
@@ -279,7 +388,8 @@ function DashboardLayoutWithRealtime({
   isMobileOpen,
   setIsMobileOpen,
   pathname,
-  handleLogout
+  handleLogout,
+  userId
 }: {
   children: React.ReactNode;
   profile: any;
@@ -289,6 +399,7 @@ function DashboardLayoutWithRealtime({
   setIsMobileOpen: (v: boolean) => void;
   pathname: string;
   handleLogout: () => void;
+  userId: string;
 }) {
   const { newNotificationCount } = useRealtime();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -328,6 +439,7 @@ function DashboardLayoutWithRealtime({
       pathname={pathname}
       handleLogout={handleLogout}
       unreadCount={unreadCount}
+      userId={userId}
     >
       {children}
     </DashboardLayoutBase>
@@ -394,6 +506,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           setIsMobileOpen={setIsMobileOpen}
           pathname={pathname}
           handleLogout={handleLogout}
+          userId={userId}
         >
           {children}
         </DashboardLayoutWithRealtime>

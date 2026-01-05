@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading, CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd, Download, TrashFull } from "react-coolicons";
+import { CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd, Download, TrashFull } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -228,14 +229,24 @@ function SettingsContent() {
         .single();
 
       if (data) {
+        // Get expertise text - prefer expertise_text, fallback to expertise_skills[0] if it's natural language
+        let expertiseText = data.expertise_text || "";
+        if (!expertiseText && data.expertise_skills?.length > 0) {
+          // If expertise_skills contains a long description (from onboarding), use it
+          const firstSkill = data.expertise_skills[0];
+          if (firstSkill && firstSkill.length > 50) {
+            expertiseText = firstSkill;
+          }
+        }
+
         const loadedProfile: ProfileData = {
           firstName: data.first_name || "",
           lastName: data.last_name || "",
           department: data.department || "",
           major: data.major || "",
           bio: data.bio || "",
-          knowledgeAreas: data.knowledge_areas || data.expertise_skills || [],
-          expertiseText: data.expertise_text || "",
+          knowledgeAreas: data.knowledge_areas || [],
+          expertiseText: expertiseText,
           timezone: data.timezone || "America/New_York",
           availabilitySlots: data.availability?.slots || [],
           currentlyAvailable: data.availability?.currentlyAvailable || false,
@@ -454,7 +465,7 @@ function SettingsContent() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loading className="w-6 h-6 animate-spin text-primary" />
+        <LottieLoader size="md" className="w-6 h-6" />
       </div>
     );
   }
@@ -489,7 +500,7 @@ function SettingsContent() {
           <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {saveStatus === 'saving' && <><Loading className="h-4 w-4 animate-spin" /> Saving...</>}
+          {saveStatus === 'saving' && <><LottieLoader size="sm" className="w-4 h-4" /> Saving...</>}
           {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-success" /> Saved</>}
           {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-destructive" /> Error</>}
           {saveStatus === 'idle' && <><WifiHigh className="h-4 w-4" /> Auto-save</>}
@@ -578,7 +589,7 @@ function SettingsContent() {
                 <CardTitle className="text-base font-semibold">What can you help with?</CardTitle>
                 {expertiseSaving && (
                   <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                    <Loading className="w-3 h-3 animate-spin mr-1" />
+                    <LottieLoader size="sm" className="w-3 h-3 mr-1" />
                     Saving...
                   </Badge>
                 )}
@@ -634,7 +645,7 @@ function SettingsContent() {
                 >
                   {exportingData ? (
                     <>
-                      <Loading className="w-4 h-4 mr-2 animate-spin" />
+                      <LottieLoader size="sm" className="w-4 h-4 mr-2" />
                       Exporting...
                     </>
                   ) : (
@@ -695,7 +706,7 @@ function SettingsContent() {
                       >
                         {deletingAccount ? (
                           <>
-                            <Loading className="w-4 h-4 mr-2 animate-spin" />
+                            <LottieLoader size="sm" className="w-4 h-4 mr-2" />
                             Deleting...
                           </>
                         ) : (
@@ -860,84 +871,58 @@ function SettingsContent() {
 
           {/* Slack */}
           <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
-                <div>
-                  <CardTitle className="text-base font-semibold">Slack Integration</CardTitle>
-                  <CardDescription>Get notified directly in Slack</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {profile.slackConnected ? (
-                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-success/20 rounded-xl flex items-center justify-center">
-                      <CheckBig className="w-5 h-5 text-success" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {profile.slackHandle ? `@${profile.slackHandle}` : "Connected"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Receiving direct messages</p>
-                    </div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                    <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
                   </div>
+                  <div>
+                    <p className="font-medium text-foreground">Slack</p>
+                    <p className="text-sm text-muted-foreground">
+                      {profile.slackConnected
+                        ? (profile.slackHandle ? `@${profile.slackHandle}` : "Receiving nudges")
+                        : "Get nudges as direct messages"}
+                    </p>
+                  </div>
+                </div>
+                {profile.slackConnected ? (
                   <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10">
                     <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
-                      <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Connect Slack</p>
-                      <p className="text-sm text-muted-foreground">Get nudges as direct messages</p>
-                    </div>
-                  </div>
+                ) : (
                   <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69] gap-2">
                     {slackConnecting ? (
-                      <Loading className="w-4 h-4 animate-spin" />
+                      <LottieLoader size="sm" className="w-4 h-4" />
                     ) : (
                       <img src="/slack-icon.svg" alt="" className="w-4 h-4" />
                     )}
                     Connect
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
 
-          {/* Video Conferencing */}
+          {/* Zoom */}
           <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <img src="/zoom-icon.svg" alt="Video" className="w-6 h-6" />
-                <div>
-                  <CardTitle className="text-base font-semibold">Video Conferencing</CardTitle>
-                  <CardDescription>Auto-generate meeting links when scheduling</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Zoom */}
-              {meetingProviders.zoom ? (
-                <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
-                      <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Zoom Connected</p>
-                      <p className="text-sm text-muted-foreground">
-                        {meetingProviders.zoomEmail || "Ready to create meetings"}
-                      </p>
-                    </div>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+                    <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
                   </div>
+                  <div>
+                    <p className="font-medium text-foreground">Zoom</p>
+                    <p className="text-sm text-muted-foreground">
+                      {meetingProviders.zoom
+                        ? (meetingProviders.zoomEmail || "Ready to create meetings")
+                        : "Auto-generate meeting links"}
+                    </p>
+                  </div>
+                </div>
+                {meetingProviders.zoom ? (
                   <Button
                     variant="outline"
                     size="sm"
@@ -947,24 +932,13 @@ function SettingsContent() {
                     <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-muted/30 border border-border/50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
-                      <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Zoom</p>
-                      <p className="text-sm text-muted-foreground">Create Zoom meetings automatically</p>
-                    </div>
-                  </div>
-                  <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681F2] gap-2">
+                ) : (
+                  <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2] gap-2">
                     <img src="/zoom-icon.svg" alt="" className="w-4 h-4" />
                     Connect
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -1238,26 +1212,28 @@ function SettingsContent() {
         <div className="space-y-6">
           {/* Trial Banner */}
           {subscription?.isOnTrial && (
-            <Card className="border-primary/30 bg-primary/5">
-              <CardContent className="py-4">
+            <Card className="border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden">
+              <CardContent className="py-5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">
-                        {subscription.trialDaysRemaining} days left in your {getPlanDisplayName(subscription.trialPlan || 'starter')} trial
+                      <p className="font-semibold text-foreground text-lg">
+                        {subscription.trialDaysRemaining} days left in your trial
                       </p>
                       <p className="text-sm text-muted-foreground">
+                        You're trialing the {getPlanDisplayName(subscription.trialPlan || 'starter')} plan.
                         {(subscription.trialDaysRemaining || 0) <= 3
-                          ? "Add a payment method to keep your features"
-                          : "Enjoying Attunly? Add a payment method anytime to continue"
+                          ? " Add a payment method to keep all features."
+                          : " Subscribe anytime to continue after trial ends."
                         }
                       </p>
                     </div>
                   </div>
                   <Button
+                    size="lg"
                     onClick={async () => {
                       try {
                         const response = await fetch('/api/billing/checkout', {
@@ -1280,7 +1256,7 @@ function SettingsContent() {
                       }
                     }}
                   >
-                    Add Payment Method
+                    Subscribe Now
                     <ArrowRightMd className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
@@ -1288,51 +1264,90 @@ function SettingsContent() {
             </Card>
           )}
 
-          {/* Current Plan */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base font-semibold">Current Plan</CardTitle>
-                  <CardDescription>Manage your organization's subscription</CardDescription>
-                </div>
-                {subscription?.isOnTrial ? (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
-                    <Clock className="w-3 h-3 mr-1" />
-                    Trial
-                  </Badge>
-                ) : subscription?.hasActiveSubscription && (
-                  <Badge variant="secondary" className="bg-success/10 text-success border-0">
-                    <CheckBig className="w-3 h-3 mr-1" />
-                    Active
-                  </Badge>
-                )}
+          {/* Billing Overview Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current Plan</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{getPlanDisplayName(plan)}</p>
+              {subscription?.isOnTrial && (
+                <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary text-xs">Trial</Badge>
+              )}
+            </Card>
+            <Card className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team Size</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{subscription?.seats || 1}</p>
+              <p className="text-xs text-muted-foreground mt-1">of {plan === 'enterprise' ? 'unlimited' : plan === 'free' ? '5' : plan === 'starter' ? '20' : '100'} seats</p>
+            </Card>
+            <Card className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Billing Cycle</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{subscription?.hasActiveSubscription ? 'Monthly' : '—'}</p>
+              {subscription?.periodEnd && (
+                <p className="text-xs text-muted-foreground mt-1">Renews {new Date(subscription.periodEnd).toLocaleDateString()}</p>
+              )}
+            </Card>
+            <Card className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className={`w-2 h-2 rounded-full ${subscription?.status === 'past_due' ? 'bg-destructive' : subscription?.hasActiveSubscription || subscription?.isOnTrial ? 'bg-success' : 'bg-muted-foreground'}`} />
+                <p className="text-2xl font-bold text-foreground">
+                  {subscription?.status === 'past_due' ? 'Past Due' : subscription?.isOnTrial ? 'Trial' : subscription?.hasActiveSubscription ? 'Active' : 'Free'}
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-primary/10 rounded-xl border border-primary/20">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            </Card>
+          </div>
+
+          {/* Subscription status warnings */}
+          {subscription?.status === 'past_due' && (
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+                    <CreditCard01 className="w-5 h-5 text-destructive" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-destructive">Payment Past Due</p>
+                    <p className="text-sm text-muted-foreground">Please update your payment method to avoid service interruption.</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/billing/portal', { method: 'POST' });
+                        const data = await response.json();
+                        if (data.url) window.location.href = data.url;
+                      } catch {
+                        toast.error('Failed to open billing portal');
+                      }
+                    }}
+                  >
+                    Update Payment
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Current Subscription Details */}
+          <Card>
+            <CardHeader className="pb-4 border-b border-border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                     {plan === 'free' ? (
-                      <Building01 className="w-6 h-6 text-primary" />
+                      <Building01 className="w-5 h-5 text-primary" />
                     ) : (
-                      <Star className="w-6 h-6 text-primary" />
+                      <Star className="w-5 h-5 text-primary" />
                     )}
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">{getPlanDisplayName(plan)} Plan</p>
-                    <p className="text-sm text-muted-foreground">
-                      {plan === 'free' ? (
-                        'Free forever with basic features'
-                      ) : (
-                        <>
-                          {subscription?.seats || 1} seat{(subscription?.seats || 1) > 1 ? 's' : ''} &middot;{' '}
-                          {subscription?.periodEnd
-                            ? `Renews ${new Date(subscription.periodEnd).toLocaleDateString()}`
-                            : 'Active subscription'}
-                        </>
-                      )}
-                    </p>
+                    <CardTitle className="text-lg font-semibold">{getPlanDisplayName(plan)} Plan</CardTitle>
+                    <CardDescription>
+                      {plan === 'free'
+                        ? 'Free forever with essential features'
+                        : `$${getPlanPricing(plan).monthly}/seat/month • Billed monthly`
+                      }
+                    </CardDescription>
                   </div>
                 </div>
                 {subscription?.hasActiveSubscription && (
@@ -1342,88 +1357,170 @@ function SettingsContent() {
                       try {
                         const response = await fetch('/api/billing/portal', { method: 'POST' });
                         const data = await response.json();
-                        if (data.url) {
-                          window.location.href = data.url;
-                        }
+                        if (data.url) window.location.href = data.url;
                       } catch {
                         toast.error('Failed to open billing portal');
                       }
                     }}
                   >
-                    Manage Subscription
+                    Manage in Stripe
+                    <ArrowRightMd className="w-4 h-4 ml-1" />
                   </Button>
                 )}
               </div>
-
-              {/* Subscription status warnings */}
-              {subscription?.status === 'past_due' && (
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="text-sm text-destructive font-medium">
-                    Payment past due - please update your payment method to avoid service interruption.
-                  </p>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Plan Features */}
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-3">What's included</p>
+                  <ul className="space-y-2.5">
+                    {plan === 'free' ? (
+                      <>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 5 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />2 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Basic skill matching</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Slack integration</li>
+                      </>
+                    ) : plan === 'starter' ? (
+                      <>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />10 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />AI-powered matching</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Email support</li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 100 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />50 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Custom branding</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Priority support</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />API access</li>
+                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />SSO (coming soon)</li>
+                      </>
+                    )}
+                  </ul>
                 </div>
-              )}
+
+                {/* Usage Summary */}
+                <div className="space-y-4">
+                  <p className="text-sm font-medium text-foreground">Usage this period</p>
+
+                  {/* Seats Progress */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Team seats</span>
+                      <span className="font-medium text-foreground">
+                        {subscription?.seats || 1} / {plan === 'enterprise' ? '∞' : plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${Math.min(((subscription?.seats || 1) / (plan === 'free' ? 5 : plan === 'starter' ? 20 : 100)) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pods Progress */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Active pods</span>
+                      <span className="font-medium text-foreground">
+                        0 / {plan === 'enterprise' ? '∞' : plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary/50 rounded-full" style={{ width: '0%' }} />
+                    </div>
+                  </div>
+
+                  {plan === 'free' && (
+                    <p className="text-xs text-muted-foreground pt-2">
+                      Upgrade to unlock more seats and pods for your team.
+                    </p>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Upgrade Options - Show if on free plan */}
-          {plan === 'free' && (
+          {/* Upgrade Options - Show if on free plan or starter */}
+          {(plan === 'free' || plan === 'starter') && (
             <Card>
               <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold">Upgrade Your Plan</CardTitle>
-                <CardDescription>Unlock more features for your team</CardDescription>
+                <CardTitle className="text-base font-semibold">
+                  {plan === 'free' ? 'Upgrade Your Plan' : 'Upgrade to Pro'}
+                </CardTitle>
+                <CardDescription>
+                  {plan === 'free'
+                    ? 'Scale your team collaboration with more features'
+                    : 'Get more seats, pods, and premium features'
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Starter Plan */}
-                  <div className="p-4 border rounded-xl hover:border-primary/50 transition-colors">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-foreground">Starter</h3>
-                      <p className="text-sm text-muted-foreground">
-                        ${getPlanPricing('starter').monthly}/seat/mo
-                      </p>
-                    </div>
-                    <ul className="text-sm text-muted-foreground space-y-2 mb-4">
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 seats</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 10 pods</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
-                    </ul>
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={async () => {
-                        try {
-                          const response = await fetch('/api/billing/checkout', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ plan: 'starter', billingPeriod: 'monthly', seats: 5 }),
-                          });
-                          const data = await response.json();
-                          if (data.url) {
-                            window.location.href = data.url;
-                          } else {
-                            toast.error(data.error || 'Failed to start checkout');
+                <div className={`grid gap-4 ${plan === 'free' ? 'md:grid-cols-2' : ''}`}>
+                  {/* Starter Plan - Only show if on free */}
+                  {plan === 'free' && (
+                    <div className="p-5 border rounded-xl hover:border-primary/50 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h3 className="font-semibold text-foreground text-lg">Starter</h3>
+                          <p className="text-sm text-muted-foreground">For growing teams</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-foreground">${getPlanPricing('starter').monthly}</p>
+                          <p className="text-xs text-muted-foreground">per seat/month</p>
+                        </div>
+                      </div>
+                      <ul className="text-sm text-muted-foreground space-y-2 mb-4">
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 seats</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 10 pods</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Email support</li>
+                      </ul>
+                      <Button
+                        className="w-full"
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/billing/checkout', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ plan: 'starter', billingPeriod: 'monthly', seats: 5 }),
+                            });
+                            const data = await response.json();
+                            if (data.url) {
+                              window.location.href = data.url;
+                            } else {
+                              toast.error(data.error || 'Failed to start checkout');
+                            }
+                          } catch {
+                            toast.error('Failed to start checkout');
                           }
-                        } catch {
-                          toast.error('Failed to start checkout');
-                        }
-                      }}
-                    >
-                      Upgrade to Starter
-                      <ArrowRightMd className="w-4 h-4 ml-2" />
-                    </Button>
-                  </div>
+                        }}
+                      >
+                        Start with Starter
+                      </Button>
+                    </div>
+                  )}
 
                   {/* Pro Plan */}
-                  <div className="p-4 border-2 border-primary rounded-xl bg-primary/10 relative">
-                    <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
-                      Popular
+                  <div className={`p-5 border-2 border-primary rounded-xl bg-primary/5 relative ${plan === 'starter' ? 'max-w-md' : ''}`}>
+                    <Badge className="absolute -top-2.5 right-4 bg-primary text-primary-foreground shadow-sm">
+                      Recommended
                     </Badge>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-foreground">Pro</h3>
-                      <p className="text-sm text-muted-foreground">
-                        ${getPlanPricing('pro').monthly}/seat/mo
-                      </p>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-foreground text-lg">Pro</h3>
+                        <p className="text-sm text-muted-foreground">For scaling organizations</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-foreground">${getPlanPricing('pro').monthly}</p>
+                        <p className="text-xs text-muted-foreground">per seat/month</p>
+                      </div>
                     </div>
                     <ul className="text-sm text-muted-foreground space-y-2 mb-4">
                       <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 100 seats</li>
@@ -1457,57 +1554,66 @@ function SettingsContent() {
                     </Button>
                   </div>
                 </div>
-
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  Need more? <a href="mailto:support@attunly.com" className="text-primary hover:underline">Contact us</a> for Enterprise pricing.
-                </p>
               </CardContent>
             </Card>
           )}
 
-          {/* Usage Stats */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold">Usage Overview</CardTitle>
-              <CardDescription>Your current usage vs plan limits</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Seats Usage */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <User01 className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">Team Seats</span>
+          {/* Enterprise CTA */}
+          <Card className="bg-gradient-to-br from-muted/50 to-transparent">
+            <CardContent className="py-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-foreground/10 rounded-xl flex items-center justify-center">
+                    <Building01 className="w-6 h-6 text-foreground" />
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {subscription?.seats || 1} / {plan === 'enterprise' ? '∞' : plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${Math.min(((subscription?.seats || 1) / (plan === 'free' ? 5 : plan === 'starter' ? 20 : 100)) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Pods Usage */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Building01 className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">Active Pods</span>
+                  <div>
+                    <p className="font-semibold text-foreground text-lg">Need Enterprise features?</p>
+                    <p className="text-sm text-muted-foreground">Unlimited seats, SSO, dedicated support, custom contracts, and SLAs.</p>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    - / {plan === 'enterprise' ? '∞' : plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}
-                  </span>
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary/50 rounded-full" style={{ width: '0%' }} />
-                </div>
+                <Button variant="outline" asChild>
+                  <a href="mailto:sales@attunly.com">Contact Sales</a>
+                </Button>
               </div>
             </CardContent>
           </Card>
+
+          {/* Billing History / Payment Method */}
+          {subscription?.hasActiveSubscription && (
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Billing & Invoices</CardTitle>
+                <CardDescription>Manage payment methods and download invoices</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center border border-border">
+                      <CreditCard01 className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Payment & Invoices</p>
+                      <p className="text-sm text-muted-foreground">Update card, view invoices, download receipts</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/billing/portal', { method: 'POST' });
+                        const data = await response.json();
+                        if (data.url) window.location.href = data.url;
+                      } catch {
+                        toast.error('Failed to open billing portal');
+                      }
+                    }}
+                  >
+                    Open Billing Portal
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </motion.div>
@@ -1519,7 +1625,7 @@ export default function SettingsPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loading className="h-8 w-8 animate-spin text-primary" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     }>
       <SettingsContent />

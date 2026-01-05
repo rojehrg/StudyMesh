@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Loading, SearchMagnifyingGlass, UsersGroup, CheckBig } from "react-coolicons";
+import { SearchMagnifyingGlass, UsersGroup, CheckBig } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 
 interface UserProfile {
   id: string;
@@ -88,7 +89,7 @@ export default function UsersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loading className="w-8 h-8 animate-spin text-violet-600" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     );
   }

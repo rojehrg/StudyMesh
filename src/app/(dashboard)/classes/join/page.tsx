@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading, ChevronLeft, UsersGroup, Building01, User01 } from "react-coolicons";
+import { ChevronLeft, UsersGroup, Building01, User01 } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -196,9 +197,9 @@ export default function JoinPodPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl">Join Enablement Pod</CardTitle>
+          <CardTitle className="text-2xl">Join Pod</CardTitle>
           <CardDescription>
-            Enter a pod code to join an existing enablement pod
+            Enter a pod code to join an existing pod
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -225,7 +226,7 @@ export default function JoinPodPage() {
                   disabled={checking || !podCode.trim() || loading}
                   variant="outline"
                 >
-                  {checking ? <Loading className="h-4 w-4 animate-spin" /> : "Check"}
+                  {checking ? <LottieLoader size="sm" className="w-4 h-4" /> : "Check"}
                 </Button>
               </div>
               {error && (
@@ -289,7 +290,7 @@ export default function JoinPodPage() {
                     disabled={loading}
                     className="w-full mt-6 bg-accent hover:bg-accent/80"
                   >
-                    {loading ? <Loading className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {loading ? <LottieLoader size="sm" className="w-4 h-4 mr-2" /> : null}
                     Join This Pod
                   </Button>
                 )}

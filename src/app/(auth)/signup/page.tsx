@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Loading, CheckBig } from "react-coolicons";
+import { CheckBig } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import dynamic from "next/dynamic";
 import { useAnalytics } from "@/components/posthog-provider";
 import { EVENTS } from "@/lib/analytics/events";
@@ -18,7 +19,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -32,38 +32,31 @@ export default function SignupPage() {
     }
   }, [searchParams]);
 
-  // Redirect if already logged in
+  // Check for existing session and redirect if logged in (non-blocking)
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Check if user has a profile before deciding where to redirect
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (profile) {
-          router.replace("/dashboard");
-        } else {
-          router.replace("/onboarding");
-        }
-      } else {
-        setCheckingSession(false);
+    // Use getUser() instead of getSession() to validate the session is still valid
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (error || !user) {
+        // Session is invalid or user was deleted - clear it
+        supabase.auth.signOut();
+        return;
       }
-    };
-    checkSession();
-  }, [supabase, router]);
 
-  // Show loading while checking session
-  if (checkingSession) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loading className="h-8 w-8 animate-spin text-violet-600" />
-      </div>
-    );
-  }
+      // User is logged in, check profile and redirect
+      supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+        .then(({ data: profile }) => {
+          if (profile) {
+            router.replace("/dashboard");
+          } else {
+            router.replace("/onboarding");
+          }
+        });
+    });
+  }, [supabase, router]);
 
   const handleGoogleSignup = async () => {
     setLoading(true);
@@ -263,7 +256,7 @@ export default function SignupPage() {
                 disabled={loading}
                 className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
               >
-                {loading && <Loading className="h-4 w-4 animate-spin" />}
+                {loading && <LottieLoader size="sm" className="w-4 h-4" />}
                 Create account
               </button>
             </form>

@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Loading, ChevronLeft, Star, Globe, TrendingUp } from "react-coolicons";
+import { ChevronLeft, Star, Globe, TrendingUp } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -86,8 +87,8 @@ export default function CreatePodPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
-            <Star className="w-6 h-6 text-accent" />
-            Create Enablement Pod
+            <Star className="w-6 h-6 text-primary" />
+            Create Pod
           </CardTitle>
           <CardDescription>
             Set up a new pod for your team to collaborate and fill knowledge gaps
@@ -166,8 +167,8 @@ export default function CreatePodPage() {
               />
             </div>
 
-            <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
-              <p className="text-sm text-primary font-medium mb-1">
+            <div className="bg-muted/50 border border-border rounded-xl p-4">
+              <p className="text-sm text-foreground font-medium mb-1">
                 What happens next?
               </p>
               <p className="text-sm text-muted-foreground">
@@ -184,7 +185,7 @@ export default function CreatePodPage() {
                 disabled={loading || !podName.trim()}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1"
               >
-                {loading ? <Loading className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loading ? <LottieLoader size="sm" className="w-4 h-4 mr-2" /> : null}
                 Create Pod
               </Button>
             </div>

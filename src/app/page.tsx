@@ -403,7 +403,7 @@ export default function LandingPage() {
       </section>
 
       {/* Solution / Features Section - ACCORDION STYLE */}
-      <section id="features" className="py-16 px-6 bg-gray-50">
+      <section id="features" className="py-16 px-6 bg-[#f5f5f5]">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
             <motion.div
@@ -683,7 +683,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-gray-50 border-t border-gray-200">
+      <footer className="py-12 px-6 bg-[#f5f5f5] border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Bell, CheckBig, CloseMd, Loading, PaperPlane, Star, Calendar } from "react-coolicons";
+import { Bell, CheckBig, CloseMd, PaperPlane, Star, Calendar } from "react-coolicons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -152,7 +152,7 @@ export default function NotificationsPage() {
     // Navigate based on notification type and metadata
     const metadata = notification.metadata || {};
     if (notification.type === 'new_match') {
-      // Navigate to Working Circles to see the new match
+      // Navigate to Find Help to see the new match
       router.push('/groups');
     } else if (notification.type === 'nudge' && metadata.pod_code) {
       // Navigate to pod page where they can respond and schedule

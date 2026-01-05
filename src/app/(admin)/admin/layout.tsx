@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Loading, MoreGridBig, UsersGroup, Building01, TrendingUp, LogOut, ChevronLeft } from "react-coolicons";
+import { MoreGridBig, UsersGroup, Building01, TrendingUp, LogOut, ChevronLeft } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import { cn } from "@/lib/utils";
 
 interface AdminLayoutProps {
@@ -68,7 +69,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loading className="w-8 h-8 animate-spin text-violet-600" />
+        <LottieLoader size="lg" className="w-8 h-8" />
       </div>
     );
   }

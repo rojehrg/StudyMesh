@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Loading, CheckBig, ChevronLeft } from "react-coolicons";
+import { CheckBig, ChevronLeft } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
@@ -140,7 +141,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
               >
-                {loading && <Loading className="h-4 w-4 animate-spin" />}
+                {loading && <LottieLoader size="sm" className="w-4 h-4" />}
                 Send reset link
               </button>
             </form>

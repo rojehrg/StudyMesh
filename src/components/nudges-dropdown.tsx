@@ -263,9 +263,9 @@ export function NudgesDropdown() {
   const displayedNotifications = activeTab === 'received' ? notifications : sentNotifications;
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" onClick={(e) => e.stopPropagation()}>
           <Bell className={cn(
             "w-5 h-5 text-foreground transition-transform",
             newNotificationCount > 0 && "animate-[wiggle_0.5s_ease-in-out]"

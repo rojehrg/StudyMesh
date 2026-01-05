@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   SearchMagnifyingGlass,
-  Loading,
   WifiHigh,
   Star,
   UserCircle,
@@ -17,6 +16,7 @@ import {
   ArrowRightMd,
   Info
 } from "react-coolicons";
+import { LottieLoader } from "@/components/loading-states";
 import { useEmbeddings } from "@/hooks/use-embeddings";
 import { createClient } from "@/lib/supabase/client";
 import { NudgeDialog } from "@/components/nudge-dialog";
@@ -199,7 +199,7 @@ export default function FindHelpPage() {
             <CardTitle className="text-base font-semibold">What do you need help with?</CardTitle>
             {!embeddingReady && (
               <Badge variant="secondary" className="text-xs bg-muted">
-                <Loading className="w-3 h-3 animate-spin mr-1" />
+                <LottieLoader size="sm" className="w-3 h-3 mr-1" />
                 Loading AI
               </Badge>
             )}
@@ -232,7 +232,7 @@ export default function FindHelpPage() {
             >
               {searching || embeddingGenerating ? (
                 <>
-                  <Loading className="w-4 h-4 animate-spin" />
+                  <LottieLoader size="sm" className="w-4 h-4" />
                   {embeddingGenerating ? "Analyzing..." : "Searching..."}
                 </>
               ) : (

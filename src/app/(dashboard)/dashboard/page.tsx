@@ -229,7 +229,7 @@ export default async function DashboardPage() {
             </Button>
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
               <Link href="/classes/create">
-                <AddPlusCircle className="mr-2 h-4 w-4" />
+                <AddPlusCircle className="mr-2 h-4 w-4 text-white" />
                 Create Pod
               </Link>
             </Button>

@@ -11,7 +11,8 @@ import {
   ArrowRight,
   X,
   CheckCircle2,
-  MessageSquare
+  MessageSquare,
+  HandHelping
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -42,8 +43,8 @@ const tourSteps: TourStep[] = [
   },
   {
     icon: Users,
-    title: "Find Your Working Circles",
-    description: "Working Circles shows you teammates who can help you grow, and those you can mentor. The matching algorithm considers skills, availability, and more."
+    title: "Find Help & Offer Expertise",
+    description: "Our AI-powered matching connects you with teammates who can help you grow, and those who need your expertise. Just describe what you need in natural language."
   },
   {
     icon: Bell,
@@ -56,12 +57,12 @@ const tourSteps: TourStep[] = [
     title: "Connect Slack for Notifications",
     description: "Get nudges and meeting invites delivered directly to your Slack DMs. Never miss an opportunity to connect with teammates.",
     tip: "Go to Settings → Notifications to connect Slack",
-    customIcon: "/slack-logo.png"
+    customIcon: "/slack-icon.svg"
   },
   {
-    icon: Sparkles,
+    icon: HandHelping,
     title: "Toggle 'Looking to Help'",
-    description: "Enable this in the sidebar to signal you're available to help teammates. It boosts your visibility in Working Circles.",
+    description: "Enable this in the sidebar to signal you're available to help teammates. It boosts your visibility in search results.",
     tip: "Active helpers appear higher in match results"
   }
 ];
