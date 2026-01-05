@@ -149,9 +149,9 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
             >
-              Describe what you need.
+              Know who to connect with.
               <br />
-              <span className="text-violet-600">AI finds who can help.</span>
+              <span className="text-violet-600">Know when they're free.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -159,7 +159,7 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Just describe your problem in plain English. Our AI understands context and instantly matches you with the teammate who has the right expertise—no tagging, no searching.
+              Attunly helps teams instantly find the right person for help—without the back-and-forth.
             </motion.p>
 
             {/* CTAs */}
@@ -341,7 +341,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI Matching Section */}
+      {/* AI Eliminates Friction Section */}
       <section className="py-16 px-6 bg-gradient-to-b from-violet-50 to-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -352,31 +352,29 @@ export default function LandingPage() {
           >
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 mb-4">
               <Sparkles className="w-3 h-3" />
-              POWERED BY AI
+              AI THAT ELIMINATES FRICTION
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Natural language. Instant matches.
+              What Attunly replaces
             </h2>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              Forget tagging skills or building directories. Just describe what you need—our AI understands context and finds the right person.
+              Stop wasting time on coordination. Let AI handle the busy work.
             </p>
           </motion.div>
 
-          {/* AI Flow Visual */}
+          {/* What AI Eliminates */}
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
             >
-              <div className="w-12 h-12 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Describe your need</h3>
-              <p className="text-sm text-gray-500 mb-4">Type naturally, like you'd ask a colleague</p>
-              <div className="bg-gray-50 rounded-lg p-3 text-left">
-                <p className="text-sm text-gray-600 italic">"Who can help me debug the checkout flow? Needs React and Stripe experience"</p>
-              </div>
+              <div className="text-3xl mb-4">🔍</div>
+              <h3 className="font-semibold text-gray-900 mb-2">No more guessing who knows what</h3>
+              <p className="text-sm text-gray-500 mb-4">AI matches you based on context and expertise—not outdated skill tags.</p>
+              <div className="text-xs text-red-500 line-through opacity-60">"Does anyone know about the billing API?"</div>
             </motion.div>
 
             <motion.div
@@ -384,18 +382,12 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
             >
-              <div className="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">AI analyzes & matches</h3>
-              <p className="text-sm text-gray-500 mb-4">Understands context, expertise, and availability</p>
-              <div className="flex justify-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className={`w-2 h-8 rounded-full ${i < 3 ? 'bg-violet-500' : 'bg-violet-200'} animate-pulse`} style={{ animationDelay: `${i * 0.1}s` }} />
-                ))}
-              </div>
+              <div className="text-3xl mb-4">📅</div>
+              <h3 className="font-semibold text-gray-900 mb-2">No more "when are you free?" threads</h3>
+              <p className="text-sm text-gray-500 mb-4">AI shows availability instantly. See who's free now, not three days from now.</p>
+              <div className="text-xs text-red-500 line-through opacity-60">"How about Tuesday?" "Can't, in meetings all day"</div>
             </motion.div>
 
             <motion.div
@@ -403,87 +395,71 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100"
             >
-              <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Connect instantly</h3>
-              <p className="text-sm text-gray-500 mb-4">See matches with availability, send a nudge</p>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 bg-violet-50 rounded-lg px-3 py-2">
-                  <div className="w-8 h-8 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">SK</div>
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-gray-900">Sarah K.</p>
-                    <p className="text-xs text-green-600">Available now</p>
-                  </div>
-                </div>
-              </div>
+              <div className="text-3xl mb-4">💬</div>
+              <h3 className="font-semibold text-gray-900 mb-2">No more Slack chaos</h3>
+              <p className="text-sm text-gray-500 mb-4">AI surfaces the right person, not everyone. Direct nudges, not noisy channels.</p>
+              <div className="text-xs text-red-500 line-through opacity-60">@channel "Can someone help with this?"</div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Problem Section */}
+      {/* Concrete Use Cases Section */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-10 items-center mb-12">
-            <div>
-              <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">The Problem</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-6">
-                Coordination shouldn't be this hard
-              </h2>
-              <p className="text-xl text-gray-500">
-                Teams span timezones. Knowledge is scattered. You waste hours finding who can help and when they're free. There's a better way.
-              </p>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex justify-center"
-            >
-              <Image
-                src="/images/online-group-meeting.svg"
-                alt="Team coordination challenges"
-                width={500}
-                height={400}
-                className="object-contain"
-              />
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Real scenarios</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
+              See yourself in this?
+            </h2>
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+              If any of these sound familiar, Attunly is for you.
+            </p>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Globe,
-                title: "Timezone math is exhausting",
-                description: "SF, London, Manila—finding a 30-minute overlap across three timezones shouldn't take longer than the meeting itself.",
-              },
-              {
-                icon: SearchMagnifyingGlass,
-                title: "Who even knows about this?",
-                description: "Someone on your team has the answer. But who? Contractors come and go, teams change, and expertise gets buried.",
-              },
-              {
-                icon: ChatCircle,
-                title: "Endless back-and-forth",
-                description: "\"When are you free?\" \"How about Tuesday?\" \"Can't, I'm in meetings.\" Three days later, you still haven't connected.",
-              },
-            ].map((problem, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-md shadow-gray-200/50 border-l-4 border-l-red-400"
-              >
-                <div className="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center mb-5">
-                  <problem.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{problem.title}</h3>
-                <p className="text-gray-500">{problem.description}</p>
-              </motion.div>
-            ))}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0 }}
+              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
+            >
+              <div className="text-sm font-medium text-violet-600 mb-3">Product Manager</div>
+              <p className="text-gray-900 font-medium mb-3">"I need a designer for a quick review—who's free in the next hour?"</p>
+              <p className="text-sm text-gray-500">Find the right person and their availability in seconds, not Slack threads.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
+            >
+              <div className="text-sm font-medium text-violet-600 mb-3">Founder</div>
+              <p className="text-gray-900 font-medium mb-3">"I need someone who understands our payment flow—now, not tomorrow."</p>
+              <p className="text-sm text-gray-500">Stop waiting. See who has the expertise and is available right now.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-gradient-to-br from-violet-50 to-white rounded-2xl p-6 border border-violet-100"
+            >
+              <div className="text-sm font-medium text-violet-600 mb-3">Team Lead</div>
+              <p className="text-gray-900 font-medium mb-3">"Our team is spread across 4 timezones. Scheduling is a nightmare."</p>
+              <p className="text-sm text-gray-500">See overlapping hours instantly. No more timezone math.</p>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -767,14 +743,52 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Who It's For Section */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-sm font-semibold text-violet-600 uppercase tracking-wider">Built for</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-4 mb-4">
+              Modern distributed teams
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
+            {[
+              { emoji: "🚀", title: "Startups", desc: "Moving fast with small, distributed teams" },
+              { emoji: "🌍", title: "Remote-first", desc: "Teams across multiple timezones" },
+              { emoji: "💬", title: "Slack-native", desc: "Teams that live in Slack all day" },
+              { emoji: "🔄", title: "Cross-functional", desc: "PMs, engineers, designers collaborating" },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div className="text-4xl mb-3">{item.emoji}</div>
+                <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-16 px-6 bg-violet-600">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Stop wasting time coordinating. Start connecting.
+            Know who to connect with. Know when.
           </h2>
           <p className="text-xl text-violet-100 mb-10">
-            Find who has the expertise. See when they're available. Schedule in seconds. Your team will thank you.
+            Stop wasting time on coordination. Start connecting with the right people, instantly.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
