@@ -211,8 +211,8 @@ export function NudgeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             Nudge {member.name}
             {member.currentlyAvailable && (
@@ -233,7 +233,8 @@ export function NudgeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="space-y-6 py-4 px-1">
           {/* Quick Templates */}
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase tracking-wide">Quick Start</Label>
@@ -468,8 +469,9 @@ export function NudgeDialog({
             </div>
           )}
         </div>
+        </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="flex-shrink-0 gap-2 sm:gap-0">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>

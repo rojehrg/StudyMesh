@@ -212,9 +212,9 @@ export default function FindHelpPage() {
           <Textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Example: My Salesforce dashboard is showing incorrect numbers and I need help debugging the SOQL query. Also having trouble with the report scheduling."
-            rows={4}
-            className="resize-none"
+            placeholder="Example: Need help debugging a React performance issue with re-renders..."
+            rows={3}
+            className="resize-none focus:ring-2 focus:ring-primary/20 transition-all"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.metaKey) {
                 handleSearch();
@@ -345,10 +345,20 @@ export default function FindHelpPage() {
                             </p>
                           )}
 
-                          {match.expertise_text && (
-                            <p className="text-sm text-foreground/80 mt-2 line-clamp-2">
-                              {match.expertise_text}
-                            </p>
+                          {/* Skills tags */}
+                          {(match.major || match.department || match.expertise_text) && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {match.major && (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                                  {match.major}
+                                </span>
+                              )}
+                              {match.department && (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                  {match.department}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
 
@@ -384,7 +394,29 @@ export default function FindHelpPage() {
               Our AI understands natural language. Just describe your problem and we'll find teammates
               with relevant expertise - no need for exact keyword matches.
             </p>
-            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
+
+            {/* Suggested queries */}
+            <div className="mt-5">
+              <p className="text-xs text-muted-foreground mb-2">Try searching for:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  "Help with React performance",
+                  "Someone who knows our API",
+                  "Design feedback needed",
+                  "Database optimization",
+                ].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => setQuery(suggestion)}
+                    className="text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 mt-5 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-success"></span>
                 Green = available now
