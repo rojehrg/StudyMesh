@@ -14,10 +14,10 @@ import {
   SearchMagnifyingGlass,
   Clock,
   Bell,
-  Star,
   ChevronDown,
   ArrowRightMd,
 } from "react-coolicons";
+import { Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const fadeIn = {
@@ -48,9 +48,9 @@ const availabilityPattern: Record<number, number[]> = {
 const features = [
   {
     id: "skills",
-    title: "Expertise Directory",
-    description: "Everyone tags what they know. When you need help with billing systems or React hooks, instantly see who has that expertise—across all teams.",
-    icon: Star,
+    title: "AI-Powered Matching",
+    description: "Just describe what you need help with—\"I need someone who understands our payment API\" or \"Looking for React expertise.\" Our AI understands context and finds the perfect match instantly.",
+    icon: Sparkles,
   },
   {
     id: "pods",
@@ -139,8 +139,8 @@ export default function LandingPage() {
             {/* Social Proof Kicker */}
             <motion.div variants={fadeIn} className="mb-8">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-violet-50 text-violet-700 border border-violet-100">
-                <UsersGroup className="w-4 h-4" />
-                For teams spread across timezones and orgs
+                <Sparkles className="w-4 h-4" />
+                AI-Powered Team Matching
               </span>
             </motion.div>
 
@@ -149,9 +149,9 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-6"
             >
-              Find the right person.
+              Describe what you need.
               <br />
-              <span className="text-violet-600">Find the right time.</span>
+              <span className="text-violet-600">AI finds who can help.</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -159,7 +159,7 @@ export default function LandingPage() {
               variants={fadeIn}
               className="text-xl md:text-2xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Your team spans timezones, departments, and Slack channels. Attunly shows who has the expertise you need and when they're free—so you connect in minutes, not days.
+              Just describe your problem in plain English. Our AI understands context and instantly matches you with the teammate who has the right expertise—no tagging, no searching.
             </motion.p>
 
             {/* CTAs */}
@@ -180,9 +180,14 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Objection Handler */}
-            <motion.p variants={fadeIn} className="text-sm text-gray-400">
-              Free forever for teams up to 10. Works with Slack. Setup takes 2 minutes.
-            </motion.p>
+            <motion.div variants={fadeIn} className="flex items-center justify-center gap-6 text-sm text-gray-400">
+              <span>Free forever for teams up to 10</span>
+              <span className="flex items-center gap-1.5">
+                <img src="/slack-icon.svg" alt="Slack" className="w-4 h-4" />
+                Works with Slack
+              </span>
+              <span>Setup takes 2 minutes</span>
+            </motion.div>
           </motion.div>
 
           {/* App Preview - Static GitHub-style Grid */}
@@ -336,6 +341,87 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* AI Matching Section */}
+      <section className="py-16 px-6 bg-gradient-to-b from-violet-50 to-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 mb-4">
+              <Sparkles className="w-3 h-3" />
+              POWERED BY AI
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Natural language. Instant matches.
+            </h2>
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+              Forget tagging skills or building directories. Just describe what you need—our AI understands context and finds the right person.
+            </p>
+          </motion.div>
+
+          {/* AI Flow Visual */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0 }}
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Describe your need</h3>
+              <p className="text-sm text-gray-500 mb-4">Type naturally, like you'd ask a colleague</p>
+              <div className="bg-gray-50 rounded-lg p-3 text-left">
+                <p className="text-sm text-gray-600 italic">"Who can help me debug the checkout flow? Needs React and Stripe experience"</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">AI analyzes & matches</h3>
+              <p className="text-sm text-gray-500 mb-4">Understands context, expertise, and availability</p>
+              <div className="flex justify-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className={`w-2 h-8 rounded-full ${i < 3 ? 'bg-violet-500' : 'bg-violet-200'} animate-pulse`} style={{ animationDelay: `${i * 0.1}s` }} />
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl p-6 shadow-lg shadow-violet-100/50 border border-violet-100 text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+              <h3 className="font-semibold text-gray-900 mb-2">Connect instantly</h3>
+              <p className="text-sm text-gray-500 mb-4">See matches with availability, send a nudge</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 bg-violet-50 rounded-lg px-3 py-2">
+                  <div className="w-8 h-8 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">SK</div>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium text-gray-900">Sarah K.</p>
+                    <p className="text-xs text-green-600">Available now</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Problem Section */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -448,10 +534,14 @@ export default function LandingPage() {
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         activeFeature === feature.id
-                          ? "bg-violet-600 text-white"
+                          ? feature.id === "slack" ? "bg-[#4A154B]" : "bg-violet-600 text-white"
                           : "bg-gray-100 text-gray-500"
                       }`}>
-                        <feature.icon className="w-5 h-5" />
+                        {feature.id === "slack" ? (
+                          <img src="/slack-icon.svg" alt="Slack" className="w-5 h-5" />
+                        ) : (
+                          <feature.icon className="w-5 h-5" />
+                        )}
                       </div>
                       <div className="flex-1">
                         <h3 className={`font-semibold ${
@@ -492,17 +582,33 @@ export default function LandingPage() {
                     <AnimatePresence mode="wait">
                       {activeFeature === "skills" && (
                         <motion.div key="skills" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <Star className="w-12 h-12 text-violet-600 mb-4" />
-                          <h4 className="text-xl font-bold text-gray-900 mb-2">Who knows what? Now you know.</h4>
-                          <p className="text-gray-500 mb-4">Everyone tags their expertise. Search "payment API" or "Kubernetes" and find the right person instantly.</p>
-                          <div className="flex justify-center py-4">
-                            <Image
-                              src="/images/skills-illustration.svg"
-                              alt="Skills and expertise matching illustration"
-                              width={300}
-                              height={200}
-                              className="object-contain"
-                            />
+                          <Sparkles className="w-12 h-12 text-violet-600 mb-4" />
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">Describe it. We match it.</h4>
+                          <p className="text-gray-500 mb-4">No more tagging or searching. Just type what you need in plain English and let AI do the work.</p>
+                          {/* AI Matching Flow Visual */}
+                          <div className="space-y-3">
+                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                              <p className="text-xs text-gray-400 mb-1">You type:</p>
+                              <p className="text-sm text-gray-700 italic">"Need help with the Stripe webhook integration"</p>
+                            </div>
+                            <div className="flex justify-center">
+                              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-violet-600" />
+                              </div>
+                            </div>
+                            <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
+                              <p className="text-xs text-violet-500 mb-2">AI found 2 matches:</p>
+                              <div className="flex gap-2">
+                                <div className="flex items-center gap-2 bg-white rounded-md px-2 py-1.5 border border-violet-100">
+                                  <div className="w-6 h-6 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">MR</div>
+                                  <span className="text-xs font-medium text-gray-700">Mike R.</span>
+                                </div>
+                                <div className="flex items-center gap-2 bg-white rounded-md px-2 py-1.5 border border-violet-100">
+                                  <div className="w-6 h-6 rounded-full bg-violet-200 text-violet-700 text-xs flex items-center justify-center font-medium">SK</div>
+                                  <span className="text-xs font-medium text-gray-700">Sarah K.</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}
@@ -551,17 +657,24 @@ export default function LandingPage() {
                       )}
                       {activeFeature === "slack" && (
                         <motion.div key="slack" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                          <ChatCircle className="w-12 h-12 text-violet-600 mb-4" />
+                          <img src="/slack-icon.svg" alt="Slack" className="w-12 h-12 mb-4" />
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Lives in Slack, not another tab</h4>
                           <p className="text-gray-500 mb-4">Your team already lives in Slack. Nudges arrive as DMs. One click to accept, then schedule.</p>
-                          <div className="flex justify-center py-4">
-                            <Image
-                              src="/images/slack-illustration.svg"
-                              alt="Messaging and notifications illustration"
-                              width={300}
-                              height={200}
-                              className="object-contain"
-                            />
+                          {/* Slack DM Preview */}
+                          <div className="bg-[#4A154B] rounded-lg p-4 text-white">
+                            <div className="flex items-center gap-2 mb-3">
+                              <img src="/slack-icon.svg" alt="Slack" className="w-5 h-5" />
+                              <span className="text-sm font-medium">Attunly</span>
+                              <span className="text-xs text-white/60">12:34 PM</span>
+                            </div>
+                            <div className="bg-white/10 rounded-md p-3 text-sm">
+                              <p className="font-medium">New nudge from Sarah K.</p>
+                              <p className="text-white/80 mt-1">"Quick sync on the API migration? 15 min"</p>
+                              <div className="flex gap-2 mt-3">
+                                <button className="px-3 py-1.5 bg-[#007A5A] text-white text-xs font-medium rounded">Accept</button>
+                                <button className="px-3 py-1.5 bg-white/20 text-white text-xs font-medium rounded">Later</button>
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}
@@ -676,9 +789,14 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-sm text-violet-200">
-            Free for teams up to 10 • Works with Slack • Setup in 2 minutes
-          </p>
+          <div className="mt-6 flex items-center justify-center gap-4 text-sm text-violet-200">
+            <span>Free for teams up to 10</span>
+            <span className="flex items-center gap-1.5">
+              <img src="/slack-icon.svg" alt="Slack" className="w-4 h-4 brightness-0 invert opacity-70" />
+              Works with Slack
+            </span>
+            <span>Setup in 2 minutes</span>
+          </div>
         </div>
       </section>
 

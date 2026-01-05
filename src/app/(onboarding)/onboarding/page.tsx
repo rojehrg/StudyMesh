@@ -105,58 +105,65 @@ export default function OnboardingPage() {
   // Get user data and pre-populate from Slack profile on mount
   useEffect(() => {
     const init = async () => {
-      // Get user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      try {
+        // Get user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-      if (userError) {
-        console.error('[Onboarding] Auth error:', userError);
-      }
-
-      if (!user) {
-        console.log('[Onboarding] No user found, redirecting to login');
-        router.push('/login');
-        return;
-      }
-
-      console.log('[Onboarding] User found:', user.id);
-      setUserId(user.id);
-
-      if (user.email) {
-        setUserEmail(user.email);
-      }
-
-      // Fetch existing profile (may have Slack data pre-filled)
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, timezone, avatar_url')
-        .eq('user_id', user.id)
-        .single();
-
-      // Pre-populate from profile (Slack data) or user metadata
-      const firstName = profile?.first_name || user.user_metadata?.full_name?.split(' ')[0] || '';
-      const lastName = profile?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
-
-      // Use profile timezone, or auto-detect
-      let timezone = profile?.timezone || 'America/New_York';
-      if (!profile?.timezone) {
-        try {
-          const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
-          if (matchedTimezone) {
-            timezone = detectedTimezone;
-          }
-        } catch (e) {
-          // Fallback to default
+        if (userError) {
+          console.error('[Onboarding] Auth error:', userError);
+          setInitialLoading(false);
+          return;
         }
-      }
 
-      setFormData(prev => ({
-        ...prev,
-        firstName,
-        lastName,
-        timezone,
-      }));
-      setInitialLoading(false);
+        if (!user) {
+          console.log('[Onboarding] No user found, redirecting to login');
+          window.location.href = '/login';
+          return;
+        }
+
+        console.log('[Onboarding] User found:', user.id);
+        setUserId(user.id);
+
+        if (user.email) {
+          setUserEmail(user.email);
+        }
+
+        // Fetch existing profile (may have Slack data pre-filled)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, timezone, avatar_url')
+          .eq('user_id', user.id)
+          .single();
+
+        // Pre-populate from profile (Slack data) or user metadata
+        const firstName = profile?.first_name || user.user_metadata?.full_name?.split(' ')[0] || '';
+        const lastName = profile?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
+
+        // Use profile timezone, or auto-detect
+        let timezone = profile?.timezone || 'America/New_York';
+        if (!profile?.timezone) {
+          try {
+            const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
+            if (matchedTimezone) {
+              timezone = detectedTimezone;
+            }
+          } catch (e) {
+            // Fallback to default
+          }
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          firstName,
+          lastName,
+          timezone,
+        }));
+      } catch (error) {
+        console.error('[Onboarding] Init error:', error);
+      } finally {
+        setInitialLoading(false);
+      }
     };
     init();
   }, [supabase, router]);
