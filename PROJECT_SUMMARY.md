@@ -1,19 +1,27 @@
-# StudyMesh / Attunly - Project Summary
+# Attunly - Project Summary
 
-**Last Updated:** January 2025  
+**Last Updated:** January 2025
 **Status:** Production-ready, deployed to Vercel
 
 ---
 
-## 🎯 What This Project Is
+## What This Project Is
 
-**Attunly** (formerly StudyMesh) is an intelligent B2B team enablement platform that helps organizations:
-- **Close knowledge gaps** by matching employees based on skill expertise and growth areas
-- **Enable collaboration** through contextual nudges and "Looking to Help" status
-- **Organize teams** with "Pods" (focused groups by project/department)
-- **Track engagement** with compatibility scores and match insights
+**Attunly** is a Slack-first tool that reduces the social friction of asking for help at work.
 
-**Core Philosophy:** Human-centric matching with algorithm-assisted discovery. Users manually select skills when nudging, bypassing keyword matching issues.
+**Core Insight:** People hesitate before sending messages. They worry about timing, interrupting, or asking the wrong person. Attunly solves this with:
+- `/attunly` slash command in Slack
+- AI-generated low-pressure messages
+- Inferred availability signals (no manual status setting)
+- Optional person suggestions based on expertise
+
+**V1 Focus:** The Slack command is the product. The web app handles settings and onboarding only.
+
+### How It Works
+1. User types: `/attunly need help with the payments API`
+2. Attunly opens modal with context, AI-generated message, and suggested people
+3. User clicks "Send" - DM delivered with the polished message
+4. Recipient responds when convenient
 
 ---
 
@@ -214,9 +222,33 @@ studymesh/
    - Shadcn UI component library
    - Toast notifications
 
-### 🔌 Integrations
+### Slack Command (Primary Interface)
 
-1. **Slack Integration**
+1. **`/attunly` Slash Command**
+   - Entry point: `/api/slack/commands`
+   - Opens modal with AI-generated message
+   - Suggests people based on expertise matching
+   - Location: `src/app/api/slack/commands/route.ts`
+
+2. **Modal Interactions**
+   - Handler: `/api/slack/interactions`
+   - Processes form submissions
+   - Sends DMs to selected recipients
+   - Location: `src/app/api/slack/interactions/route.ts`
+
+3. **AI Message Generation**
+   - Uses Groq (free tier) with Llama 3.1
+   - Generates low-pressure, contextual messages
+   - Location: `src/lib/slack/message-generator.ts`
+
+4. **Person Suggestions**
+   - Semantic matching with expertise profiles
+   - Inferred availability signals
+   - Location: `src/lib/slack/person-suggester.ts`
+
+### Legacy Web Integrations
+
+1. **Slack DM Notifications**
    - Webhook endpoint: `/api/slack/nudge`
    - Sends nudges to Slack channels
    - Location: `src/app/api/slack/nudge/route.ts`
@@ -298,14 +330,24 @@ npm run lint
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Required in `.env.local` (local) or Vercel dashboard (production):
 
 ```bash
+# Core
 NEXT_PUBLIC_SUPABASE_URL=https://yrpiyqiocdfbwwtlktgu.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
 DATABASE_URL=postgresql://postgres.xxx:[PASSWORD]@aws-1-us-east-2.pooler.supabase.com:6543/postgres
+
+# Slack (Required for /attunly command)
+SLACK_CLIENT_ID=your-slack-app-client-id
+SLACK_CLIENT_SECRET=your-slack-app-client-secret
+SLACK_SIGNING_SECRET=your-slack-signing-secret
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+
+# AI (Required for message generation)
+GROQ_API_KEY=your-groq-api-key  # Free at console.groq.com
 ```
 
 **Note:** `DATABASE_URL` must use Transaction Pooler port `6543`, not direct connection port `5432`.

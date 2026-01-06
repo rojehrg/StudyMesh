@@ -4,15 +4,52 @@
 
 /*
  * ATTUNLY COLOR PALETTE
- * Clean, minimal pastel palette - 4 core colors
- *
- * Primary: Soft violet (actions, links, focus)
- * Secondary: Light lavender (subtle backgrounds)
- * Muted: Warm gray (text, disabled)
- * Background: Warm cream/off-white (notepad feel)
- *
- * NO orange, NO harsh colors
+ * Dashboard: Soft violet theme
+ * Landing Page: Warm terracotta + cream theme
  */
+
+/* ===== LANDING PAGE STYLES ===== */
+.landing-page {
+  /* Warm palette for landing page */
+  --terracotta: 16 85% 58%;
+  --sage: 152 25% 48%;
+  --cream: 40 30% 97%;
+  --ink: 30 10% 15%;
+  --ink-muted: 30 5% 45%;
+
+  /* Override primary for landing */
+  --background: 40 30% 97%;
+  --foreground: 30 10% 15%;
+  --primary: 16 85% 58%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 35 20% 94%;
+  --muted-foreground: 30 5% 45%;
+  --border: 35 15% 88%;
+  --card: 0 0% 100%;
+  --card-foreground: 30 10% 15%;
+}
+
+/* Landing page typography */
+.hero-headline {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.section-headline {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.subheadline {
+  font-family: var(--font-serif);
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.5;
+}
 
 @layer base {
   :root {

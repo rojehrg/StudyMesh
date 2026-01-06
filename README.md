@@ -1,6 +1,18 @@
 # Attunly
 
-The intelligent enablement platform for high-performing B2B teams. Connect employees, close skill gaps, and foster collaboration.
+Ask for help in Slack without interrupting the wrong person.
+
+Attunly is a Slack-first tool that reduces the social friction of asking for help at work. Type `/attunly` to get AI-generated, low-pressure messages and suggestions for who to reach out to.
+
+## How It Works
+
+1. Type `/attunly need help with the payments API` in any Slack channel
+2. Attunly opens a modal with:
+   - Your context (pre-filled)
+   - AI-generated message (low-pressure, editable)
+   - Suggested teammates (based on expertise, optional)
+3. Click "Send" - the message goes as a DM
+4. The recipient responds when convenient
 
 ## Tech Stack
 
@@ -15,27 +27,25 @@ The intelligent enablement platform for high-performing B2B teams. Connect emplo
 
 ## Features
 
-### Core Features
-- **Smart Matching**: AI-powered skill matching with fuzzy logic ("Tax Recon" = "Tax Reconciliation")
-- **Enablement Pods**: Create and join focused team groups with unique invite codes
-- **Nudges**: Send contextual help requests to teammates
-- **Meeting Scheduling**: Schedule meetings with availability overlap detection
-- **Real-time Notifications**: In-app + Slack + Email notifications
+### Slack Command (Primary Interface)
+- **`/attunly`**: The main way to ask for help
+- **AI Message Generation**: Creates low-pressure, contextual messages
+- **Person Suggestions**: Optional - suggests who might know the answer
+- **Inferred Availability**: No manual status setting - signals are inferred
 
-### Authentication Methods
+### Web Dashboard (Settings & Onboarding)
+- **Profile Setup**: Add your expertise and knowledge areas
+- **Team Pods**: Organize into focused groups
+- **Meeting Scheduling**: Book time with availability overlap detection
+- **Notifications**: View and manage help requests
+
+### Authentication
 
 | Method | Description |
 |--------|-------------|
-| **Email + Password** | Traditional signup/login with email verification |
-| **Google OAuth** | One-click sign in with Google account |
-| **Slack OAuth** | Sign in with Slack workspace account |
-
-### Slack Integration (Optional)
-
-Slack integration enhances the experience with:
-- **Direct Message Notifications**: Nudges and meeting invites sent via Slack DM
-- **Workspace Context**: Connect your Slack workspace to your organization
-- **@Mentions**: Get notified when teammates reach out
+| **Email + Password** | Traditional signup/login |
+| **Google OAuth** | One-click sign in |
+| **Slack OAuth** | Sign in with Slack (recommended)
 
 ## Getting Started
 
@@ -66,11 +76,17 @@ ADMIN_SECRET=generate-with-openssl-rand-hex-32
 ENCRYPTION_KEY=generate-with-openssl-rand-hex-32
 
 # ===================
-# SLACK (Optional - for notifications)
+# SLACK (Required for /attunly command)
 # ===================
 SLACK_CLIENT_ID=your-slack-app-client-id
 SLACK_CLIENT_SECRET=your-slack-app-client-secret
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+SLACK_SIGNING_SECRET=your-slack-signing-secret
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+
+# ===================
+# AI (Required for message generation)
+# ===================
+GROQ_API_KEY=your-groq-api-key  # Free at console.groq.com
 ```
 
 ### Generate Secrets
@@ -116,21 +132,25 @@ curl -X POST http://localhost:3000/api/admin/migrate \
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Login, signup, forgot-password
-│   ├── (dashboard)/       # Protected routes (dashboard, settings, etc.)
-│   ├── (onboarding)/      # First-time user flow
-│   ├── (legal)/           # Privacy policy, terms
-│   └── api/               # API routes
-├── components/            # React components
-│   ├── ui/               # Shadcn UI primitives
-│   └── ...               # Feature components
-├── lib/                   # Utilities
-│   ├── db/               # Drizzle schema
-│   ├── supabase/         # Supabase clients
-│   ├── logic/            # Matching algorithm
-│   └── notifications/    # Notification service
-└── hooks/                # Custom React hooks
+├── app/
+│   ├── api/
+│   │   └── slack/
+│   │       ├── commands/      # /attunly slash command handler
+│   │       └── interactions/  # Modal submission handler
+│   ├── (auth)/               # Login, signup
+│   ├── (dashboard)/          # Settings, notifications
+│   └── (onboarding)/         # First-time setup
+├── lib/
+│   ├── slack/
+│   │   ├── verify-signature.ts   # Request verification
+│   │   ├── modal-builder.ts      # Block Kit modal
+│   │   ├── message-generator.ts  # AI message generation
+│   │   └── person-suggester.ts   # Expertise matching
+│   ├── ai/
+│   │   └── semantic-search.ts    # Groq LLM integration
+│   ├── db/                       # Drizzle schema
+│   └── notifications/            # DM sending
+└── components/                   # React components
 ```
 
 ## Security Features
@@ -153,11 +173,20 @@ Quick deploy:
 
 ## API Routes
 
+### Slack Integration (Primary)
+
 | Route | Method | Description |
 |-------|--------|-------------|
+| `/api/slack/commands` | POST | Handles `/attunly` slash command |
+| `/api/slack/interactions` | POST | Handles modal submissions |
 | `/api/auth/slack` | GET | Initiate Slack OAuth |
 | `/api/auth/slack/callback` | GET | Slack OAuth callback |
 | `/api/slack/oauth` | GET/POST | Connect/disconnect Slack |
+
+### Web Dashboard
+
+| Route | Method | Description |
+|-------|--------|-------------|
 | `/api/meetings` | GET/POST | List/create meetings |
 | `/api/meetings/[id]/rsvp` | POST | RSVP to meeting |
 | `/api/pods/[code]/settings` | PATCH | Update pod settings |
