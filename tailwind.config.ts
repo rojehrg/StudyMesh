@@ -19,11 +19,24 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-roboto)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
       },
       colors: {
+        // Attunly coffee palette
+        coffee: {
+          espresso: "#1a1614",    // Deep coffee-black (primary text, buttons)
+          roast: "#2c2420",       // Rich brown-black (hover states)
+          mocha: "#4a3f38",       // Warm chocolate (secondary headings)
+          cortado: "#6b5d54",     // Balanced brown (body text)
+          latte: "#8c7b70",       // Milky brown (muted text, labels)
+          oat: "#b5a89d",         // Soft tan (headline accents)
+          steamed: "#d4cbc4",     // Warm beige (dividers)
+          foam: "#e8e2dc",        // Light cream (borders)
+          cream: "#f6f3f0",       // Warm off-white (alt backgrounds)
+          paper: "#fffcf9",       // Slightly warm white (primary bg)
+        },
         // Semantic colors using CSS variables (theme-aware)
-        // Simplified palette: background, foreground, primary, secondary, accent, muted + semantic
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
