@@ -112,7 +112,7 @@ export function OnboardingChecklist({ items, onDismiss, className }: OnboardingC
               <div className="flex justify-center gap-3">
                 <Button asChild>
                   <Link href="/find-help">
-                    Find Help
+                    AI Match
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

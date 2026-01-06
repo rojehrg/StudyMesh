@@ -14,11 +14,11 @@ import {
   HamburgerLg,
   LogOut,
   Calendar,
-  Bell,
-  SearchMagnifyingGlass
+  Bell
 } from "react-coolicons";
 import { HandHelping } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
@@ -33,6 +33,13 @@ import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
 import { RealtimeProvider, useRealtime } from "@/components/realtime-provider";
 import { CelebrationProvider } from "@/components/celebration-provider";
+
+// AI Match icon component
+function AiMatchIcon() {
+  return (
+    <img src="/ai-search.svg" alt="" className="w-6 h-6" />
+  );
+}
 
 interface SidebarItemProps {
   icon: any;
@@ -163,7 +170,7 @@ function DashboardLayoutBase({
 
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: MoreGridBig, label: "Dashboard", href: "/dashboard" },
-    { icon: SearchMagnifyingGlass, label: "Find Help", href: "/find-help" },
+    { icon: AiMatchIcon, label: "AI Match", href: "/find-help" },
     { icon: BookOpen, label: "Pods", href: "/classes" },
     { icon: Bell, label: "Nudges", href: "/notifications", badge: totalUnread > 0 ? totalUnread : undefined },
     { icon: Calendar, label: "Meetings", href: "/meetings" },

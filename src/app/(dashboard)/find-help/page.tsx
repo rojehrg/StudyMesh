@@ -8,13 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  SearchMagnifyingGlass,
   WifiHigh,
   Star,
   UserCircle,
   PaperPlane,
   ArrowRightMd,
-  Info
+  Info,
+  SearchMagnifyingGlass
 } from "react-coolicons";
 import { LottieLoader } from "@/components/loading-states";
 import { useEmbeddings } from "@/hooks/use-embeddings";
@@ -38,6 +38,8 @@ interface MatchResult {
 
 interface CurrentUser {
   userId: string;
+  firstName?: string;
+  lastName?: string;
   knowledgeAreas?: string[];
   expertiseSkills?: string[];
   timezone?: string;
@@ -64,7 +66,7 @@ export default function FindHelpPage() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_id, expertise_skills, expertise_text, timezone, availability')
+        .select('user_id, first_name, last_name, expertise_skills, expertise_text, timezone, availability')
         .eq('user_id', user.id)
         .single();
 
@@ -76,6 +78,8 @@ export default function FindHelpPage() {
       if (profile) {
         setCurrentUser({
           userId: profile.user_id,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
           knowledgeAreas: profile.expertise_skills || [],
           timezone: profile.timezone,
           availabilitySlots: profile.availability?.slots || [],
@@ -106,8 +110,12 @@ export default function FindHelpPage() {
     if (!query.trim()) return;
 
     setSearching(true);
-    setHasSearched(true);
+    setHasSearched(false); // Reset so loading shows cleanly
+    setResults([]);
     setSearchType(null);
+
+    // Minimum loading time for UX
+    const minLoadTime = new Promise(resolve => setTimeout(resolve, 800));
 
     try {
       let queryEmbedding = null;
@@ -122,15 +130,18 @@ export default function FindHelpPage() {
       }
 
       // Search for matches - API will fall back to text search if no embedding
-      const response = await fetch('/api/find-help', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          queryEmbedding,
-          queryText: query, // Always pass text for fallback
-          limit: 10,
+      const [response] = await Promise.all([
+        fetch('/api/find-help', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            queryEmbedding,
+            queryText: query, // Always pass text for fallback
+            limit: 10,
+          }),
         }),
-      });
+        minLoadTime, // Ensure minimum loading time
+      ]);
 
       const data = await response.json();
 
@@ -147,6 +158,7 @@ export default function FindHelpPage() {
       setResults([]);
     } finally {
       setSearching(false);
+      setHasSearched(true);
     }
   }, [query, embed, embeddingReady]);
 
@@ -158,10 +170,21 @@ export default function FindHelpPage() {
     suggestedTime?: string;
     message: string;
   }) => {
-    const response = await fetch('/api/nudge', {
+    const senderName = currentUser?.firstName
+      ? `${currentUser.firstName}${currentUser.lastName ? ' ' + currentUser.lastName : ''}`
+      : 'Someone';
+
+    const response = await fetch('/api/slack/nudge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        recipientUserId: data.recipientId,
+        senderName,
+        topic: data.topic,
+        nudgeType: data.type,
+        meetingLength: data.meetingLength,
+        message: data.message,
+      }),
     });
 
     if (!response.ok) {
@@ -184,11 +207,11 @@ export default function FindHelpPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <SearchMagnifyingGlass className="w-7 h-7 text-primary" />
-          Find Help
+          <img src="/ai-search.svg" alt="" className="w-7 h-7" />
+          AI Match
         </h1>
         <p className="text-muted-foreground mt-1">
-          Describe what you need help with and we'll find the right teammates
+          Describe what you need help with and our AI will find the right teammates
         </p>
       </div>
 
@@ -228,7 +251,7 @@ export default function FindHelpPage() {
             <Button
               onClick={handleSearch}
               disabled={!query.trim() || searching}
-              className="gap-2"
+              className="gap-2 bg-violet-500 hover:bg-violet-600 rounded-xl cursor-pointer active:scale-95 transition-all"
             >
               {searching || embeddingGenerating ? (
                 <>
@@ -236,18 +259,28 @@ export default function FindHelpPage() {
                   {embeddingGenerating ? "Analyzing..." : "Searching..."}
                 </>
               ) : (
-                <>
-                  <Star className="w-4 h-4" />
-                  Find Matches
-                </>
+                "Find Matches"
               )}
             </Button>
           </div>
         </CardContent>
       </Card>
 
+      {/* Loading State */}
+      {searching && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <LottieLoader size="lg" className="w-16 h-16 mx-auto mb-4" />
+            <h3 className="font-semibold text-foreground mb-2">Finding the best matches...</h3>
+            <p className="text-sm text-muted-foreground">
+              Our AI is analyzing your request
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Results */}
-      {hasSearched && (
+      {hasSearched && !searching && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -366,10 +399,7 @@ export default function FindHelpPage() {
                         <Button
                           size="sm"
                           onClick={() => setSelectedMember(match)}
-                          className={match.currently_available
-                            ? 'bg-success hover:bg-success/90'
-                            : 'bg-primary hover:bg-primary/90'
-                          }
+                          className="bg-violet-500 hover:bg-violet-600 rounded-xl"
                         >
                           <PaperPlane className="w-4 h-4 mr-1" />
                           Nudge
@@ -385,7 +415,7 @@ export default function FindHelpPage() {
       )}
 
       {/* Help tip when no search yet */}
-      {!hasSearched && (
+      {!hasSearched && !searching && (
         <Card className="border-dashed">
           <CardContent className="py-8 text-center">
             <Info className="w-10 h-10 text-muted-foreground mx-auto mb-3" />

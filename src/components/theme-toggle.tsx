@@ -33,7 +33,7 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9"
+          className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none data-[state=open]:ring-0"
           onClick={(e) => e.stopPropagation()}
         >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

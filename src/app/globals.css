@@ -329,6 +329,14 @@ button:focus-visible {
   outline: none;
 }
 
+/* Remove focus outlines from dropdown menu items */
+[role="menuitem"]:focus-visible,
+[role="menuitem"]:focus,
+[data-radix-collection-item]:focus-visible,
+[data-radix-collection-item]:focus {
+  outline: none;
+}
+
 
 /* Badge without borders */
 .badge-clean {

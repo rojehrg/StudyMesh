@@ -98,9 +98,9 @@ export default function SupportPage() {
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How does Find Help work?</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">How does AI Match work?</h3>
               <p className="text-gray-600">
-                Our AI matches your request with teammates who have relevant expertise. Just describe what you need help with, and we'll show you the best matches.
+                AI Match uses AI to find teammates with relevant expertise. Just describe what you need help with, and we'll show you the best matches.
               </p>
             </div>
             <div>

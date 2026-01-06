@@ -57,7 +57,7 @@ function ProductMockup() {
               <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              attunly.com/find-help
+              attunly.com/ai-match
             </div>
           </div>
         </div>
@@ -76,14 +76,9 @@ function ProductMockup() {
                   className="inline-block w-0.5 h-4 bg-violet-500 ml-0.5 align-middle"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 bg-gray-100 rounded border border-gray-200">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-                <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Find
-                </div>
+              <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 shadow-sm">
+                <img src="/ai-search.svg" alt="" className="w-3.5 h-3.5 brightness-0 invert" />
+                AI Match
               </div>
             </div>
           </div>
@@ -458,8 +453,8 @@ export default function LandingPage() {
               },
               {
                 step: "2",
-                icon: Sparkles,
-                title: "AI finds the match",
+                icon: () => <img src="/ai-search.svg" alt="" className="w-10 h-10" />,
+                title: "AI Match finds the right person",
                 desc: "Our AI understands context, expertise, and availability to surface the right teammates instantly.",
               },
               {
@@ -606,7 +601,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Sparkles, title: "AI-Powered Matching", desc: "Describe what you need in plain English" },
+              { icon: () => <img src="/ai-search.svg" alt="" className="w-5 h-5" />, title: "AI Match", desc: "Describe what you need in plain English" },
               { icon: Users, title: "Team Availability", desc: "See who's free right now, not in 3 days" },
               { icon: Clock, title: "Focus Time Respect", desc: "Know when not to interrupt" },
               { icon: Zap, title: "Instant Connection", desc: "From question to conversation in seconds" },

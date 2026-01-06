@@ -253,17 +253,17 @@ export default async function DashboardPage() {
         </Button>
       </div>
 
-      {/* Find Help Quick Access */}
+      {/* AI Match Quick Access */}
       <Link href="/find-help">
         <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20 hover:border-primary/40 transition-all cursor-pointer hover:shadow-md">
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-                <SearchMagnifyingGlass className="w-6 h-6 text-primary" />
+                <img src="/ai-search.svg" alt="" className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">Need help with something?</h3>
-                <p className="text-sm text-muted-foreground">Our AI will match you with the right teammate</p>
+                <p className="text-sm text-muted-foreground">AI Match will find the right teammate for you</p>
               </div>
             </div>
             <ArrowRightMd className="w-5 h-5 text-primary" />
