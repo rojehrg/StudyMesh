@@ -136,6 +136,35 @@
     --chart-4: 152 55% 45%;
     --chart-5: 38 92% 50%;
   }
+
+  /* Force light mode on pages with .light class (overrides dark mode) */
+  .light {
+    --background: 0 0% 96%;
+    --foreground: 220 13% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+    --primary: 262 45% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 98%;
+    --secondary-foreground: 220 13% 30%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 220 13% 18%;
+    --muted: 0 0% 98%;
+    --muted-foreground: 220 9% 46%;
+    --destructive: 0 45% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 158 45% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 90% 50%;
+    --warning-foreground: 38 90% 10%;
+    --info: 210 70% 55%;
+    --info-foreground: 0 0% 100%;
+    --border: 220 10% 88%;
+    --input: 220 10% 88%;
+    --ring: 262 45% 58%;
+  }
 }
 
 @layer base {

@@ -88,9 +88,8 @@ export async function middleware(request: NextRequest) {
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const needsOnboarding = !profile?.expertise_skills || profile.expertise_skills.length === 0;
-
-    if (needsOnboarding) {
+    // Only redirect to onboarding if no profile exists at all
+    if (!profile) {
       return NextResponse.redirect(new URL('/onboarding', request.url))
     }
 

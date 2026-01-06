@@ -438,7 +438,7 @@ export default function FindHelpPage() {
                   <button
                     key={suggestion}
                     onClick={() => setQuery(suggestion)}
-                    className="text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    className="text-sm px-4 py-2 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 hover:bg-violet-200 dark:hover:bg-violet-800/40 transition-colors"
                   >
                     {suggestion}
                   </button>

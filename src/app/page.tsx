@@ -256,8 +256,8 @@ export default function LandingPage() {
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
               Pricing
             </Link>
-            <Link href="/docs" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              Docs
+            <Link href="/support" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              Support
             </Link>
           </div>
 
@@ -447,7 +447,7 @@ export default function LandingPage() {
             {[
               {
                 step: "1",
-                icon: Search,
+                icon: MessageSquare,
                 title: "Describe what you need",
                 desc: "Type in plain English. \"Need help with React performance\" or \"Looking for someone who knows our payment API.\"",
               },
@@ -459,7 +459,7 @@ export default function LandingPage() {
               },
               {
                 step: "3",
-                icon: Zap,
+                icon: Users,
                 title: "Connect with clarity",
                 desc: "See who's available right now, respect focus time, and reach out with confidence.",
               },
