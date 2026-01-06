@@ -6,7 +6,7 @@ import { encryptToken } from "@/lib/encryption";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
 const SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim();
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const STATE_COOKIE_NAME = "slack_oauth_state";

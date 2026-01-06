@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const SLACK_CLIENT_ID = process.env.SLACK_CLIENT_ID;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").trim();
 const STATE_COOKIE_NAME = "slack_oauth_state";
 const STATE_COOKIE_MAX_AGE = 60 * 10; // 10 minutes
 
