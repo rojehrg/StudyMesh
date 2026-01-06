@@ -601,7 +601,7 @@ export function AvailabilityGrid({
                 {day}
               </div>
               {/* Time Slots - grouped by hour for better visual */}
-              <div className="flex-1 flex gap-px">
+              <div className="flex-1 flex gap-0.5">
                 {TIME_SLOTS.map((slot, slotIndex) => {
                   const isSelected = isSlotSelected(dayIndex, slotIndex);
                   const isCurrentSlot = getCurrentDay() === dayIndex && getCurrentTimeSlot() === slotIndex;
@@ -610,11 +610,11 @@ export function AvailabilityGrid({
                     <div
                       key={slotIndex}
                       className={cn(
-                        "flex-1 h-6 rounded-[2px] transition-colors cursor-pointer select-none",
+                        "flex-1 aspect-square rounded-[3px] transition-colors cursor-pointer select-none",
                         isSelected
                           ? "bg-primary/70 hover:bg-primary/60"
                           : "bg-muted hover:bg-accent",
-                        isCurrentSlot && !isSelected && "ring-1 ring-primary/50",
+                        isCurrentSlot && !isSelected && "ring-2 ring-violet-500 dark:ring-violet-400",
                         readOnly && "cursor-default"
                       )}
                       onMouseDown={() => handleMouseDown(dayIndex, slotIndex)}
@@ -633,15 +633,15 @@ export function AvailabilityGrid({
       <div className="flex flex-col sm:flex-row gap-4 justify-between text-sm">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-[2px] bg-primary/70" />
+            <div className="w-3 h-3 rounded bg-primary/70" />
             <span className="text-muted-foreground">Available</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-[2px] bg-muted" />
+            <div className="w-3 h-3 rounded bg-muted" />
             <span className="text-muted-foreground">Busy</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-[2px] bg-muted ring-1 ring-primary/50" />
+            <div className="w-3 h-3 rounded bg-muted ring-2 ring-violet-500 dark:ring-violet-400" />
             <span className="text-muted-foreground">Current time</span>
           </div>
         </div>

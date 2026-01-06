@@ -42,7 +42,12 @@ const tourSteps: TourStep[] = [
     description: "Add your expertise skills (what you're good at) and growth skills (what you want to learn). This helps us match you with the right teammates."
   },
   {
-    icon: () => <img src="/ai-search.svg" alt="" className="w-6 h-6" />,
+    icon: () => (
+      <>
+        <img src="/ai-search.svg" alt="" className="w-6 h-6 dark:hidden" />
+        <img src="/ai-search-dark.svg" alt="" className="w-6 h-6 hidden dark:block" />
+      </>
+    ),
     title: "AI Match",
     description: "Our AI-powered matching connects you with teammates who can help you grow. Just describe what you need in natural language and AI Match finds the right person."
   },

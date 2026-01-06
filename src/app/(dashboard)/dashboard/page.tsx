@@ -259,7 +259,8 @@ export default async function DashboardPage() {
           <CardContent className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-                <img src="/ai-search.svg" alt="" className="w-6 h-6" />
+                <img src="/ai-search.svg" alt="" className="w-6 h-6 dark:hidden" />
+                <img src="/ai-search-dark.svg" alt="" className="w-6 h-6 hidden dark:block" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">Need help with something?</h3>

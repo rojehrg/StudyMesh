@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CloseMd, CheckBig, User01, Clock, Mail, Link as LinkIcon, LinkBreak, ChatCircle, WifiHigh, WifiOff, Star, AddPlus, Building01, Copy, Camera, Instance, CreditCard01, ArrowRightMd, Download, TrashFull } from "react-coolicons";
-import { LottieLoader } from "@/components/loading-states";
+import { LottieLoader, PageLoader } from "@/components/loading-states";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -463,11 +463,7 @@ function SettingsContent() {
   ).slice(0, 6);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <LottieLoader size="md" className="w-6 h-6" />
-      </div>
-    );
+    return <PageLoader message="Loading settings..." />;
   }
 
   const copyInviteCode = () => {

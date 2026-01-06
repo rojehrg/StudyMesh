@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   WifiHigh,
-  Star,
   UserCircle,
   PaperPlane,
   ArrowRightMd,
@@ -207,7 +206,8 @@ export default function FindHelpPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <img src="/ai-search.svg" alt="" className="w-7 h-7" />
+          <img src="/ai-search.svg" alt="" className="w-7 h-7 dark:hidden" />
+          <img src="/ai-search-dark.svg" alt="" className="w-7 h-7 hidden dark:block" />
           AI Match
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -237,7 +237,7 @@ export default function FindHelpPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Example: Need help debugging a React performance issue with re-renders..."
             rows={3}
-            className="resize-none focus:ring-2 focus:ring-primary/20 transition-all"
+            className="resize-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-colors duration-200"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && e.metaKey) {
                 handleSearch();
@@ -289,10 +289,10 @@ export default function FindHelpPage() {
               </h2>
               {searchType && results.length > 0 && (
                 <Badge variant="secondary" className={`text-xs border-0 ${
-                  searchType === 'ai' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                  searchType === 'ai' ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
                 }`}>
                   {searchType === 'ai' ? (
-                    <><Star className="w-3 h-3 mr-1" />AI Match</>
+                    <>AI Match</>
                   ) : (
                     <><SearchMagnifyingGlass className="w-3 h-3 mr-1" />Text Search</>
                   )}
@@ -300,7 +300,7 @@ export default function FindHelpPage() {
               )}
             </div>
             {results.length > 0 && (
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+              <Badge variant="secondary" className="bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 border-0">
                 {results.length} {results.length === 1 ? 'person' : 'people'} found
               </Badge>
             )}
@@ -352,24 +352,24 @@ export default function FindHelpPage() {
                             <h3 className="font-semibold text-foreground">
                               {match.first_name} {match.last_name}
                             </h3>
+                            {match.currently_available && (
+                              <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-0 text-xs">
+                                <WifiHigh className="w-3 h-3 mr-0.5" />
+                                Available
+                              </Badge>
+                            )}
                             <Badge
                               variant="secondary"
                               className={`text-xs border-0 ${
                                 formatSimilarity(match.similarity) >= 80
-                                  ? 'bg-success/20 text-success'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
                                   : formatSimilarity(match.similarity) >= 60
-                                  ? 'bg-primary/20 text-primary'
-                                  : 'bg-muted text-muted-foreground'
+                                  ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300'
+                                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
                               }`}
                             >
                               {formatSimilarity(match.similarity)}% match
                             </Badge>
-                            {match.currently_available && (
-                              <Badge className="bg-success/20 text-success border-0 text-xs">
-                                <WifiHigh className="w-3 h-3 mr-0.5" />
-                                Available now
-                              </Badge>
-                            )}
                           </div>
 
                           {(match.major || match.department) && (
@@ -382,12 +382,12 @@ export default function FindHelpPage() {
                           {(match.major || match.department || match.expertise_text) && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {match.major && (
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
                                   {match.major}
                                 </span>
                               )}
                               {match.department && (
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                                   {match.department}
                                 </span>
                               )}

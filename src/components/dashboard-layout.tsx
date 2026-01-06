@@ -29,15 +29,17 @@ import { toast } from "sonner";
 import { NudgesDropdown } from "@/components/nudges-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
-import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
-import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
 import { RealtimeProvider, useRealtime } from "@/components/realtime-provider";
 import { CelebrationProvider } from "@/components/celebration-provider";
 
-// AI Match icon component
+// AI Match icon component - shows light/dark version based on theme
+// Uses fixed size that doesn't shrink when sidebar collapses
 function AiMatchIcon() {
   return (
-    <img src="/ai-search.svg" alt="" className="w-6 h-6" />
+    <span className="flex items-center justify-center w-6 h-6 min-w-6 min-h-6">
+      <img src="/ai-search.svg" alt="" className="w-6 h-6 dark:hidden" />
+      <img src="/ai-search-dark.svg" alt="" className="w-6 h-6 hidden dark:block" />
+    </span>
   );
 }
 
@@ -239,7 +241,7 @@ function DashboardLayoutBase({
 
         {/* Sidebar Bottom Section - Org Name + Looking to Help */}
         {userId && (
-          <div className={cn("pb-2 space-y-3", isCollapsed ? "px-2" : "px-3")}>
+          <div className="pb-2 space-y-3 px-3">
             {/* Organization Name - only show when expanded */}
             {orgName && !isCollapsed && (
               <motion.div
@@ -257,8 +259,7 @@ function DashboardLayoutBase({
             <button
               onClick={() => handleLookingToHelpToggle(!isLookingToHelp)}
               className={cn(
-                "w-full flex items-center rounded-xl border transition-all duration-300",
-                isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors duration-300",
                 isLookingToHelp
                   ? "bg-success/10 border-success/30"
                   : "bg-card border-border hover:bg-muted/50"
@@ -273,8 +274,8 @@ function DashboardLayoutBase({
                   width: isCollapsed ? 0 : "auto",
                   opacity: isCollapsed ? 0 : 1,
                 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                className={cn("overflow-hidden flex items-center justify-between", !isCollapsed && "flex-1")}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden flex items-center justify-between flex-1"
                 style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
               >
                 <p className={cn("text-sm font-medium whitespace-nowrap", isLookingToHelp ? "text-success" : "text-foreground")}>
@@ -292,11 +293,8 @@ function DashboardLayoutBase({
         )}
 
         {/* User Profile */}
-        <div className={cn("p-3", isCollapsed && "px-2")}>
-          <div className={cn(
-            "flex items-center p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer",
-            isCollapsed && "justify-center"
-          )}>
+        <div className="p-3">
+          <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
             <Avatar className="h-9 w-9 shrink-0">
               <AvatarImage src="" />
               <AvatarFallback className="bg-primary/10 text-primary font-medium">
@@ -304,25 +302,29 @@ function DashboardLayoutBase({
               </AvatarFallback>
             </Avatar>
 
-            {!isCollapsed && (
-              <>
-                <div className="ml-3 overflow-hidden flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {profile?.first_name && profile?.last_name
-                      ? `${profile.first_name} ${profile.last_name}`
-                      : "User"}
-                  </p>
-                </div>
+            <motion.div
+              initial={false}
+              animate={{
+                width: isCollapsed ? 0 : "auto",
+                opacity: isCollapsed ? 0 : 1,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="overflow-hidden flex items-center flex-1"
+            >
+              <p className="text-sm font-medium text-foreground truncate flex-1">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : "User"}
+              </p>
 
-                <button
-                  onClick={handleLogout}
-                  className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95 ml-auto shrink-0"
-                  title="Logout"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            )}
+              <button
+                onClick={handleLogout}
+                className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95 shrink-0"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </motion.div>
           </div>
         </div>
       </aside>
@@ -380,8 +382,6 @@ function DashboardLayoutBase({
       {/* Onboarding Tour for New Users */}
       <OnboardingTour />
 
-      {/* Keyboard Shortcuts Help Dialog */}
-      <KeyboardShortcutsHelp />
     </div>
   );
 }
@@ -462,8 +462,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const supabase = createClient();
 
-  // Enable global keyboard shortcuts
-  useGlobalShortcuts();
 
   useEffect(() => {
     loadProfile();
