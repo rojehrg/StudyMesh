@@ -1,0 +1,5 @@
+{
+  "bypassProtection": [
+    "/api/slack/*"
+  ]
+}
