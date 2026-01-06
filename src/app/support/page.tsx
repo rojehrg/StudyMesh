@@ -1,126 +1,112 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, Mail, FileText, ArrowLeft } from "lucide-react";
+"use client";
 
-export const metadata = {
-  title: "Support - Attunly",
-  description: "Get help with Attunly. Contact our support team or browse our documentation.",
-};
+import Link from "next/link";
 
 export default function SupportPage() {
   return (
-    <div className="min-h-screen bg-white light">
+    <div
+      className="min-h-screen bg-coffee-paper"
+      style={{
+        fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif',
+      }}
+    >
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/icon.png" alt="Attunly" className="w-7 h-7" />
-            <span className="font-bold text-xl">
-              <span className="text-gray-900">Attun</span>
-              <span className="text-violet-600">ly</span>
-            </span>
+      <header className="border-b border-coffee-foam bg-[#fffcf9]/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-2xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/logo.svg" alt="" className="w-6 h-6" />
+            <span className="font-semibold text-xl text-coffee-espresso">attunly</span>
           </Link>
-          <Button variant="ghost" asChild className="text-gray-700 hover:text-gray-900 hover:bg-gray-100">
-            <Link href="/">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Link>
-          </Button>
+          <Link
+            href="/"
+            className="text-sm text-coffee-cortado hover:text-coffee-espresso transition-colors"
+          >
+            ← Back to Home
+          </Link>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">How can we help?</h1>
-          <p className="text-xl text-gray-600">
-            Get support for Attunly. We're here to help you succeed.
-          </p>
+      <main className="max-w-2xl mx-auto px-6 py-16">
+        <h1 className="text-4xl font-semibold text-coffee-espresso mb-4">How can we help?</h1>
+        <p className="text-xl text-coffee-cortado mb-12 leading-relaxed">
+          Get support for Attunly. We typically respond within 24 hours.
+        </p>
+
+        <div className="space-y-6 mb-12">
+          <div className="p-6 bg-coffee-paper rounded-lg border border-coffee-foam">
+            <h2 className="text-lg font-medium text-coffee-espresso mb-2">Email Support</h2>
+            <p className="text-coffee-cortado mb-4 leading-relaxed">
+              Get help from our team via email.
+            </p>
+            <a
+              href="mailto:support@attunly.com"
+              className="text-coffee-espresso hover:text-coffee-roast font-medium"
+            >
+              support@attunly.com →
+            </a>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          <Card className="hover:border-violet-300 transition-colors bg-white border-gray-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-violet-600" />
-              </div>
-              <CardTitle className="text-gray-900">Email Support</CardTitle>
-              <CardDescription className="text-gray-600">
-                Get help from our team via email. We typically respond within 24 hours.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <a
-                href="mailto:support@attunly.com"
-                className="text-violet-600 hover:underline font-medium"
-              >
-                support@attunly.com
-              </a>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:border-violet-300 transition-colors bg-white border-gray-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-6 h-6 text-violet-600" />
-              </div>
-              <CardTitle className="text-gray-900">Documentation</CardTitle>
-              <CardDescription className="text-gray-600">
-                Browse guides and tutorials to get the most out of Attunly.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link
-                href="/docs/zoom"
-                className="text-violet-600 hover:underline font-medium"
-              >
-                View Documentation
-              </Link>
-            </CardContent>
-          </Card>
+        <div className="p-6 bg-coffee-cream rounded-lg border border-coffee-foam mb-12">
+          <h2 className="text-2xl font-semibold text-coffee-espresso mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-medium text-coffee-espresso mb-2">How do I use /attunly?</h3>
+              <p className="text-coffee-cortado leading-relaxed">
+                Type /attunly in any Slack channel or DM, describe what you need help with, and we'll draft a calm message for you. Review it, pick a recipient, and send.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-coffee-espresso mb-2">What does Attunly do with my data?</h3>
+              <p className="text-coffee-cortado leading-relaxed">
+                We only access the data needed to draft and send your message. Message content is not stored after delivery. See our <Link href="/privacy" className="text-coffee-espresso hover:text-coffee-roast">Privacy Policy</Link> for details.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-coffee-espresso mb-2">How do I remove Attunly from my workspace?</h3>
+              <p className="text-coffee-cortado leading-relaxed">
+                Go to your Slack workspace settings → Manage apps → Find Attunly → Remove. This will disconnect Attunly from your workspace.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-coffee-espresso mb-2">Is there a free trial?</h3>
+              <p className="text-coffee-cortado leading-relaxed">
+                Attunly is free to start. No credit card required. We'll let you know if that changes.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <Card className="bg-white border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-gray-900">Frequently Asked Questions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How do I connect Slack?</h3>
-              <p className="text-gray-600">
-                Go to Settings → Integrations and click "Connect Slack". You'll be redirected to authorize Attunly with your Slack workspace.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How do I create a pod?</h3>
-              <p className="text-gray-600">
-                Click "Create Pod" from your dashboard. Give it a name and share the pod code with your teammates so they can join.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How does AI Match work?</h3>
-              <p className="text-gray-600">
-                AI Match uses AI to find teammates with relevant expertise. Just describe what you need help with, and we'll show you the best matches.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How do I delete my account?</h3>
-              <p className="text-gray-600">
-                Go to Settings → scroll to the bottom → click "Delete Account". This will permanently delete all your data.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="text-center mt-12 text-gray-500">
-          <p>
+        <div className="text-center">
+          <p className="text-coffee-latte">
             Can't find what you're looking for?{" "}
-            <a href="mailto:support@attunly.com" className="text-violet-600 hover:underline">
+            <a href="mailto:support@attunly.com" className="text-coffee-espresso hover:text-coffee-roast">
               Contact us directly
             </a>
           </p>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="px-6 py-12 bg-coffee-espresso text-coffee-latte">
+        <div className="max-w-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <a href="/" className="flex items-center gap-2">
+            <img src="/logo.svg" alt="" className="w-6 h-6 invert" />
+            <span className="text-xl font-semibold text-coffee-paper">attunly</span>
+          </a>
+          <div className="flex gap-8 text-sm">
+            <Link href="/privacy" className="hover:text-coffee-paper transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-coffee-paper transition-colors">
+              Terms
+            </Link>
+            <Link href="/support" className="text-coffee-paper">
+              Contact
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
