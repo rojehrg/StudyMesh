@@ -225,6 +225,19 @@ export const billingEvents = pgTable("billing_events", {
   processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// Slash command events - tracking for send rate measurement
+// North star metric: send_rate = sent / modal_opened
+export const commandEvents = pgTable("command_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slackUserId: text("slack_user_id").notNull(),
+  slackTeamId: text("slack_team_id").notNull(),
+  eventType: text("event_type").notNull(), // 'invoked', 'modal_opened', 'sent', 'abandoned'
+  context: text("context"), // What they typed after /attunly (for debugging, not analytics)
+  recipientSlackId: text("recipient_slack_id"), // Who they sent to (only for 'sent' events)
+  metadata: jsonb("metadata").default({}), // Additional context
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
@@ -240,3 +253,5 @@ export type MeetingParticipant = typeof meetingParticipants.$inferSelect;
 export type SchedulingPermission = typeof schedulingPermissions.$inferSelect;
 export type UserProviderCredential = typeof userProviderCredentials.$inferSelect;
 export type BillingEvent = typeof billingEvents.$inferSelect;
+export type CommandEvent = typeof commandEvents.$inferSelect;
+export type NewCommandEvent = typeof commandEvents.$inferInsert;
