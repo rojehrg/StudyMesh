@@ -4,44 +4,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  MoreGridBig,
-  BookOpen,
-  UsersGroup,
-  AddPlusCircle,
-  Exit,
   Settings,
   ChevronLeft,
   HamburgerLg,
   LogOut,
-  Calendar,
-  Bell
 } from "react-coolicons";
-import { HandHelping } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { NudgesDropdown } from "@/components/nudges-dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
 import { RealtimeProvider, useRealtime } from "@/components/realtime-provider";
 import { CelebrationProvider } from "@/components/celebration-provider";
-
-// AI Match icon component - shows light/dark version based on theme
-// Uses fixed size that doesn't shrink when sidebar collapses
-function AiMatchIcon() {
-  return (
-    <span className="flex items-center justify-center w-6 h-6 min-w-6 min-h-6">
-      <img src="/ai-search.svg" alt="" className="w-6 h-6 dark:hidden" />
-      <img src="/ai-search-dark.svg" alt="" className="w-6 h-6 hidden dark:block" />
-    </span>
-  );
-}
 
 interface SidebarItemProps {
   icon: any;
@@ -124,9 +102,7 @@ function DashboardLayoutBase({
   unreadCount?: number;
   userId?: string;
 }) {
-  const totalUnread = unreadCount;
   const supabase = createClient();
-  const [isLookingToHelp, setIsLookingToHelp] = useState(profile?.availability?.lookingToHelp || false);
   const [orgName, setOrgName] = useState<string | null>(null);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
 
@@ -134,24 +110,6 @@ function DashboardLayoutBase({
   useEffect(() => {
     setPendingPath(null);
   }, [pathname]);
-
-  // Update looking to help status
-  const handleLookingToHelpToggle = async (checked: boolean) => {
-    if (!userId) return;
-    try {
-      const currentAvailability = profile?.availability || {};
-      await supabase
-        .from('profiles')
-        .update({
-          availability: { ...currentAvailability, lookingToHelp: checked }
-        })
-        .eq('user_id', userId);
-      setIsLookingToHelp(checked);
-      toast.success(checked ? "You're visible as looking to help!" : "Status updated");
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
 
   // Fetch organization name
   useEffect(() => {
@@ -170,14 +128,9 @@ function DashboardLayoutBase({
     loadOrgName();
   }, [userId, supabase]);
 
+  // Minimal sidebar for Slack-first experience
+  // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
-    { icon: MoreGridBig, label: "Dashboard", href: "/dashboard" },
-    { icon: AiMatchIcon, label: "AI Match", href: "/find-help" },
-    { icon: BookOpen, label: "Pods", href: "/classes" },
-    { icon: Bell, label: "Nudges", href: "/notifications", badge: totalUnread > 0 ? totalUnread : undefined },
-    { icon: Calendar, label: "Meetings", href: "/meetings" },
-    { icon: AddPlusCircle, label: "Create Pod", href: "/classes/create" },
-    { icon: Exit, label: "Join Pod", href: "/classes/join" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
@@ -239,56 +192,18 @@ function DashboardLayoutBase({
           ))}
         </nav>
 
-        {/* Sidebar Bottom Section - Org Name + Looking to Help */}
-        {userId && (
-          <div className="pb-2 space-y-3 px-3">
-            {/* Organization Name - only show when expanded */}
-            {orgName && !isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="px-3 py-2 rounded-xl bg-muted/50 border border-border/50"
-              >
-                <p className="text-xs text-muted-foreground">Organization</p>
-                <p className="text-sm font-medium text-foreground truncate">{orgName}</p>
-              </motion.div>
-            )}
-
-            {/* Looking to Help Toggle - smooth transition */}
-            <button
-              onClick={() => handleLookingToHelpToggle(!isLookingToHelp)}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors duration-300",
-                isLookingToHelp
-                  ? "bg-success/10 border-success/30"
-                  : "bg-card border-border hover:bg-muted/50"
-              )}
-              title={isCollapsed ? (isLookingToHelp ? "Looking to help" : "Not looking to help") : undefined}
+        {/* Sidebar Bottom Section - Org Name only */}
+        {userId && orgName && !isCollapsed && (
+          <div className="pb-2 px-3">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-3 py-2 rounded-xl bg-muted/50 border border-border/50"
             >
-              <HandHelping className={cn("w-5 h-5 shrink-0 transition-colors", isLookingToHelp ? "text-success" : "text-muted-foreground")} />
-
-              <motion.div
-                initial={false}
-                animate={{
-                  width: isCollapsed ? 0 : "auto",
-                  opacity: isCollapsed ? 0 : 1,
-                }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="overflow-hidden flex items-center justify-between flex-1"
-                style={{ pointerEvents: isCollapsed ? "none" : "auto" }}
-              >
-                <p className={cn("text-sm font-medium whitespace-nowrap", isLookingToHelp ? "text-success" : "text-foreground")}>
-                  {isLookingToHelp ? "Helping" : "Not helping"}
-                </p>
-                <Switch
-                  checked={isLookingToHelp}
-                  onCheckedChange={handleLookingToHelpToggle}
-                  onClick={(e) => e.stopPropagation()}
-                  className="data-[state=checked]:bg-success ml-2"
-                />
-              </motion.div>
-            </button>
+              <p className="text-xs text-muted-foreground">Organization</p>
+              <p className="text-sm font-medium text-foreground truncate">{orgName}</p>
+            </motion.div>
           </div>
         )}
 
@@ -350,7 +265,6 @@ function DashboardLayoutBase({
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <NudgesDropdown />
           </div>
         </header>
 
