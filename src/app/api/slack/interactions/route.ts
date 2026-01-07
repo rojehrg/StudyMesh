@@ -140,7 +140,7 @@ async function handleViewSubmission(payload: any) {
   }
 
   try {
-    await sendSlackDM(recipientId, message, user.id);
+    await sendSlackDM(recipientId, message, user.id, team.id);
 
     // Track successful send
     if (user?.id && team?.id) {
@@ -149,8 +149,8 @@ async function handleViewSubmission(payload: any) {
       });
     }
 
-    // Send habit loop confirmation (quiet, non-intrusive)
-    await sendHabitLoopConfirmation(user.id, recipientId);
+    // Send confirmation to sender
+    await sendConfirmationToSender(user.id, recipientId);
 
     return NextResponse.json({
       response_action: 'clear',
@@ -184,9 +184,14 @@ async function handleBlockActions(payload: any) {
 }
 
 /**
- * Sends a DM to a Slack user.
+ * Sends a DM to a Slack user with strong sender attribution and reply button.
  */
-async function sendSlackDM(recipientId: string, message: string, senderId: string) {
+async function sendSlackDM(
+  recipientId: string,
+  message: string,
+  senderId: string,
+  teamId: string
+) {
   const botToken = process.env.SLACK_BOT_TOKEN;
 
   if (!botToken) {
@@ -213,7 +218,10 @@ async function sendSlackDM(recipientId: string, message: string, senderId: strin
 
   const channelId = openResult.channel.id;
 
-  // Send the message
+  // Build deep link for reply button
+  const replyDeepLink = `slack://user?team=${teamId}&id=${senderId}`;
+
+  // Send the message with strong attribution and reply button
   const messageResponse = await fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
     headers: {
@@ -222,8 +230,15 @@ async function sendSlackDM(recipientId: string, message: string, senderId: strin
     },
     body: JSON.stringify({
       channel: channelId,
-      text: message,
+      text: `<@${senderId}> asked via Attunly:\n\n${message}`,
       blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*<@${senderId}> asked via Attunly:*`,
+          },
+        },
         {
           type: 'section',
           text: {
@@ -232,11 +247,17 @@ async function sendSlackDM(recipientId: string, message: string, senderId: strin
           },
         },
         {
-          type: 'context',
+          type: 'actions',
           elements: [
             {
-              type: 'mrkdwn',
-              text: `_Sent via Attunly by <@${senderId}>_`,
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: `Reply to <@${senderId}>`,
+                emoji: true,
+              },
+              url: replyDeepLink,
+              action_id: 'reply_to_sender',
             },
           ],
         },
@@ -254,10 +275,10 @@ async function sendSlackDM(recipientId: string, message: string, senderId: strin
 }
 
 /**
- * Sends a quiet confirmation to the sender with habit loop reminder.
- * "Sent. Use /attunly anytime you're blocked."
+ * Sends confirmation to sender that message was delivered.
+ * "Sent to @Bob. If they reply, it will come back to you directly."
  */
-async function sendHabitLoopConfirmation(senderId: string, recipientId: string) {
+async function sendConfirmationToSender(senderId: string, recipientId: string) {
   const botToken = process.env.SLACK_BOT_TOKEN;
 
   if (!botToken) return;
@@ -278,7 +299,7 @@ async function sendHabitLoopConfirmation(senderId: string, recipientId: string) 
     const openResult = await openResponse.json();
     if (!openResult.ok) return;
 
-    // Send simple, quiet confirmation with habit loop
+    // Send confirmation with reply expectation
     await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
@@ -287,16 +308,14 @@ async function sendHabitLoopConfirmation(senderId: string, recipientId: string) 
       },
       body: JSON.stringify({
         channel: openResult.channel.id,
-        text: `Sent to <@${recipientId}>. Use /attunly anytime you're blocked.`,
+        text: `Sent to <@${recipientId}>. If they reply, it will come back to you directly.`,
         blocks: [
           {
-            type: 'context',
-            elements: [
-              {
-                type: 'mrkdwn',
-                text: `Sent to <@${recipientId}>. Use \`/attunly\` anytime you're blocked.`,
-              },
-            ],
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: `Sent to <@${recipientId}>. If they reply, it will come back to you directly.`,
+            },
           },
         ],
       }),
