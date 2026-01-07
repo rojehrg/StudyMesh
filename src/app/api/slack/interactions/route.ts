@@ -71,6 +71,9 @@ export async function POST(request: Request) {
       callback_id,
       userId: user?.id,
       teamId: team?.id,
+      viewCallbackId: view?.callback_id,
+      payloadCallbackId: payload.callback_id,
+      viewType: view?.type,
     });
 
     switch (type) {

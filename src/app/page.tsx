@@ -90,31 +90,31 @@ const Hero = () => (
   <section className="min-h-[70vh] flex flex-col justify-center px-6 md:px-12 lg:px-24 py-16 bg-coffee-paper">
     <div className="max-w-2xl mx-auto w-full">
       <p className="text-coffee-latte text-sm tracking-wide uppercase mb-6">
-        A Slack command
+        Find the right person to ask
       </p>
 
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-6">
-        Ask for help in Slack
+        Ask for help
         <br />
-        <span className="text-coffee-oat">without overthinking.</span>
+        <span className="text-coffee-oat">without the friction.</span>
       </h1>
 
       <p className="text-xl md:text-2xl text-coffee-cortado leading-relaxed mb-10 max-w-[60ch]">
-        Type <code className="bg-coffee-cream px-2 py-0.5 rounded text-lg font-mono text-coffee-mocha">/attunly</code>.
-        Get a calm draft that makes the ask easy to send. Move the work forward.
+        Describe what you know. Connect your calendar.
+        Then type <code className="bg-coffee-cream px-2 py-0.5 rounded text-lg font-mono text-coffee-mocha">/attunly</code> in Slack
+        to find who can help and when they're free.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <Button primary href="/api/auth/slack">
-          <SlackIcon />
-          Add to Slack
+        <Button primary href="/signup">
+          Create your profile
         </Button>
         <Button href="#how-it-works">See how it works →</Button>
       </div>
 
       {/* Proof line */}
       <p className="text-sm text-coffee-latte max-w-[60ch]">
-        No setup. No status updates. Works where you already work.
+        No status to set. No scheduling awkwardness. Just ask.
       </p>
     </div>
   </section>
@@ -158,20 +158,20 @@ const TheSolution = () => (
     </p>
 
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
-      It helps you write the message
+      It knows who knows what
       <br />
-      <span className="text-coffee-oat">and actually send it.</span>
+      <span className="text-coffee-oat">and when they're free.</span>
     </h2>
 
     <div className="space-y-5 text-lg text-coffee-cortado leading-relaxed max-w-[60ch]">
       <p>
-        Type <code className="bg-coffee-cream px-2 py-0.5 rounded font-mono text-coffee-mocha">/attunly</code> and
-        describe what you need. Attunly drafts a calm, low-pressure message—one
-        that's easy for someone to say yes or no to.
+        Everyone creates a profile describing their expertise in their own words.
+        Attunly understands natural language, so "I'm good at React hooks and debugging CSS" works.
       </p>
       <p>
-        You can also see who might be the right person to ask. Suggestions are optional.
-        You can pick someone yourself. Edit the draft however you like. Then send it.
+        When you need help, type <code className="bg-coffee-cream px-2 py-0.5 rounded font-mono text-coffee-mocha">/attunly</code> in Slack.
+        Attunly finds who matches and shows their real availability from Google Calendar.
+        Then it drafts a calm message you can send or edit.
       </p>
     </div>
   </Section>
@@ -194,18 +194,18 @@ const HowItWorks = () => (
       {[
         {
           step: '1',
-          title: 'Type /attunly in Slack',
-          desc: 'Describe what you need help with in a few words.',
+          title: 'Create your profile',
+          desc: 'Describe what you know in your own words. No forms, just natural language.',
         },
         {
           step: '2',
-          title: 'Review the suggested message',
-          desc: 'Change it or send it as-is. Either way is fine.',
+          title: 'Connect your calendar',
+          desc: "Link Google Calendar so others can see when you're actually free.",
         },
         {
           step: '3',
-          title: 'Send it',
-          desc: 'The question gets asked. You move on.',
+          title: 'Use /attunly in Slack',
+          desc: 'Describe what you need. Get matched with someone who can help and see their availability.',
         },
       ].map((item) => (
         <div key={item.step} className="flex gap-6">
@@ -316,22 +316,22 @@ const Trust = () => (
 const FinalCTA = () => (
   <Section className="text-center" id="install">
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-      Start asking without overthinking.
+      Find the right person to ask.
     </h2>
 
     <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto">
-      Add Attunly to Slack in under a minute.
+      Create your profile in a few minutes. Then use Slack to ask for help.
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-      <Button primary href="/api/auth/slack">
-        <SlackIcon />
-        Add to Slack
+      <Button primary href="/signup">
+        Create your profile
       </Button>
+      <Button href="/login">Already have an account? →</Button>
     </div>
 
     <p className="text-sm text-coffee-latte">
-      Free to start · No credit card · Works with any Slack plan
+      Free to start · No credit card
     </p>
   </Section>
 );
@@ -380,10 +380,17 @@ export default function AttunlyLanding() {
             <img src="/logo.svg" alt="" className="w-7 h-7" />
             <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
           </a>
-          <Button primary href="/api/auth/slack" className="text-sm py-2.5 px-5">
-            <SlackIcon className="w-4 h-4 mr-2" />
-            Add to Slack
-          </Button>
+          <div className="flex items-center gap-4">
+            <a
+              href="/login"
+              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+            >
+              Log in
+            </a>
+            <Button primary href="/signup" className="text-sm py-2.5 px-5">
+              Create profile
+            </Button>
+          </div>
         </div>
       </nav>
 
