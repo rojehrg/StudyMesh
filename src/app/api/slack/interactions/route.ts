@@ -62,7 +62,9 @@ export async function POST(request: Request) {
     }
 
     const payload = JSON.parse(payloadStr);
-    const { type, callback_id, user, team, view } = payload;
+    const { type, user, team, view } = payload;
+    // callback_id is inside view for modal submissions
+    const callback_id = view?.callback_id || payload.callback_id;
 
     console.log('[Slack Interactions] Received:', {
       type,
@@ -103,7 +105,8 @@ export async function POST(request: Request) {
  * Handles modal form submissions.
  */
 async function handleViewSubmission(payload: any) {
-  const { callback_id, user, team, view } = payload;
+  const { user, team, view } = payload;
+  const callback_id = view?.callback_id;
 
   if (callback_id !== 'ask_for_help_submit') {
     console.warn('[Slack Interactions] Unknown callback_id:', callback_id);
