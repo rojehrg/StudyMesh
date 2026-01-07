@@ -3,12 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { CheckBig, ChevronLeft } from "react-coolicons";
-import { LottieLoader } from "@/components/loading-states";
-import dynamic from "next/dynamic";
-
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-import startupMeeting from "../../../../public/animations/startup-meeting.json";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -40,130 +34,120 @@ export default function ForgotPasswordPage() {
   // Success state
   if (success) {
     return (
-      <div className="flex min-h-screen">
-        {/* Left side - Success message */}
-        <div className="flex-1 flex flex-col bg-white">
-          {/* Logo */}
-          <div className="h-16 px-8 flex items-center">
-            <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-              <img src="/icon.png" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
-              <span className="text-violet-600">ly</span></span>
+      <div
+        className="min-h-screen bg-coffee-paper flex flex-col"
+        style={{
+          fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif',
+        }}
+      >
+        {/* Header */}
+        <header className="h-16 px-6 md:px-12 flex items-center border-b border-coffee-foam">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <img src="/logo.svg" alt="" className="w-7 h-7" />
+            <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
+          </Link>
+        </header>
+
+        {/* Success content */}
+        <main className="flex-1 flex items-center justify-center px-6 py-12">
+          <div className="w-full max-w-sm text-center">
+            <div className="w-16 h-16 bg-coffee-cream rounded-full flex items-center justify-center mx-auto mb-6 border border-coffee-foam">
+              <svg className="w-8 h-8 text-coffee-mocha" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-semibold text-coffee-espresso">Check your email</h1>
+            <p className="mt-4 text-coffee-cortado">
+              We sent a password reset link to <span className="font-medium text-coffee-espresso">{email}</span>
+            </p>
+            <p className="mt-2 text-coffee-latte text-sm">Click the link in your email to reset your password.</p>
+            <Link
+              href="/login"
+              className="mt-8 inline-flex w-full h-11 items-center justify-center rounded-lg bg-coffee-espresso text-coffee-paper font-medium hover:bg-coffee-roast transition-colors"
+            >
+              Back to sign in
             </Link>
           </div>
-
-          {/* Success content */}
-          <div className="flex-1 flex items-center justify-center px-8 md:px-16 lg:px-24">
-            <div className="w-full max-w-md text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckBig className="w-10 h-10 text-green-600" />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">Check your email</h1>
-              <p className="mt-4 text-lg text-gray-600">
-                We sent a password reset link to <span className="font-medium text-gray-900">{email}</span>
-              </p>
-              <p className="mt-2 text-gray-500">Click the link in your email to reset your password.</p>
-              <Link
-                href="/login"
-                className="mt-8 inline-flex w-full h-11 items-center justify-center rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors"
-              >
-                Back to Sign in
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side - Animation with lavender background */}
-        <div className="hidden md:flex flex-1 bg-violet-100 items-center justify-center">
-          <Lottie
-            animationData={startupMeeting}
-            loop={true}
-            style={{ width: 400, height: 350 }}
-          />
-        </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left side - Form */}
-      <div className="flex-1 flex flex-col bg-white">
-        {/* Logo */}
-        <div className="h-16 px-8 flex items-center">
-          <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-            <img src="/icon.png" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
-            <span className="text-violet-600">ly</span></span>
+    <div
+      className="min-h-screen bg-coffee-paper flex flex-col"
+      style={{
+        fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif',
+      }}
+    >
+      {/* Header */}
+      <header className="h-16 px-6 md:px-12 flex items-center border-b border-coffee-foam">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <img src="/logo.svg" alt="" className="w-7 h-7" />
+          <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
+        </Link>
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1 text-sm text-coffee-cortado hover:text-coffee-espresso mb-8 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to sign in
           </Link>
-        </div>
 
-        {/* Form container */}
-        <div className="flex-1 flex items-center justify-center px-8 md:px-16 lg:px-24">
-          <div className="w-full max-w-md">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-8"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back to login
-            </Link>
+          <h1 className="text-3xl font-semibold text-coffee-espresso">
+            Reset your password
+          </h1>
+          <p className="mt-2 text-coffee-cortado">
+            Enter your email and we&apos;ll send you a reset link.
+          </p>
 
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              Reset your password
-              <span className="inline-block">🔑</span>
-            </h1>
-            <p className="mt-3 text-gray-500 text-lg">Enter your email and we&apos;ll send you a reset link.</p>
+          {error && (
+            <div className="mt-6 p-4 rounded-lg bg-coffee-cream border border-coffee-steamed text-coffee-mocha text-sm">
+              {error}
+            </div>
+          )}
 
-            {error && (
-              <div className="mt-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleResetPassword} className="mt-8 space-y-5">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  placeholder="you@example.com"
-                  className="w-full h-11 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
-                />
-              </div>
-
-              <button
-                type="submit"
+          <form onSubmit={handleResetPassword} className="mt-8 space-y-5">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-coffee-mocha mb-1.5">
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 disabled={loading}
-                className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-              >
-                {loading && <LottieLoader size="sm" className="w-4 h-4" />}
-                Send reset link
-              </button>
-            </form>
+                placeholder="you@example.com"
+                className="w-full h-11 px-4 rounded-lg border border-coffee-foam bg-white text-coffee-espresso placeholder:text-coffee-latte focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:border-transparent disabled:opacity-50 font-sans"
+              />
+            </div>
 
-            <p className="mt-8 text-sm text-gray-500">
-              Remember your password?{" "}
-              <Link href="/login" className="font-medium text-violet-600 hover:text-violet-500">
-                Sign in
-              </Link>
-            </p>
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 rounded-lg bg-coffee-espresso text-coffee-paper font-medium hover:bg-coffee-roast focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+            >
+              {loading ? "Sending..." : "Send reset link"}
+            </button>
+          </form>
+
+          <p className="mt-8 text-sm text-coffee-latte text-center">
+            Remember your password?{" "}
+            <Link href="/login" className="font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors">
+              Sign in
+            </Link>
+          </p>
         </div>
-      </div>
-
-      {/* Right side - Animation with lavender background */}
-      <div className="hidden md:flex flex-1 bg-violet-100 items-center justify-center">
-        <Lottie
-          animationData={startupMeeting}
-          loop={true}
-          style={{ width: 400, height: 350 }}
-        />
-      </div>
+      </main>
     </div>
   );
 }

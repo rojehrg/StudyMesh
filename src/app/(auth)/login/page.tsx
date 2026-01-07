@@ -4,11 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LottieLoader } from "@/components/loading-states";
-import dynamic from "next/dynamic";
-
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-import startupMeeting from "../../../../public/animations/startup-meeting.json";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,15 +15,12 @@ export default function LoginPage() {
 
   // Check for existing session and redirect if logged in (non-blocking)
   useEffect(() => {
-    // Use getUser() instead of getSession() to validate the session is still valid
     supabase.auth.getUser().then(({ data: { user }, error }) => {
       if (error || !user) {
-        // Session is invalid or user was deleted - clear it
         supabase.auth.signOut();
         return;
       }
 
-      // User is logged in, check profile and redirect
       supabase
         .from('profiles')
         .select('id')
@@ -57,7 +49,6 @@ export default function LoginPage() {
 
       if (error) throw error;
 
-      // Check if user has a profile before redirecting
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -113,35 +104,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left side - Login form */}
-      <div className="flex-1 flex flex-col bg-white">
-        {/* Logo */}
-        <div className="h-16 px-8 flex items-center">
-          <Link href="/" className="flex items-center gap-0.5 hover:opacity-90 transition-opacity">
-            <img src="/icon.png" alt="Attunly" className="w-7 h-7" /><span className="font-bold text-xl"><span className="text-gray-900">Attun</span>
-            <span className="text-violet-600">ly</span></span>
-          </Link>
-        </div>
+    <div
+      className="min-h-screen bg-coffee-paper flex flex-col"
+      style={{
+        fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif',
+      }}
+    >
+      {/* Header */}
+      <header className="h-16 px-6 md:px-12 flex items-center border-b border-coffee-foam">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <img src="/logo.svg" alt="" className="w-7 h-7" />
+          <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
+        </Link>
+      </header>
 
-        {/* Form container */}
-        <div className="flex-1 flex items-center justify-center px-8 md:px-16 lg:px-24">
-          <div className="w-full max-w-md">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              Hey, welcome back!
-              <span className="inline-block animate-[wave_1s_ease-in-out_infinite]">👋</span>
-            </h1>
-            <p className="mt-3 text-gray-500 text-lg">Good to see you again. Let&apos;s get you signed in.</p>
+      {/* Main content */}
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <h1 className="text-3xl font-semibold text-coffee-espresso">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-coffee-cortado">
+            Sign in to continue to your dashboard.
+          </p>
 
           {error && (
-            <div className="mt-6 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+            <div className="mt-6 p-4 rounded-lg bg-coffee-cream border border-coffee-steamed text-coffee-mocha text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="mt-8 space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-coffee-mocha mb-1.5">
                 Email
               </label>
               <input
@@ -152,16 +147,16 @@ export default function LoginPage() {
                 required
                 disabled={loading}
                 placeholder="you@example.com"
-                className="w-full h-11 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+                className="w-full h-11 px-4 rounded-lg border border-coffee-foam bg-white text-coffee-espresso placeholder:text-coffee-latte focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:border-transparent disabled:opacity-50 font-sans"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-coffee-mocha">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-sm text-violet-600 hover:text-violet-500">
+                <Link href="/forgot-password" className="text-sm text-coffee-cortado hover:text-coffee-espresso transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -173,31 +168,30 @@ export default function LoginPage() {
                 required
                 disabled={loading}
                 placeholder="Enter your password"
-                className="w-full h-11 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+                className="w-full h-11 px-4 rounded-lg border border-coffee-foam bg-white text-coffee-espresso placeholder:text-coffee-latte focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:border-transparent disabled:opacity-50 font-sans"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-11 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+              className="w-full h-11 rounded-lg bg-coffee-espresso text-coffee-paper font-medium hover:bg-coffee-roast focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
             >
-              {loading && <LottieLoader size="sm" className="w-4 h-4" />}
-              Sign in
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
           <div className="mt-6 flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-sm text-gray-500">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-coffee-foam" />
+            <span className="text-sm text-coffee-latte">or</span>
+            <div className="flex-1 h-px bg-coffee-foam" />
           </div>
 
           <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="mt-6 w-full h-11 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:opacity-50 flex items-center justify-center gap-3 transition-colors"
+            className="mt-6 w-full h-11 rounded-lg border border-coffee-foam bg-white text-coffee-mocha font-medium hover:bg-coffee-cream focus:outline-none focus:ring-2 focus:ring-coffee-foam disabled:opacity-50 flex items-center justify-center gap-3 transition-colors"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -208,24 +202,14 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          <p className="mt-8 text-sm text-gray-500">
+          <p className="mt-8 text-sm text-coffee-latte text-center">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="font-medium text-violet-600 hover:text-violet-500">
-              Sign up
+            <Link href="/signup" className="font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors">
+              Create one
             </Link>
           </p>
-          </div>
         </div>
-      </div>
-
-      {/* Right side - Animation with lavender background */}
-      <div className="hidden md:flex flex-1 bg-violet-100 items-center justify-center">
-        <Lottie
-          animationData={startupMeeting}
-          loop={true}
-          style={{ width: 400, height: 350 }}
-        />
-      </div>
+      </main>
     </div>
   );
 }
