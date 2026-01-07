@@ -13,9 +13,8 @@
  */
 
 import { db } from '@/lib/db';
-import { profiles, podMembers, pods } from '@/lib/db/schema';
+import { profiles } from '@/lib/db/schema';
 import { eq, and, isNotNull } from 'drizzle-orm';
-import { semanticMatch } from '@/lib/ai/semantic-search';
 import type { TeamMember } from './modal-builder';
 
 interface SuggesterConfig {
@@ -42,15 +41,13 @@ export async function suggestPeople(
 
   try {
     // Get all Slack-connected users in the same workspace (excluding the requester)
+    // Only query columns that definitely exist in the database
     const teamMembers = await db
       .select({
         userId: profiles.userId,
         firstName: profiles.firstName,
         lastName: profiles.lastName,
         slackUserId: profiles.slackUserId,
-        expertiseText: profiles.expertiseText,
-        knowledgeAreas: profiles.knowledgeAreas,
-        currentlyAvailable: profiles.currentlyAvailable,
         department: profiles.department,
         major: profiles.major,
       })
@@ -73,71 +70,13 @@ export async function suggestPeople(
       return [];
     }
 
-    // If no context provided, return all members with availability hints
-    if (!context.trim()) {
-      return otherMembers.slice(0, limit).map((m) => ({
-        slackUserId: m.slackUserId!,
-        displayName: formatDisplayName(m.firstName, m.lastName, m.department),
-        availabilityHint: getAvailabilityHint(m.currentlyAvailable),
-        score: 0,
-      }));
-    }
-
-    // Try semantic matching first
-    const profilesForMatching = otherMembers
-      .filter((m) => m.expertiseText || (m.knowledgeAreas && m.knowledgeAreas.length > 0))
-      .map((m) => ({
-        user_id: m.userId,
-        first_name: m.firstName || '',
-        last_name: m.lastName || '',
-        expertise_text: buildExpertiseText(m.expertiseText, m.knowledgeAreas),
-        department: m.department || undefined,
-        major: m.major || undefined,
-      }));
-
-    let matchResults: { user_id: string; score: number; reason: string }[] = [];
-
-    if (profilesForMatching.length > 0) {
-      matchResults = await semanticMatch(context, profilesForMatching);
-    }
-
-    // Build scored results
-    const scoredResults: SuggestedPerson[] = [];
-
-    for (const member of otherMembers) {
-      const match = matchResults.find((r) => r.user_id === member.userId);
-
-      if (match && match.user_id !== '__RATE_LIMITED__') {
-        scoredResults.push({
-          slackUserId: member.slackUserId!,
-          displayName: formatDisplayName(member.firstName, member.lastName, member.department),
-          availabilityHint: getAvailabilityHint(member.currentlyAvailable),
-          score: match.score,
-          matchReason: match.reason,
-        });
-      }
-    }
-
-    // Sort by score and apply limit
-    scoredResults.sort((a, b) => b.score - a.score);
-
-    // If we got semantic matches, return those
-    if (scoredResults.length > 0) {
-      return scoredResults.slice(0, limit);
-    }
-
-    // Fallback: return available members first, then others
-    const fallbackResults = otherMembers
-      .map((m) => ({
-        slackUserId: m.slackUserId!,
-        displayName: formatDisplayName(m.firstName, m.lastName, m.department),
-        availabilityHint: getAvailabilityHint(m.currentlyAvailable),
-        score: m.currentlyAvailable ? 50 : 10,
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
-
-    return fallbackResults;
+    // Return team members as simple list (no semantic matching for now)
+    // Person suggestions are secondary - just return basic list
+    return otherMembers.slice(0, limit).map((m) => ({
+      slackUserId: m.slackUserId!,
+      displayName: formatDisplayName(m.firstName, m.lastName, m.department),
+      score: 10,
+    }));
   } catch (error) {
     console.error('[Person Suggester] Error:', error);
     return [];
@@ -154,39 +93,6 @@ function formatDisplayName(
 ): string {
   const name = [firstName, lastName].filter(Boolean).join(' ') || 'Unknown';
   return department ? `${name} (${department})` : name;
-}
-
-/**
- * Generates an availability hint based on status.
- */
-function getAvailabilityHint(currentlyAvailable: boolean | null): string | undefined {
-  if (currentlyAvailable === true) {
-    return 'likely available';
-  }
-  if (currentlyAvailable === false) {
-    return 'may be busy';
-  }
-  return undefined;
-}
-
-/**
- * Builds expertise text from profile data.
- */
-function buildExpertiseText(
-  expertiseText: string | null,
-  knowledgeAreas: string[] | null
-): string {
-  const parts: string[] = [];
-
-  if (expertiseText) {
-    parts.push(expertiseText);
-  }
-
-  if (knowledgeAreas && knowledgeAreas.length > 0) {
-    parts.push(`Knowledge areas: ${knowledgeAreas.join(', ')}`);
-  }
-
-  return parts.join('. ') || 'No expertise listed';
 }
 
 /**
