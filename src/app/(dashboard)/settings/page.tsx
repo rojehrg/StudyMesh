@@ -492,27 +492,27 @@ function SettingsContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>
+          <h1 className="text-2xl font-bold text-coffee-espresso">Settings</h1>
+          <p className="text-coffee-cortado mt-1">Manage your profile and preferences</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-coffee-cortado">
           {saveStatus === 'saving' && <><LottieLoader size="sm" className="w-4 h-4" /> Saving...</>}
-          {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-success" /> Saved</>}
-          {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-destructive" /> Error</>}
+          {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-emerald-600" /> Saved</>}
+          {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-red-500" /> Error</>}
           {saveStatus === 'idle' && <><WifiHigh className="h-4 w-4" /> Auto-save</>}
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+      <div className="flex gap-1 p-1 bg-coffee-cream rounded-lg w-fit">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === tab.id
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white text-coffee-espresso shadow-sm"
+                : "text-coffee-cortado hover:text-coffee-espresso"
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -525,15 +525,15 @@ function SettingsContent() {
       {activeTab === "profile" && (
         <div className="space-y-6">
           {/* Basic Info */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Basic Information</CardTitle>
-              <CardDescription>Your personal details visible to teammates</CardDescription>
+              <CardTitle className="text-base font-semibold text-coffee-espresso">Basic Information</CardTitle>
+              <CardDescription className="text-coffee-cortado">Your personal details visible to teammates</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">First Name</Label>
+                  <Label className="text-sm text-coffee-cortado">First Name</Label>
                   <Input
                     value={profile.firstName}
                     onChange={(e) => updateProfile({ firstName: e.target.value })}
@@ -541,7 +541,7 @@ function SettingsContent() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">Last Name</Label>
+                  <Label className="text-sm text-coffee-cortado">Last Name</Label>
                   <Input
                     value={profile.lastName}
                     onChange={(e) => updateProfile({ lastName: e.target.value })}
@@ -549,7 +549,7 @@ function SettingsContent() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">Department</Label>
+                  <Label className="text-sm text-coffee-cortado">Department</Label>
                   <Input
                     value={profile.department}
                     onChange={(e) => updateProfile({ department: e.target.value })}
@@ -557,7 +557,7 @@ function SettingsContent() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground">Job Title</Label>
+                  <Label className="text-sm text-coffee-cortado">Job Title</Label>
                   <Input
                     value={profile.major}
                     onChange={(e) => updateProfile({ major: e.target.value })}
@@ -566,7 +566,7 @@ function SettingsContent() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Bio</Label>
+                <Label className="text-sm text-coffee-cortado">Bio</Label>
                 <Textarea
                   value={profile.bio}
                   onChange={(e) => updateProfile({ bio: e.target.value })}
@@ -579,18 +579,18 @@ function SettingsContent() {
           </Card>
 
           {/* What Can You Help With - AI-powered expertise matching */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-base font-semibold">What can you help with?</CardTitle>
+                <CardTitle className="text-base font-semibold text-coffee-espresso">What can you help with?</CardTitle>
                 {expertiseSaving && (
-                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                  <Badge variant="secondary" className="text-xs bg-coffee-cream text-coffee-mocha">
                     <LottieLoader size="sm" className="w-3 h-3 mr-1" />
                     Saving...
                   </Badge>
                 )}
               </div>
-              <CardDescription>
+              <CardDescription className="text-coffee-cortado">
                 Describe your expertise in your own words. Be specific about tools, processes, or domains you know well.
                 Our AI will match you with teammates who need your help.
               </CardDescription>
@@ -604,10 +604,10 @@ function SettingsContent() {
                 maxLength={500}
                 className="resize-none"
               />
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center justify-between text-xs text-coffee-cortado">
                 <span>{profile.expertiseText?.length || 0}/500 characters</span>
                 {profile.expertiseText && !expertiseSaving && (
-                  <span className="flex items-center gap-1 text-success">
+                  <span className="flex items-center gap-1 text-emerald-600">
                     <CheckBig className="w-3 h-3" />
                     Saved
                   </span>
@@ -617,21 +617,21 @@ function SettingsContent() {
           </Card>
 
           {/* Privacy & Data - GDPR Compliance */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Privacy & Data</CardTitle>
-              <CardDescription>Manage your personal data and account</CardDescription>
+              <CardTitle className="text-base font-semibold text-coffee-espresso">Privacy & Data</CardTitle>
+              <CardDescription className="text-coffee-cortado">Manage your personal data and account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Export Data */}
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-coffee-cream/50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Download className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 bg-coffee-cream rounded-xl flex items-center justify-center">
+                    <Download className="w-5 h-5 text-coffee-mocha" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Export Your Data</p>
-                    <p className="text-sm text-muted-foreground">Download all your personal data as JSON</p>
+                    <p className="font-medium text-coffee-espresso">Export Your Data</p>
+                    <p className="text-sm text-coffee-cortado">Download all your personal data as JSON</p>
                   </div>
                 </div>
                 <Button
@@ -654,20 +654,20 @@ function SettingsContent() {
               </div>
 
               {/* Delete Account */}
-              <div className="border-t border-border pt-4">
+              <div className="border-t border-coffee-foam pt-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
-                      <TrashFull className="w-5 h-5 text-destructive" />
+                    <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+                      <TrashFull className="w-5 h-5 text-red-500" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Delete Account</p>
-                      <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+                      <p className="font-medium text-coffee-espresso">Delete Account</p>
+                      <p className="text-sm text-coffee-cortado">Permanently delete your account and all data</p>
                     </div>
                   </div>
                   <Button
                     variant="outline"
-                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                    className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
                     onClick={() => setShowDeleteConfirm(true)}
                   >
                     <TrashFull className="w-4 h-4 mr-2" />
@@ -680,13 +680,13 @@ function SettingsContent() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-xl"
+                    className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl"
                   >
-                    <p className="text-sm font-medium text-destructive mb-2">
+                    <p className="text-sm font-medium text-red-600 mb-2">
                       This action cannot be undone. All your data will be permanently deleted.
                     </p>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Type <span className="font-mono font-bold text-foreground">DELETE</span> to confirm:
+                    <p className="text-sm text-coffee-cortado mb-3">
+                      Type <span className="font-mono font-bold text-coffee-espresso">DELETE</span> to confirm:
                     </p>
                     <div className="flex items-center gap-2">
                       <Input
@@ -732,7 +732,7 @@ function SettingsContent() {
       {activeTab === "availability" && (
         <div className="space-y-6">
           {/* Google Calendar Sync */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -740,8 +740,8 @@ function SettingsContent() {
                     <img src="/google-calendar-icon.svg" alt="Google Calendar" className="w-10 h-10" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Google Calendar</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-coffee-espresso">Google Calendar</p>
+                    <p className="text-sm text-coffee-cortado">
                       {meetingProviders.googleCalendar
                         ? (meetingProviders.googleCalendarEmail || "Syncing busy times")
                         : "Sync your calendar to show busy times"}
@@ -753,7 +753,7 @@ function SettingsContent() {
                     variant="outline"
                     size="sm"
                     onClick={disconnectGoogleCalendar}
-                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                    className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
                   >
                     <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
@@ -774,10 +774,10 @@ function SettingsContent() {
           </Card>
 
           {/* Weekly Availability Grid */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Weekly Availability</CardTitle>
-              <CardDescription>Set when you're free to help teammates</CardDescription>
+              <CardTitle className="text-base font-semibold text-coffee-espresso">Weekly Availability</CardTitle>
+              <CardDescription className="text-coffee-cortado">Set when you're free to help teammates</CardDescription>
             </CardHeader>
             <CardContent>
               <AvailabilityGrid
@@ -801,14 +801,14 @@ function SettingsContent() {
       {activeTab === "integrations" && (
         <div className="space-y-6">
           {/* Email */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Email Notifications</CardTitle>
-              <CardDescription>How you receive updates via email</CardDescription>
+              <CardTitle className="text-base font-semibold text-coffee-espresso">Email Notifications</CardTitle>
+              <CardDescription className="text-coffee-cortado">How you receive updates via email</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Email Address</Label>
+                <Label className="text-sm text-coffee-cortado">Email Address</Label>
                 <Input
                   type="email"
                   value={profile.email}
@@ -817,14 +817,14 @@ function SettingsContent() {
                   className="max-w-md"
                 />
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-border">
+              <div className="flex items-center justify-between pt-4 border-t border-coffee-foam">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 bg-coffee-cream rounded-xl flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-coffee-mocha" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive nudges and meeting invites</p>
+                    <p className="font-medium text-coffee-espresso">Email Notifications</p>
+                    <p className="text-sm text-coffee-cortado">Receive nudges and meeting invites</p>
                   </div>
                 </div>
                 <Switch
@@ -836,16 +836,16 @@ function SettingsContent() {
           </Card>
 
           {/* Slack */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center shadow-sm border border-border/50">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-coffee-foam">
                     <img src="/slack-icon.svg" alt="Slack" className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Slack</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-coffee-espresso">Slack</p>
+                    <p className="text-sm text-coffee-cortado">
                       {profile.slackConnected
                         ? (profile.slackHandle ? `@${profile.slackHandle}` : "Receiving nudges")
                         : "Get nudges as direct messages"}
@@ -853,7 +853,7 @@ function SettingsContent() {
                   </div>
                 </div>
                 {profile.slackConnected ? (
-                  <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10">
+                  <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
                     <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
                   </Button>
@@ -872,7 +872,7 @@ function SettingsContent() {
           </Card>
 
           {/* Zoom */}
-          <Card>
+          <Card className="bg-white border-coffee-foam">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -880,8 +880,8 @@ function SettingsContent() {
                     <img src="/zoom-icon.svg" alt="Zoom" className="w-10 h-10" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Zoom</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-coffee-espresso">Zoom</p>
+                    <p className="text-sm text-coffee-cortado">
                       {meetingProviders.zoom
                         ? (meetingProviders.zoomEmail || "Ready to create meetings")
                         : "Auto-generate meeting links"}
@@ -893,7 +893,7 @@ function SettingsContent() {
                     variant="outline"
                     size="sm"
                     onClick={disconnectZoom}
-                    className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                    className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
                   >
                     <LinkBreak className="w-4 h-4 mr-2" />
                     Disconnect
@@ -916,28 +916,28 @@ function SettingsContent() {
           {org ? (
             <>
               {/* Organization Overview Card */}
-              <Card>
+              <Card className="bg-white border-coffee-foam">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <Building01 className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 bg-coffee-cream rounded-xl flex items-center justify-center">
+                      <Building01 className="w-5 h-5 text-coffee-mocha" />
                     </div>
                     <div>
-                      <CardTitle className="text-base font-semibold">Organization Overview</CardTitle>
-                      <CardDescription>Your team workspace details</CardDescription>
+                      <CardTitle className="text-base font-semibold text-coffee-espresso">Organization Overview</CardTitle>
+                      <CardDescription className="text-coffee-cortado">Your team workspace details</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Org Name & Role */}
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
+                  <div className="flex items-center justify-between p-4 bg-coffee-cream/30 rounded-xl border border-coffee-foam">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-primary font-bold text-lg">{org.name?.[0]?.toUpperCase() || 'O'}</span>
+                      <div className="w-10 h-10 bg-coffee-cream rounded-full flex items-center justify-center">
+                        <span className="text-coffee-mocha font-bold text-lg">{org.name?.[0]?.toUpperCase() || 'O'}</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{org.name}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-semibold text-coffee-espresso">{org.name}</p>
+                        <p className="text-sm text-coffee-cortado">
                           {org.isOwner ? "Owner" : "Member"}
                         </p>
                       </div>
@@ -947,48 +947,48 @@ function SettingsContent() {
                   {/* Invite Code - Inside Overview for owners */}
                   {org.isOwner && org.inviteCode && (
                     <div className="pt-2">
-                      <label className="text-sm font-medium text-muted-foreground mb-2 block">Invite Code</label>
+                      <label className="text-sm font-medium text-coffee-cortado mb-2 block">Invite Code</label>
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 p-3 bg-muted/50 rounded-lg font-mono text-lg tracking-widest text-center border border-border/50">
+                        <div className="flex-1 p-3 bg-coffee-cream/50 rounded-lg font-mono text-lg tracking-widest text-center border border-coffee-foam text-coffee-espresso">
                           {org.inviteCode}
                         </div>
                         <Button onClick={copyInviteCode} variant="outline" size="icon" className="shrink-0">
                           {copiedInvite ? (
-                            <CheckBig className="w-4 h-4 text-success" />
+                            <CheckBig className="w-4 h-4 text-emerald-600" />
                           ) : (
                             <Copy className="w-4 h-4" />
                           )}
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">Share this code to invite teammates to your organization</p>
+                      <p className="text-xs text-coffee-cortado mt-2">Share this code to invite teammates to your organization</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* Workspace Integrations Card */}
-              <Card>
+              <Card className="bg-white border-coffee-foam">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
                       <img src="/slack-icon.svg" alt="Slack" className="w-8 h-8" />
                     </div>
                     <div>
-                      <CardTitle className="text-base font-semibold">Workspace Slack</CardTitle>
-                      <CardDescription>Connect your organization's Slack workspace</CardDescription>
+                      <CardTitle className="text-base font-semibold text-coffee-espresso">Workspace Slack</CardTitle>
+                      <CardDescription className="text-coffee-cortado">Connect your organization's Slack workspace</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {org.slackConnected ? (
-                    <div className="flex items-center justify-between p-4 bg-success/10 border border-success/20 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
                           <img src="/slack-icon.svg" alt="Slack" className="w-10 h-10" />
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">Connected</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-medium text-coffee-espresso">Connected</p>
+                          <p className="text-sm text-coffee-cortado">
                             {org.slackTeamName || "Workspace connected"}
                           </p>
                         </div>
@@ -1001,8 +1001,8 @@ function SettingsContent() {
                           <img src="/slack-icon.svg" alt="Slack" className="w-10 h-10 opacity-60" />
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">Connect Workspace Slack</p>
-                          <p className="text-sm text-muted-foreground">Enable Slack notifications for your team</p>
+                          <p className="font-medium text-coffee-espresso">Connect Workspace Slack</p>
+                          <p className="text-sm text-coffee-cortado">Enable Slack notifications for your team</p>
                         </div>
                       </div>
                       {org.isOwner && (
@@ -1018,20 +1018,20 @@ function SettingsContent() {
 
               {/* Customization Card - Pro+ feature */}
               {org.isOwner && (
-                <Card>
+                <Card className="bg-white border-coffee-foam">
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                          <Instance className="w-5 h-5 text-primary" />
+                        <div className="w-10 h-10 bg-coffee-cream rounded-xl flex items-center justify-center">
+                          <Instance className="w-5 h-5 text-coffee-mocha" />
                         </div>
                         <div>
-                          <CardTitle className="text-base font-semibold">Brand Colors</CardTitle>
-                          <CardDescription>Customize your team's color theme</CardDescription>
+                          <CardTitle className="text-base font-semibold text-coffee-espresso">Brand Colors</CardTitle>
+                          <CardDescription className="text-coffee-cortado">Customize your team's color theme</CardDescription>
                         </div>
                       </div>
                       {!canCustomize && (
-                        <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                        <Badge variant="secondary" className="bg-coffee-cream text-coffee-mocha border-0">
                           Pro
                         </Badge>
                       )}
@@ -1050,26 +1050,26 @@ function SettingsContent() {
 
               {/* Leave Organization - For non-owners */}
               {!org.isOwner && (
-                <Card className="border-destructive/20">
+                <Card className="bg-white border-red-200">
                   <CardHeader className="pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
-                        <LinkBreak className="w-5 h-5 text-destructive" />
+                      <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+                        <LinkBreak className="w-5 h-5 text-red-500" />
                       </div>
                       <div>
-                        <CardTitle className="text-base font-semibold">Leave Organization</CardTitle>
-                        <CardDescription>Remove yourself from {org.name}</CardDescription>
+                        <CardTitle className="text-base font-semibold text-coffee-espresso">Leave Organization</CardTitle>
+                        <CardDescription className="text-coffee-cortado">Remove yourself from {org.name}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-coffee-cortado">
                         You'll lose access to all pods and data in this organization.
                       </p>
                       <Button
                         variant="outline"
-                        className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
                         onClick={async () => {
                           if (!confirm('Are you sure you want to leave this organization? This cannot be undone.')) return;
                           try {
@@ -1094,29 +1094,29 @@ function SettingsContent() {
 
               {/* Danger Zone - For owners */}
               {org.isOwner && (
-                <Card className="border-destructive/20">
+                <Card className="bg-white border-red-200">
                   <CardHeader className="pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
-                        <TrashFull className="w-5 h-5 text-destructive" />
+                      <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+                        <TrashFull className="w-5 h-5 text-red-500" />
                       </div>
                       <div>
-                        <CardTitle className="text-base font-semibold text-destructive">Danger Zone</CardTitle>
-                        <CardDescription>Irreversible actions for {org.name}</CardDescription>
+                        <CardTitle className="text-base font-semibold text-red-600">Danger Zone</CardTitle>
+                        <CardDescription className="text-coffee-cortado">Irreversible actions for {org.name}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-destructive/5 border border-destructive/20 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-xl">
                       <div>
-                        <p className="font-medium text-foreground">Delete Organization</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-medium text-coffee-espresso">Delete Organization</p>
+                        <p className="text-sm text-coffee-cortado">
                           Permanently delete this organization and all its data
                         </p>
                       </div>
                       <Button
                         variant="outline"
-                        className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
                         onClick={async () => {
                           const confirmText = prompt(
                             `This will permanently delete "${org.name}" and all its pods, members data, and settings.\n\nType the organization name to confirm:`
@@ -1159,12 +1159,12 @@ function SettingsContent() {
               )}
             </>
           ) : (
-            <Card>
+            <Card className="bg-white border-coffee-foam">
               <CardContent className="py-12 text-center">
-                <Building01 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">No Organization</h3>
-                <p className="text-sm text-muted-foreground mb-4">You're not part of an organization yet</p>
-                <Button asChild>
+                <Building01 className="w-12 h-12 text-coffee-latte mx-auto mb-4" />
+                <h3 className="font-semibold text-coffee-espresso mb-2">No Organization</h3>
+                <p className="text-sm text-coffee-cortado mb-4">You're not part of an organization yet</p>
+                <Button asChild className="bg-coffee-espresso hover:bg-coffee-roast">
                   <a href="/org-setup">Join or Create Organization</a>
                 </Button>
               </CardContent>
@@ -1178,18 +1178,18 @@ function SettingsContent() {
         <div className="space-y-6">
           {/* Trial Banner */}
           {subscription?.isOnTrial && (
-            <Card className="border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden">
+            <Card className="border-coffee-latte bg-gradient-to-r from-coffee-cream via-coffee-cream/50 to-transparent overflow-hidden">
               <CardContent className="py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 bg-coffee-cream rounded-xl flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-coffee-mocha" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground text-lg">
+                      <p className="font-semibold text-coffee-espresso text-lg">
                         {subscription.trialDaysRemaining} days left in your trial
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-coffee-cortado">
                         You're trialing the {getPlanDisplayName(subscription.trialPlan || 'starter')} plan.
                         {(subscription.trialDaysRemaining || 0) <= 3
                           ? " Add a payment method to keep all features."
@@ -1200,6 +1200,7 @@ function SettingsContent() {
                   </div>
                   <Button
                     size="lg"
+                    className="bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper"
                     onClick={async () => {
                       try {
                         const response = await fetch('/api/billing/checkout', {
@@ -1232,30 +1233,30 @@ function SettingsContent() {
 
           {/* Billing Overview Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current Plan</p>
-              <p className="text-2xl font-bold text-foreground mt-1">{getPlanDisplayName(plan)}</p>
+            <Card className="p-4 bg-white border-coffee-foam">
+              <p className="text-xs font-medium text-coffee-cortado uppercase tracking-wide">Current Plan</p>
+              <p className="text-2xl font-bold text-coffee-espresso mt-1">{getPlanDisplayName(plan)}</p>
               {subscription?.isOnTrial && (
-                <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary text-xs">Trial</Badge>
+                <Badge variant="secondary" className="mt-2 bg-coffee-cream text-coffee-mocha text-xs">Trial</Badge>
               )}
             </Card>
-            <Card className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team Size</p>
-              <p className="text-2xl font-bold text-foreground mt-1">{subscription?.seats || 1}</p>
-              <p className="text-xs text-muted-foreground mt-1">of {plan === 'enterprise' ? 'unlimited' : plan === 'free' ? '5' : plan === 'starter' ? '20' : '100'} seats</p>
+            <Card className="p-4 bg-white border-coffee-foam">
+              <p className="text-xs font-medium text-coffee-cortado uppercase tracking-wide">Team Size</p>
+              <p className="text-2xl font-bold text-coffee-espresso mt-1">{subscription?.seats || 1}</p>
+              <p className="text-xs text-coffee-cortado mt-1">of {plan === 'enterprise' ? 'unlimited' : plan === 'free' ? '5' : plan === 'starter' ? '20' : '100'} seats</p>
             </Card>
-            <Card className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Billing Cycle</p>
-              <p className="text-2xl font-bold text-foreground mt-1">{subscription?.hasActiveSubscription ? 'Monthly' : '—'}</p>
+            <Card className="p-4 bg-white border-coffee-foam">
+              <p className="text-xs font-medium text-coffee-cortado uppercase tracking-wide">Billing Cycle</p>
+              <p className="text-2xl font-bold text-coffee-espresso mt-1">{subscription?.hasActiveSubscription ? 'Monthly' : '—'}</p>
               {subscription?.periodEnd && (
-                <p className="text-xs text-muted-foreground mt-1">Renews {new Date(subscription.periodEnd).toLocaleDateString()}</p>
+                <p className="text-xs text-coffee-cortado mt-1">Renews {new Date(subscription.periodEnd).toLocaleDateString()}</p>
               )}
             </Card>
-            <Card className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</p>
+            <Card className="p-4 bg-white border-coffee-foam">
+              <p className="text-xs font-medium text-coffee-cortado uppercase tracking-wide">Status</p>
               <div className="flex items-center gap-2 mt-1">
-                <div className={`w-2 h-2 rounded-full ${subscription?.status === 'past_due' ? 'bg-destructive' : subscription?.hasActiveSubscription || subscription?.isOnTrial ? 'bg-success' : 'bg-muted-foreground'}`} />
-                <p className="text-2xl font-bold text-foreground">
+                <div className={`w-2 h-2 rounded-full ${subscription?.status === 'past_due' ? 'bg-red-500' : subscription?.hasActiveSubscription || subscription?.isOnTrial ? 'bg-emerald-500' : 'bg-coffee-latte'}`} />
+                <p className="text-2xl font-bold text-coffee-espresso">
                   {subscription?.status === 'past_due' ? 'Past Due' : subscription?.isOnTrial ? 'Trial' : subscription?.hasActiveSubscription ? 'Active' : 'Free'}
                 </p>
               </div>
@@ -1264,19 +1265,19 @@ function SettingsContent() {
 
           {/* Subscription status warnings */}
           {subscription?.status === 'past_due' && (
-            <Card className="border-destructive/30 bg-destructive/5">
+            <Card className="border-red-200 bg-red-50">
               <CardContent className="py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
-                    <CreditCard01 className="w-5 h-5 text-destructive" />
+                  <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                    <CreditCard01 className="w-5 h-5 text-red-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-destructive">Payment Past Due</p>
-                    <p className="text-sm text-muted-foreground">Please update your payment method to avoid service interruption.</p>
+                    <p className="font-medium text-red-600">Payment Past Due</p>
+                    <p className="text-sm text-coffee-cortado">Please update your payment method to avoid service interruption.</p>
                   </div>
                   <Button
                     variant="outline"
-                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    className="border-red-200 text-red-500 hover:bg-red-100"
                     onClick={async () => {
                       try {
                         const response = await fetch('/api/billing/portal', { method: 'POST' });
@@ -1295,20 +1296,20 @@ function SettingsContent() {
           )}
 
           {/* Current Subscription Details */}
-          <Card>
-            <CardHeader className="pb-4 border-b border-border">
+          <Card className="bg-white border-coffee-foam">
+            <CardHeader className="pb-4 border-b border-coffee-foam">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-coffee-cream rounded-xl flex items-center justify-center">
                     {plan === 'free' ? (
-                      <Building01 className="w-5 h-5 text-primary" />
+                      <Building01 className="w-5 h-5 text-coffee-mocha" />
                     ) : (
-                      <Star className="w-5 h-5 text-primary" />
+                      <Star className="w-5 h-5 text-coffee-mocha" />
                     )}
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-semibold">{getPlanDisplayName(plan)} Plan</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-lg font-semibold text-coffee-espresso">{getPlanDisplayName(plan)} Plan</CardTitle>
+                    <CardDescription className="text-coffee-cortado">
                       {plan === 'free'
                         ? 'Free forever with essential features'
                         : `$${getPlanPricing(plan).monthly}/seat/month • Billed monthly`
@@ -1339,31 +1340,31 @@ function SettingsContent() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Plan Features */}
                 <div>
-                  <p className="text-sm font-medium text-foreground mb-3">What's included</p>
+                  <p className="text-sm font-medium text-coffee-espresso mb-3">What's included</p>
                   <ul className="space-y-2.5">
                     {plan === 'free' ? (
                       <>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 5 team members</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />2 active pods</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Basic skill matching</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Slack integration</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 5 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />2 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Basic skill matching</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Slack integration</li>
                       </>
                     ) : plan === 'starter' ? (
                       <>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 team members</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />10 active pods</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />AI-powered matching</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Email support</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 20 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />10 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />AI-powered matching</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Advanced analytics</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Email support</li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 100 team members</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />50 active pods</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Custom branding</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />Priority support</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />API access</li>
-                        <li className="flex items-center gap-2 text-sm text-muted-foreground"><CheckBig className="w-4 h-4 text-success shrink-0" />SSO (coming soon)</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 100 team members</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />50 active pods</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Custom branding</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Priority support</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />API access</li>
+                        <li className="flex items-center gap-2 text-sm text-coffee-cortado"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />SSO (coming soon)</li>
                       </>
                     )}
                   </ul>
@@ -1371,19 +1372,19 @@ function SettingsContent() {
 
                 {/* Usage Summary */}
                 <div className="space-y-4">
-                  <p className="text-sm font-medium text-foreground">Usage this period</p>
+                  <p className="text-sm font-medium text-coffee-espresso">Usage this period</p>
 
                   {/* Seats Progress */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Team seats</span>
-                      <span className="font-medium text-foreground">
+                      <span className="text-coffee-cortado">Team seats</span>
+                      <span className="font-medium text-coffee-espresso">
                         {subscription?.seats || 1} / {plan === 'enterprise' ? '∞' : plan === 'free' ? 5 : plan === 'starter' ? 20 : 100}
                       </span>
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-2 bg-coffee-cream rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-primary rounded-full transition-all"
+                        className="h-full bg-coffee-mocha rounded-full transition-all"
                         style={{ width: `${Math.min(((subscription?.seats || 1) / (plan === 'free' ? 5 : plan === 'starter' ? 20 : 100)) * 100, 100)}%` }}
                       />
                     </div>
@@ -1392,18 +1393,18 @@ function SettingsContent() {
                   {/* Pods Progress */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Active pods</span>
-                      <span className="font-medium text-foreground">
+                      <span className="text-coffee-cortado">Active pods</span>
+                      <span className="font-medium text-coffee-espresso">
                         0 / {plan === 'enterprise' ? '∞' : plan === 'free' ? 2 : plan === 'starter' ? 10 : 50}
                       </span>
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-primary/50 rounded-full" style={{ width: '0%' }} />
+                    <div className="h-2 bg-coffee-cream rounded-full overflow-hidden">
+                      <div className="h-full bg-coffee-latte rounded-full" style={{ width: '0%' }} />
                     </div>
                   </div>
 
                   {plan === 'free' && (
-                    <p className="text-xs text-muted-foreground pt-2">
+                    <p className="text-xs text-coffee-cortado pt-2">
                       Upgrade to unlock more seats and pods for your team.
                     </p>
                   )}
@@ -1414,12 +1415,12 @@ function SettingsContent() {
 
           {/* Upgrade Options - Show if on free plan or starter */}
           {(plan === 'free' || plan === 'starter') && (
-            <Card>
+            <Card className="bg-white border-coffee-foam">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold">
+                <CardTitle className="text-base font-semibold text-coffee-espresso">
                   {plan === 'free' ? 'Upgrade Your Plan' : 'Upgrade to Pro'}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-coffee-cortado">
                   {plan === 'free'
                     ? 'Scale your team collaboration with more features'
                     : 'Get more seats, pods, and premium features'
@@ -1430,22 +1431,22 @@ function SettingsContent() {
                 <div className={`grid gap-4 ${plan === 'free' ? 'md:grid-cols-2' : ''}`}>
                   {/* Starter Plan - Only show if on free */}
                   {plan === 'free' && (
-                    <div className="p-5 border rounded-xl hover:border-primary/50 transition-colors">
+                    <div className="p-5 border border-coffee-foam rounded-xl hover:border-coffee-latte transition-colors">
                       <div className="flex items-center justify-between mb-3">
                         <div>
-                          <h3 className="font-semibold text-foreground text-lg">Starter</h3>
-                          <p className="text-sm text-muted-foreground">For growing teams</p>
+                          <h3 className="font-semibold text-coffee-espresso text-lg">Starter</h3>
+                          <p className="text-sm text-coffee-cortado">For growing teams</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-foreground">${getPlanPricing('starter').monthly}</p>
-                          <p className="text-xs text-muted-foreground">per seat/month</p>
+                          <p className="text-2xl font-bold text-coffee-espresso">${getPlanPricing('starter').monthly}</p>
+                          <p className="text-xs text-coffee-cortado">per seat/month</p>
                         </div>
                       </div>
-                      <ul className="text-sm text-muted-foreground space-y-2 mb-4">
-                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 20 seats</li>
-                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 10 pods</li>
-                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Advanced analytics</li>
-                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Email support</li>
+                      <ul className="text-sm text-coffee-cortado space-y-2 mb-4">
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 20 seats</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 10 pods</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Advanced analytics</li>
+                        <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Email support</li>
                       </ul>
                       <Button
                         className="w-full"
@@ -1474,29 +1475,29 @@ function SettingsContent() {
                   )}
 
                   {/* Pro Plan */}
-                  <div className={`p-5 border-2 border-primary rounded-xl bg-primary/5 relative ${plan === 'starter' ? 'max-w-md' : ''}`}>
-                    <Badge className="absolute -top-2.5 right-4 bg-primary text-primary-foreground shadow-sm">
+                  <div className={`p-5 border-2 border-coffee-mocha rounded-xl bg-coffee-cream/50 relative ${plan === 'starter' ? 'max-w-md' : ''}`}>
+                    <Badge className="absolute -top-2.5 right-4 bg-coffee-espresso text-coffee-paper shadow-sm">
                       Recommended
                     </Badge>
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h3 className="font-semibold text-foreground text-lg">Pro</h3>
-                        <p className="text-sm text-muted-foreground">For scaling organizations</p>
+                        <h3 className="font-semibold text-coffee-espresso text-lg">Pro</h3>
+                        <p className="text-sm text-coffee-cortado">For scaling organizations</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-foreground">${getPlanPricing('pro').monthly}</p>
-                        <p className="text-xs text-muted-foreground">per seat/month</p>
+                        <p className="text-2xl font-bold text-coffee-espresso">${getPlanPricing('pro').monthly}</p>
+                        <p className="text-xs text-coffee-cortado">per seat/month</p>
                       </div>
                     </div>
-                    <ul className="text-sm text-muted-foreground space-y-2 mb-4">
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 100 seats</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Up to 50 pods</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Custom branding</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />Priority support</li>
-                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-success shrink-0" />API access</li>
+                    <ul className="text-sm text-coffee-cortado space-y-2 mb-4">
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 100 seats</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Up to 50 pods</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Custom branding</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />Priority support</li>
+                      <li className="flex items-center gap-2"><CheckBig className="w-4 h-4 text-emerald-600 shrink-0" />API access</li>
                     </ul>
                     <Button
-                      className="w-full"
+                      className="w-full bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper"
                       onClick={async () => {
                         try {
                           const response = await fetch('/api/billing/checkout', {
@@ -1525,16 +1526,16 @@ function SettingsContent() {
           )}
 
           {/* Enterprise CTA */}
-          <Card className="bg-gradient-to-br from-muted/50 to-transparent">
+          <Card className="bg-gradient-to-br from-coffee-cream/50 to-transparent border-coffee-foam">
             <CardContent className="py-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-foreground/10 rounded-xl flex items-center justify-center">
-                    <Building01 className="w-6 h-6 text-foreground" />
+                  <div className="w-12 h-12 bg-coffee-cream rounded-xl flex items-center justify-center">
+                    <Building01 className="w-6 h-6 text-coffee-espresso" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-lg">Need Enterprise features?</p>
-                    <p className="text-sm text-muted-foreground">Unlimited seats, SSO, dedicated support, custom contracts, and SLAs.</p>
+                    <p className="font-semibold text-coffee-espresso text-lg">Need Enterprise features?</p>
+                    <p className="text-sm text-coffee-cortado">Unlimited seats, SSO, dedicated support, custom contracts, and SLAs.</p>
                   </div>
                 </div>
                 <Button variant="outline" asChild>
@@ -1546,20 +1547,20 @@ function SettingsContent() {
 
           {/* Billing History / Payment Method */}
           {subscription?.hasActiveSubscription && (
-            <Card>
+            <Card className="bg-white border-coffee-foam">
               <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold">Billing & Invoices</CardTitle>
-                <CardDescription>Manage payment methods and download invoices</CardDescription>
+                <CardTitle className="text-base font-semibold text-coffee-espresso">Billing & Invoices</CardTitle>
+                <CardDescription className="text-coffee-cortado">Manage payment methods and download invoices</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
+                <div className="flex items-center justify-between p-4 bg-coffee-cream/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center border border-border">
-                      <CreditCard01 className="w-5 h-5 text-muted-foreground" />
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-coffee-foam">
+                      <CreditCard01 className="w-5 h-5 text-coffee-cortado" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Payment & Invoices</p>
-                      <p className="text-sm text-muted-foreground">Update card, view invoices, download receipts</p>
+                      <p className="font-medium text-coffee-espresso">Payment & Invoices</p>
+                      <p className="text-sm text-coffee-cortado">Update card, view invoices, download receipts</p>
                     </div>
                   </div>
                   <Button
