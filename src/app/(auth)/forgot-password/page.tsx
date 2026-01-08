@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
@@ -24,8 +25,8 @@ export default function ForgotPasswordPage() {
       if (error) throw error;
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -43,7 +44,7 @@ export default function ForgotPasswordPage() {
         {/* Header */}
         <header className="h-16 px-6 md:px-12 flex items-center border-b border-coffee-foam">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/logo.svg" alt="" className="w-7 h-7" />
+            <Image src="/logo.svg" alt="Attunly logo" width={28} height={28} />
             <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
           </Link>
         </header>
@@ -83,7 +84,7 @@ export default function ForgotPasswordPage() {
       {/* Header */}
       <header className="h-16 px-6 md:px-12 flex items-center border-b border-coffee-foam">
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <img src="/logo.svg" alt="" className="w-7 h-7" />
+          <Image src="/logo.svg" alt="Attunly logo" width={28} height={28} />
           <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
         </Link>
       </header>

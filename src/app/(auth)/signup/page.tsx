@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAnalytics } from "@/components/posthog-provider";
@@ -133,7 +134,7 @@ export default function SignupPage() {
           {/* Header */}
           <header className="h-16 px-6 md:px-12 flex items-center">
             <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <img src="/logo.svg" alt="" className="w-7 h-7" />
+              <Image src="/logo.svg" alt="Attunly logo" width={28} height={28} />
               <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
             </Link>
           </header>
@@ -185,7 +186,7 @@ export default function SignupPage() {
         {/* Header */}
         <header className="h-16 px-6 md:px-12 flex items-center">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/logo.svg" alt="" className="w-7 h-7" />
+            <Image src="/logo.svg" alt="Attunly logo" width={28} height={28} />
             <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
           </Link>
         </header>

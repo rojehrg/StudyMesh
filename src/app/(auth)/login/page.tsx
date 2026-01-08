@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import dynamic from "next/dynamic";
@@ -123,7 +124,7 @@ export default function LoginPage() {
         {/* Header */}
         <header className="h-16 px-6 md:px-12 flex items-center">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/logo.svg" alt="" className="w-7 h-7" />
+            <Image src="/logo.svg" alt="Attunly logo" width={28} height={28} />
             <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
           </Link>
         </header>
