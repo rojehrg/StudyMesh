@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function WorkingCirclesPage() {
-  redirect("/classes");
+export default function GroupsPage() {
+  redirect("/dashboard");
 }
