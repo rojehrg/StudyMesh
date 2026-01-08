@@ -49,7 +49,7 @@ const Section = ({
         px-6 md:px-12 lg:px-24 py-24 md:py-32
         ${darker ? 'bg-coffee-cream' : 'bg-coffee-paper'}
         ${className}
-        transition-all duration-[600ms] ease-out
+        transition-all duration-500 ease-out
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}
       `}
     >
@@ -348,7 +348,7 @@ const HowItWorks = () => {
     <section
       ref={ref}
       id="how-it-works"
-      className={`px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream transition-all duration-[600ms] ease-out ${
+      className={`px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream transition-all duration-500 ease-out ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
       }`}
     >
@@ -469,6 +469,141 @@ const Trust = () => (
   </Section>
 );
 
+// Who Uses It Section
+const WhoUsesIt = () => (
+  <Section>
+    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Built for</p>
+
+    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10 max-w-[60ch]">
+      Teams where knowledge
+      <br />
+      <span className="text-coffee-oat">is scattered across people.</span>
+    </h2>
+
+    <div className="space-y-5">
+      {[
+        {
+          title: 'Engineering teams',
+          desc: 'When the person who built that service left six months ago, and the docs are outdated.',
+        },
+        {
+          title: 'Product organizations',
+          desc: 'When you need someone who understands the customer context before you write the spec.',
+        },
+        {
+          title: 'Growing companies',
+          desc: 'When you can\'t keep track of who joined which team and what they\'re good at.',
+        },
+        {
+          title: 'Remote and hybrid teams',
+          desc: 'When you can\'t tap someone on the shoulder to ask a quick question.',
+        },
+      ].map((item) => (
+        <div
+          key={item.title}
+          className="card-hover p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
+        >
+          <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
+          <p className="text-coffee-cortado">{item.desc}</p>
+        </div>
+      ))}
+    </div>
+  </Section>
+);
+
+// Integrations Section
+const Integrations = () => (
+  <Section darker>
+    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Works with your tools</p>
+
+    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
+      No new apps to learn.
+    </h2>
+
+    <div className="grid gap-5">
+      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-lg bg-[#4A154B] flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-coffee-espresso">Slack</h3>
+        </div>
+        <p className="text-coffee-cortado">
+          Type <code className="bg-coffee-cream px-1.5 py-0.5 rounded text-sm text-coffee-mocha">/attunly</code> in any channel.
+          Get suggestions, send messages, all without leaving Slack.
+        </p>
+      </div>
+
+      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-lg bg-white border border-coffee-foam flex items-center justify-center">
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-coffee-espresso">Google Calendar</h3>
+        </div>
+        <p className="text-coffee-cortado">
+          See when teammates are actually free. Not just "online" — actually available for a call or a quick chat.
+        </p>
+      </div>
+    </div>
+  </Section>
+);
+
+// FAQ Section
+const FAQ = () => {
+  const faqs = [
+    {
+      q: 'How does Attunly know who to suggest?',
+      a: 'When you set up your profile, you describe what you know in plain English. Our AI matches your questions to those expertise descriptions — not just keyword matching, but understanding context.',
+    },
+    {
+      q: 'What if I want to message someone not in the suggestions?',
+      a: 'The suggestions are just that — suggestions. You can search for anyone in your workspace and message them directly.',
+    },
+    {
+      q: 'Does it require everyone on my team to sign up?',
+      a: 'Attunly works best when more people have profiles, but you can start with just a few. Anyone in your Slack workspace can receive messages.',
+    },
+    {
+      q: 'Is my calendar data private?',
+      a: 'Yes. We only show free/busy status, never meeting details. Your calendar data is encrypted and never shared with other users or third parties.',
+    },
+    {
+      q: 'What if I don\'t want to be disturbed?',
+      a: 'You control your availability. Set yourself as unavailable, and Attunly won\'t suggest you to others. You can also set office hours.',
+    },
+  ];
+
+  return (
+    <Section>
+      <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Questions</p>
+
+      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
+        Common questions.
+      </h2>
+
+      <div className="space-y-6">
+        {faqs.map((faq, index) => (
+          <div
+            key={index}
+            className="pb-6 border-b border-coffee-foam last:border-b-0"
+          >
+            <h3 className="text-lg font-medium text-coffee-espresso mb-2">{faq.q}</h3>
+            <p className="text-coffee-cortado">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+};
+
 // Final CTA Section
 const FinalCTA = () => (
   <Section className="text-center" id="install">
@@ -548,6 +683,9 @@ export default function AttunlyLanding() {
       <HowItWorks />
       <WhatsDifferent />
       <Trust />
+      <WhoUsesIt />
+      <Integrations />
+      <FAQ />
       <FinalCTA />
       <Footer />
     </main>

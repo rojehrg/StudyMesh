@@ -33,21 +33,23 @@ export default function SignupPage() {
   // Check for existing session and redirect if logged in (non-blocking)
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user }, error }) => {
+      // If no user, just stay on signup page - don't sign out (that would destroy pending sessions)
       if (error || !user) {
-        supabase.auth.signOut();
         return;
       }
 
       supabase
         .from('profiles')
-        .select('id')
+        .select('id, organization_id')
         .eq('user_id', user.id)
         .maybeSingle()
         .then(({ data: profile }) => {
-          if (profile) {
-            router.replace("/dashboard");
-          } else {
+          if (!profile) {
             router.replace("/onboarding");
+          } else if (!profile.organization_id) {
+            router.replace("/org-setup");
+          } else {
+            router.replace("/dashboard");
           }
         });
     });
@@ -80,7 +82,7 @@ export default function SignupPage() {
       if (data?.url) {
         window.location.href = data.url;
       }
-    } catch (err: any) {
+    } catch {
       setError("Failed to connect to Google. Please try again.");
       setLoading(false);
     }
@@ -110,8 +112,8 @@ export default function SignupPage() {
 
       track(EVENTS.USER_SIGNED_UP, { method: 'email', requires_confirmation: true });
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

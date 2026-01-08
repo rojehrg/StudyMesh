@@ -75,11 +75,11 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(exchangeError.message)}`)
   }
 
-  // Check if user needs onboarding
+  // Check if user needs onboarding or org setup
   if (data?.user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, organization_id')
       .eq('user_id', data.user.id)
       .maybeSingle()
 
@@ -99,13 +99,24 @@ export async function GET(request: Request) {
         }).catch((err) => console.error('[OAuth Callback] Welcome email failed:', err));
       }
       redirectUrl = `${origin}/onboarding`
-    } else {
+    } else if (!profile.organization_id) {
+      console.log('[OAuth Callback] User needs org setup, redirecting to org-setup');
       // Track returning login
       serverAnalytics.track({
         userId: data.user.id,
         event: EVENTS.USER_LOGGED_IN,
         properties: { method: 'google' }
       });
+      redirectUrl = `${origin}/org-setup`
+    } else {
+      console.log('[OAuth Callback] Existing user with org, redirecting to dashboard');
+      // Track returning login
+      serverAnalytics.track({
+        userId: data.user.id,
+        event: EVENTS.USER_LOGGED_IN,
+        properties: { method: 'google' }
+      });
+      redirectUrl = `${origin}/dashboard`
     }
   }
 

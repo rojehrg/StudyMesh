@@ -7,158 +7,56 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { CloseMd, ArrowRightMd, CheckBig, Globe, ChevronDown, SearchMagnifyingGlass, LogOut, Clock, Link as LinkIcon, Star } from "react-coolicons";
 import { LottieLoader } from "@/components/loading-states";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-// Timezone options
-const TIMEZONE_OPTIONS = [
-  { label: "Pacific Time (Los Angeles)", value: "America/Los_Angeles", region: "Americas" },
-  { label: "Mountain Time (Denver)", value: "America/Denver", region: "Americas" },
-  { label: "Central Time (Chicago)", value: "America/Chicago", region: "Americas" },
-  { label: "Eastern Time (New York)", value: "America/New_York", region: "Americas" },
-  { label: "Alaska (Anchorage)", value: "America/Anchorage", region: "Americas" },
-  { label: "Hawaii (Honolulu)", value: "Pacific/Honolulu", region: "Americas" },
-  { label: "Toronto", value: "America/Toronto", region: "Americas" },
-  { label: "UTC / GMT", value: "UTC", region: "Europe" },
-  { label: "London (GMT/BST)", value: "Europe/London", region: "Europe" },
-  { label: "Paris (CET)", value: "Europe/Paris", region: "Europe" },
-  { label: "Berlin (CET)", value: "Europe/Berlin", region: "Europe" },
-  { label: "Amsterdam", value: "Europe/Amsterdam", region: "Europe" },
-  { label: "Dubai (GST)", value: "Asia/Dubai", region: "Asia" },
-  { label: "Mumbai (Kolkata)", value: "Asia/Kolkata", region: "Asia" },
-  { label: "Singapore", value: "Asia/Singapore", region: "Asia" },
-  { label: "Hong Kong", value: "Asia/Hong_Kong", region: "Asia" },
-  { label: "Tokyo", value: "Asia/Tokyo", region: "Asia" },
-  { label: "Sydney (AEST)", value: "Australia/Sydney", region: "Pacific" },
-  { label: "Auckland", value: "Pacific/Auckland", region: "Pacific" },
-];
-
-// Availability presets for quick setup
-const AVAILABILITY_PRESETS = [
-  {
-    id: "morning",
-    label: "Morning Person",
-    description: "Best 8 AM - 12 PM",
-    icon: "🌅",
-    hours: { start: 8, end: 12 },
-  },
-  {
-    id: "core",
-    label: "Core Hours",
-    description: "9 AM - 5 PM",
-    icon: "☀️",
-    hours: { start: 9, end: 17 },
-  },
-  {
-    id: "afternoon",
-    label: "Afternoon Focus",
-    description: "Best 1 PM - 6 PM",
-    icon: "🌤️",
-    hours: { start: 13, end: 18 },
-  },
-  {
-    id: "flexible",
-    label: "Flexible",
-    description: "Available throughout",
-    icon: "🔄",
-    hours: { start: 9, end: 18 },
-  },
-];
+import { ArrowRightMd, LogOut } from "react-coolicons";
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [timezoneSearch, setTimezoneSearch] = useState("");
-  const [timezoneOpen, setTimezoneOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  // Form State
+  // Form State - simplified
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    department: "",
     role: "",
-    bio: "",
-    timezone: "America/New_York",
-    expertiseDescription: "", // Natural language: what I can help with
-    growthDescription: "", // Natural language: what I want to learn
-    availabilityPreset: "core",
+    aboutMe: "", // Natural language: skills, interests, what you can help with
   });
 
-  // Get user data and pre-populate from Slack profile on mount
+  // Get user data on mount
   useEffect(() => {
     const init = async () => {
       try {
-        // Get user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-        if (userError) {
-          console.error('[Onboarding] Auth error:', userError);
-          setInitialLoading(false);
-          return;
-        }
-
-        if (!user) {
-          console.log('[Onboarding] No user found, redirecting to login');
+        if (userError || !user) {
           window.location.href = '/login';
           return;
         }
 
-        console.log('[Onboarding] User found:', user.id);
         setUserId(user.id);
+        if (user.email) setUserEmail(user.email);
 
-        if (user.email) {
-          setUserEmail(user.email);
-        }
-
-        // Fetch existing profile (may have Slack data pre-filled)
+        // Fetch existing profile
         const { data: profile } = await supabase
           .from('profiles')
-          .select('first_name, last_name, timezone, avatar_url')
+          .select('first_name, last_name')
           .eq('user_id', user.id)
           .single();
 
-        // Pre-populate from profile (Slack data) or user metadata
+        // Pre-populate from profile or user metadata
         const firstName = profile?.first_name || user.user_metadata?.full_name?.split(' ')[0] || '';
         const lastName = profile?.last_name || user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
 
-        // Use profile timezone, or auto-detect
-        let timezone = profile?.timezone || 'America/New_York';
-        if (!profile?.timezone) {
-          try {
-            const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const matchedTimezone = TIMEZONE_OPTIONS.find(tz => tz.value === detectedTimezone);
-            if (matchedTimezone) {
-              timezone = detectedTimezone;
-            }
-          } catch (e) {
-            // Fallback to default
-          }
-        }
-
-        setFormData(prev => ({
-          ...prev,
-          firstName,
-          lastName,
-          timezone,
-        }));
+        setFormData(prev => ({ ...prev, firstName, lastName }));
       } catch (error) {
         console.error('[Onboarding] Init error:', error);
       } finally {
@@ -166,33 +64,20 @@ export default function OnboardingPage() {
       }
     };
     init();
-  }, [supabase, router]);
+  }, [supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    // Force hard navigation to clear all state
     window.location.href = "/login";
   };
 
-  const filteredTimezones = TIMEZONE_OPTIONS.filter(tz =>
-    tz.label.toLowerCase().includes(timezoneSearch.toLowerCase()) ||
-    tz.value.toLowerCase().includes(timezoneSearch.toLowerCase())
-  );
-
-  const selectedTimezoneLabel = TIMEZONE_OPTIONS.find(tz => tz.value === formData.timezone)?.label || formData.timezone;
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (connectSlack = false) => {
     setLoading(true);
     try {
-      // Use the userId we stored on page load
       if (!userId) {
-        console.error('[Onboarding] No userId stored, attempting to fetch again');
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) {
-          console.error('[Onboarding] Auth error on submit:', userError);
-          toast.error("Session expired", {
-            description: "Please log in again"
-          });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast.error("Session expired", { description: "Please log in again" });
           router.push('/login');
           return;
         }
@@ -200,543 +85,289 @@ export default function OnboardingPage() {
       }
 
       const currentUserId = userId;
-      if (!currentUserId) {
-        throw new Error("No user found");
-      }
+      if (!currentUserId) throw new Error("No user found");
 
-      console.log('[Onboarding] Saving profile for user:', currentUserId);
+      // Auto-detect timezone
+      let timezone = 'America/New_York';
+      try {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch (e) {}
 
-      // Insert into 'profiles' table using Supabase client
-      // Store natural language descriptions - AI will process these for matching
+      // Save profile
       const { error } = await supabase
         .from('profiles')
         .upsert({
           user_id: currentUserId,
           first_name: formData.firstName,
           last_name: formData.lastName,
-          department: formData.department,
-          major: formData.role, // Mapping 'Job Title' to 'major' column
-          bio: formData.bio,
-          timezone: formData.timezone,
-          expertise_skills: [formData.expertiseDescription], // Store as array for compatibility
-          growth_skills: [formData.growthDescription], // Store as array for compatibility
+          major: formData.role,
+          expertise_skills: [formData.aboutMe],
+          timezone,
           updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id'
-        });
+        }, { onConflict: 'user_id' });
 
-      if (error) {
-        console.error('[Onboarding] Database error:', error);
-        throw error;
+      if (error) throw error;
+
+      if (connectSlack) {
+        // Open Slack OAuth in same window, it will redirect back
+        window.location.href = '/api/slack/oauth?redirect=/org-setup';
+        return;
       }
 
-      console.log('[Onboarding] Profile saved successfully');
-
-      // Check if user has an organization
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('user_id', currentUserId)
-        .single();
-
-      // Show celebration first
+      // Show celebration then redirect
       setShowCelebration(true);
-
-      // Wait for celebration animation, then redirect
       setTimeout(() => {
-        if (profile?.organization_id) {
-          router.push("/dashboard");
-        } else {
-          router.push("/org-setup");
-        }
+        router.push("/org-setup");
         router.refresh();
-      }, 2000);
+      }, 1500);
+
     } catch (error) {
       console.error("Error saving profile:", error);
-      toast.error("Failed to save profile", {
-        description: "Please try again"
-      });
+      toast.error("Failed to save profile", { description: "Please try again" });
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading while checking auth
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-coffee-paper flex items-center justify-center">
         <LottieLoader size="lg" />
       </div>
     );
   }
 
+  const isStep1Valid = formData.firstName && formData.lastName && formData.role && formData.aboutMe.trim().length > 20;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-coffee-paper"
+      style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
+    >
       {/* Header */}
-      <div className="h-16 px-8 flex items-center justify-between border-b border-border bg-card">
+      <header className="h-16 px-6 md:px-12 flex items-center justify-between border-b border-coffee-foam">
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <img src="/icon.png" alt="Attunly" className="w-7 h-7" />
-          <span className="font-bold text-xl">
-            <span className="text-foreground">Attun</span>
-            <span className="text-primary">ly</span>
-          </span>
+          <img src="/logo.svg" alt="" className="w-7 h-7" />
+          <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
         </Link>
         {userEmail && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">{userEmail}</span>
+            <span className="text-sm text-coffee-cortado">{userEmail}</span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 text-sm text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Log out
             </button>
           </div>
         )}
-      </div>
+      </header>
 
-      <div className="flex items-center justify-center p-6 min-h-[calc(100vh-4rem)]">
-        <div className="w-full max-w-3xl">
-          {/* Progress Bar */}
-          <div className="mb-10">
-          <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={{ width: "0%" }}
-              animate={{ width: `${(step / 5) * 100}%` }}
-              transition={{ duration: 0.5 }}
-            />
+      <main className="flex items-center justify-center p-6 min-h-[calc(100vh-4rem)]">
+        <div className="w-full max-w-lg">
+          {/* Progress */}
+          <div className="mb-8">
+            <div className="h-1.5 bg-coffee-foam rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-coffee-espresso"
+                initial={{ width: "0%" }}
+                animate={{ width: step === 1 ? "50%" : "100%" }}
+                transition={{ duration: 0.4 }}
+              />
+            </div>
+            <div className="flex justify-between mt-2 text-sm text-coffee-latte">
+              <span className={step >= 1 ? "text-coffee-espresso font-medium" : ""}>About You</span>
+              <span className={step >= 2 ? "text-coffee-espresso font-medium" : ""}>Connect</span>
+            </div>
           </div>
-          <div className="flex justify-between mt-3 text-sm text-muted-foreground font-medium">
-            <span className={step >= 1 ? "text-primary" : ""}>Profile</span>
-            <span className={step >= 2 ? "text-primary" : ""}>AI Matching</span>
-            <span className={step >= 3 ? "text-primary" : ""}>Timezone</span>
-            <span className={step >= 4 ? "text-primary" : ""}>Availability</span>
-            <span className={step >= 5 ? "text-primary" : ""}>Connect</span>
-          </div>
-        </div>
 
-        <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <Card className="shadow-lg border-border bg-card">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-3xl text-foreground">Tell us about yourself</CardTitle>
-                  <CardDescription className="text-base text-muted-foreground">This helps us match you with the right pods.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-base text-foreground">First Name</Label>
+          <AnimatePresence mode="wait">
+            {/* Step 1: About You */}
+            {step === 1 && !showCelebration && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
+              >
+                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+                  Tell us about yourself
+                </h1>
+                <p className="text-coffee-cortado mb-6">
+                  This helps teammates know who to reach out to.
+                </p>
+
+                <div className="space-y-5">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
+                        First name
+                      </Label>
                       <Input
                         id="firstName"
-                        placeholder="Enter your first name"
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
-                        className="h-12 text-base bg-background border-input text-foreground placeholder:text-muted-foreground"
+                        placeholder="Jane"
+                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
                       />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-base text-foreground">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        placeholder="Enter your last name"
-                        value={formData.lastName}
-                        onChange={e => setFormData({...formData, lastName: e.target.value})}
-                        className="h-12 text-base bg-background border-input text-foreground placeholder:text-muted-foreground"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="dept" className="text-base text-foreground">Department</Label>
-                    <Input
-                      id="dept"
-                      placeholder="e.g. Engineering, Sales, Product"
-                      value={formData.department}
-                      onChange={e => setFormData({...formData, department: e.target.value})}
-                      className="h-12 text-base bg-background border-input text-foreground placeholder:text-muted-foreground"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role" className="text-base text-foreground">Job Title</Label>
-                    <Input
-                      id="role"
-                      placeholder="e.g. Senior Account Executive"
-                      value={formData.role}
-                      onChange={e => setFormData({...formData, role: e.target.value})}
-                      className="h-12 text-base bg-background border-input text-foreground placeholder:text-muted-foreground"
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter className="justify-end pt-4">
-                  <Button
-                    onClick={() => setStep(2)}
-                    disabled={!formData.firstName || !formData.lastName || !formData.department || !formData.role}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 text-base"
-                  >
-                    Next <ArrowRightMd className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <Card className="shadow-lg border-border bg-card overflow-hidden">
-                {/* AI Header with gradient accent */}
-                <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-8 py-5 border-b border-border">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Star className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-semibold text-foreground">AI-Powered Matching</h2>
-                      <p className="text-base text-muted-foreground">Describe yourself naturally - our AI handles the rest</p>
+                      <Label htmlFor="lastName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
+                        Last name
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={e => setFormData({...formData, lastName: e.target.value})}
+                        placeholder="Smith"
+                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
+                      />
                     </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="role" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
+                      Your role
+                    </Label>
+                    <Input
+                      id="role"
+                      value={formData.role}
+                      onChange={e => setFormData({...formData, role: e.target.value})}
+                      placeholder="e.g. Senior Product Manager"
+                      className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="aboutMe" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
+                      About you
+                    </Label>
+                    <p className="text-sm text-coffee-latte mb-2">
+                      What do you know? What can you help with? What are you learning?
+                    </p>
+                    <Textarea
+                      id="aboutMe"
+                      value={formData.aboutMe}
+                      onChange={e => setFormData({...formData, aboutMe: e.target.value})}
+                      placeholder="I've been in product for 5 years, specializing in B2B SaaS. I can help with roadmap prioritization, stakeholder management, and writing PRDs. Currently learning more about AI/ML product strategy and would love to connect with folks who have experience there."
+                      className="min-h-[140px] bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha resize-none font-sans text-[15px]"
+                    />
+                    <p className="text-xs text-coffee-latte mt-1.5">
+                      Write naturally — our AI uses this to match you with teammates.
+                    </p>
                   </div>
                 </div>
 
-                <CardContent className="space-y-6 pt-6 px-8">
-                  {/* Info banner */}
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/10">
-                    <Star className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <p className="text-base text-muted-foreground">
-                      Our AI uses natural language to understand your expertise and connect you with teammates who can help - or who need your help. Just write like you're describing yourself to a colleague.
-                    </p>
-                  </div>
-
-                  {/* What I can help with */}
-                  <div className="space-y-3">
-                    <Label className="text-base text-foreground font-medium flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full bg-success" />
-                      What I can help others with
-                    </Label>
-                    <Textarea
-                      value={formData.expertiseDescription}
-                      onChange={(e) => setFormData({...formData, expertiseDescription: e.target.value})}
-                      placeholder="e.g. I'm experienced in Python and data analysis. I've built several ML models and can help with pandas, scikit-learn, and general coding best practices. Also happy to mentor on career growth in tech."
-                      className="min-h-[130px] text-base resize-none bg-background border-input text-foreground placeholder:text-muted-foreground"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Think: skills, tools, experiences, advice you can share
-                    </p>
-                  </div>
-
-                  {/* What I want to learn */}
-                  <div className="space-y-3">
-                    <Label className="text-base text-foreground font-medium flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                      What I want to learn or get help with
-                    </Label>
-                    <Textarea
-                      value={formData.growthDescription}
-                      onChange={(e) => setFormData({...formData, growthDescription: e.target.value})}
-                      placeholder="e.g. I'd love to improve my presentation skills and learn more about product management. Also interested in learning React and modern frontend development."
-                      className="min-h-[130px] text-base resize-none bg-background border-input text-foreground placeholder:text-muted-foreground"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Think: skills you're developing, areas you're curious about, challenges you're facing
-                    </p>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex justify-between pt-4 pb-6 px-8">
-                  <Button variant="ghost" onClick={() => setStep(1)} className="text-muted-foreground hover:text-foreground hover:bg-accent h-12 px-6 text-base">Back</Button>
+                <div className="mt-8 flex justify-end">
                   <Button
-                    onClick={() => setStep(3)}
-                    disabled={!formData.expertiseDescription.trim()}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 text-base"
+                    onClick={() => setStep(2)}
+                    disabled={!isStep1Valid}
+                    className="bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper h-11 px-6 font-medium"
                   >
-                    Next <ArrowRightMd className="ml-2 h-5 w-5" />
+                    Continue <ArrowRightMd className="ml-2 h-4 w-4" />
                   </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
+                </div>
+              </motion.div>
+            )}
 
-          {step === 3 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <Card className="shadow-lg border-border bg-card">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-3xl text-foreground">Final Polish</CardTitle>
-                  <CardDescription className="text-base text-muted-foreground">How can teammates partner with you?</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Timezone */}
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2 text-base text-foreground">
-                      <Globe className="w-5 h-5 text-primary" />
-                      Your Timezone
-                    </Label>
-                    <p className="text-base text-muted-foreground">
-                      We auto-detected your timezone. Change it if needed for accurate meeting suggestions.
-                    </p>
-                    <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-between h-12 text-base font-normal bg-background border-input text-foreground hover:bg-accent"
-                        >
-                          <span className="truncate">{selectedTimezoneLabel}</span>
-                          <ChevronDown className="h-5 w-5 opacity-50 shrink-0" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[400px] p-0 bg-popover border-border" align="start">
-                        <div className="p-3 border-b border-border">
-                          <div className="relative">
-                            <SearchMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              placeholder="Search timezone..."
-                              value={timezoneSearch}
-                              onChange={(e) => setTimezoneSearch(e.target.value)}
-                              className="pl-9 h-10 bg-background border-input text-foreground placeholder:text-muted-foreground"
-                            />
-                          </div>
-                        </div>
-                        <ScrollArea className="h-[280px]">
-                          <div className="p-1">
-                            {filteredTimezones.map((tz) => (
-                              <button
-                                key={tz.value}
-                                onClick={() => {
-                                  setFormData(prev => ({ ...prev, timezone: tz.value }));
-                                  setTimezoneOpen(false);
-                                  setTimezoneSearch("");
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2.5 text-base rounded-md hover:bg-accent transition-colors text-foreground ${
-                                  formData.timezone === tz.value ? "bg-accent" : ""
-                                }`}
-                              >
-                                <span>{tz.label}</span>
-                                {formData.timezone === tz.value && (
-                                  <CheckBig className="h-5 w-5 text-primary" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+            {/* Step 2: Connect Slack */}
+            {step === 2 && !showCelebration && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
+              >
+                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+                  Connect Slack
+                </h1>
+                <p className="text-coffee-cortado mb-6">
+                  Get matched with teammates right where you work.
+                </p>
 
-                  {/* Bio */}
-                  <div className="space-y-3">
-                    <Label htmlFor="bio" className="text-base text-foreground">Bio / Working Style</Label>
-                    <Textarea
-                      id="bio"
-                      className="min-h-[130px] text-base resize-none bg-background border-input text-foreground placeholder:text-muted-foreground"
-                      placeholder="I'm usually available in the mornings. I prefer async reviews but happy to jump on a call for complex blockers."
-                      value={formData.bio}
-                      onChange={e => setFormData({...formData, bio: e.target.value})}
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-4">
-                  <Button variant="ghost" onClick={() => setStep(2)} className="text-muted-foreground hover:text-foreground hover:bg-accent h-12 px-6 text-base">Back</Button>
-                  <Button
-                    onClick={() => setStep(4)}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 text-base"
-                  >
-                    Next <ArrowRightMd className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 4 && (
-            <motion.div
-              key="step4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <Card className="shadow-lg border-border bg-card">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-3xl text-foreground">When are you available?</CardTitle>
-                  <CardDescription className="text-base text-muted-foreground">Help teammates know the best time to reach you.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <div className="grid grid-cols-2 gap-4">
-                    {AVAILABILITY_PRESETS.map((preset) => {
-                      const isSelected = formData.availabilityPreset === preset.id;
-                      return (
-                        <button
-                          key={preset.id}
-                          onClick={() => setFormData(prev => ({ ...prev, availabilityPreset: preset.id }))}
-                          className={cn(
-                            "relative flex flex-col items-center p-6 rounded-xl border-2 transition-all h-[140px]",
-                            isSelected
-                              ? "border-primary bg-primary/5 shadow-sm"
-                              : "border-border bg-card hover:border-primary/30 hover:bg-muted/30"
-                          )}
-                        >
-                          {/* Selection indicator */}
-                          {isSelected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                              <CheckBig className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                          <span className="text-4xl mb-2">{preset.icon}</span>
-                          <span className="font-semibold text-lg text-foreground">{preset.label}</span>
-                          <span className="text-base text-muted-foreground">{preset.description}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p className="text-base text-muted-foreground text-center pt-2">
-                    You can customize your detailed schedule in Settings later.
-                  </p>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-4">
-                  <Button variant="ghost" onClick={() => setStep(3)} className="text-muted-foreground hover:text-foreground hover:bg-accent h-12 px-6 text-base">Back</Button>
-                  <Button
-                    onClick={() => setStep(5)}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 text-base"
-                  >
-                    Next <ArrowRightMd className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
-
-          {step === 5 && !showCelebration && (
-            <motion.div
-              key="step5"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <Card className="shadow-lg border-border bg-card">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-3xl text-foreground">Connect Your Tools</CardTitle>
-                  <CardDescription className="text-base text-muted-foreground">Get nudge notifications where you already work.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Slack */}
-                  <div className="flex items-center justify-between p-5 rounded-xl border border-border bg-muted/30">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-white border border-border flex items-center justify-center">
-                        <img src="/slack-icon.svg" alt="Slack" className="w-7 h-7" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-lg text-foreground">Slack</p>
-                        <p className="text-base text-muted-foreground">Receive nudges as DMs</p>
-                      </div>
+                <div className="p-5 rounded-xl border border-coffee-foam bg-coffee-cream/30">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-white border border-coffee-foam flex items-center justify-center">
+                      <img src="/slack-icon.svg" alt="Slack" className="w-7 h-7" />
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.open('/api/slack/oauth', '_blank')}
-                      className="border-[#4A154B] text-[#4A154B] hover:bg-[#4A154B]/10 h-11 px-5 text-base"
-                    >
-                      Connect
-                    </Button>
-                  </div>
-
-                  {/* Zoom */}
-                  <div className="flex items-center justify-between p-5 rounded-xl border border-border bg-muted/30">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-white border border-border flex items-center justify-center">
-                        <img src="/zoom-icon.svg" alt="Zoom" className="w-7 h-7" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-lg text-foreground">Zoom</p>
-                        <p className="text-base text-muted-foreground">Auto-create meeting links</p>
-                      </div>
+                    <div>
+                      <p className="font-medium text-coffee-espresso">Slack</p>
+                      <p className="text-sm text-coffee-cortado">Use /attunly to find teammates</p>
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.open('/api/auth/zoom', '_blank')}
-                      className="border-[#2D8CFF] text-[#2D8CFF] hover:bg-[#2D8CFF]/10 h-11 px-5 text-base"
-                    >
-                      Connect
-                    </Button>
                   </div>
-
-                  <p className="text-base text-muted-foreground text-center pt-2">
-                    You can skip this and connect later in Settings.
-                  </p>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-4">
-                  <Button variant="ghost" onClick={() => setStep(4)} className="text-muted-foreground hover:text-foreground hover:bg-accent h-12 px-6 text-base">Back</Button>
                   <Button
-                    onClick={handleSubmit}
+                    onClick={() => handleSubmit(true)}
                     disabled={loading}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 text-base transition-all active:scale-95"
+                    className="w-full bg-[#4A154B] hover:bg-[#3a1039] text-white h-11 font-medium"
                   >
-                    {loading && <LottieLoader size="sm" className="w-5 h-5 mr-2" />}
-                    Complete Profile
+                    {loading ? <LottieLoader size="sm" className="w-5 h-5 mr-2" /> : null}
+                    Connect Slack
                   </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          )}
+                </div>
 
-          {/* Celebration Screen */}
-          {showCelebration && (
-            <motion.div
-              key="celebration"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", duration: 0.6 }}
-              className="text-center py-12"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="text-8xl mb-6"
-              >
-                🎉
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="flex-1 h-px bg-coffee-foam" />
+                  <span className="text-sm text-coffee-latte">or</span>
+                  <div className="flex-1 h-px bg-coffee-foam" />
+                </div>
+
+                <div className="mt-6 flex justify-between items-center">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="text-sm text-coffee-cortado hover:text-coffee-espresso transition-colors"
+                  >
+                    ← Back
+                  </button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSubmit(false)}
+                    disabled={loading}
+                    className="border-coffee-foam text-coffee-mocha hover:bg-coffee-cream h-11 px-6"
+                  >
+                    {loading ? <LottieLoader size="sm" className="w-5 h-5 mr-2" /> : null}
+                    Skip for now
+                  </Button>
+                </div>
+
+                <p className="text-xs text-coffee-latte text-center mt-4">
+                  You can always connect Slack later in Settings.
+                </p>
               </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-4xl font-bold text-foreground mb-3"
-              >
-                You're all set!
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-xl text-muted-foreground mb-8"
-              >
-                Welcome to Attunly, {formData.firstName}!
-              </motion.p>
+            )}
+
+            {/* Celebration - calm, on-brand */}
+            {showCelebration && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="flex justify-center gap-2"
+                key="celebration"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="text-center py-12"
               >
-                <span className="text-2xl animate-bounce" style={{ animationDelay: "0ms" }}>✨</span>
-                <span className="text-2xl animate-bounce" style={{ animationDelay: "100ms" }}>🚀</span>
-                <span className="text-2xl animate-bounce" style={{ animationDelay: "200ms" }}>💜</span>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                  className="w-16 h-16 rounded-full bg-coffee-cream border border-coffee-foam flex items-center justify-center mx-auto mb-6"
+                >
+                  <svg className="w-8 h-8 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </motion.div>
+                <h2 className="text-3xl font-semibold text-coffee-espresso mb-2">
+                  Welcome, {formData.firstName}
+                </h2>
+                <p className="text-coffee-cortado">
+                  Setting up your workspace...
+                </p>
               </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
