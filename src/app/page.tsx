@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Lottie from 'lottie-react';
+import freelancerChatting from '../../public/lottie/freelancer-chatting.json';
 
 const Section = ({
   children,
@@ -262,30 +264,49 @@ const Hero = () => (
 
 // The Moment Section
 const TheMoment = () => (
-  <Section darker>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
+  <section className="relative px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream overflow-visible">
+    <div className="max-w-5xl mx-auto">
+      <div className="max-w-2xl">
+        <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
 
-    <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
-      <p>The cursor is blinking in Slack.</p>
-      <p>
-        You need help with something. But you&apos;re not sure who knows it. You&apos;re not sure if they&apos;re free.
-        You&apos;re not sure how to phrase it.
-      </p>
-      <p className="text-coffee-latte">So the question waits, and the work stays blocked.</p>
+        <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
+          <p>The cursor is blinking in Slack.</p>
+          <p>
+            You need help with something. But you&apos;re not sure who knows it. You&apos;re not sure if they&apos;re free.
+            You&apos;re not sure how to phrase it.
+          </p>
+          <p className="text-coffee-latte">So the question waits, and the work stays blocked.</p>
+        </div>
+
+        <div className="mt-10 pt-8 border-t border-coffee-steamed">
+          <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
+            That question? It stays unasked. And the work stays stuck.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div className="mt-10 pt-8 border-t border-coffee-steamed">
-      <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-        That question? It stays unasked. And the work stays stuck.
-      </p>
+    {/* Lottie Animation - positioned to section */}
+    <div className="hidden lg:block absolute bottom-0 right-0 w-[550px] -translate-x-36 translate-y-[42px]">
+      <Lottie
+        animationData={freelancerChatting}
+        loop={true}
+        className="w-full h-auto"
+      />
     </div>
-  </Section>
+  </section>
 );
 
 // Social Proof Section
 const SocialProof = () => (
   <Section>
-    <div className="text-center">
+    <div className="text-center relative">
+      {/* Arrow pointing to quote */}
+      <img
+        src="/arrow-brush.svg"
+        alt=""
+        className="absolute top-0 -left-28 w-24 h-24 rotate-[310deg] opacity-60"
+      />
       <blockquote className="text-2xl md:text-3xl text-coffee-mocha leading-relaxed mb-6 max-w-[50ch] mx-auto">
         &ldquo;Attunly cut our &apos;who knows this?&apos; messages by 80%. People actually ask for help now.&rdquo;
       </blockquote>
@@ -296,88 +317,280 @@ const SocialProof = () => (
   </Section>
 );
 
-// How It Works Section
-const HowItWorks = () => (
-  <section
-    id="how-it-works"
-    className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream"
-  >
-    <div className="max-w-2xl mx-auto">
-      <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Three steps</p>
+// Before/After Demo Section
+const BeforeAfterDemo = () => {
+  const [activeTab, setActiveTab] = useState<'without' | 'with'>('without');
 
-      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-12">
-        How it works
-      </h2>
+  return (
+    <section
+      id="how-it-works"
+      className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-espresso"
+    >
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4">
+            From stuck to unstuck.
+          </h2>
+          <p className="text-lg text-coffee-steamed max-w-[50ch] mx-auto">
+            See the difference one command makes.
+          </p>
+        </div>
 
-      <div className="space-y-8">
-        {[
-          {
-            step: '1',
-            title: 'Type /attunly in Slack',
-            desc: 'Describe what you need. "Need help with the payments API" or "anyone know React hooks?"',
-          },
-          {
-            step: '2',
-            title: 'See who matches + availability',
-            desc: "Attunly shows teammates with relevant expertise and when they're actually free—not just a green dot.",
-          },
-          {
-            step: '3',
-            title: 'Send a message or book time',
-            desc: 'Use the drafted message or schedule a call. The question gets asked. The work unblocks.',
-          },
-        ].map((item) => (
-          <div key={item.step} className="flex gap-5 items-start">
-            <div className="flex-shrink-0 w-11 h-11 rounded-full bg-coffee-espresso text-coffee-paper flex items-center justify-center text-lg font-semibold">
-              {item.step}
-            </div>
-            <div className="pt-1">
-              <h3 className="text-xl font-medium text-coffee-espresso mb-2">{item.title}</h3>
-              <p className="text-coffee-cortado">{item.desc}</p>
-            </div>
+        {/* Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-coffee-roast/50 rounded-full p-1">
+            <button
+              onClick={() => setActiveTab('without')}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+                activeTab === 'without'
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-steamed hover:text-coffee-paper'
+              }`}
+            >
+              Without Attunly
+            </button>
+            <button
+              onClick={() => setActiveTab('with')}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+                activeTab === 'with'
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-steamed hover:text-coffee-paper'
+              }`}
+            >
+              With Attunly
+            </button>
           </div>
-        ))}
+        </div>
+
+        {/* Mock Slack UI */}
+        <div className="bg-[#1a1d21] rounded-xl shadow-2xl overflow-hidden font-sans ring-1 ring-coffee-oat/70 shadow-[0_0_60px_-12px_rgba(199,163,118,0.4)]">
+          {/* Slack header */}
+          <div className="bg-[#1a1d21] px-4 py-3 flex items-center gap-3 border-b border-white/10">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
+            </div>
+            <span className="text-white/70 text-sm font-medium ml-2">
+              {activeTab === 'without' ? '# general' : '# engineering'}
+            </span>
+            <span className="text-white/40 text-xs">
+              {activeTab === 'without' ? '847 members' : '24 members'}
+            </span>
+          </div>
+
+          {/* Chat content */}
+          <div className="p-5 min-h-[320px]">
+            {activeTab === 'without' ? (
+              /* Without Attunly - The anxiety */
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    Y
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">You</span>
+                      <span className="text-xs text-white/40">2:34 PM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      hey does anyone know how the auth flow works? I need to add a new OAuth provider but I&apos;m not sure where to start
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-white/40 text-sm pl-12">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>3 hours later...</span>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    M
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">Mike</span>
+                      <span className="text-xs text-white/40">5:47 PM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      hmm not sure, maybe try asking in #backend?
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    S
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">Sara</span>
+                      <span className="text-xs text-white/40">5:52 PM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      I think Jake worked on that? Or maybe it was the other team
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <p className="text-white/50 text-sm text-center">
+                    Half a day lost. Still no answer.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* With Attunly - The solution */
+              <div className="space-y-4">
+                <div className="border border-white/20 rounded-lg px-4 py-3 bg-white/5">
+                  <div className="flex items-center text-[15px]">
+                    <span className="text-white font-semibold">/attunly</span>
+                    <span className="ml-2 text-white/80">need help with auth flow, adding OAuth provider</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-5">
+                  <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
+                    <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold text-white text-[15px]">Attunly</span>
+                      <span className="text-[11px] text-white/50 bg-white/10 px-1.5 py-0.5 rounded font-medium">APP</span>
+                      <span className="text-xs text-white/40">just now</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed mb-3">
+                      Found <strong>2 people</strong> who can help with authentication:
+                    </p>
+
+                    {/* Expert cards */}
+                    <div className="space-y-2">
+                      <div className="p-3 bg-coffee-cream rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
+                              LG
+                            </div>
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-green-500"></div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-coffee-espresso text-sm">Lisa G.</div>
+                            <p className="text-xs text-coffee-cortado">Free now · OAuth, SSO, Identity</p>
+                          </div>
+                          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">
+                            Ask
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-coffee-cream rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
+                              CB
+                            </div>
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-yellow-500"></div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-coffee-espresso text-sm">Chris B.</div>
+                            <p className="text-xs text-coffee-cortado">Free at 3pm · Auth, Permissions</p>
+                          </div>
+                          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white text-coffee-espresso border border-coffee-foam">
+                            Ask
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+                      <p className="text-white/70 text-sm text-center">
+                        Question answered in 10 minutes.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// What's Different + Who Uses It Combined Section
+const WhatsDifferentAndWhoUsesIt = () => (
+  <section className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-paper">
+    <div className="max-w-5xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-12 md:gap-16">
+        {/* Left: The Gap */}
+        <div>
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">The gap</p>
+
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
+            Three questions
+            <br />
+            <span className="text-coffee-oat">Slack can&apos;t answer.</span>
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              {
+                title: '"Who knows this?"',
+                desc: "Attunly matches your question to teammates based on what they know.",
+              },
+              {
+                title: '"Are they actually free?"',
+                desc: 'Shows actual calendar availability, not just a green dot.',
+              },
+              {
+                title: '"How do I ask?"',
+                desc: "Drafts a low-pressure message that's easy to say yes or no to.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam"
+              >
+                <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
+                <p className="text-coffee-cortado text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Sound Familiar */}
+        <div>
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Sound familiar?</p>
+
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
+            Moments Attunly
+            <br />
+            <span className="text-coffee-oat">was made for.</span>
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              'When the person who built that service left 6 months ago',
+              'When you\'re the new hire who doesn\'t know anyone yet',
+              'When it\'s 4pm and you need someone who\'s actually free',
+              'When you don\'t want to post in #general and look clueless',
+            ].map((moment) => (
+              <div
+                key={moment}
+                className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam"
+              >
+                <p className="text-coffee-mocha text-sm">{moment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   </section>
-);
-
-// What's Different Section
-const WhatsDifferent = () => (
-  <Section>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">The gap</p>
-
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10 max-w-[60ch]">
-      Three questions
-      <br />
-      <span className="text-coffee-oat">Slack can&apos;t answer.</span>
-    </h2>
-
-    <div className="space-y-5">
-      {[
-        {
-          title: '"Who knows this?"',
-          desc: "Slack doesn't know who has what expertise. Attunly matches your question to teammates based on what they know.",
-        },
-        {
-          title: '"Are they actually free?"',
-          desc: 'A green dot means online, not available. Attunly shows actual calendar availability.',
-        },
-        {
-          title: '"How do I ask without being annoying?"',
-          desc: "Attunly drafts a low-pressure message that's easy to say yes or no to.",
-        },
-      ].map((item) => (
-        <div
-          key={item.title}
-          className="p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
-        >
-          <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
-          <p className="text-coffee-cortado">{item.desc}</p>
-        </div>
-      ))}
-    </div>
-  </Section>
 );
 
 // Trust Section
@@ -390,12 +603,12 @@ const Trust = () => (
     </h2>
 
     <div className="grid gap-5">
-      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
         <h3 className="text-lg font-semibold text-coffee-espresso mb-2">2-minute setup</h3>
         <p className="text-coffee-cortado">Describe what you know in plain English. Connect your calendar. Done.</p>
       </div>
 
-      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
         <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Lives in Slack</h3>
         <p className="text-coffee-cortado">
           No new app. No new tab. Just{' '}
@@ -404,39 +617,10 @@ const Trust = () => (
         </p>
       </div>
 
-      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
         <h3 className="text-lg font-semibold text-coffee-espresso mb-2">You stay in control</h3>
         <p className="text-coffee-cortado">Edit the draft. Pick a different person. Schedule or message. Your call.</p>
       </div>
-    </div>
-  </Section>
-);
-
-// Who Uses It Section
-const WhoUsesIt = () => (
-  <Section>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Sound familiar?</p>
-
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10 max-w-[60ch]">
-      Moments Attunly
-      <br />
-      <span className="text-coffee-oat">was made for.</span>
-    </h2>
-
-    <div className="space-y-5">
-      {[
-        'When the person who built that service left 6 months ago',
-        'When you\'re the new hire who doesn\'t know anyone yet',
-        'When it\'s 4pm and you need someone who\'s actually free to help',
-        'When you\'re stuck but don\'t want to post in #general and look clueless',
-      ].map((moment) => (
-        <div
-          key={moment}
-          className="p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
-        >
-          <p className="text-coffee-mocha">{moment}</p>
-        </div>
-      ))}
     </div>
   </Section>
 );
@@ -791,7 +975,7 @@ export default function AttunlyLanding() {
       }}
     >
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4 bg-coffee-paper/70 border-b border-coffee-foam/50">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm border-b border-coffee-latte">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="" className="w-7 h-7" />
@@ -821,9 +1005,8 @@ export default function AttunlyLanding() {
       <Hero />
       <TheMoment />
       <SocialProof />
-      <HowItWorks />
-      <WhatsDifferent />
-      <WhoUsesIt />
+      <BeforeAfterDemo />
+      <WhatsDifferentAndWhoUsesIt />
       <Trust />
       <Pricing />
       <FAQ />
