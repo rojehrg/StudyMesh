@@ -1,33 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-// Fade-in on scroll hook
-const useFadeIn = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  return { ref, isVisible };
-};
 
 const Section = ({
   children,
@@ -39,24 +13,18 @@ const Section = ({
   className?: string;
   darker?: boolean;
   id?: string;
-}) => {
-  const { ref, isVisible } = useFadeIn();
-  return (
-    <section
-      ref={ref}
-      id={id}
-      className={`
-        px-6 md:px-12 lg:px-24 py-24 md:py-32
-        ${darker ? 'bg-coffee-cream' : 'bg-coffee-paper'}
-        ${className}
-        transition-all duration-500 ease-out
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}
-      `}
-    >
-      <div className="max-w-2xl mx-auto">{children}</div>
-    </section>
-  );
-};
+}) => (
+  <section
+    id={id}
+    className={`
+      px-6 md:px-12 lg:px-24 py-24 md:py-32
+      ${darker ? 'bg-coffee-cream' : 'bg-coffee-paper'}
+      ${className}
+    `}
+  >
+    <div className="max-w-2xl mx-auto">{children}</div>
+  </section>
+);
 
 const Button = ({
   children,
@@ -259,18 +227,17 @@ const Hero = () => (
           <p className="text-coffee-latte text-sm tracking-wide uppercase mb-6">A Slack command</p>
 
           <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-6">
-            Ask for help in Slack
+            Find the right person.
             <br />
-            <span className="text-coffee-oat">without overthinking.</span>
+            <span className="text-coffee-oat">Ask them easily.</span>
           </h1>
 
           <p className="text-xl text-coffee-cortado leading-relaxed mb-10 max-w-[60ch]">
             Type{' '}
             <code className="bg-coffee-cream px-2 py-0.5 rounded text-lg font-mono text-coffee-mocha">
               /attunly
-            </code>
-            . Get matched with who can help, see their availability, and send a calm message. Move the work
-            forward.
+            </code>{' '}
+            in Slack, describe what you need. Get matched with who knows it, see when they&apos;re free, send a message that&apos;s easy to say yes to.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -282,7 +249,7 @@ const Hero = () => (
           </div>
 
           <p className="text-sm text-coffee-latte max-w-[60ch]">
-            No setup. No status updates. Works where you already work.
+            2-minute setup · Lives entirely in Slack · Free for small teams
           </p>
         </div>
 
@@ -309,105 +276,81 @@ const TheMoment = () => (
 
     <div className="mt-10 pt-8 border-t border-coffee-steamed">
       <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-        The question never gets asked. That&apos;s the cost.
+        That question? It stays unasked. And the work stays stuck.
       </p>
     </div>
   </Section>
 );
 
-// The Solution Section
-const TheSolution = () => (
+// Social Proof Section
+const SocialProof = () => (
   <Section>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">What Attunly does</p>
-
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
-      It finds who can help,
-      <br />
-      <span className="text-coffee-oat">and helps you ask.</span>
-    </h2>
-
-    <div className="space-y-5 text-lg text-coffee-cortado leading-relaxed max-w-[60ch]">
-      <p>
-        Type{' '}
-        <code className="bg-coffee-cream px-2 py-0.5 rounded font-mono text-coffee-mocha">
-          /attunly need help with the payments API
-        </code>{' '}
-        — Attunly matches you with teammates who have relevant expertise, shows you when they&apos;re actually
-        free, and drafts a calm message.
+    <div className="text-center">
+      <blockquote className="text-2xl md:text-3xl text-coffee-mocha leading-relaxed mb-6 max-w-[50ch] mx-auto">
+        &ldquo;Attunly cut our &apos;who knows this?&apos; messages by 80%. People actually ask for help now.&rdquo;
+      </blockquote>
+      <p className="text-coffee-cortado">
+        — Engineering Manager, Series B startup
       </p>
-      <p>Pick a person, edit the message if you want, send it. Or book time directly.</p>
     </div>
   </Section>
 );
 
 // How It Works Section
-const HowItWorks = () => {
-  const { ref, isVisible } = useFadeIn();
+const HowItWorks = () => (
+  <section
+    id="how-it-works"
+    className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream"
+  >
+    <div className="max-w-2xl mx-auto">
+      <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Three steps</p>
 
-  return (
-    <section
-      ref={ref}
-      id="how-it-works"
-      className={`px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream transition-all duration-500 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-      }`}
-    >
-      <div className="max-w-2xl mx-auto">
-        <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Three steps</p>
+      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-12">
+        How it works
+      </h2>
 
-        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-12">
-          How it works
-        </h2>
-
-        <div className="space-y-8">
-          {[
-            {
-              step: '1',
-              title: 'Type /attunly in Slack',
-              desc: 'Describe what you need. "Need help with the payments API" or "anyone know React hooks?"',
-            },
-            {
-              step: '2',
-              title: 'See who matches + availability',
-              desc: "Attunly shows teammates with relevant expertise and when they're actually free—not just \"online.\"",
-            },
-            {
-              step: '3',
-              title: 'Send a message or book time',
-              desc: 'Use the drafted message or schedule a call. The question gets asked. You move on.',
-            },
-          ].map((item, index) => (
-            <div
-              key={item.step}
-              className={`flex gap-5 items-start transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <div className="flex-shrink-0 w-11 h-11 rounded-full bg-coffee-espresso text-coffee-paper flex items-center justify-center text-lg font-semibold">
-                {item.step}
-              </div>
-              <div className="pt-1">
-                <h3 className="text-xl font-medium text-coffee-espresso mb-2">{item.title}</h3>
-                <p className="text-coffee-cortado">{item.desc}</p>
-              </div>
+      <div className="space-y-8">
+        {[
+          {
+            step: '1',
+            title: 'Type /attunly in Slack',
+            desc: 'Describe what you need. "Need help with the payments API" or "anyone know React hooks?"',
+          },
+          {
+            step: '2',
+            title: 'See who matches + availability',
+            desc: "Attunly shows teammates with relevant expertise and when they're actually free—not just a green dot.",
+          },
+          {
+            step: '3',
+            title: 'Send a message or book time',
+            desc: 'Use the drafted message or schedule a call. The question gets asked. The work unblocks.',
+          },
+        ].map((item) => (
+          <div key={item.step} className="flex gap-5 items-start">
+            <div className="flex-shrink-0 w-11 h-11 rounded-full bg-coffee-espresso text-coffee-paper flex items-center justify-center text-lg font-semibold">
+              {item.step}
             </div>
-          ))}
-        </div>
+            <div className="pt-1">
+              <h3 className="text-xl font-medium text-coffee-espresso mb-2">{item.title}</h3>
+              <p className="text-coffee-cortado">{item.desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 // What's Different Section
 const WhatsDifferent = () => (
   <Section>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Why this exists</p>
+    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">The gap</p>
 
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10 max-w-[60ch]">
-      Slack doesn&apos;t help you
+      Three questions
       <br />
-      <span className="text-coffee-oat">with this part.</span>
+      <span className="text-coffee-oat">Slack can&apos;t answer.</span>
     </h2>
 
     <div className="space-y-5">
@@ -417,17 +360,17 @@ const WhatsDifferent = () => (
           desc: "Slack doesn't know who has what expertise. Attunly matches your question to teammates based on what they know.",
         },
         {
-          title: '"Are they free?"',
+          title: '"Are they actually free?"',
           desc: 'A green dot means online, not available. Attunly shows actual calendar availability.',
         },
         {
-          title: '"How do I phrase this?"',
+          title: '"How do I ask without being annoying?"',
           desc: "Attunly drafts a low-pressure message that's easy to say yes or no to.",
         },
       ].map((item) => (
         <div
           key={item.title}
-          className="card-hover p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
+          className="p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
         >
           <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
           <p className="text-coffee-cortado">{item.desc}</p>
@@ -472,39 +415,26 @@ const Trust = () => (
 // Who Uses It Section
 const WhoUsesIt = () => (
   <Section>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Built for</p>
+    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Sound familiar?</p>
 
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10 max-w-[60ch]">
-      Teams where knowledge
+      Moments Attunly
       <br />
-      <span className="text-coffee-oat">is scattered across people.</span>
+      <span className="text-coffee-oat">was made for.</span>
     </h2>
 
     <div className="space-y-5">
       {[
-        {
-          title: 'Engineering teams',
-          desc: 'When the person who built that service left six months ago, and the docs are outdated.',
-        },
-        {
-          title: 'Product organizations',
-          desc: 'When you need someone who understands the customer context before you write the spec.',
-        },
-        {
-          title: 'Growing companies',
-          desc: 'When you can\'t keep track of who joined which team and what they\'re good at.',
-        },
-        {
-          title: 'Remote and hybrid teams',
-          desc: 'When you can\'t tap someone on the shoulder to ask a quick question.',
-        },
-      ].map((item) => (
+        'When the person who built that service left 6 months ago',
+        'When you\'re the new hire who doesn\'t know anyone yet',
+        'When it\'s 4pm and you need someone who\'s actually free to help',
+        'When you\'re stuck but don\'t want to post in #general and look clueless',
+      ].map((moment) => (
         <div
-          key={item.title}
-          className="card-hover p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
+          key={moment}
+          className="p-5 bg-coffee-cream rounded-xl border border-coffee-foam"
         >
-          <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
-          <p className="text-coffee-cortado">{item.desc}</p>
+          <p className="text-coffee-mocha">{moment}</p>
         </div>
       ))}
     </div>
@@ -556,6 +486,211 @@ const Integrations = () => (
   </Section>
 );
 
+// Pricing Section
+const Pricing = () => {
+  const [isYearly, setIsYearly] = useState(false);
+
+  const plans = [
+    {
+      name: 'Free',
+      description: 'Try Attunly with a small team',
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      features: [
+        { text: 'Up to 5 team members', included: true },
+        { text: 'Basic expertise matching', included: true },
+        { text: 'Slack integration', included: true },
+        { text: 'AI-drafted messages', included: true },
+        { text: 'Calendar integration', included: false },
+        { text: 'Advanced analytics', included: false },
+        { text: 'Priority support', included: false },
+      ],
+      cta: 'Get Started Free',
+      popular: false,
+    },
+    {
+      name: 'Starter',
+      description: 'For growing teams',
+      monthlyPrice: 8,
+      yearlyPrice: 6,
+      features: [
+        { text: 'Up to 20 team members', included: true },
+        { text: 'AI-powered matching', included: true },
+        { text: 'Slack integration', included: true },
+        { text: 'AI-drafted messages', included: true },
+        { text: 'Calendar integration', included: true },
+        { text: 'Basic analytics', included: true },
+        { text: 'Priority support', included: false },
+      ],
+      cta: 'Start 14-Day Trial',
+      popular: false,
+    },
+    {
+      name: 'Pro',
+      description: 'For scaling organizations',
+      monthlyPrice: 15,
+      yearlyPrice: 12,
+      features: [
+        { text: 'Up to 100 team members', included: true },
+        { text: 'AI-powered matching', included: true },
+        { text: 'All integrations', included: true },
+        { text: 'AI-drafted messages', included: true },
+        { text: 'Calendar integration', included: true },
+        { text: 'Advanced analytics', included: true },
+        { text: 'Priority support', included: true },
+      ],
+      cta: 'Start 14-Day Trial',
+      popular: true,
+    },
+  ];
+
+  return (
+    <section
+      id="pricing"
+      className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-paper"
+    >
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Pricing</p>
+
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
+            Simple, transparent pricing.
+            <br />
+            <span className="text-coffee-oat">Start free, scale as you grow.</span>
+          </h2>
+
+          <p className="text-lg text-coffee-cortado mb-8 max-w-[50ch] mx-auto">
+            No hidden fees. 14-day free trial on paid plans. Cancel anytime.
+          </p>
+
+          {/* Billing Toggle */}
+          <div className="inline-flex items-center gap-3 bg-coffee-cream rounded-full p-1.5">
+            <button
+              onClick={() => setIsYearly(false)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                !isYearly
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-cortado hover:text-coffee-espresso'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsYearly(true)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                isYearly
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-cortado hover:text-coffee-espresso'
+              }`}
+            >
+              Yearly
+            </button>
+          </div>
+          {isYearly && (
+            <p className="text-sm text-coffee-roast font-medium mt-3">
+              Save 25% with annual billing
+            </p>
+          )}
+        </div>
+
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative rounded-xl p-6 ${
+                plan.popular
+                  ? 'bg-coffee-espresso text-coffee-paper ring-2 ring-coffee-espresso md:-mt-4 md:mb-4 md:py-10'
+                  : 'bg-coffee-cream border border-coffee-foam'
+              }`}
+            >
+              {plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-coffee-oat text-coffee-espresso text-xs font-semibold px-3 py-1 rounded-full">
+                  Most Popular
+                </span>
+              )}
+
+              <div className="mb-4">
+                <h3 className={`text-xl font-semibold mb-1 ${plan.popular ? 'text-coffee-paper' : 'text-coffee-espresso'}`}>
+                  {plan.name}
+                </h3>
+                <p className={`text-sm ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-cortado'}`}>
+                  {plan.description}
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-4xl font-bold ${plan.popular ? 'text-coffee-paper' : 'text-coffee-espresso'}`}>
+                    ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
+                  </span>
+                  <span className={plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}>
+                    /user/mo
+                  </span>
+                </div>
+                {plan.monthlyPrice === 0 ? (
+                  <p className={`text-sm mt-1 ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}`}>
+                    Free forever
+                  </p>
+                ) : isYearly ? (
+                  <p className={`text-sm mt-1 ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}`}>
+                    Billed annually
+                  </p>
+                ) : null}
+              </div>
+
+              <Link
+                href="/signup"
+                className={`block w-full text-center px-6 py-3 rounded-lg font-medium transition-all duration-200 mb-6 ${
+                  plan.popular
+                    ? 'bg-coffee-paper text-coffee-espresso hover:bg-coffee-cream'
+                    : 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast'
+                }`}
+              >
+                {plan.cta}
+              </Link>
+
+              <div className="space-y-3">
+                {plan.features.map((feature, featureIndex) => (
+                  <div
+                    key={featureIndex}
+                    className={`flex items-center gap-3 text-sm ${
+                      feature.included
+                        ? plan.popular ? 'text-coffee-paper' : 'text-coffee-cortado'
+                        : plan.popular ? 'text-coffee-mocha' : 'text-coffee-latte'
+                    }`}
+                  >
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
+                      feature.included
+                        ? plan.popular ? 'bg-coffee-paper/20 text-coffee-paper' : 'bg-coffee-paper text-coffee-espresso'
+                        : plan.popular ? 'bg-coffee-mocha/30 text-coffee-mocha' : 'bg-coffee-foam text-coffee-latte'
+                    }`}>
+                      {feature.included ? '✓' : '–'}
+                    </span>
+                    <span className={!feature.included ? 'line-through' : ''}>
+                      {feature.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Enterprise CTA */}
+        <div className="mt-12 text-center">
+          <p className="text-coffee-cortado">
+            Need more than 100 users?{' '}
+            <Link href="/support" className="text-coffee-espresso font-medium hover:text-coffee-roast transition-colors">
+              Contact us for Enterprise pricing →
+            </Link>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // FAQ Section
 const FAQ = () => {
   const faqs = [
@@ -606,13 +741,13 @@ const FAQ = () => {
 
 // Final CTA Section
 const FinalCTA = () => (
-  <Section className="text-center" id="install">
+  <Section className="text-center" id="install" darker>
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-      Start asking without overthinking.
+      That question doesn&apos;t have to wait.
     </h2>
 
     <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto">
-      Add Attunly to Slack in under a minute.
+      Add Attunly to Slack. Find who can help. Ask easily.
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
@@ -622,7 +757,7 @@ const FinalCTA = () => (
       </Button>
     </div>
 
-    <p className="text-sm text-coffee-latte">Free to start · No credit card · Works with any Slack plan</p>
+    <p className="text-sm text-coffee-latte">Free for teams up to 5 · Setup takes 2 minutes</p>
   </Section>
 );
 
@@ -664,6 +799,12 @@ export default function AttunlyLanding() {
           </Link>
           <div className="flex items-center gap-4">
             <Link
+              href="#pricing"
+              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
               href="/login"
               className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
@@ -679,12 +820,12 @@ export default function AttunlyLanding() {
 
       <Hero />
       <TheMoment />
-      <TheSolution />
+      <SocialProof />
       <HowItWorks />
       <WhatsDifferent />
-      <Trust />
       <WhoUsesIt />
-      <Integrations />
+      <Trust />
+      <Pricing />
       <FAQ />
       <FinalCTA />
       <Footer />
