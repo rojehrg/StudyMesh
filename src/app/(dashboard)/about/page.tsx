@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Brain,
   ArrowRight,
-  CheckCircle2,
   MessageSquare,
   Clock,
   Lightbulb,
@@ -186,12 +185,12 @@ export default function AboutPage() {
             </div>
 
             <blockquote className="text-2xl md:text-3xl font-semibold text-foreground leading-relaxed">
-              "The best teams aren't just skilled—they're <span className="text-primary">connected</span>.
-              When expertise flows freely, blockers disappear, delivery accelerates, and everyone grows."
+              &ldquo;The best teams aren&apos;t just skilled—they&apos;re <span className="text-primary">connected</span>.
+              When expertise flows freely, blockers disappear, delivery accelerates, and everyone grows.&rdquo;
             </blockquote>
 
             <p className="text-muted-foreground text-lg max-w-3xl">
-              We built Attunly because we've seen firsthand how knowledge silos cripple even the most talented teams.
+              We built Attunly because we&apos;ve seen firsthand how knowledge silos cripple even the most talented teams.
               Someone always has the answer—the challenge is finding them.
             </p>
           </div>
@@ -372,11 +371,11 @@ export default function AboutPage() {
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground">
-              Ready to unlock your team's potential?
+              Ready to unlock your team&apos;s potential?
             </h2>
 
             <p className="text-primary-foreground/80 text-lg max-w-xl mx-auto">
-              Join teams who've transformed how they share knowledge and accelerate growth.
+              Join teams who&apos;ve transformed how they share knowledge and accelerate growth.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
