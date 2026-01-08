@@ -238,6 +238,54 @@ export const commandEvents = pgTable("command_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ============================================
+// LINGO TRANSLATION SYSTEM
+// Cross-team communication translation
+// ============================================
+
+// Department lingo profiles - stores terminology and communication patterns per department
+export const departmentLingoProfiles = pgTable("department_lingo_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
+  department: text("department").notNull(),
+  // Terms array: [{"term": "MRR", "meaning": "Monthly Recurring Revenue", "context": "sales metric"}]
+  terms: jsonb("terms").default([]),
+  // Communication style description: "Direct, metric-focused, uses acronyms"
+  communicationStyle: text("communication_style"),
+  // Common phrases used by the department
+  commonPhrases: jsonb("common_phrases").default([]),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Term translations - maps terms between departments (learning loop)
+export const termTranslations = pgTable("term_translations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
+  sourceDepartment: text("source_department").notNull(),
+  targetDepartment: text("target_department").notNull(),
+  sourceTerm: text("source_term").notNull(),
+  targetTerm: text("target_term").notNull(),
+  confidence: integer("confidence").default(50), // 0-100 scale
+  usageCount: integer("usage_count").default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Translation events - tracks translation usage for learning and analytics
+export const translationEvents = pgTable("translation_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "set null" }),
+  sourceDepartment: text("source_department").notNull(),
+  targetDepartment: text("target_department").notNull(),
+  originalText: text("original_text").notNull(),
+  translatedText: text("translated_text").notNull(),
+  wasHelpful: boolean("was_helpful"), // null = no feedback, true/false = user feedback
+  feedback: text("feedback"), // Optional text feedback
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
@@ -255,3 +303,9 @@ export type UserProviderCredential = typeof userProviderCredentials.$inferSelect
 export type BillingEvent = typeof billingEvents.$inferSelect;
 export type CommandEvent = typeof commandEvents.$inferSelect;
 export type NewCommandEvent = typeof commandEvents.$inferInsert;
+export type DepartmentLingoProfile = typeof departmentLingoProfiles.$inferSelect;
+export type NewDepartmentLingoProfile = typeof departmentLingoProfiles.$inferInsert;
+export type TermTranslation = typeof termTranslations.$inferSelect;
+export type NewTermTranslation = typeof termTranslations.$inferInsert;
+export type TranslationEvent = typeof translationEvents.$inferSelect;
+export type NewTranslationEvent = typeof translationEvents.$inferInsert;

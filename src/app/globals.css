@@ -329,9 +329,9 @@
   background: hsl(var(--border));
 }
 
-/* Selection */
+/* Selection - coffee brown */
 ::selection {
-  background: hsl(var(--primary) / 0.2);
+  background: hsl(30 25% 70% / 0.4);
   color: hsl(var(--foreground));
 }
 

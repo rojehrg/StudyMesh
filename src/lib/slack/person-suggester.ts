@@ -283,3 +283,90 @@ export async function getTopSuggestion(
   const suggestions = await suggestPeople({ ...config, limit: 1 });
   return suggestions.length > 0 ? suggestions[0] : null;
 }
+
+/**
+ * Gets the department of the requester (person asking for help)
+ */
+export async function getRequesterDepartment(
+  slackTeamId: string,
+  slackUserId: string
+): Promise<{ department: string | null; organizationId: string | null }> {
+  try {
+    // Find the organization by Slack team ID
+    const org = await db
+      .select({ id: organizations.id })
+      .from(organizations)
+      .where(eq(organizations.slackTeamId, slackTeamId))
+      .limit(1);
+
+    if (!org.length) {
+      return { department: null, organizationId: null };
+    }
+
+    const organizationId = org[0].id;
+
+    // Get requester's profile
+    const requester = await db
+      .select({
+        department: profiles.department,
+      })
+      .from(profiles)
+      .where(
+        and(
+          eq(profiles.organizationId, organizationId),
+          eq(profiles.slackUserId, slackUserId)
+        )
+      )
+      .limit(1);
+
+    return {
+      department: requester.length > 0 ? requester[0].department : null,
+      organizationId,
+    };
+  } catch (error) {
+    console.error('[Person Suggester] Error getting requester department:', error);
+    return { department: null, organizationId: null };
+  }
+}
+
+/**
+ * Gets the department of a suggested person by their Slack user ID
+ */
+export async function getSuggestedPersonDepartment(
+  slackTeamId: string,
+  slackUserId: string
+): Promise<string | null> {
+  try {
+    // Find the organization by Slack team ID
+    const org = await db
+      .select({ id: organizations.id })
+      .from(organizations)
+      .where(eq(organizations.slackTeamId, slackTeamId))
+      .limit(1);
+
+    if (!org.length) {
+      return null;
+    }
+
+    const organizationId = org[0].id;
+
+    // Get person's profile
+    const person = await db
+      .select({
+        department: profiles.department,
+      })
+      .from(profiles)
+      .where(
+        and(
+          eq(profiles.organizationId, organizationId),
+          eq(profiles.slackUserId, slackUserId)
+        )
+      )
+      .limit(1);
+
+    return person.length > 0 ? person[0].department : null;
+  } catch (error) {
+    console.error('[Person Suggester] Error getting person department:', error);
+    return null;
+  }
+}

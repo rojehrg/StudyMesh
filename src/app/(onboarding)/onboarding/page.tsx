@@ -35,9 +35,26 @@ export default function OnboardingPage() {
   useEffect(() => {
     const init = async () => {
       try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        // Use getSession first - it reads from cookies without server verification
+        // This is more reliable right after OAuth redirect
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (userError || !user) {
+        if (sessionError) {
+          console.error('[Onboarding] Session error:', sessionError);
+        }
+
+        // If no session from cookies, try getUser as fallback
+        let user = session?.user ?? null;
+        if (!user) {
+          const { data: userData, error: userError } = await supabase.auth.getUser();
+          if (userError) {
+            console.error('[Onboarding] User error:', userError);
+          }
+          user = userData?.user ?? null;
+        }
+
+        if (!user) {
+          console.log('[Onboarding] No user found, redirecting to login');
           window.location.href = '/login';
           return;
         }

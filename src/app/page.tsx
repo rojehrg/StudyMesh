@@ -379,8 +379,8 @@ const BeforeAfterDemo = () => {
             </span>
           </div>
 
-          {/* Chat content */}
-          <div className="p-5 min-h-[320px]">
+          {/* Chat content - fixed height to prevent layout shift when switching tabs */}
+          <div className="p-5 min-h-[420px]">
             {activeTab === 'without' ? (
               /* Without Attunly - The anxiety */
               <div className="space-y-4">
@@ -770,11 +770,10 @@ const Pricing = () => {
               Yearly
             </button>
           </div>
-          {isYearly && (
-            <p className="text-sm text-coffee-roast font-medium mt-3">
-              Save 25% with annual billing
-            </p>
-          )}
+          {/* Always render to prevent layout shift */}
+          <p className={`text-sm text-coffee-roast font-medium mt-3 transition-opacity ${isYearly ? 'opacity-100' : 'opacity-0'}`}>
+            Save 25% with annual billing
+          </p>
         </div>
 
         {/* Pricing Cards */}
@@ -875,8 +874,10 @@ const Pricing = () => {
   );
 };
 
-// FAQ Section
+// FAQ Section - Accordion with flip arrows
 const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   const faqs = [
     {
       q: 'How does Attunly know who to suggest?',
@@ -901,25 +902,46 @@ const FAQ = () => {
   ];
 
   return (
-    <Section>
-      <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Questions</p>
+    <section className="px-6 md:px-12 lg:px-24 py-16 md:py-20 bg-coffee-paper">
+      <div className="max-w-2xl mx-auto">
+        <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Questions</p>
 
-      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
-        Common questions.
-      </h2>
+        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8">
+          Common questions.
+        </h2>
 
-      <div className="space-y-6">
-        {faqs.map((faq, index) => (
-          <div
-            key={index}
-            className="pb-6 border-b border-coffee-foam last:border-b-0"
-          >
-            <h3 className="text-lg font-medium text-coffee-espresso mb-2">{faq.q}</h3>
-            <p className="text-coffee-cortado">{faq.a}</p>
-          </div>
-        ))}
+        <div className="divide-y divide-coffee-foam">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="cursor-pointer"
+              onClick={() => setOpenIndex(openIndex === index ? null : index)}
+            >
+              <div className="flex justify-between items-center py-5 gap-4">
+                <h3 className="text-lg font-medium text-coffee-espresso">{faq.q}</h3>
+                <svg
+                  className={`w-5 h-5 text-coffee-cortado flex-shrink-0 transition-transform duration-200 ${
+                    openIndex === index ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div
+                className={`overflow-hidden transition-all duration-200 ${
+                  openIndex === index ? 'max-h-40 pb-5' : 'max-h-0'
+                }`}
+              >
+                <p className="text-coffee-cortado">{faq.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </Section>
+    </section>
   );
 };
 
@@ -975,7 +997,7 @@ export default function AttunlyLanding() {
       }}
     >
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm border-b border-coffee-latte">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="" className="w-7 h-7" />

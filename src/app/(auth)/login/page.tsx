@@ -18,11 +18,25 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  // Check for OAuth errors in URL params on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlError = params.get('error');
+    if (urlError) {
+      // Decode and display the OAuth error
+      setError(decodeURIComponent(urlError));
+      // Clean up the URL without reloading
+      window.history.replaceState({}, '', '/login');
+    }
+  }, []);
+
   // Check for existing session and redirect if logged in (non-blocking)
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      // If no user, just stay on login page - don't sign out (that would destroy pending sessions)
-      if (error || !user) {
+    // Use getSession first - more reliable right after OAuth
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user;
+      // If no user, just stay on login page
+      if (!user) {
         return;
       }
 
@@ -85,6 +99,7 @@ export default function LoginPage() {
 
     try {
       const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log('[Login] Starting OAuth with redirectUrl:', redirectUrl);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -97,6 +112,12 @@ export default function LoginPage() {
         },
       });
 
+      console.log('[Login] OAuth response:', {
+        hasUrl: !!data?.url,
+        error: error?.message,
+        urlHost: data?.url ? new URL(data.url).host : null
+      });
+
       if (error) {
         setError(error.message);
         setLoading(false);
@@ -106,7 +127,8 @@ export default function LoginPage() {
       if (data?.url) {
         window.location.href = data.url;
       }
-    } catch {
+    } catch (err) {
+      console.error('[Login] OAuth error:', err);
       setError("Failed to connect to Google. Please try again.");
       setLoading(false);
     }

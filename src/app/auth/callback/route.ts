@@ -11,11 +11,20 @@ export async function GET(request: Request) {
   const errorDescription = searchParams.get('error_description')
   const next = searchParams.get('next') ?? '/dashboard'
 
+  // Log all query params for debugging
+  const allParams: Record<string, string> = {};
+  searchParams.forEach((value, key) => {
+    allParams[key] = key === 'code' ? '[REDACTED]' : value;
+  });
+
   console.log('[OAuth Callback] Received:', {
     hasCode: !!code,
+    codeLength: code?.length,
     error,
     errorDescription,
-    origin
+    origin,
+    fullUrl: request.url.replace(/code=[^&]+/, 'code=[REDACTED]'),
+    allParams
   });
 
   // Handle OAuth errors
@@ -38,6 +47,15 @@ export async function GET(request: Request) {
   }
 
   const cookieStore = await cookies()
+
+  // Log available cookies (for debugging PKCE issues)
+  const allCookies = cookieStore.getAll();
+  const cookieNames = allCookies.map(c => c.name);
+  console.log('[OAuth Callback] Available cookies:', {
+    count: allCookies.length,
+    names: cookieNames,
+    hasPkce: cookieNames.some(n => n.includes('code_verifier') || n.includes('pkce'))
+  });
 
   // We need to create the response first so we can set cookies on it
   let redirectUrl = `${origin}${next}`

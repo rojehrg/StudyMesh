@@ -33,9 +33,11 @@ export default function SignupPage() {
 
   // Check for existing session and redirect if logged in (non-blocking)
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      // If no user, just stay on signup page - don't sign out (that would destroy pending sessions)
-      if (error || !user) {
+    // Use getSession first - more reliable right after OAuth redirect
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user;
+      // If no user, just stay on signup page
+      if (!user) {
         return;
       }
 

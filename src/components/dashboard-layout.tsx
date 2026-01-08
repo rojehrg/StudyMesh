@@ -41,18 +41,18 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
       prefetch={true}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-100 overflow-hidden whitespace-nowrap group",
+        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-100 overflow-hidden whitespace-nowrap group",
         showActive
-          ? "bg-muted text-foreground font-medium border-l-2 border-primary"
-          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-2 border-transparent"
+          ? "bg-coffee-cream/70 text-coffee-espresso font-medium"
+          : "text-coffee-cortado hover:bg-coffee-cream/40 hover:text-coffee-mocha"
       )}
       title={isCollapsed ? label : ""}
     >
       <div className="relative flex items-center">
-        <Icon className={cn("w-5 h-5 shrink-0", isPending && "animate-pulse")} />
+        <Icon className={cn("w-[18px] h-[18px] shrink-0", isPending && "animate-pulse")} />
         {badge ? (
           <span className={cn(
-            "absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full z-10 shadow-sm",
+            "absolute -top-1.5 -right-1.5 bg-coffee-mocha text-coffee-paper text-[10px] font-bold min-w-[16px] h-[16px] flex items-center justify-center px-1 rounded-full z-10",
             !isCollapsed && "hidden"
           )}>
             {badge > 9 ? '9+' : badge}
@@ -64,13 +64,13 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
         initial={false}
         animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="overflow-hidden whitespace-nowrap font-medium"
+        className="overflow-hidden whitespace-nowrap text-sm"
       >
         {label}
       </motion.span>
 
       {!isCollapsed && badge ? (
-        <span className="ml-auto bg-primary text-primary-foreground text-xs font-bold min-w-[22px] h-[22px] flex items-center justify-center px-1.5 rounded-full shadow-sm">
+        <span className="ml-auto bg-coffee-mocha text-coffee-paper text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center px-1 rounded-full">
           {badge > 9 ? '9+' : badge}
         </span>
       ) : null}
@@ -135,11 +135,14 @@ function DashboardLayoutBase({
   ];
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div
+      className="flex min-h-screen bg-coffee-paper"
+      style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
+    >
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-coffee-espresso/30 z-40 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -147,25 +150,24 @@ function DashboardLayoutBase({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 bg-card shadow-lg transition-all duration-300 ease-in-out flex flex-col",
+          "fixed inset-y-0 left-0 z-30 bg-white border-r border-coffee-foam transition-all duration-300 ease-in-out flex flex-col",
           isCollapsed ? "w-20" : "w-64",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-4">
-          <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <img src="/icon.png" alt="Attunly" className={cn(
+        <div className="h-14 flex items-center px-4">
+          <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/logo.svg" alt="Attunly" className={cn(
               "shrink-0 transition-all duration-300",
-              isCollapsed ? "w-10 h-10" : "w-7 h-7"
+              isCollapsed ? "w-8 h-8" : "w-6 h-6"
             )} />
             <motion.span
               initial={false}
               animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
-              className="whitespace-nowrap overflow-hidden text-xl font-bold"
+              className="whitespace-nowrap overflow-hidden text-lg font-semibold text-coffee-espresso"
             >
-              <span className="text-foreground">Attun</span>
-              <span className="text-primary">ly</span>
+              attunly
             </motion.span>
           </Link>
         </div>
@@ -199,20 +201,20 @@ function DashboardLayoutBase({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="px-3 py-2 rounded-xl bg-muted/50 border border-border/50"
+              className="px-3 py-2 rounded-lg bg-coffee-cream/40"
             >
-              <p className="text-xs text-muted-foreground">Organization</p>
-              <p className="text-sm font-medium text-foreground truncate">{orgName}</p>
+              <p className="text-[10px] uppercase tracking-wider text-coffee-latte">Organization</p>
+              <p className="text-sm text-coffee-mocha truncate">{orgName}</p>
             </motion.div>
           </div>
         )}
 
         {/* User Profile */}
-        <div className="p-3">
-          <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer">
-            <Avatar className="h-9 w-9 shrink-0">
+        <div className="p-3 border-t border-coffee-foam/50">
+          <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-coffee-cream/40 transition-colors cursor-pointer">
+            <Avatar className="h-8 w-8 shrink-0">
               <AvatarImage src="" />
-              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+              <AvatarFallback className="bg-coffee-foam text-coffee-mocha text-sm font-medium">
                 {profile?.first_name?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
@@ -226,7 +228,7 @@ function DashboardLayoutBase({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="overflow-hidden flex items-center flex-1"
             >
-              <p className="text-sm font-medium text-foreground truncate flex-1">
+              <p className="text-sm text-coffee-mocha truncate flex-1">
                 {profile?.first_name && profile?.last_name
                   ? `${profile.first_name} ${profile.last_name}`
                   : "User"}
@@ -234,10 +236,10 @@ function DashboardLayoutBase({
 
               <button
                 onClick={handleLogout}
-                className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg transition-colors active:scale-95 shrink-0"
+                className="text-coffee-latte hover:text-coffee-mocha p-1 rounded transition-colors active:scale-95 shrink-0"
                 title="Logout"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
               </button>
             </motion.div>
           </div>
@@ -251,25 +253,24 @@ function DashboardLayoutBase({
       )}>
         {/* Header - Fixed positioning */}
         <header className={cn(
-          "h-14 bg-card/95 backdrop-blur-sm shadow-sm flex items-center justify-between px-4 fixed top-0 right-0 z-30 border-b border-border/50",
+          "h-12 bg-coffee-paper/95 backdrop-blur-sm flex items-center justify-between px-4 fixed top-0 right-0 z-30",
           isCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
         )}>
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden">
-              <HamburgerLg className="w-6 h-6 text-foreground" />
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden text-coffee-mocha hover:bg-coffee-cream/50 h-8 w-8">
+              <HamburgerLg className="w-5 h-5" />
             </Button>
-            <span className="ml-3 font-bold text-lg md:hidden">
-              <span className="text-foreground">Attun</span>
-              <span className="text-primary">ly</span>
+            <span className="ml-2 font-semibold text-base md:hidden text-coffee-espresso">
+              attunly
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            {/* Theme toggle hidden for now - using light mode */}
           </div>
         </header>
 
         {/* Page Content - Add top margin for fixed header */}
-        <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-14 pt-6">
+        <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-12 pt-4">
           <CelebrationProvider>
             {children}
           </CelebrationProvider>
@@ -281,9 +282,9 @@ function DashboardLayoutBase({
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "hidden md:flex fixed top-1/2 -translate-y-1/2 z-40",
-          "bg-card",
-          "rounded-r-lg p-1.5 shadow-lg hover:shadow-xl",
-          "text-muted-foreground hover:text-primary transition-all duration-300 active:scale-95",
+          "bg-white border border-coffee-foam",
+          "rounded-r-lg p-1.5 shadow-sm hover:shadow-md",
+          "text-coffee-cortado hover:text-coffee-espresso transition-all duration-300 active:scale-95",
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
       >

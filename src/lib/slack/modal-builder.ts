@@ -23,11 +23,20 @@ export interface RecentContact {
   avatarUrl?: string;
 }
 
+export interface LingoTranslation {
+  originalQuestion: string;
+  translatedQuestion: string;
+  sourceDepartment: string;
+  targetDepartment: string;
+  wasTranslated: boolean;
+}
+
 export interface ModalConfig {
   initialContext: string;
   teamMembers?: TeamMember[];
   suggestedMessage?: string;
   recentContacts?: RecentContact[];
+  lingoTranslation?: LingoTranslation;
 }
 
 /**
@@ -35,7 +44,7 @@ export interface ModalConfig {
  * Optimized for send rate - keep friction low.
  */
 export function buildAskForHelpModal(config: ModalConfig) {
-  const { initialContext, teamMembers = [], suggestedMessage, recentContacts = [] } = config;
+  const { initialContext, teamMembers = [], suggestedMessage, recentContacts = [], lingoTranslation } = config;
 
   const blocks: any[] = [
     // Context input
@@ -58,6 +67,29 @@ export function buildAskForHelpModal(config: ModalConfig) {
       },
     },
   ];
+
+  // Add lingo translation preview if cross-department translation happened
+  if (lingoTranslation?.wasTranslated) {
+    blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Translated for ${lingoTranslation.targetDepartment}:*\n${lingoTranslation.translatedQuestion}`,
+      },
+    });
+    blocks.push({
+      type: 'context',
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: `_Your original: "${lingoTranslation.originalQuestion}"_`,
+        },
+      ],
+    });
+    blocks.push({
+      type: 'divider',
+    });
+  }
 
   // Build recipient options - combine recent contacts + suggestions
   const recipientOptions: any[] = [];

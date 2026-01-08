@@ -138,10 +138,74 @@ export async function POST(req: Request) {
     await client`CREATE INDEX IF NOT EXISTS "idx_meeting_participants_meeting" ON "meeting_participants" ("meeting_id")`;
     await client`CREATE INDEX IF NOT EXISTS "idx_meeting_participants_user" ON "meeting_participants" ("user_id")`;
 
+    // ============================================
+    // LINGO TRANSLATION SYSTEM TABLES
+    // ============================================
+
+    // Create department_lingo_profiles table
+    await client`
+      CREATE TABLE IF NOT EXISTS "department_lingo_profiles" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE,
+        "department" text NOT NULL,
+        "terms" jsonb DEFAULT '[]',
+        "communication_style" text,
+        "common_phrases" jsonb DEFAULT '[]',
+        "created_at" timestamptz DEFAULT now() NOT NULL,
+        "updated_at" timestamptz DEFAULT now() NOT NULL,
+        UNIQUE("organization_id", "department")
+      )
+    `;
+
+    // Create indexes for department_lingo_profiles
+    await client`CREATE INDEX IF NOT EXISTS "idx_lingo_profiles_org" ON "department_lingo_profiles" ("organization_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "idx_lingo_profiles_dept" ON "department_lingo_profiles" ("organization_id", "department")`;
+
+    // Create term_translations table
+    await client`
+      CREATE TABLE IF NOT EXISTS "term_translations" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE,
+        "source_department" text NOT NULL,
+        "target_department" text NOT NULL,
+        "source_term" text NOT NULL,
+        "target_term" text NOT NULL,
+        "confidence" integer DEFAULT 50,
+        "usage_count" integer DEFAULT 0,
+        "created_at" timestamptz DEFAULT now() NOT NULL,
+        "updated_at" timestamptz DEFAULT now() NOT NULL
+      )
+    `;
+
+    // Create indexes for term_translations
+    await client`CREATE INDEX IF NOT EXISTS "idx_term_trans_org" ON "term_translations" ("organization_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "idx_term_trans_depts" ON "term_translations" ("organization_id", "source_department", "target_department")`;
+
+    // Create translation_events table
+    await client`
+      CREATE TABLE IF NOT EXISTS "translation_events" (
+        "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+        "organization_id" uuid REFERENCES "organizations"("id") ON DELETE CASCADE,
+        "user_id" uuid REFERENCES "profiles"("id") ON DELETE SET NULL,
+        "source_department" text NOT NULL,
+        "target_department" text NOT NULL,
+        "original_text" text NOT NULL,
+        "translated_text" text NOT NULL,
+        "was_helpful" boolean,
+        "feedback" text,
+        "created_at" timestamptz DEFAULT now() NOT NULL
+      )
+    `;
+
+    // Create indexes for translation_events
+    await client`CREATE INDEX IF NOT EXISTS "idx_trans_events_org" ON "translation_events" ("organization_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "idx_trans_events_user" ON "translation_events" ("user_id")`;
+    await client`CREATE INDEX IF NOT EXISTS "idx_trans_events_depts" ON "translation_events" ("source_department", "target_department")`;
+
     return NextResponse.json({
       success: true,
       message: "Migration completed successfully",
-      tables: ["organizations", "availability_schedules", "scheduled_meetings", "meeting_participants"],
+      tables: ["organizations", "availability_schedules", "scheduled_meetings", "meeting_participants", "department_lingo_profiles", "term_translations", "translation_events"],
       profileUpdates: ["organization_id", "first_name", "last_name", "avatar_url", "slack_handle", "timezone", "email", "email_notifications", "slack_user_id", "slack_access_token", "slack_team_id", "slack_connected"],
       podUpdates: ["organization_id"]
     });

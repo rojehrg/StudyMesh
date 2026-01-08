@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { verifySlackRequest } from '@/lib/slack/verify-signature';
-import { buildAskForHelpModal, openModal, type TeamMember, type RecentContact } from '@/lib/slack/modal-builder';
+import { buildAskForHelpModal, openModal, type TeamMember, type RecentContact, type LingoTranslation } from '@/lib/slack/modal-builder';
 import { generateHelpMessage } from '@/lib/slack/message-generator';
-import { suggestPeople } from '@/lib/slack/person-suggester';
+import { suggestPeople, getRequesterDepartment, getSuggestedPersonDepartment } from '@/lib/slack/person-suggester';
+import { translateToLingo } from '@/lib/ai/lingo-translator';
 import { db } from '@/lib/db';
 import { commandEvents } from '@/lib/db/schema';
 
@@ -162,6 +163,7 @@ export async function POST(request: Request) {
     let suggestedMessage: string | undefined;
     let teamMembers: TeamMember[] = [];
     let recentContacts: RecentContact[] = [];
+    let lingoTranslation: LingoTranslation | undefined;
 
     // Start all async operations in parallel
     const messagePromise = text.trim()
@@ -194,11 +196,20 @@ export async function POST(request: Request) {
         })
       : Promise.resolve([]);
 
+    // Get requester's department for lingo translation
+    const requesterInfoPromise = teamId && userId
+      ? getRequesterDepartment(teamId, userId).catch((error) => {
+          console.error('[Slack Command] Failed to get requester department:', error);
+          return { department: null, organizationId: null };
+        })
+      : Promise.resolve({ department: null, organizationId: null });
+
     // Wait for all to complete
-    const [messageResult, suggestions, contacts] = await Promise.all([
+    const [messageResult, suggestions, contacts, requesterInfo] = await Promise.all([
       messagePromise,
       suggestionsPromise,
       recentContactsPromise,
+      requesterInfoPromise,
     ]);
 
     if (messageResult) {
@@ -222,12 +233,52 @@ export async function POST(request: Request) {
       console.log('[Slack Command] Recent contacts found:', contacts.length);
     }
 
+    // Cross-department lingo translation
+    // If requester has a department and we have suggestions, translate for the top suggestion's department
+    if (
+      text.trim() &&
+      requesterInfo.department &&
+      requesterInfo.organizationId &&
+      teamId &&
+      suggestions.length > 0
+    ) {
+      const topSuggestion = suggestions[0];
+      const targetDepartment = await getSuggestedPersonDepartment(teamId, topSuggestion.slackUserId);
+
+      if (targetDepartment && targetDepartment !== requesterInfo.department) {
+        console.log('[Slack Command] Attempting lingo translation:', {
+          source: requesterInfo.department,
+          target: targetDepartment,
+        });
+
+        try {
+          const translation = await translateToLingo(
+            text,
+            requesterInfo.department,
+            targetDepartment,
+            requesterInfo.organizationId
+          );
+
+          if (translation.wasTranslated) {
+            lingoTranslation = translation;
+            console.log('[Slack Command] Lingo translation successful:', {
+              sourceDepartment: translation.sourceDepartment,
+              targetDepartment: translation.targetDepartment,
+            });
+          }
+        } catch (error) {
+          console.error('[Slack Command] Lingo translation failed:', error);
+        }
+      }
+    }
+
     // Build and open the modal
     const modal = buildAskForHelpModal({
       initialContext: text,
       teamMembers,
       suggestedMessage,
       recentContacts,
+      lingoTranslation,
     });
 
     try {
@@ -239,6 +290,9 @@ export async function POST(request: Request) {
           hasAiMessage: !!suggestedMessage,
           suggestionsCount: teamMembers.length,
           recentContactsCount: recentContacts.length,
+          hasLingoTranslation: !!lingoTranslation?.wasTranslated,
+          lingoSourceDept: lingoTranslation?.sourceDepartment,
+          lingoTargetDept: lingoTranslation?.targetDepartment,
         });
       }
 
