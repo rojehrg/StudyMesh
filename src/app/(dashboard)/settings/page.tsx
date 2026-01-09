@@ -151,51 +151,48 @@ function SettingsContent() {
         lastSavedRef.current = JSON.stringify(profileData);
       }
 
-      // Load org data with stats
-      const { data: orgMember } = await supabase
-        .from('organization_members')
-        .select('organization_id, role, organizations(id, name, invite_code, slack_connected, slack_team_name)')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Load org data directly from profile's organization_id
+      if (profileData?.organization_id) {
+        const { data: orgData } = await supabase
+          .from('organizations')
+          .select('id, name, invite_code, slack_connected, slack_team_name, owner_id')
+          .eq('id', profileData.organization_id)
+          .single();
 
-      if (orgMember?.organizations) {
-        const orgData = orgMember.organizations as any;
+        if (orgData) {
+          const isOwner = orgData.owner_id === user.id;
 
-        // Get member stats for admins
-        let memberCount = 0;
-        let slackConnectedCount = 0;
-        let expertiseFilledCount = 0;
+          // Get member stats for admins/owners
+          let memberCount = 0;
+          let slackConnectedCount = 0;
+          let expertiseFilledCount = 0;
 
-        if (orgMember.role === 'owner' || orgMember.role === 'admin') {
-          const { count: totalMembers } = await supabase
-            .from('organization_members')
-            .select('*', { count: 'exact', head: true })
-            .eq('organization_id', orgData.id);
-          memberCount = totalMembers || 0;
+          if (isOwner) {
+            // Get profiles with slack connected in this org
+            const { data: profiles } = await supabase
+              .from('profiles')
+              .select('slack_connected, expertise_text')
+              .eq('organization_id', orgData.id);
 
-          // Get profiles with slack connected
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('slack_connected, expertise_text')
-            .eq('organization_id', orgData.id);
-
-          if (profiles) {
-            slackConnectedCount = profiles.filter(p => p.slack_connected).length;
-            expertiseFilledCount = profiles.filter(p => p.expertise_text && p.expertise_text.length > 10).length;
+            if (profiles) {
+              memberCount = profiles.length;
+              slackConnectedCount = profiles.filter(p => p.slack_connected).length;
+              expertiseFilledCount = profiles.filter(p => p.expertise_text && p.expertise_text.length > 10).length;
+            }
           }
-        }
 
-        setOrg({
-          id: orgData.id,
-          name: orgData.name,
-          inviteCode: orgData.invite_code,
-          isOwner: orgMember.role === 'owner' || orgMember.role === 'admin',
-          slackConnected: orgData.slack_connected || false,
-          slackTeamName: orgData.slack_team_name || "",
-          memberCount,
-          slackConnectedCount,
-          expertiseFilledCount,
-        });
+          setOrg({
+            id: orgData.id,
+            name: orgData.name,
+            inviteCode: orgData.invite_code,
+            isOwner,
+            slackConnected: orgData.slack_connected || false,
+            slackTeamName: orgData.slack_team_name || "",
+            memberCount,
+            slackConnectedCount,
+            expertiseFilledCount,
+          });
+        }
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -564,10 +561,10 @@ function SettingsContent() {
         </div>
       </section>
 
-      {/* Team Section - Admin Only */}
-      {org?.isOwner && (
+      {/* Organization Section - Show for all users */}
+      {org && (
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-coffee-espresso">Team</h2>
+          <h2 className="text-lg font-semibold text-coffee-espresso">Organization</h2>
 
           <div className="bg-white rounded-xl border border-coffee-foam p-5 space-y-4">
             {/* Org Name */}
@@ -577,7 +574,7 @@ function SettingsContent() {
               </div>
               <div>
                 <p className="font-semibold text-coffee-espresso">{org.name}</p>
-                <p className="text-sm text-coffee-cortado">Organization Owner</p>
+                <p className="text-sm text-coffee-cortado">{org.isOwner ? 'Owner' : 'Member'}</p>
               </div>
             </div>
 
@@ -595,8 +592,8 @@ function SettingsContent() {
               <p className="text-xs text-coffee-cortado mt-2">Share this code to invite teammates</p>
             </div>
 
-            {/* Team Stats */}
-            {(org.memberCount ?? 0) > 0 && (
+            {/* Team Stats - Admin Only */}
+            {org.isOwner && (org.memberCount ?? 0) > 0 && (
               <div className="pt-4 border-t border-coffee-foam">
                 <h4 className="text-sm font-medium text-coffee-mocha mb-3">Team Health</h4>
                 <div className="space-y-2 text-sm">
