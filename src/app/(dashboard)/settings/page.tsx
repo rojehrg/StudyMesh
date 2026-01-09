@@ -155,12 +155,13 @@ function SettingsContent() {
       if (profileData?.organization_id) {
         const { data: orgData } = await supabase
           .from('organizations')
-          .select('id, name, invite_code, slack_connected, slack_team_name, owner_id')
+          .select('id, name, invite_code, slack_bot_token, slack_team_name, owner_id')
           .eq('id', profileData.organization_id)
           .single();
 
         if (orgData) {
           const isOwner = orgData.owner_id === user.id;
+          const slackConnected = !!orgData.slack_bot_token;
 
           // Get member stats for admins/owners
           let memberCount = 0;
@@ -186,7 +187,7 @@ function SettingsContent() {
             name: orgData.name,
             inviteCode: orgData.invite_code,
             isOwner,
-            slackConnected: orgData.slack_connected || false,
+            slackConnected,
             slackTeamName: orgData.slack_team_name || "",
             memberCount,
             slackConnectedCount,
