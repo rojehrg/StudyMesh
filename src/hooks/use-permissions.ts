@@ -18,6 +18,7 @@ import {
 } from '@/lib/rbac/permissions';
 
 interface OrgMembership {
+  userId: string;
   organizationId: string;
   organizationName: string;
   role: OrganizationRoleType;
@@ -71,6 +72,7 @@ export function usePermissions(): UsePermissionsReturn {
       const role = memberData.role as OrganizationRoleType;
 
       setMembership({
+        userId: user.id,
         organizationId: org.id,
         organizationName: org.name,
         role,

@@ -10,6 +10,7 @@ import {
   LogOut,
   Users,
 } from "react-coolicons";
+import { FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -133,6 +134,7 @@ function DashboardLayoutBase({
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: Users, label: "Team", href: "/team" },
+    { icon: FileText, label: "Audit Log", href: "/audit-log" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
 

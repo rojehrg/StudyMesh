@@ -19,21 +19,22 @@ import { toast } from "sonner";
 import { usePermissions } from "@/hooks/use-permissions";
 import {
   Permission,
-  OrganizationRole,
   getRoleDisplayName,
   getRoleDescription,
-} from "@/lib/rbac";
+} from "@/lib/rbac/permissions";
+import { OrganizationRole } from "@/lib/db/schema";
 import {
   Users,
   UserPlus,
   Copy,
-  CheckBig,
-  TrashFull,
+  Check,
+  Trash2,
   ShieldAlert,
   Crown,
   User,
-} from "react-coolicons";
-import { Slack, Mail } from "lucide-react";
+  Slack,
+  Mail,
+} from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -277,7 +278,7 @@ export default function TeamPage() {
                   className="shrink-0"
                 >
                   {copiedCode ? (
-                    <CheckBig className="w-4 h-4 text-emerald-600" />
+                    <Check className="w-4 h-4 text-emerald-600" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -425,7 +426,7 @@ export default function TeamPage() {
                       {removingId === member.user_id ? (
                         <LottieLoader size="sm" className="w-4 h-4" />
                       ) : (
-                        <TrashFull className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       )}
                     </Button>
                   )}
