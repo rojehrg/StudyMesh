@@ -42,29 +42,27 @@ export async function GET() {
 
     const supabase = await createClient();
 
-    // Fetch all organization members with expertise data
-    const { data: members, error } = await supabase
-      .from('organization_members')
+    // Fetch all profiles in the organization directly
+    const { data: profiles, error } = await supabase
+      .from('profiles')
       .select(`
         user_id,
-        profiles (
-          user_id,
-          first_name,
-          last_name,
-          department,
-          major,
-          expertise_text,
-          knowledge_areas,
-          currently_available,
-          slack_connected
-        )
+        first_name,
+        last_name,
+        department,
+        major,
+        expertise_text,
+        knowledge_areas,
+        availability,
+        slack_user_id
       `)
-      .eq('organization_id', context.organizationId);
+      .eq('organization_id', context.organizationId)
+      .neq('user_id', context.userId); // Exclude current user to test with others
 
     if (error) throw error;
 
     // Fetch embeddings separately (not in Drizzle schema)
-    const userIds = members?.map(m => m.user_id) || [];
+    const userIds = profiles?.map(p => p.user_id) || [];
     let embeddingsMap: Record<string, number[]> = {};
 
     if (userIds.length > 0) {
@@ -80,13 +78,11 @@ export async function GET() {
     const nodes: GraphNode[] = [];
     const graphMembers: GraphMember[] = [];
 
-    for (const member of members || []) {
-      const profile = member.profiles as any;
-      if (!profile) continue;
-
+    for (const profile of profiles || []) {
       const firstName = profile.first_name || '';
       const lastName = profile.last_name || '';
       const knowledgeAreas = profile.knowledge_areas || [];
+      const availability = profile.availability as { currentlyAvailable?: boolean } | null;
 
       nodes.push({
         id: profile.user_id,
@@ -96,8 +92,8 @@ export async function GET() {
         major: profile.major,
         expertiseText: profile.expertise_text,
         knowledgeAreas,
-        currentlyAvailable: profile.currently_available || false,
-        slackConnected: profile.slack_connected || false,
+        currentlyAvailable: availability?.currentlyAvailable || false,
+        slackConnected: !!profile.slack_user_id,
         expertiseDepth: calculateExpertiseDepth({
           expertise_text: profile.expertise_text,
           knowledge_areas: knowledgeAreas,

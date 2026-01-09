@@ -42,10 +42,21 @@ export interface GraphData {
   };
 }
 
+export class GraphError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 const fetcher = async (url: string): Promise<GraphData> => {
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error('Failed to fetch graph data');
+    if (res.status === 401) {
+      throw new GraphError('Not authenticated or not in an organization', 401);
+    }
+    throw new GraphError('Failed to fetch graph data', res.status);
   }
   return res.json();
 };

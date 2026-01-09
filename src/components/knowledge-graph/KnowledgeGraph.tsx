@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Network, Users } from 'lucide-react';
-import { useGraphData, type GraphNode } from './hooks/useGraphData';
+import { useGraphData, type GraphNode, GraphError } from './hooks/useGraphData';
 import { useGraphFilters } from './hooks/useGraphFilters';
 import { GraphCanvas } from './GraphCanvas';
 import { GraphFilters } from './GraphFilters';
@@ -26,14 +26,18 @@ export function KnowledgeGraph() {
   }
 
   if (error) {
+    const isAuthError = error instanceof GraphError && error.status === 401;
+
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-        <Network className="w-12 h-12 text-coffee-latte mb-4" />
+        <Users className="w-12 h-12 text-coffee-latte mb-4" />
         <h2 className="text-lg font-medium text-coffee-espresso mb-2">
-          Could not load knowledge graph
+          {isAuthError ? 'No teammates to display' : 'Could not load knowledge graph'}
         </h2>
-        <p className="text-coffee-cortado">
-          Please try refreshing the page
+        <p className="text-coffee-cortado max-w-sm">
+          {isAuthError
+            ? 'Invite teammates to your organization to see the knowledge graph and discover expertise across your team.'
+            : 'Please try refreshing the page'}
         </p>
       </div>
     );

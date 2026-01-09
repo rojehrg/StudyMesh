@@ -229,9 +229,9 @@ const Hero = () => (
           <p className="text-coffee-latte text-xs md:text-sm tracking-wide uppercase mb-4 md:mb-6">A Slack command</p>
 
           <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6">
-            Find the right person.
+            Ask for help in Slack.
             <br />
-            <span className="text-coffee-oat">Ask them easily.</span>
+            <span className="text-coffee-oat">Without the awkward part.</span>
           </h1>
 
           <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch]">
@@ -239,7 +239,7 @@ const Hero = () => (
             <code className="bg-coffee-cream px-1.5 md:px-2 py-0.5 rounded text-sm md:text-lg font-mono text-coffee-mocha">
               /attunly
             </code>{' '}
-            in Slack. Find who knows it, see when they&apos;re free, ask in a language they understand.
+            and describe what you need. See who knows it, when they&apos;re free, and send a message they can easily say yes or no to.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
@@ -270,17 +270,16 @@ const TheMoment = () => (
         <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
 
         <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
-          <p>The cursor is blinking in Slack.</p>
+          <p>You need help with something.</p>
           <p>
-            You need help with something. But you&apos;re not sure who knows it. You&apos;re not sure if they&apos;re free.
-            You&apos;re not sure how to phrase it.
+            You&apos;re not sure who knows it. Not sure if they&apos;re busy. Not sure how to ask without sounding clueless.
           </p>
-          <p className="text-coffee-latte">So the question waits, and the work stays blocked.</p>
+          <p className="text-coffee-latte">So you don&apos;t ask. You guess. You wait. The work stays stuck.</p>
         </div>
 
         <div className="mt-10 pt-8 border-t border-coffee-steamed">
           <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-            That question? It stays unasked. And the work stays stuck.
+            Attunly handles the awkward part. You just describe what you need.
           </p>
         </div>
       </div>
@@ -308,10 +307,10 @@ const SocialProof = () => (
         className="absolute top-0 -left-28 w-24 h-24 rotate-[310deg] opacity-60"
       />
       <blockquote className="text-2xl md:text-3xl text-coffee-mocha leading-relaxed mb-6 max-w-[50ch] mx-auto">
-        &ldquo;Attunly cut our &apos;who knows this?&apos; messages by 80%. People actually ask for help now.&rdquo;
+        &ldquo;New hires used to wait days before asking anyone anything. Now they ask in their first week.&rdquo;
       </blockquote>
       <p className="text-coffee-cortado">
-        — Engineering Manager, Series B startup
+        — Engineering Manager, 45-person startup
       </p>
     </div>
   </Section>
@@ -329,10 +328,10 @@ const BeforeAfterDemo = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4">
-            From stuck to unstuck.
+            The difference is time.
           </h2>
           <p className="text-lg text-coffee-steamed max-w-[50ch] mx-auto">
-            See the difference one command makes.
+            Hours waiting for a maybe. Or minutes to the right person.
           </p>
         </div>
 
@@ -547,8 +546,8 @@ const WhatsDifferentAndWhoUsesIt = () => (
                 desc: 'Shows actual calendar availability, not just a green dot.',
               },
               {
-                title: '"How do I ask?"',
-                desc: "Drafts a low-pressure message that's easy to say yes or no to.",
+                title: '"How do I phrase this?"',
+                desc: "Drafts a message for you. Clear, specific, and easy for them to say yes or no to.",
               },
               {
                 title: '"Do they speak my language?"',
@@ -578,10 +577,10 @@ const WhatsDifferentAndWhoUsesIt = () => (
 
           <div className="space-y-4">
             {[
-              'When the person who built that service left 6 months ago',
-              'When you\'re the new hire who doesn\'t know anyone yet',
-              'When it\'s 4pm and you need someone who\'s actually free',
-              'When you don\'t want to post in #general and look clueless',
+              'The person who built it left months ago. No one knows who took over.',
+              'You\'re new. You don\'t know who knows what yet.',
+              'It\'s 4pm. You need someone free, not just online.',
+              'You don\'t want to ping #general and wait for maybes.',
             ].map((moment) => (
               <div
                 key={moment}
@@ -607,12 +606,12 @@ const LingoTranslation = () => {
         <div className="text-center mb-10">
           <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Cross-team clarity</p>
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-            Same question.
+            They speak engineering.
             <br />
-            <span className="text-coffee-oat">Different languages.</span>
+            <span className="text-coffee-oat">You speak sales.</span>
           </h2>
           <p className="text-lg text-coffee-cortado max-w-[50ch] mx-auto">
-            Attunly translates departmental jargon automatically.
+            Attunly translates your question so the right person understands it.
           </p>
         </div>
 
@@ -787,10 +786,10 @@ const LingoTranslation = () => {
 // Trust Section
 const Trust = () => (
   <Section darker>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Designed for real teams</p>
+    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">No new tools to learn</p>
 
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
-      Stays out of your way.
+      It&apos;s just a Slack command.
     </h2>
 
     <div className="grid gap-5">
@@ -809,8 +808,8 @@ const Trust = () => (
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">You stay in control</h3>
-        <p className="text-coffee-cortado">Edit the draft. Pick a different person. Schedule or message. Your call.</p>
+        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Low pressure for everyone</h3>
+        <p className="text-coffee-cortado">The message makes it easy to say yes or no. No guilt, no obligation. The receiver stays in control.</p>
       </div>
     </div>
   </Section>
@@ -1144,11 +1143,11 @@ const FAQ = () => {
 const FinalCTA = () => (
   <Section className="text-center" id="install" darker>
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-      That question doesn&apos;t have to wait.
+      Stop guessing. Start asking.
     </h2>
 
     <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto">
-      Add Attunly to Slack. Find who can help. Ask easily.
+      One command. The right person. A message they can actually respond to.
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
