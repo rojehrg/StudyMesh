@@ -283,12 +283,12 @@ export default function FindHelpPage() {
 
                     {/* Lingo translation badge */}
                     {match.translated_expertise && (
-                      <div className="mt-2 p-2 bg-purple-50 rounded-lg border border-purple-100">
-                        <p className="text-xs text-purple-600 font-medium flex items-center gap-1 mb-1">
+                      <div className="mt-2 p-2 bg-coffee-cream rounded-lg border border-coffee-foam">
+                        <p className="text-xs text-coffee-latte font-medium flex items-center gap-1 mb-1">
                           <Languages className="w-3 h-3" />
                           Translated from {match.translation_info?.from_dept}
                         </p>
-                        <p className="text-sm text-purple-800">
+                        <p className="text-sm text-coffee-espresso">
                           {match.translated_expertise}
                         </p>
                       </div>

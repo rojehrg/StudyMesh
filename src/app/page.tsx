@@ -597,75 +597,192 @@ const WhatsDifferentAndWhoUsesIt = () => (
   </section>
 );
 
-// Lingo Translation Section
-const LingoTranslation = () => (
-  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream/50">
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-12">
-        <span className="inline-block mb-4 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
-          Cross-Department Clarity
-        </span>
-        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-          One language.
-          <br />
-          <span className="text-coffee-oat">Every department.</span>
-        </h2>
-        <p className="text-lg text-coffee-cortado max-w-2xl mx-auto">
-          When Sales asks about "deal velocity," Engineering hears "lead conversion pipeline performance."
-          Attunly translates departmental jargon so everyone understands each other.
-        </p>
-      </div>
+// Lingo Translation Section - matches BeforeAfterDemo style
+const LingoTranslation = () => {
+  const [activeTab, setActiveTab] = useState<'without' | 'with'>('without');
 
-      {/* Before/After Translation Demo */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Before - Jargon */}
-        <div className="bg-white rounded-xl p-6 border border-coffee-foam">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-              <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <span className="font-medium text-coffee-mocha">Without translation</span>
-          </div>
-          <div className="space-y-3">
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Sales asks:</p>
-              <p className="text-sm text-coffee-espresso">"Who can help with our deal velocity issues?"</p>
-            </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Engineering sees:</p>
-              <p className="text-sm text-gray-400 italic">"Deal velocity? What does that even mean?"</p>
-            </div>
+  return (
+    <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Cross-team clarity</p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
+            Same question.
+            <br />
+            <span className="text-coffee-oat">Different languages.</span>
+          </h2>
+          <p className="text-lg text-coffee-cortado max-w-[50ch] mx-auto">
+            Attunly translates departmental jargon automatically.
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-coffee-steamed/50 rounded-full p-1">
+            <button
+              onClick={() => setActiveTab('without')}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+                activeTab === 'without'
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-cortado hover:text-coffee-espresso'
+              }`}
+            >
+              Without Attunly
+            </button>
+            <button
+              onClick={() => setActiveTab('with')}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+                activeTab === 'with'
+                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
+                  : 'text-coffee-cortado hover:text-coffee-espresso'
+              }`}
+            >
+              With Attunly
+            </button>
           </div>
         </div>
 
-        {/* After - Translated */}
-        <div className="bg-white rounded-xl p-6 border-2 border-purple-200">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
-              <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-              </svg>
+        {/* Mock Slack UI */}
+        <div className="bg-[#1a1d21] rounded-xl shadow-2xl overflow-hidden font-sans ring-1 ring-coffee-oat/70">
+          {/* Slack header */}
+          <div className="bg-[#1a1d21] px-4 py-3 flex items-center gap-3 border-b border-white/10">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
             </div>
-            <span className="font-medium text-coffee-mocha">With Attunly</span>
+            <span className="text-white/70 text-sm font-medium ml-2"># sales</span>
           </div>
-          <div className="space-y-3">
-            <div className="p-3 bg-purple-50 rounded-lg">
-              <p className="text-xs text-purple-600 mb-1">Sales asks:</p>
-              <p className="text-sm text-coffee-espresso">"Who can help with our deal velocity issues?"</p>
-            </div>
-            <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-              <p className="text-xs text-green-600 mb-1">Engineering sees:</p>
-              <p className="text-sm text-coffee-espresso">"Who can help optimize lead conversion performance in the pipeline?"</p>
-              <p className="text-xs text-gray-400 mt-1 italic">Auto-translated from Sales → Engineering</p>
-            </div>
+
+          {/* Chat content */}
+          <div className="p-5 min-h-[320px]">
+            {activeTab === 'without' ? (
+              /* Without Attunly - Lost in translation */
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    J
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">Jordan (Sales)</span>
+                      <span className="text-xs text-white/60">10:15 AM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      Hey @engineering — our deal velocity is tanking. Can someone help figure out why prospects are dropping off?
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-white/60 text-sm pl-12">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>45 minutes later...</span>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    A
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">Alex (Engineering)</span>
+                      <span className="text-xs text-white/60">11:02 AM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      Deal velocity? Is that a metric we track? Not sure what system that&apos;s in.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    M
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">Maria (Engineering)</span>
+                      <span className="text-xs text-white/60">11:08 AM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      Might be CRM-related? Or maybe ask product?
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+                  <p className="text-white/50 text-sm text-center">
+                    Different departments, different languages. Question goes unanswered.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* With Attunly - Translated */
+              <div className="space-y-4">
+                <div className="border border-white/20 rounded-lg px-4 py-3 bg-white/5">
+                  <div className="flex items-center text-[15px]">
+                    <span className="text-white font-semibold">/attunly</span>
+                    <span className="ml-2 text-white/80">deal velocity is tanking, prospects dropping off</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-5">
+                  <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
+                    <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold text-white text-[15px]">Attunly</span>
+                      <span className="text-[11px] text-white/50 bg-white/10 px-1.5 py-0.5 rounded font-medium">APP</span>
+                    </div>
+
+                    {/* Translation callout */}
+                    <div className="p-3 bg-coffee-cream rounded-lg mb-3">
+                      <p className="text-xs text-coffee-latte mb-1">Translated for Engineering:</p>
+                      <p className="text-sm text-coffee-espresso">
+                        &ldquo;Lead conversion rate in the sales pipeline is declining. Looking for help diagnosing funnel drop-off points.&rdquo;
+                      </p>
+                    </div>
+
+                    <p className="text-[15px] text-white/90 leading-relaxed mb-3">
+                      Found <strong>2 people</strong> who can help:
+                    </p>
+
+                    {/* Expert card */}
+                    <div className="p-3 bg-coffee-cream rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
+                            SP
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-coffee-espresso"></div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-coffee-espresso text-sm">Sam P.</div>
+                          <p className="text-xs text-coffee-cortado">Free now · Analytics, Funnels, Conversion</p>
+                        </div>
+                        <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">
+                          Ask
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+                      <p className="text-white/70 text-sm text-center">
+                        Same question. Now everyone understands.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // Trust Section
 const Trust = () => (
