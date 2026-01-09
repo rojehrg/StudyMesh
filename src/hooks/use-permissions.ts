@@ -73,10 +73,24 @@ export function usePermissions(): UsePermissionsReturn {
         return;
       }
 
-      // Determine role: owner if they own the org, otherwise member
-      const role: OrganizationRoleType = org.owner_id === user.id
-        ? OrganizationRole.OWNER
-        : OrganizationRole.MEMBER;
+      // Determine role: owner if they own the org, otherwise check organization_members
+      let role: OrganizationRoleType = OrganizationRole.MEMBER;
+
+      if (org.owner_id === user.id) {
+        role = OrganizationRole.OWNER;
+      } else {
+        // Check organization_members for admin role
+        const { data: membership } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('organization_id', org.id)
+          .maybeSingle();
+
+        if (membership?.role === 'admin') {
+          role = OrganizationRole.ADMIN;
+        }
+      }
 
       setMembership({
         userId: user.id,
