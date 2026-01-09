@@ -31,6 +31,14 @@ export default function OnboardingPage() {
     aboutMe: "", // Natural language: skills, interests, what you can help with
   });
 
+  // Track which fields have been touched for validation
+  const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
+    role: false,
+    aboutMe: false,
+  });
+
   // Get user data on mount
   useEffect(() => {
     const init = async () => {
@@ -154,7 +162,16 @@ export default function OnboardingPage() {
     );
   }
 
-  const isStep1Valid = formData.firstName && formData.lastName && formData.role && formData.aboutMe.trim().length > 20;
+  // Validation - reduced minimum to 10 chars for aboutMe
+  const isStep1Valid = formData.firstName && formData.lastName && formData.role && formData.aboutMe.trim().length >= 10;
+
+  // Count completed fields for progress indicator
+  const completedFields = [
+    formData.firstName,
+    formData.lastName,
+    formData.role,
+    formData.aboutMe.trim().length >= 10
+  ].filter(Boolean).length;
 
   return (
     <div
@@ -220,49 +237,67 @@ export default function OnboardingPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                        First name
+                        First name <span className="text-red-400">*</span>
                       </Label>
                       <Input
                         id="firstName"
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
+                        onBlur={() => setTouched({...touched, firstName: true})}
                         placeholder="Jane"
                         autoComplete="off"
-                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
+                        className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
+                          touched.firstName && !formData.firstName ? 'border-red-300' : 'border-coffee-foam'
+                        }`}
                       />
+                      {touched.firstName && !formData.firstName && (
+                        <p className="text-xs text-red-500 mt-1">First name is required</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="lastName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                        Last name
+                        Last name <span className="text-red-400">*</span>
                       </Label>
                       <Input
                         id="lastName"
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
+                        onBlur={() => setTouched({...touched, lastName: true})}
                         placeholder="Smith"
                         autoComplete="off"
-                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
+                        className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
+                          touched.lastName && !formData.lastName ? 'border-red-300' : 'border-coffee-foam'
+                        }`}
                       />
+                      {touched.lastName && !formData.lastName && (
+                        <p className="text-xs text-red-500 mt-1">Last name is required</p>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="role" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                      Your role
+                      Your role <span className="text-red-400">*</span>
                     </Label>
                     <Input
                       id="role"
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value})}
+                      onBlur={() => setTouched({...touched, role: true})}
                       placeholder="e.g. Senior Product Manager"
                       autoComplete="off"
-                      className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
+                      className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
+                        touched.role && !formData.role ? 'border-red-300' : 'border-coffee-foam'
+                      }`}
                     />
+                    {touched.role && !formData.role && (
+                      <p className="text-xs text-red-500 mt-1">Role is required</p>
+                    )}
                   </div>
 
                   <div>
                     <Label htmlFor="aboutMe" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                      About you
+                      About you <span className="text-red-400">*</span>
                     </Label>
                     <p className="text-sm text-coffee-latte mb-2">
                       What do you know? What can you help with? What are you learning?
@@ -271,16 +306,29 @@ export default function OnboardingPage() {
                       id="aboutMe"
                       value={formData.aboutMe}
                       onChange={e => setFormData({...formData, aboutMe: e.target.value})}
+                      onBlur={() => setTouched({...touched, aboutMe: true})}
                       placeholder="I've been in product for 5 years, specializing in B2B SaaS. I can help with roadmap prioritization, stakeholder management, and writing PRDs. Currently learning more about AI/ML product strategy and would love to connect with folks who have experience there."
-                      className="min-h-[140px] bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none resize-none font-sans text-[15px]"
+                      className={`min-h-[140px] bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none resize-none font-sans text-[15px] ${
+                        touched.aboutMe && formData.aboutMe.trim().length < 10 ? 'border-red-300' : 'border-coffee-foam'
+                      }`}
                     />
-                    <p className="text-xs text-coffee-latte mt-1.5">
-                      Write naturally — our AI uses this to match you with teammates.
-                    </p>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <p className="text-xs text-coffee-latte">
+                        Write naturally — our AI uses this to match you with teammates.
+                      </p>
+                      {touched.aboutMe && formData.aboutMe.trim().length < 10 && (
+                        <p className="text-xs text-red-500">
+                          {formData.aboutMe.trim().length}/10 characters
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-8 flex justify-end">
+                <div className="mt-8 flex items-center justify-between">
+                  <p className="text-sm text-coffee-latte">
+                    {completedFields} of 4 complete
+                  </p>
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!isStep1Valid}
