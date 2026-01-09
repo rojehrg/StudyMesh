@@ -23,6 +23,7 @@ import {
   Clock,
   Users,
   ArrowRight,
+  Languages,
 } from "lucide-react";
 
 interface Match {
@@ -37,6 +38,11 @@ interface Match {
   department: string | null;
   timezone: string | null;
   slack_connected: boolean;
+  translated_expertise?: string | null;
+  translation_info?: {
+    from_dept: string;
+    to_dept: string;
+  } | null;
 }
 
 export default function FindHelpPage() {
@@ -274,6 +280,19 @@ export default function FindHelpPage() {
                         {match.expertise_text}
                       </p>
                     ) : null}
+
+                    {/* Lingo translation badge */}
+                    {match.translated_expertise && (
+                      <div className="mt-2 p-2 bg-purple-50 rounded-lg border border-purple-100">
+                        <p className="text-xs text-purple-600 font-medium flex items-center gap-1 mb-1">
+                          <Languages className="w-3 h-3" />
+                          Translated from {match.translation_info?.from_dept}
+                        </p>
+                        <p className="text-sm text-purple-800">
+                          {match.translated_expertise}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Action */}

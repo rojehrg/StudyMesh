@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { serverAnalytics } from "@/lib/analytics";
 import { semanticMatch } from "@/lib/ai/semantic-search";
+import { translateToLingo } from "@/lib/ai/lingo-translator";
 
 /**
  * POST /api/find-help
@@ -22,10 +23,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { queryText, limit = 10 } = body;
 
-    // Get user's organization
+    // Get user's organization and department for lingo translation
     const { data: profile } = await supabase
       .from('profiles')
-      .select('organization_id')
+      .select('organization_id, department')
       .eq('user_id', user.id)
       .single();
 
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const requesterDept = profile.department;
+    const orgId = profile.organization_id;
 
     // Fetch all profiles with expertise in the org (excluding current user)
     const { data: allProfiles, error: fetchError } = await supabase
@@ -87,7 +91,7 @@ export async function POST(request: Request) {
       } else if (aiMatches.length > 0) {
         // Map AI results back to full profiles
         const profileMap = new Map(allProfiles.map(p => [p.user_id, p]));
-        const matches = aiMatches.slice(0, limit).map(match => {
+        const baseMatches = aiMatches.slice(0, limit).map(match => {
           const p = profileMap.get(match.user_id)!;
           return {
             user_id: p.user_id,
@@ -104,6 +108,37 @@ export async function POST(request: Request) {
             slack_connected: !!p.slack_user_id,
           };
         });
+
+        // Apply lingo translation for cross-department matches
+        const matches = await Promise.all(baseMatches.map(async (match) => {
+          if (requesterDept && match.department &&
+              requesterDept.toLowerCase() !== match.department.toLowerCase()) {
+            try {
+              const textToTranslate = match.match_reason || match.expertise_text || '';
+              if (textToTranslate) {
+                const translation = await translateToLingo(
+                  textToTranslate,
+                  match.department,
+                  requesterDept,
+                  orgId
+                );
+                if (translation.wasTranslated) {
+                  return {
+                    ...match,
+                    translated_expertise: translation.translatedQuestion,
+                    translation_info: {
+                      from_dept: match.department,
+                      to_dept: requesterDept,
+                    },
+                  };
+                }
+              }
+            } catch (err) {
+              console.error('Lingo translation error:', err);
+            }
+          }
+          return match;
+        }));
 
         serverAnalytics.findHelpSearched(user.id, queryText, matches.length);
         return NextResponse.json({
@@ -192,7 +227,38 @@ export async function POST(request: Request) {
 
         // Sort by match count (most relevant first), then limit
         scoredMatches.sort((a, b) => b.matchCount - a.matchCount);
-        const matches = scoredMatches.slice(0, limit).map(({ matchCount, ...rest }) => rest);
+        const baseMatches = scoredMatches.slice(0, limit).map(({ matchCount, ...rest }) => rest);
+
+        // Apply lingo translation for cross-department matches
+        const matches = await Promise.all(baseMatches.map(async (match) => {
+          if (requesterDept && match.department &&
+              requesterDept.toLowerCase() !== match.department.toLowerCase()) {
+            try {
+              const textToTranslate = match.expertise_text || '';
+              if (textToTranslate) {
+                const translation = await translateToLingo(
+                  textToTranslate,
+                  match.department,
+                  requesterDept,
+                  orgId
+                );
+                if (translation.wasTranslated) {
+                  return {
+                    ...match,
+                    translated_expertise: translation.translatedQuestion,
+                    translation_info: {
+                      from_dept: match.department,
+                      to_dept: requesterDept,
+                    },
+                  };
+                }
+              }
+            } catch (err) {
+              console.error('Lingo translation error:', err);
+            }
+          }
+          return match;
+        }));
 
         // Track text search
         serverAnalytics.findHelpSearched(user.id, queryText, matches.length);

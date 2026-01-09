@@ -239,7 +239,7 @@ const Hero = () => (
             <code className="bg-coffee-cream px-1.5 md:px-2 py-0.5 rounded text-sm md:text-lg font-mono text-coffee-mocha">
               /attunly
             </code>{' '}
-            in Slack, describe what you need. Get matched with who knows it, see when they&apos;re free, send a message that&apos;s easy to say yes to.
+            in Slack. Find who knows it, see when they&apos;re free, ask in a language they understand.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
@@ -531,7 +531,7 @@ const WhatsDifferentAndWhoUsesIt = () => (
           <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">The gap</p>
 
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
-            Three questions
+            Four questions
             <br />
             <span className="text-coffee-oat">Slack can&apos;t answer.</span>
           </h2>
@@ -549,6 +549,10 @@ const WhatsDifferentAndWhoUsesIt = () => (
               {
                 title: '"How do I ask?"',
                 desc: "Drafts a low-pressure message that's easy to say yes or no to.",
+              },
+              {
+                title: '"Do they speak my language?"',
+                desc: "Auto-translates jargon between departments. Sales-speak becomes engineering-speak.",
               },
             ].map((item) => (
               <div
@@ -586,6 +590,76 @@ const WhatsDifferentAndWhoUsesIt = () => (
                 <p className="text-coffee-mocha text-sm">{moment}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// Lingo Translation Section
+const LingoTranslation = () => (
+  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream/50">
+    <div className="max-w-4xl mx-auto">
+      <div className="text-center mb-12">
+        <span className="inline-block mb-4 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+          Cross-Department Clarity
+        </span>
+        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
+          One language.
+          <br />
+          <span className="text-coffee-oat">Every department.</span>
+        </h2>
+        <p className="text-lg text-coffee-cortado max-w-2xl mx-auto">
+          When Sales asks about "deal velocity," Engineering hears "lead conversion pipeline performance."
+          Attunly translates departmental jargon so everyone understands each other.
+        </p>
+      </div>
+
+      {/* Before/After Translation Demo */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Before - Jargon */}
+        <div className="bg-white rounded-xl p-6 border border-coffee-foam">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+              <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <span className="font-medium text-coffee-mocha">Without translation</span>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Sales asks:</p>
+              <p className="text-sm text-coffee-espresso">"Who can help with our deal velocity issues?"</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Engineering sees:</p>
+              <p className="text-sm text-gray-400 italic">"Deal velocity? What does that even mean?"</p>
+            </div>
+          </div>
+        </div>
+
+        {/* After - Translated */}
+        <div className="bg-white rounded-xl p-6 border-2 border-purple-200">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+              <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+            </div>
+            <span className="font-medium text-coffee-mocha">With Attunly</span>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 bg-purple-50 rounded-lg">
+              <p className="text-xs text-purple-600 mb-1">Sales asks:</p>
+              <p className="text-sm text-coffee-espresso">"Who can help with our deal velocity issues?"</p>
+            </div>
+            <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+              <p className="text-xs text-green-600 mb-1">Engineering sees:</p>
+              <p className="text-sm text-coffee-espresso">"Who can help optimize lead conversion performance in the pipeline?"</p>
+              <p className="text-xs text-gray-400 mt-1 italic">Auto-translated from Sales → Engineering</p>
+            </div>
           </div>
         </div>
       </div>
@@ -899,6 +973,10 @@ const FAQ = () => {
       q: 'What if I don\'t want to be disturbed?',
       a: 'You control your availability. Set yourself as unavailable, and Attunly won\'t suggest you to others. You can also set office hours.',
     },
+    {
+      q: 'What if I don\'t understand someone\'s technical jargon?',
+      a: 'Attunly automatically translates departmental terminology. When an engineer\'s expertise is described in technical terms, you\'ll see a plain-English version tailored to your department. No more "lost in translation" moments.',
+    },
   ];
 
   return (
@@ -1054,6 +1132,7 @@ export default function AttunlyLanding() {
       <SocialProof />
       <BeforeAfterDemo />
       <WhatsDifferentAndWhoUsesIt />
+      <LingoTranslation />
       <Trust />
       <Pricing />
       <FAQ />
