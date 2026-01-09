@@ -12,6 +12,15 @@ import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time } from "d
  * - Contextual nudges with meeting suggestions
  */
 
+// Organization member roles for RBAC
+export const OrganizationRole = {
+  OWNER: 'owner',
+  ADMIN: 'admin',
+  MEMBER: 'member',
+} as const;
+
+export type OrganizationRoleType = typeof OrganizationRole[keyof typeof OrganizationRole];
+
 // Organizations - team workspaces
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -44,6 +53,17 @@ export const organizations = pgTable("organizations", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Organization members - tracks membership and roles
+export const organizationMembers = pgTable("organization_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id").notNull().unique(), // One org per user
+  role: text("role").default("member").notNull(), // 'owner', 'admin', 'member'
+  invitedBy: uuid("invited_by"), // Who invited this user (null for owner)
+  invitedAt: timestamp("invited_at", { withTimezone: true }),
+  joinedAt: timestamp("joined_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const profiles = pgTable("profiles", {
@@ -289,6 +309,8 @@ export const translationEvents = pgTable("translation_events", {
 // Type exports for TypeScript
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
+export type OrganizationMember = typeof organizationMembers.$inferSelect;
+export type NewOrganizationMember = typeof organizationMembers.$inferInsert;
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type Pod = typeof pods.$inferSelect;

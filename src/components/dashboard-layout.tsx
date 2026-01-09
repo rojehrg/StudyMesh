@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   HamburgerLg,
   LogOut,
+  Users,
 } from "react-coolicons";
 import { cn } from "@/lib/utils";
 
@@ -131,6 +132,7 @@ function DashboardLayoutBase({
   // Minimal sidebar for Slack-first experience
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
+    { icon: Users, label: "Team", href: "/team" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
