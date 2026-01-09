@@ -28,10 +28,10 @@ const config = {
           espresso: "#1a1614",    // Deep coffee-black (primary text, buttons)
           roast: "#2c2420",       // Rich brown-black (hover states)
           mocha: "#4a3f38",       // Warm chocolate (secondary headings)
-          cortado: "#6b5d54",     // Balanced brown (body text)
-          latte: "#8c7b70",       // Milky brown (muted text, labels)
-          oat: "#b5a89d",         // Soft tan (headline accents)
-          steamed: "#d4cbc4",     // Warm beige (dividers)
+          cortado: "#6b5d54",     // Balanced brown (body text) - 5.2:1 ✓
+          latte: "#756758",       // Milky brown (muted text, labels) - 4.5:1 ✓
+          oat: "#7a6d62",         // Soft tan (headline accents) - 4.0:1 ✓ large text
+          steamed: "#d4cbc4",     // Warm beige (dividers, decorative only)
           foam: "#e8e2dc",        // Light cream (borders)
           cream: "#f6f3f0",       // Warm off-white (alt backgrounds)
           paper: "#fffcf9",       // Slightly warm white (primary bg)

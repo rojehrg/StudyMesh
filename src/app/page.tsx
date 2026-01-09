@@ -19,7 +19,7 @@ const Section = ({
   <section
     id={id}
     className={`
-      px-6 md:px-12 lg:px-24 py-24 md:py-32
+      px-4 md:px-12 lg:px-24 py-16 md:py-32
       ${darker ? 'bg-coffee-cream' : 'bg-coffee-paper'}
       ${className}
     `}
@@ -143,8 +143,48 @@ const TypingAnimation = () => {
   }, [displayText, isDeleting, scenarioIndex, currentScenario.phrase, scenarios.length]);
 
   return (
-    <div className="hidden lg:block">
-      <div className="bg-white rounded-xl shadow-xl border border-coffee-foam/50 overflow-hidden max-w-md ml-auto font-sans">
+    <div>
+      {/* Mobile: Static demo */}
+      <div className="lg:hidden">
+        <div className="bg-white rounded-xl shadow-lg border border-coffee-foam/50 overflow-hidden font-sans">
+          <div className="bg-[#3F0F40] px-4 py-2.5 flex items-center gap-2">
+            <span className="text-white/90 text-sm font-medium"># engineering</span>
+          </div>
+          <div className="p-4">
+            <div className="border border-gray-300 rounded-lg px-3 py-2.5 bg-white mb-4">
+              <div className="flex items-center text-sm">
+                <span className="text-gray-900 font-bold">/attunly</span>
+                <span className="ml-2 text-gray-700">need help with auth</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
+                <img src="/logo.svg" alt="Attunly" className="w-4 h-4 invert" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-800 mb-2">Found <strong>2 people</strong> who can help:</p>
+                <div className="p-2.5 bg-coffee-cream rounded-lg border border-coffee-foam">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative">
+                      <div className="w-9 h-9 rounded-lg bg-coffee-steamed flex items-center justify-center text-xs font-semibold text-coffee-mocha">LG</div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-green-500"></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-coffee-espresso text-sm">Lisa G.</div>
+                      <p className="text-xs text-coffee-cortado">Free now · OAuth, SSO</p>
+                    </div>
+                    <button className="px-2.5 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">Ask</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: Full animated demo */}
+      <div className="hidden lg:block">
+        <div className="bg-white rounded-xl shadow-xl border border-coffee-foam/50 overflow-hidden max-w-md ml-auto font-sans">
         {/* Slack header */}
         <div className="bg-[#3F0F40] px-4 py-3 flex items-center gap-2">
           <div className="flex gap-1.5">
@@ -215,34 +255,35 @@ const TypingAnimation = () => {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 };
 
 // Hero Section
 const Hero = () => (
-  <section className="min-h-screen flex flex-col justify-center px-6 md:px-12 lg:px-24 pt-24 pb-16 bg-coffee-paper">
+  <section className="min-h-screen flex flex-col justify-center px-4 md:px-12 lg:px-24 pt-20 md:pt-24 pb-12 md:pb-16 bg-coffee-paper">
     <div className="max-w-5xl mx-auto w-full">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left: Copy */}
         <div>
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-6">A Slack command</p>
+          <p className="text-coffee-latte text-xs md:text-sm tracking-wide uppercase mb-4 md:mb-6">A Slack command</p>
 
-          <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6">
             Find the right person.
             <br />
             <span className="text-coffee-oat">Ask them easily.</span>
           </h1>
 
-          <p className="text-xl text-coffee-cortado leading-relaxed mb-10 max-w-[60ch]">
+          <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch]">
             Type{' '}
-            <code className="bg-coffee-cream px-2 py-0.5 rounded text-lg font-mono text-coffee-mocha">
+            <code className="bg-coffee-cream px-1.5 md:px-2 py-0.5 rounded text-sm md:text-lg font-mono text-coffee-mocha">
               /attunly
             </code>{' '}
             in Slack, describe what you need. Get matched with who knows it, see when they&apos;re free, send a message that&apos;s easy to say yes to.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
             <Button primary href="/signup">
               <SlackIcon />
               Add to Slack
@@ -250,7 +291,7 @@ const Hero = () => (
             <Button href="#how-it-works">See how it works →</Button>
           </div>
 
-          <p className="text-sm text-coffee-latte max-w-[60ch]">
+          <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
             2-minute setup · Lives entirely in Slack · Free for small teams
           </p>
         </div>
@@ -264,7 +305,7 @@ const Hero = () => (
 
 // The Moment Section
 const TheMoment = () => (
-  <section className="relative px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-cream overflow-visible">
+  <section className="relative px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream overflow-visible">
     <div className="max-w-5xl mx-auto">
       <div className="max-w-2xl">
         <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
@@ -324,7 +365,7 @@ const BeforeAfterDemo = () => {
   return (
     <section
       id="how-it-works"
-      className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-espresso"
+      className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-espresso"
     >
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
@@ -374,7 +415,7 @@ const BeforeAfterDemo = () => {
             <span className="text-white/70 text-sm font-medium ml-2">
               {activeTab === 'without' ? '# general' : '# engineering'}
             </span>
-            <span className="text-white/40 text-xs">
+            <span className="text-white/60 text-xs">
               {activeTab === 'without' ? '847 members' : '24 members'}
             </span>
           </div>
@@ -391,7 +432,7 @@ const BeforeAfterDemo = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-white text-[15px]">You</span>
-                      <span className="text-xs text-white/40">2:34 PM</span>
+                      <span className="text-xs text-white/60">2:34 PM</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed">
                       hey does anyone know how the auth flow works? I need to add a new OAuth provider but I&apos;m not sure where to start
@@ -399,7 +440,7 @@ const BeforeAfterDemo = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-white/40 text-sm pl-12">
+                <div className="flex items-center gap-2 text-white/60 text-sm pl-12">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -413,7 +454,7 @@ const BeforeAfterDemo = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-white text-[15px]">Mike</span>
-                      <span className="text-xs text-white/40">5:47 PM</span>
+                      <span className="text-xs text-white/60">5:47 PM</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed">
                       hmm not sure, maybe try asking in #backend?
@@ -428,7 +469,7 @@ const BeforeAfterDemo = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-white text-[15px]">Sara</span>
-                      <span className="text-xs text-white/40">5:52 PM</span>
+                      <span className="text-xs text-white/60">5:52 PM</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed">
                       I think Jake worked on that? Or maybe it was the other team
@@ -460,7 +501,7 @@ const BeforeAfterDemo = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold text-white text-[15px]">Attunly</span>
                       <span className="text-[11px] text-white/50 bg-white/10 px-1.5 py-0.5 rounded font-medium">APP</span>
-                      <span className="text-xs text-white/40">just now</span>
+                      <span className="text-xs text-white/60">just now</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed mb-3">
                       Found <strong>2 people</strong> who can help with authentication:
@@ -523,7 +564,7 @@ const BeforeAfterDemo = () => {
 
 // What's Different + Who Uses It Combined Section
 const WhatsDifferentAndWhoUsesIt = () => (
-  <section className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-paper">
+  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper">
     <div className="max-w-5xl mx-auto">
       <div className="grid md:grid-cols-2 gap-12 md:gap-16">
         {/* Left: The Gap */}
@@ -731,7 +772,7 @@ const Pricing = () => {
   return (
     <section
       id="pricing"
-      className="px-6 md:px-12 lg:px-24 py-24 md:py-32 bg-coffee-paper"
+      className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper"
     >
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
@@ -777,11 +818,11 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-6">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-xl p-6 ${
+              className={`relative rounded-xl p-5 md:p-6 ${
                 plan.popular
                   ? 'bg-coffee-espresso text-coffee-paper ring-2 ring-coffee-espresso md:-mt-4 md:mb-4 md:py-10'
                   : 'bg-coffee-cream border border-coffee-foam'
@@ -840,13 +881,13 @@ const Pricing = () => {
                     className={`flex items-center gap-3 text-sm ${
                       feature.included
                         ? plan.popular ? 'text-coffee-paper' : 'text-coffee-cortado'
-                        : plan.popular ? 'text-coffee-mocha' : 'text-coffee-latte'
+                        : plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'
                     }`}
                   >
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
                       feature.included
                         ? plan.popular ? 'bg-coffee-paper/20 text-coffee-paper' : 'bg-coffee-paper text-coffee-espresso'
-                        : plan.popular ? 'bg-coffee-mocha/30 text-coffee-mocha' : 'bg-coffee-foam text-coffee-latte'
+                        : plan.popular ? 'bg-coffee-steamed/20 text-coffee-steamed' : 'bg-coffee-foam text-coffee-latte'
                     }`}>
                       {feature.included ? '✓' : '–'}
                     </span>
@@ -902,7 +943,7 @@ const FAQ = () => {
   ];
 
   return (
-    <section className="px-6 md:px-12 lg:px-24 py-16 md:py-20 bg-coffee-paper">
+    <section className="px-4 md:px-12 lg:px-24 py-12 md:py-20 bg-coffee-paper">
       <div className="max-w-2xl mx-auto">
         <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Questions</p>
 
@@ -969,8 +1010,8 @@ const FinalCTA = () => (
 
 // Footer
 const Footer = () => (
-  <footer className="px-6 md:px-12 lg:px-24 py-12 bg-coffee-espresso text-coffee-oat">
-    <div className="max-w-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+  <footer className="px-4 md:px-12 lg:px-24 py-10 md:py-12 bg-coffee-espresso text-coffee-oat">
+    <div className="max-w-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
       <div className="text-xl font-semibold text-coffee-paper">attunly</div>
       <div className="flex gap-8 text-sm">
         <Link href="/privacy" className="hover:text-coffee-paper transition-colors">
@@ -987,6 +1028,56 @@ const Footer = () => (
   </footer>
 );
 
+// Mobile Nav Component
+const MobileNav = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      {/* Hamburger button - mobile only */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden p-2 -mr-2 text-coffee-espresso"
+        aria-label="Toggle menu"
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {isOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+
+      {/* Mobile menu overlay */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 top-[60px] bg-coffee-paper z-40">
+          <div className="flex flex-col p-6 gap-4">
+            <Link
+              href="#pricing"
+              onClick={() => setIsOpen(false)}
+              className="text-lg font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors py-2"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => setIsOpen(false)}
+              className="text-lg font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors py-2"
+            >
+              Log in
+            </Link>
+            <Button primary href="/signup" className="text-base py-3 px-6 mt-2">
+              <SlackIcon className="w-5 h-5 mr-2" />
+              Add to Slack
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 // Main Page
 export default function AttunlyLanding() {
   return (
@@ -997,13 +1088,15 @@ export default function AttunlyLanding() {
       }}
     >
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="" className="w-7 h-7" />
             <span className="text-xl font-semibold text-coffee-espresso">attunly</span>
           </Link>
-          <div className="flex items-center gap-4">
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-4">
             <Link
               href="#pricing"
               className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
@@ -1021,6 +1114,9 @@ export default function AttunlyLanding() {
               Add to Slack
             </Button>
           </div>
+
+          {/* Mobile nav */}
+          <MobileNav />
         </div>
       </nav>
 
