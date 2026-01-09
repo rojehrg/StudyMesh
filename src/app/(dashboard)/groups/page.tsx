@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { KnowledgeGraph } from "@/components/knowledge-graph";
 
 export default function GroupsPage() {
-  redirect("/dashboard");
+  return <KnowledgeGraph />;
 }

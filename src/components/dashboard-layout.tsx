@@ -10,7 +10,7 @@ import {
   LogOut,
   Users,
 } from "react-coolicons";
-import { FileText } from "lucide-react";
+import { FileText, Network, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -133,6 +133,8 @@ function DashboardLayoutBase({
   // Minimal sidebar for Slack-first experience
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
+    { icon: Search, label: "Find Help", href: "/find-help" },
+    { icon: Network, label: "Graph", href: "/groups" },
     { icon: Users, label: "Team", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
     { icon: Settings, label: "Settings", href: "/settings" },
