@@ -60,17 +60,10 @@ export function LoadingSpinner({
   );
 }
 
-// Full page loader with fun messages
-const loadingMessages = [
-  "Finding your teammates...",
-  "Checking who's available...",
-  "Loading the good stuff...",
-  "Almost there...",
-  "Getting things ready...",
-];
-
+// Full page loader
 export function PageLoader({ message }: { message?: string }) {
-  const randomMessage = message || loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+  // Use static message to avoid SSR hydration mismatch
+  const displayMessage = message || "Loading...";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -87,7 +80,7 @@ export function PageLoader({ message }: { message?: string }) {
         transition={{ delay: 0.2 }}
         className="text-muted-foreground"
       >
-        {randomMessage}
+        {displayMessage}
       </motion.p>
     </div>
   );
