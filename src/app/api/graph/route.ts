@@ -27,6 +27,7 @@ export interface GraphNode {
   slackConnected: boolean;
   expertiseDepth: number;
   color: string;
+  avatarUrl: string | null;
 }
 
 // GET /api/graph - Fetch graph data
@@ -52,7 +53,8 @@ export async function GET() {
         department,
         major,
         expertise_text,
-        slack_user_id
+        slack_user_id,
+        avatar_url
       `)
       .eq('organization_id', context.organizationId)
       .neq('user_id', context.userId); // Exclude current user to test with others
@@ -95,6 +97,7 @@ export async function GET() {
           knowledge_areas: [],
         }),
         color: getDepartmentColor(profile.department),
+        avatarUrl: profile.avatar_url || null,
       });
 
       graphMembers.push({

@@ -228,7 +228,7 @@ function DashboardLayoutBase({
         <div className="p-3 border-t border-coffee-foam/50">
           <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-coffee-cream/40 transition-colors cursor-pointer">
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarImage src="" />
+              {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt="Profile" />}
               <AvatarFallback className="bg-coffee-foam text-coffee-mocha text-sm font-medium">
                 {profile?.first_name?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>

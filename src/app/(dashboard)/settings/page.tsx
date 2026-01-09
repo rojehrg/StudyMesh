@@ -13,7 +13,8 @@ import { LottieLoader, PageLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { usePlanFeatures, getPlanDisplayName, getPlanPricing } from "@/hooks/use-plan-features";
-import { Slack, Calendar, Video } from "lucide-react";
+import { Slack, Calendar, Video, Camera, X } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileData {
   firstName: string;
@@ -23,6 +24,7 @@ interface ProfileData {
   expertiseText: string;
   slackHandle: string;
   slackConnected: boolean;
+  avatarUrl: string | null;
 }
 
 interface OrgData {
@@ -45,6 +47,7 @@ const DEFAULT_PROFILE: ProfileData = {
   expertiseText: "",
   slackHandle: "",
   slackConnected: false,
+  avatarUrl: null,
 };
 
 function SettingsContent() {
@@ -69,6 +72,8 @@ function SettingsContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { subscription, plan, loading: billingLoading } = usePlanFeatures();
   const supabase = createClient();
@@ -147,6 +152,7 @@ function SettingsContent() {
           expertiseText: profileData.expertise_text || "",
           slackHandle: profileData.slack_handle || "",
           slackConnected: profileData.slack_connected || false,
+          avatarUrl: profileData.avatar_url || null,
         });
         lastSavedRef.current = JSON.stringify(profileData);
       }
@@ -264,6 +270,74 @@ function SettingsContent() {
         toast.error('Failed to save expertise');
       }
     }, 1500);
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Use JPG, PNG, or WebP.');
+      return;
+    }
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 2MB.');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/user/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setProfile(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
+        toast.success('Profile photo updated');
+      } else {
+        toast.error(data.error || 'Failed to upload photo');
+      }
+    } catch {
+      toast.error('Failed to upload photo');
+    } finally {
+      setAvatarUploading(false);
+      // Reset input so same file can be selected again
+      if (avatarInputRef.current) {
+        avatarInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setAvatarUploading(true);
+    try {
+      const response = await fetch('/api/user/avatar', {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setProfile(prev => ({ ...prev, avatarUrl: null }));
+        toast.success('Profile photo removed');
+      } else {
+        toast.error(data.error || 'Failed to remove photo');
+      }
+    } catch {
+      toast.error('Failed to remove photo');
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const connectSlack = async () => {
@@ -394,6 +468,62 @@ function SettingsContent() {
         <h2 className="text-lg font-semibold text-coffee-espresso">Your Profile</h2>
 
         <div className="bg-white rounded-xl border border-coffee-foam p-5 space-y-4">
+          {/* Avatar Upload */}
+          <div className="flex items-center gap-4 pb-4 border-b border-coffee-foam">
+            <div className="relative">
+              <Avatar className="h-20 w-20 ring-2 ring-coffee-foam">
+                {profile.avatarUrl ? (
+                  <AvatarImage src={profile.avatarUrl} alt="Profile photo" />
+                ) : null}
+                <AvatarFallback className="bg-coffee-cream text-coffee-mocha text-xl font-semibold">
+                  {profile.firstName?.[0]?.toUpperCase() || profile.lastName?.[0]?.toUpperCase() || "?"}
+                </AvatarFallback>
+              </Avatar>
+              {avatarUploading && (
+                <div className="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
+                  <LottieLoader size="sm" className="w-6 h-6" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-coffee-espresso mb-1">Profile Photo</p>
+              <p className="text-sm text-coffee-mocha mb-3">JPG, PNG, or WebP. Max 2MB.</p>
+              <div className="flex items-center gap-2">
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  id="avatar-upload"
+                  aria-label="Upload profile photo"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={avatarUploading}
+                  className="text-coffee-mocha"
+                >
+                  <Camera className="w-4 h-4 mr-2" aria-hidden="true" />
+                  {profile.avatarUrl ? 'Change' : 'Upload'}
+                </Button>
+                {profile.avatarUrl && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAvatarRemove}
+                    disabled={avatarUploading}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4 mr-1" aria-hidden="true" />
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-sm text-coffee-mocha">First Name</Label>

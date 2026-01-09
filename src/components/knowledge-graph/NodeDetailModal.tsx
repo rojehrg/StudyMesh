@@ -11,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Slack, MapPin, Briefcase } from 'lucide-react';
@@ -53,6 +53,7 @@ export function NodeDetailModal({ node, onClose }: Props) {
             {/* Header with Avatar */}
             <SheetHeader className="flex flex-row items-start gap-4 space-y-0">
               <Avatar className="h-16 w-16 shrink-0 ring-2 ring-coffee-foam">
+                {node.avatarUrl && <AvatarImage src={node.avatarUrl} alt={node.name} />}
                 <AvatarFallback
                   className="text-xl font-semibold"
                   style={{ backgroundColor: node.color, color: 'white' }}

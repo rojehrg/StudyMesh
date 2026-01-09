@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LottieLoader, PageLoader } from "@/components/loading-states";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -49,6 +49,7 @@ interface TeamMember {
     major: string | null;
     slack_connected: boolean;
     slack_handle: string | null;
+    avatar_url: string | null;
   } | null;
 }
 
@@ -356,6 +357,9 @@ export default function TeamPage() {
               >
                 {/* Avatar */}
                 <Avatar className="h-10 w-10 shrink-0">
+                  {profile?.avatar_url && (
+                    <AvatarImage src={profile.avatar_url} alt={name} />
+                  )}
                   <AvatarFallback className="bg-coffee-cream text-coffee-mocha">
                     {initials}
                   </AvatarFallback>

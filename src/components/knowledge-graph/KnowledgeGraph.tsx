@@ -12,7 +12,7 @@ import { NodeDetailModal } from './NodeDetailModal';
 import { PageLoader } from '@/components/loading-states';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 export function KnowledgeGraph() {
@@ -248,6 +248,7 @@ function PersonCard({ node, onSelect }: { node: GraphNode; onSelect: () => void 
       {/* Header */}
       <div className="flex items-start gap-3 mb-3">
         <Avatar className="h-11 w-11 shrink-0 ring-2 ring-coffee-foam">
+          {node.avatarUrl && <AvatarImage src={node.avatarUrl} alt={node.name} />}
           <AvatarFallback
             className="text-sm font-semibold"
             style={{ backgroundColor: node.color, color: 'white' }}
@@ -273,12 +274,19 @@ function PersonCard({ node, onSelect }: { node: GraphNode; onSelect: () => void 
         </div>
       </div>
 
-      {/* Expertise - expands on hover */}
+      {/* Expertise - expands on hover with smooth animation */}
       {node.expertiseText && (
         <div className="mb-3 p-2.5 bg-coffee-cream/40 rounded-md">
-          <p className={`text-sm text-coffee-espresso transition-all duration-200 ${isExpanded ? '' : 'line-clamp-2'}`}>
-            {node.expertiseText}
-          </p>
+          <motion.div
+            initial={false}
+            animate={{ height: isExpanded ? 'auto' : '2.75rem' }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <p className="text-sm text-coffee-espresso">
+              {node.expertiseText}
+            </p>
+          </motion.div>
         </div>
       )}
 

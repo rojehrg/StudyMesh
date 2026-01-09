@@ -164,7 +164,8 @@ export async function getOrganizationMembers() {
         department,
         major,
         slack_connected,
-        slack_handle
+        slack_handle,
+        avatar_url
       )
     `)
     .eq('organization_id', context.organizationId)

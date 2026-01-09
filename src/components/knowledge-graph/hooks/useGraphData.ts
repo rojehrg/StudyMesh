@@ -18,6 +18,7 @@ export interface GraphNode {
   slackConnected: boolean;
   expertiseDepth: number;
   color: string;
+  avatarUrl: string | null;
 }
 
 export interface GraphEdge {

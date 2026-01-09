@@ -77,6 +77,7 @@ export const profiles = pgTable("profiles", {
   department: text("department"),
   major: text("major"), // Job title
   bio: text("bio"),
+  avatarUrl: text("avatar_url"), // Profile picture URL from Supabase Storage
 
   // Knowledge areas - lightweight tags (NOT skills with proficiency)
   // Examples: "Rippling tax recon", "SQL debugging", "Salesforce setup"
