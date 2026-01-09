@@ -227,7 +227,8 @@ export default function OnboardingPage() {
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
                         placeholder="Jane"
-                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
+                        autoComplete="off"
+                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
                       />
                     </div>
                     <div>
@@ -239,7 +240,8 @@ export default function OnboardingPage() {
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
                         placeholder="Smith"
-                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
+                        autoComplete="off"
+                        className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
                       />
                     </div>
                   </div>
@@ -253,7 +255,8 @@ export default function OnboardingPage() {
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value})}
                       placeholder="e.g. Senior Product Manager"
-                      className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha font-sans"
+                      autoComplete="off"
+                      className="h-11 bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset]"
                     />
                   </div>
 
@@ -269,7 +272,7 @@ export default function OnboardingPage() {
                       value={formData.aboutMe}
                       onChange={e => setFormData({...formData, aboutMe: e.target.value})}
                       placeholder="I've been in product for 5 years, specializing in B2B SaaS. I can help with roadmap prioritization, stakeholder management, and writing PRDs. Currently learning more about AI/ML product strategy and would love to connect with folks who have experience there."
-                      className="min-h-[140px] bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:ring-coffee-mocha resize-none font-sans text-[15px]"
+                      className="min-h-[140px] bg-white border-coffee-foam text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none resize-none font-sans text-[15px]"
                     />
                     <p className="text-xs text-coffee-latte mt-1.5">
                       Write naturally — our AI uses this to match you with teammates.
@@ -281,7 +284,11 @@ export default function OnboardingPage() {
                   <Button
                     onClick={() => setStep(2)}
                     disabled={!isStep1Valid}
-                    className="bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper h-11 px-6 font-medium"
+                    className={`h-11 px-6 font-medium transition-colors ${
+                      isStep1Valid
+                        ? 'bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper'
+                        : 'bg-coffee-steamed text-coffee-cortado cursor-not-allowed'
+                    }`}
                   >
                     Continue <ArrowRightMd className="ml-2 h-4 w-4" />
                   </Button>

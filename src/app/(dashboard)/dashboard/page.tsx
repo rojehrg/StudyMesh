@@ -14,10 +14,10 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  // Fetch profile with calendar connection status
+  // Fetch profile
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('first_name, last_name, slack_connected, slack_handle, google_calendar_connected')
+    .select('first_name, last_name, slack_connected, slack_handle')
     .eq('user_id', user.id)
     .maybeSingle();
 
@@ -28,6 +28,14 @@ export default async function DashboardPage() {
   if (!profile) {
     redirect('/onboarding');
   }
+
+  // Check for Google Calendar connection in user_provider_credentials
+  const { data: googleCreds } = await supabase
+    .from('user_provider_credentials')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('provider', 'google')
+    .maybeSingle();
 
   // Fetch activity stats for this week
   const weekAgo = new Date();
@@ -47,7 +55,7 @@ export default async function DashboardPage() {
   ]);
 
   const isSlackConnected = profile.slack_connected === true;
-  const isCalendarConnected = profile.google_calendar_connected === true;
+  const isCalendarConnected = !!googleCreds;
   const nudgesSent = sentNudges.count || 0;
   const nudgesReceived = receivedNudges.count || 0;
 
