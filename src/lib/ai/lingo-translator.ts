@@ -95,45 +95,40 @@ async function getKnownTranslations(
  * Build the prompt for Groq to translate between department lingos
  */
 function buildTranslationPrompt(
-  originalQuestion: string,
+  originalText: string,
   sourceDept: string,
   targetDept: string,
   sourceLingo: LingoProfile | null,
   targetLingo: LingoProfile | null,
   knownTranslations: TermMapping[]
 ): string {
-  let contextSection = '';
-
-  if (sourceLingo?.communicationStyle) {
-    contextSection += `- ${sourceDept} typically communicates: ${sourceLingo.communicationStyle}\n`;
-  }
-  if (targetLingo?.communicationStyle) {
-    contextSection += `- ${targetDept} typically communicates: ${targetLingo.communicationStyle}\n`;
-  }
-
   let termMappings = '';
   if (knownTranslations.length > 0) {
-    termMappings = `\nKNOWN TERM MAPPINGS (use these when applicable):
-${knownTranslations.map(t => `- "${t.sourceTerm}" → "${t.targetTerm}"`).join('\n')}
-`;
+    termMappings = `\nKnown translations: ${knownTranslations.map(t => `${t.sourceTerm}→${t.targetTerm}`).join(', ')}\n`;
   }
 
-  return `You are a communication translator helping team members ask for help across departments.
+  return `Translate this ${sourceDept} skill into ${targetDept} terms.
 
-CONTEXT:
-- Original question from ${sourceDept}: "${originalQuestion}"
-- Target department: ${targetDept}
-${contextSection}${termMappings}
-TASK:
-Rewrite the question so a ${targetDept} person immediately understands what's needed.
-- Keep the core ask the same
-- Translate jargon to ${targetDept}-friendly terms
-- Match ${targetDept}'s communication style if known
-- Be concise and clear
-- Don't add unnecessary context or explanation
+Input: "${originalText}"
+${termMappings}
+RULES:
+- Keep it SHORT. Match the input length. 2-word input = 2-4 word output.
+- Just translate the jargon, don't explain what it means.
+- Sound like a person, not a corporate memo.
+- No full sentences unless the input was a full sentence.
+- Never start with "How can we" or "Ability to" or "Helps with".
 
-OUTPUT FORMAT:
-Return ONLY the translated question, nothing else. No quotes, no explanation.`;
+EXAMPLES:
+Good: "scalable APIs" → "handles customer growth"
+Bad: "scalable APIs" → "How can we ensure our systems handle large numbers of customers..."
+
+Good: "performance optimization" → "makes things faster"
+Bad: "performance optimization" → "Streamlining processes to improve speed and efficiency"
+
+Good: "CI/CD pipelines" → "automated releases"
+Bad: "CI/CD pipelines" → "Systems that help deploy code automatically to production"
+
+Output the translation only. No quotes, no explanation.`;
 }
 
 /**
@@ -199,8 +194,8 @@ export async function translateToLingo(
         messages: [
           { role: 'user', content: prompt },
         ],
-        temperature: 0.3, // Low temperature for more consistent translations
-        max_tokens: 500,
+        temperature: 0.2, // Low temperature for consistent, concise translations
+        max_tokens: 50, // Keep outputs short
       }),
     });
 

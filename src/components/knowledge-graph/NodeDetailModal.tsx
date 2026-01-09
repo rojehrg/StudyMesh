@@ -47,35 +47,35 @@ export function NodeDetailModal({ node, onClose }: Props) {
 
   return (
     <Sheet open={!!node} onOpenChange={() => onClose()}>
-      <SheetContent side="right" className="w-[400px] sm:w-[480px]">
+      <SheetContent side="right" className="w-[400px] sm:w-[480px] bg-white">
         {node && (
           <div className="space-y-6">
             {/* Header with Avatar */}
             <SheetHeader className="flex flex-row items-start gap-4 space-y-0">
-              <Avatar className="h-16 w-16 shrink-0">
+              <Avatar className="h-16 w-16 shrink-0 ring-2 ring-coffee-foam">
                 <AvatarFallback
-                  className="text-xl font-medium"
-                  style={{ backgroundColor: node.color + '30', color: node.color }}
+                  className="text-xl font-semibold"
+                  style={{ backgroundColor: node.color, color: 'white' }}
                 >
                   {node.initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <SheetTitle className="text-xl text-coffee-espresso">
+                  <SheetTitle className="text-xl font-bold text-coffee-espresso">
                     {node.name}
                   </SheetTitle>
                   {node.currentlyAvailable && (
-                    <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                    <span className="flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full font-medium">
                       <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                       Available
                     </span>
                   )}
                 </div>
                 {node.major && (
-                  <div className="flex items-center gap-1.5 text-coffee-cortado mt-1">
+                  <div className="flex items-center gap-1.5 text-coffee-mocha mt-1">
                     <Briefcase className="w-3.5 h-3.5" />
-                    <span className="text-sm">{node.major}</span>
+                    <span className="text-sm font-medium">{node.major}</span>
                   </div>
                 )}
                 {node.department && (
@@ -90,10 +90,10 @@ export function NodeDetailModal({ node, onClose }: Props) {
             {/* Expertise Description */}
             {node.expertiseText && (
               <div>
-                <h3 className="text-sm font-medium text-coffee-mocha mb-2">
+                <h3 className="text-sm font-semibold text-coffee-espresso mb-2">
                   About their expertise
                 </h3>
-                <p className="text-sm text-coffee-cortado leading-relaxed">
+                <p className="text-sm text-coffee-mocha leading-relaxed">
                   {node.expertiseText}
                 </p>
               </div>
@@ -102,7 +102,7 @@ export function NodeDetailModal({ node, onClose }: Props) {
             {/* Knowledge Areas */}
             {node.knowledgeAreas.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-coffee-mocha mb-2">
+                <h3 className="text-sm font-semibold text-coffee-espresso mb-2">
                   Knowledge Areas
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
@@ -110,7 +110,7 @@ export function NodeDetailModal({ node, onClose }: Props) {
                     <Badge
                       key={area}
                       variant="secondary"
-                      className="bg-coffee-cream text-coffee-mocha"
+                      className="bg-coffee-cream text-coffee-espresso"
                     >
                       {area}
                     </Badge>
@@ -118,27 +118,6 @@ export function NodeDetailModal({ node, onClose }: Props) {
                 </div>
               </div>
             )}
-
-            {/* Expertise Depth Indicator */}
-            <div>
-              <h3 className="text-sm font-medium text-coffee-mocha mb-2">
-                Expertise Depth
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-2 bg-coffee-cream rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${node.expertiseDepth * 10}%`,
-                      backgroundColor: node.color,
-                    }}
-                  />
-                </div>
-                <span className="text-sm text-coffee-cortado w-8 text-right">
-                  {node.expertiseDepth}/10
-                </span>
-              </div>
-            </div>
 
             {/* Actions */}
             <div className="pt-4 border-t border-coffee-foam">
@@ -152,7 +131,7 @@ export function NodeDetailModal({ node, onClose }: Props) {
                   {isAskingForHelp ? 'Opening...' : 'Ask for Help'}
                 </Button>
               ) : (
-                <Button variant="outline" className="w-full" disabled>
+                <Button variant="outline" className="w-full border-coffee-foam text-coffee-cortado" disabled>
                   <Slack className="w-4 h-4 mr-2" />
                   Not connected to Slack
                 </Button>

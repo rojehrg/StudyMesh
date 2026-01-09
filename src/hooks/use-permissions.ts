@@ -49,27 +49,34 @@ export function usePermissions(): UsePermissionsReturn {
         return;
       }
 
-      const { data: memberData } = await supabase
-        .from('organization_members')
-        .select(`
-          organization_id,
-          role,
-          organizations (
-            id,
-            name
-          )
-        `)
+      // Get organization_id from profile (more reliable than organization_members)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (!memberData?.organizations) {
+      if (!profile?.organization_id) {
         setMembership(null);
         return;
       }
 
-      // Supabase returns single object for single-row foreign key relations
-      const org = memberData.organizations as unknown as { id: string; name: string };
-      const role = memberData.role as OrganizationRoleType;
+      // Get organization details
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('id, name, owner_id')
+        .eq('id', profile.organization_id)
+        .single();
+
+      if (!org) {
+        setMembership(null);
+        return;
+      }
+
+      // Determine role: owner if they own the org, otherwise member
+      const role: OrganizationRoleType = org.owner_id === user.id
+        ? OrganizationRole.OWNER
+        : OrganizationRole.MEMBER;
 
       setMembership({
         userId: user.id,

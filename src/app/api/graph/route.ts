@@ -52,8 +52,6 @@ export async function GET() {
         department,
         major,
         expertise_text,
-        knowledge_areas,
-        availability,
         slack_user_id
       `)
       .eq('organization_id', context.organizationId)
@@ -81,8 +79,6 @@ export async function GET() {
     for (const profile of profiles || []) {
       const firstName = profile.first_name || '';
       const lastName = profile.last_name || '';
-      const knowledgeAreas = profile.knowledge_areas || [];
-      const availability = profile.availability as { currentlyAvailable?: boolean } | null;
 
       nodes.push({
         id: profile.user_id,
@@ -91,12 +87,12 @@ export async function GET() {
         department: profile.department,
         major: profile.major,
         expertiseText: profile.expertise_text,
-        knowledgeAreas,
-        currentlyAvailable: availability?.currentlyAvailable || false,
+        knowledgeAreas: [],
+        currentlyAvailable: false,
         slackConnected: !!profile.slack_user_id,
         expertiseDepth: calculateExpertiseDepth({
           expertise_text: profile.expertise_text,
-          knowledge_areas: knowledgeAreas,
+          knowledge_areas: [],
         }),
         color: getDepartmentColor(profile.department),
       });
@@ -104,7 +100,7 @@ export async function GET() {
       graphMembers.push({
         user_id: profile.user_id,
         expertise_embedding: embeddingsMap[profile.user_id] || null,
-        knowledge_areas: knowledgeAreas,
+        knowledge_areas: [],
       });
     }
 

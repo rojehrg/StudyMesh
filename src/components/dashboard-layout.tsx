@@ -10,7 +10,7 @@ import {
   LogOut,
   Users,
 } from "react-coolicons";
-import { FileText, Network, Search } from "lucide-react";
+import { FileText, LayoutGrid, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -134,8 +134,8 @@ function DashboardLayoutBase({
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
     { icon: Search, label: "Find Help", href: "/find-help" },
-    { icon: Network, label: "Graph", href: "/groups" },
-    { icon: Users, label: "Team", href: "/team" },
+    { icon: LayoutGrid, label: "Directory", href: "/groups" },
+    { icon: Users, label: "Manage", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
@@ -145,11 +145,20 @@ function DashboardLayoutBase({
       className="flex min-h-screen bg-coffee-paper"
       style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
     >
+      {/* Skip Link for Keyboard Navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-coffee-espresso focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee-mocha"
+      >
+        Skip to main content
+      </a>
+
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-coffee-espresso/30 z-40 md:hidden"
           onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
         />
       )}
 
@@ -179,7 +188,7 @@ function DashboardLayoutBase({
         </div>
 
         {/* Nav Items */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto" aria-label="Main navigation">
           {navItems.map((item) => (
             <SidebarItem
               key={item.href}
@@ -242,10 +251,10 @@ function DashboardLayoutBase({
 
               <button
                 onClick={handleLogout}
-                className="text-coffee-latte hover:text-coffee-mocha p-1 rounded transition-colors active:scale-95 shrink-0"
-                title="Logout"
+                className="text-coffee-latte hover:text-coffee-mocha p-1 rounded transition-colors active:scale-95 shrink-0 focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-1"
+                aria-label="Log out"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
               </button>
             </motion.div>
           </div>
@@ -263,8 +272,8 @@ function DashboardLayoutBase({
           isCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
         )}>
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden text-coffee-mocha hover:bg-coffee-cream/50 h-8 w-8">
-              <HamburgerLg className="w-5 h-5" />
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="md:hidden text-coffee-mocha hover:bg-coffee-cream/50 h-8 w-8" aria-label="Open navigation menu">
+              <HamburgerLg className="w-5 h-5" aria-hidden="true" />
             </Button>
             <span className="ml-2 font-semibold text-base md:hidden text-coffee-espresso">
               attunly
@@ -276,7 +285,7 @@ function DashboardLayoutBase({
         </header>
 
         {/* Page Content - Add top margin for fixed header */}
-        <main className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-12 pt-4">
+        <main id="main-content" className="flex-1 px-6 md:px-8 pb-6 md:pb-8 overflow-x-hidden mt-12 pt-4">
           <CelebrationProvider>
             {children}
           </CelebrationProvider>
@@ -291,13 +300,15 @@ function DashboardLayoutBase({
           "bg-white border border-coffee-foam",
           "rounded-r-lg p-1.5 shadow-sm hover:shadow-md",
           "text-coffee-cortado hover:text-coffee-espresso transition-all duration-300 active:scale-95",
+          "focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-1",
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <ChevronLeft className={cn(
           "w-4 h-4 transition-transform duration-300",
           isCollapsed && "rotate-180"
-        )} />
+        )} aria-hidden="true" />
       </button>
 
       {/* Onboarding Tour for New Users */}

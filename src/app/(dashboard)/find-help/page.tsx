@@ -108,7 +108,7 @@ export default function FindHelpPage() {
           Find Help
         </h1>
         <p className="text-coffee-cortado">
-          Describe what you need help with and we'll find the right person
+          Search by topic or skill to discover who can help
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function FindHelpPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="e.g., I need help with React performance optimization..."
+              placeholder="e.g., React, sales pipeline, data analysis..."
               className="pl-10 h-12 text-base"
               autoFocus
             />
@@ -135,8 +135,8 @@ export default function FindHelpPage() {
               <LottieLoader size="sm" className="w-5 h-5" />
             ) : (
               <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Find
+                <Search className="w-4 h-4 mr-2" />
+                Search
               </>
             )}
           </Button>
@@ -160,21 +160,24 @@ export default function FindHelpPage() {
       {/* Example queries */}
       {!searched && (
         <div className="mb-8">
-          <p className="text-sm text-coffee-cortado mb-3">Try searching for:</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="text-sm text-coffee-mocha mb-3">Popular topics:</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Popular search topics">
             {[
-              "React hooks best practices",
-              "Database optimization",
-              "UX design feedback",
-              "Python data analysis",
-              "AWS deployment help",
+              "React",
+              "SQL",
+              "UX design",
+              "Python",
+              "sales strategy",
+              "APIs",
+              "data analysis",
             ].map((example) => (
               <button
                 key={example}
                 onClick={() => {
                   setQuery(example);
                 }}
-                className="text-sm px-3 py-1.5 bg-coffee-cream/50 hover:bg-coffee-cream text-coffee-mocha rounded-full transition-colors"
+                className="text-sm px-3 py-1.5 bg-coffee-cream/50 hover:bg-coffee-cream text-coffee-mocha rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-1"
+                aria-label={`Search for ${example}`}
               >
                 {example}
               </button>
@@ -214,7 +217,7 @@ export default function FindHelpPage() {
             className="space-y-3"
           >
             <p className="text-sm text-coffee-cortado mb-4">
-              {matches.length} {matches.length === 1 ? "person" : "people"} can help
+              {matches.length} {matches.length === 1 ? "match" : "matches"} found
             </p>
 
             {matches.map((match, index) => (
@@ -223,20 +226,19 @@ export default function FindHelpPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl border border-coffee-foam p-4 hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl border border-coffee-foam p-5 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <Avatar className="h-12 w-12 shrink-0">
-                    <AvatarFallback className="bg-coffee-cream text-coffee-mocha text-lg">
+                {/* Header: Avatar, Name, Badges, Action */}
+                <div className="flex items-center gap-4 mb-4">
+                  <Avatar className="h-11 w-11 shrink-0">
+                    <AvatarFallback className="bg-coffee-cream text-coffee-mocha text-base font-medium">
                       {getInitials(match.first_name, match.last_name)}
                     </AvatarFallback>
                   </Avatar>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-medium text-coffee-espresso">
+                      <h3 className="font-semibold text-coffee-espresso">
                         {match.first_name} {match.last_name}
                       </h3>
                       {match.currently_available && (
@@ -245,7 +247,6 @@ export default function FindHelpPage() {
                           Available
                         </span>
                       )}
-                      {/* Match score */}
                       <Badge
                         variant="secondary"
                         className="bg-coffee-cream/50 text-coffee-mocha text-xs"
@@ -253,9 +254,7 @@ export default function FindHelpPage() {
                         {Math.round(match.similarity * 100)}% match
                       </Badge>
                     </div>
-
-                    {/* Role & Department */}
-                    <div className="flex items-center gap-3 text-sm text-coffee-cortado mt-1">
+                    <div className="flex items-center gap-3 text-sm text-coffee-cortado mt-0.5">
                       {match.major && (
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-3.5 h-3.5" />
@@ -269,30 +268,6 @@ export default function FindHelpPage() {
                         </span>
                       )}
                     </div>
-
-                    {/* Match reason or expertise */}
-                    {match.match_reason ? (
-                      <p className="text-sm text-coffee-mocha mt-2 italic">
-                        "{match.match_reason}"
-                      </p>
-                    ) : match.expertise_text ? (
-                      <p className="text-sm text-coffee-cortado mt-2 line-clamp-2">
-                        {match.expertise_text}
-                      </p>
-                    ) : null}
-
-                    {/* Lingo translation badge */}
-                    {match.translated_expertise && (
-                      <div className="mt-2 p-2 bg-coffee-cream rounded-lg border border-coffee-foam">
-                        <p className="text-xs text-coffee-latte font-medium flex items-center gap-1 mb-1">
-                          <Languages className="w-3 h-3" />
-                          Translated from {match.translation_info?.from_dept}
-                        </p>
-                        <p className="text-sm text-coffee-espresso">
-                          {match.translated_expertise}
-                        </p>
-                      </div>
-                    )}
                   </div>
 
                   {/* Action */}
@@ -314,6 +289,31 @@ export default function FindHelpPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Expertise section */}
+                <div className="space-y-2">
+                  {/* Their expertise */}
+                  {(match.match_reason || match.expertise_text) && (
+                    <div className="bg-coffee-cream/30 rounded-lg px-3 py-2">
+                      <p className="text-xs text-coffee-latte mb-1">Their expertise</p>
+                      <p className="text-sm text-coffee-mocha">
+                        {match.match_reason || match.expertise_text}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Translation */}
+                  {match.translated_expertise && (
+                    <div className="bg-coffee-foam/50 rounded-lg px-3 py-2">
+                      <p className="text-xs text-coffee-latte mb-1">
+                        In {match.translation_info?.to_dept} terms
+                      </p>
+                      <p className="text-sm text-coffee-espresso font-medium">
+                        {match.translated_expertise.replace(/^.*→\s*/, '')}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -330,18 +330,18 @@ export default function FindHelpPage() {
             {[
               {
                 icon: Search,
-                title: "Describe your need",
-                desc: "Tell us what you're trying to solve",
+                title: "Search a topic",
+                desc: "Enter keywords or skills you need",
               },
               {
                 icon: Sparkles,
-                title: "AI finds matches",
-                desc: "We match your request to team expertise",
+                title: "See who knows it",
+                desc: "AI matches you with the right people",
               },
               {
                 icon: MessageSquare,
-                title: "Connect & learn",
-                desc: "Reach out and get the help you need",
+                title: "Reach out",
+                desc: "Send them a message on Slack",
               },
             ].map((step, i) => (
               <div

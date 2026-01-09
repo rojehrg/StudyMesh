@@ -25,28 +25,31 @@ export async function getUserOrgContext(): Promise<UserOrgContext | null> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: membership } = await supabase
-    .from('organization_members')
-    .select(`
-      organization_id,
-      role,
-      organizations (
-        id,
-        name
-      )
-    `)
+  // Get organization_id from profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
     .eq('user_id', user.id)
-    .maybeSingle();
+    .single();
 
-  if (!membership?.organizations) return null;
+  if (!profile?.organization_id) return null;
 
-  // Supabase returns single object for single-row foreign key relations
-  const org = membership.organizations as unknown as { id: string; name: string };
+  // Get organization details
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id, name, owner_id')
+    .eq('id', profile.organization_id)
+    .single();
+
+  if (!org) return null;
+
+  // Determine role based on ownership
+  const role: OrganizationRoleType = org.owner_id === user.id ? 'owner' : 'member';
 
   return {
     userId: user.id,
     organizationId: org.id,
-    role: membership.role as OrganizationRoleType,
+    role,
     organizationName: org.name,
   };
 }

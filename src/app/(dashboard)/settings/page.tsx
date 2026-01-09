@@ -396,32 +396,36 @@ function SettingsContent() {
         <div className="bg-white rounded-xl border border-coffee-foam p-5 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm text-coffee-cortado">First Name</Label>
+              <Label htmlFor="firstName" className="text-sm text-coffee-mocha">First Name</Label>
               <Input
+                id="firstName"
                 value={profile.firstName}
                 onChange={(e) => updateProfile({ firstName: e.target.value })}
                 placeholder="John"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-coffee-cortado">Last Name</Label>
+              <Label htmlFor="lastName" className="text-sm text-coffee-mocha">Last Name</Label>
               <Input
+                id="lastName"
                 value={profile.lastName}
                 onChange={(e) => updateProfile({ lastName: e.target.value })}
                 placeholder="Doe"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-coffee-cortado">Department</Label>
+              <Label htmlFor="department" className="text-sm text-coffee-mocha">Department</Label>
               <Input
+                id="department"
                 value={profile.department}
                 onChange={(e) => updateProfile({ department: e.target.value })}
                 placeholder="Engineering"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-coffee-cortado">Job Title</Label>
+              <Label htmlFor="jobTitle" className="text-sm text-coffee-mocha">Job Title</Label>
               <Input
+                id="jobTitle"
                 value={profile.major}
                 onChange={(e) => updateProfile({ major: e.target.value })}
                 placeholder="Software Engineer"
@@ -434,17 +438,19 @@ function SettingsContent() {
         <div className="bg-white rounded-xl border border-coffee-foam p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-coffee-espresso">What can you help with?</h3>
-              <p className="text-sm text-coffee-cortado">Describe your expertise - our AI uses this to match you with teammates who need help.</p>
+              <Label htmlFor="expertise" className="font-medium text-coffee-espresso block">What can you help with?</Label>
+              <p id="expertise-description" className="text-sm text-coffee-mocha mt-1">Describe your expertise - our AI uses this to match you with teammates who need help.</p>
             </div>
             {expertiseSaving && (
-              <Badge className="bg-coffee-cream text-coffee-mocha text-xs">
-                <LottieLoader size="sm" className="w-3 h-3 mr-1" />
+              <Badge className="bg-coffee-cream text-coffee-mocha text-xs" aria-live="polite">
+                <LottieLoader size="sm" className="w-3 h-3 mr-1" aria-hidden="true" />
                 Saving...
               </Badge>
             )}
           </div>
           <Textarea
+            id="expertise"
+            aria-describedby="expertise-description"
             value={profile.expertiseText}
             onChange={(e) => handleExpertiseChange(e.target.value)}
             placeholder="Example: I've been doing sales ops for 5 years. Really good at Salesforce automation, building reports, and helping new reps get up to speed."
@@ -487,13 +493,13 @@ function SettingsContent() {
             </div>
             {profile.slackConnected ? (
               <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
-                <LinkBreak className="w-4 h-4 mr-2" />
-                Disconnect
+                <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
+                Disconnect Slack
               </Button>
             ) : (
               <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69]">
-                {slackConnecting ? <LottieLoader size="sm" className="w-4 h-4 mr-2" /> : <Slack className="w-4 h-4 mr-2" />}
-                Connect
+                {slackConnecting ? <LottieLoader size="sm" className="w-4 h-4 mr-2" aria-hidden="true" /> : <Slack className="w-4 h-4 mr-2" aria-hidden="true" />}
+                Connect Slack
               </Button>
             )}
           </div>
@@ -518,13 +524,13 @@ function SettingsContent() {
             </div>
             {meetingProviders.googleCalendar ? (
               <Button variant="outline" size="sm" onClick={disconnectGoogleCalendar} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
-                <LinkBreak className="w-4 h-4 mr-2" />
-                Disconnect
+                <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
+                Disconnect Calendar
               </Button>
             ) : (
               <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6]">
-                <Calendar className="w-4 h-4 mr-2" />
-                Connect
+                <Calendar className="w-4 h-4 mr-2" aria-hidden="true" />
+                Connect Calendar
               </Button>
             )}
           </div>
@@ -549,13 +555,13 @@ function SettingsContent() {
             </div>
             {meetingProviders.zoom ? (
               <Button variant="outline" size="sm" onClick={disconnectZoom} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
-                <LinkBreak className="w-4 h-4 mr-2" />
-                Disconnect
+                <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
+                Disconnect Zoom
               </Button>
             ) : (
               <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2]">
-                <Video className="w-4 h-4 mr-2" />
-                Connect
+                <Video className="w-4 h-4 mr-2" aria-hidden="true" />
+                Connect Zoom
               </Button>
             )}
           </div>

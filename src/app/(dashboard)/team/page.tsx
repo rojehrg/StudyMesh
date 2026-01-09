@@ -245,10 +245,10 @@ export default function TeamPage() {
         <div>
           <h1 className="text-2xl font-bold text-coffee-espresso flex items-center gap-2">
             <Users className="w-6 h-6" />
-            Team
+            Manage Members
           </h1>
           <p className="text-coffee-cortado mt-1">
-            Manage your organization members ({members.length} member{members.length !== 1 ? "s" : ""})
+            Invite teammates & manage roles ({members.length} member{members.length !== 1 ? "s" : ""})
           </p>
         </div>
       </div>
@@ -264,11 +264,16 @@ export default function TeamPage() {
           {/* Invite Code */}
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <label className="text-sm text-coffee-cortado mb-1.5 block">
+              <label id="invite-code-label" className="text-sm text-coffee-mocha mb-1.5 block font-medium">
                 Share invite code
               </label>
               <div className="flex items-center gap-2">
-                <div className="flex-1 p-3 bg-coffee-cream/50 rounded-lg font-mono text-lg tracking-widest text-center border border-coffee-foam text-coffee-espresso">
+                <div
+                  className="flex-1 p-3 bg-coffee-cream/50 rounded-lg font-mono text-lg tracking-widest text-center border border-coffee-foam text-coffee-espresso"
+                  aria-labelledby="invite-code-label"
+                  role="textbox"
+                  aria-readonly="true"
+                >
                   {inviteCode}
                 </div>
                 <Button
@@ -276,11 +281,12 @@ export default function TeamPage() {
                   variant="outline"
                   size="icon"
                   className="shrink-0"
+                  aria-label={copiedCode ? "Copied invite code" : "Copy invite code"}
                 >
                   {copiedCode ? (
-                    <Check className="w-4 h-4 text-emerald-600" />
+                    <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                   ) : (
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-4 h-4" aria-hidden="true" />
                   )}
                 </Button>
               </div>
@@ -289,11 +295,12 @@ export default function TeamPage() {
 
           {/* Email Invite */}
           <div>
-            <label className="text-sm text-coffee-cortado mb-1.5 block">
+            <label htmlFor="invite-email" className="text-sm text-coffee-mocha mb-1.5 block font-medium">
               Or invite by email
             </label>
             <div className="flex items-center gap-2">
               <Input
+                id="invite-email"
                 type="email"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
@@ -306,10 +313,10 @@ export default function TeamPage() {
                 className="bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper"
               >
                 {inviting ? (
-                  <LottieLoader size="sm" className="w-4 h-4" />
+                  <LottieLoader size="sm" className="w-4 h-4" aria-hidden="true" />
                 ) : (
                   <>
-                    <Mail className="w-4 h-4 mr-2" />
+                    <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
                     Invite
                   </>
                 )}
@@ -422,11 +429,12 @@ export default function TeamPage() {
                       className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => handleRemove(member.user_id, name)}
                       disabled={removingId === member.user_id}
+                      aria-label={`Remove ${name} from organization`}
                     >
                       {removingId === member.user_id ? (
-                        <LottieLoader size="sm" className="w-4 h-4" />
+                        <LottieLoader size="sm" className="w-4 h-4" aria-hidden="true" />
                       ) : (
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       )}
                     </Button>
                   )}
@@ -444,30 +452,30 @@ export default function TeamPage() {
       </div>
 
       {/* Role Legend */}
-      <div className="bg-coffee-cream/40 rounded-xl border border-coffee-foam/50 p-4">
-        <h3 className="text-sm font-medium text-coffee-mocha mb-3">Role Permissions</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-start gap-2">
-            <Badge className={`${getRoleBadgeClass("owner")} shrink-0`}>
+      <div className="bg-coffee-cream/40 rounded-xl border border-coffee-foam/50 p-5">
+        <h3 className="text-sm font-semibold text-coffee-mocha mb-4">Role Permissions</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Badge className={`${getRoleBadgeClass("owner")} shrink-0 text-xs px-2.5 py-1`}>
               {getRoleIcon("owner")} Owner
             </Badge>
-            <span className="text-coffee-cortado">
+            <span className="text-sm text-coffee-cortado">
               {getRoleDescription(OrganizationRole.OWNER)}
             </span>
           </div>
-          <div className="flex items-start gap-2">
-            <Badge className={`${getRoleBadgeClass("admin")} shrink-0`}>
+          <div className="flex items-center gap-3">
+            <Badge className={`${getRoleBadgeClass("admin")} shrink-0 text-xs px-2.5 py-1`}>
               {getRoleIcon("admin")} Admin
             </Badge>
-            <span className="text-coffee-cortado">
+            <span className="text-sm text-coffee-cortado">
               {getRoleDescription(OrganizationRole.ADMIN)}
             </span>
           </div>
-          <div className="flex items-start gap-2">
-            <Badge className={`${getRoleBadgeClass("member")} shrink-0`}>
+          <div className="flex items-center gap-3">
+            <Badge className={`${getRoleBadgeClass("member")} shrink-0 text-xs px-2.5 py-1`}>
               {getRoleIcon("member")} Member
             </Badge>
-            <span className="text-coffee-cortado">
+            <span className="text-sm text-coffee-cortado">
               {getRoleDescription(OrganizationRole.MEMBER)}
             </span>
           </div>
