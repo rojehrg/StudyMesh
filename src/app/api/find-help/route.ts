@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { serverAnalytics } from "@/lib/analytics";
 import { semanticMatch } from "@/lib/ai/semantic-search";
-import { translateToLingo } from "@/lib/ai/lingo-translator";
+import { translateToLingo, expandQueryForSearch } from "@/lib/ai/lingo-translator";
 
 /**
  * POST /api/find-help
@@ -74,7 +74,19 @@ export async function POST(request: Request) {
 
     // Try AI-powered semantic search first (Groq - free)
     if (queryText && queryText.trim() && process.env.GROQ_API_KEY) {
-      const aiMatches = await semanticMatch(queryText, allProfiles.map(p => ({
+      // Expand query with cross-department terminology for better matching
+      const queryExpansion = await expandQueryForSearch(
+        queryText,
+        requesterDept,
+        orgId
+      );
+
+      // Use expanded query for semantic matching (better cross-dept discovery)
+      const searchQuery = queryExpansion.wasExpanded
+        ? queryExpansion.expandedQuery
+        : queryText;
+
+      const aiMatches = await semanticMatch(searchQuery, allProfiles.map(p => ({
         user_id: p.user_id,
         first_name: p.first_name || '',
         last_name: p.last_name || '',
@@ -145,6 +157,8 @@ export async function POST(request: Request) {
           success: true,
           matches,
           searchType: 'ai',
+          queryExpanded: queryExpansion.wasExpanded,
+          expandedQuery: queryExpansion.wasExpanded ? queryExpansion.expandedQuery : undefined,
         });
       }
     }

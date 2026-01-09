@@ -394,3 +394,122 @@ function getDefaultCommunicationStyle(department: string): string {
 
   return 'Professional, clear communication';
 }
+
+/**
+ * Expand a search query for cross-department matching
+ *
+ * Takes a query in the user's department language and expands it
+ * with synonyms and terminology from other departments to improve
+ * cross-functional search results.
+ */
+export interface QueryExpansionResult {
+  originalQuery: string;
+  expandedQuery: string;
+  wasExpanded: boolean;
+  sourceDepartment: string | null;
+}
+
+export async function expandQueryForSearch(
+  query: string,
+  userDepartment: string | null,
+  organizationId: string
+): Promise<QueryExpansionResult> {
+  // If no department or no API key, return original
+  if (!userDepartment || !process.env.GROQ_API_KEY) {
+    return {
+      originalQuery: query,
+      expandedQuery: query,
+      wasExpanded: false,
+      sourceDepartment: userDepartment,
+    };
+  }
+
+  try {
+    // Get user's lingo profile for context
+    const userLingo = await getLingoProfile(organizationId, userDepartment);
+
+    const prompt = `You are a search query expander for a workplace expertise-finding tool.
+
+CONTEXT:
+- User is from the ${userDepartment} department
+- They're searching for someone who can help with: "${query}"
+${userLingo?.communicationStyle ? `- Their department typically: ${userLingo.communicationStyle}` : ''}
+
+TASK:
+Expand this query with synonyms and equivalent terms from other departments so we can find experts across the organization.
+
+For example:
+- "deal velocity" (Sales) → also search: "lead conversion rate", "pipeline throughput", "sales cycle speed"
+- "tech debt" (Engineering) → also search: "code maintenance", "legacy system issues", "refactoring needs"
+- "churn rate" (Product) → also search: "customer retention", "user drop-off", "subscription cancellation"
+
+OUTPUT FORMAT:
+Return a single search string that combines the original query with 3-5 equivalent terms from other departments.
+Format: "original query" OR "synonym1" OR "synonym2" OR "synonym3"
+
+Only output the expanded search string, nothing else.`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 300,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        log.warn('Groq rate limit hit during query expansion');
+      } else {
+        log.error('Groq API error during query expansion', { status: response.status });
+      }
+      return {
+        originalQuery: query,
+        expandedQuery: query,
+        wasExpanded: false,
+        sourceDepartment: userDepartment,
+      };
+    }
+
+    const data = await response.json();
+    const expandedQuery = data.choices?.[0]?.message?.content?.trim();
+
+    if (!expandedQuery) {
+      return {
+        originalQuery: query,
+        expandedQuery: query,
+        wasExpanded: false,
+        sourceDepartment: userDepartment,
+      };
+    }
+
+    log.info('Expanded search query', {
+      originalQuery: query,
+      expandedLength: expandedQuery.length,
+      department: userDepartment,
+    });
+
+    return {
+      originalQuery: query,
+      expandedQuery,
+      wasExpanded: true,
+      sourceDepartment: userDepartment,
+    };
+  } catch (error) {
+    log.error('Query expansion error', { error });
+    return {
+      originalQuery: query,
+      expandedQuery: query,
+      wasExpanded: false,
+      sourceDepartment: userDepartment,
+    };
+  }
+}
