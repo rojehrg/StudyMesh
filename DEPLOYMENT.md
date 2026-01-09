@@ -44,13 +44,27 @@ In Vercel Dashboard → Project → Settings → Environment Variables:
 | `ADMIN_SECRET` | Admin API authentication | `openssl rand -hex 32` |
 | `ENCRYPTION_KEY` | Token encryption key (32 bytes hex) | `openssl rand -hex 32` |
 
-#### Slack Integration (Optional)
+#### Slack Integration (Required for core functionality)
 
 | Variable | Description | Where to Get |
 |----------|-------------|--------------|
 | `SLACK_CLIENT_ID` | Slack App Client ID | [api.slack.com/apps](https://api.slack.com/apps) |
 | `SLACK_CLIENT_SECRET` | Slack App Client Secret | Slack App Settings |
-| `SLACK_WEBHOOK_URL` | Incoming Webhook URL | Slack App → Incoming Webhooks |
+| `SLACK_SIGNING_SECRET` | Request signing secret | Slack App → Basic Information |
+| `SLACK_WEBHOOK_URL` | Incoming Webhook URL (optional fallback) | Slack App → Incoming Webhooks |
+
+#### AI Matching (Required)
+
+| Variable | Description | Where to Get |
+|----------|-------------|--------------|
+| `GROQ_API_KEY` | Groq API key for semantic matching | [console.groq.com](https://console.groq.com) |
+
+#### Billing (Optional)
+
+| Variable | Description | Where to Get |
+|----------|-------------|--------------|
+| `STRIPE_SECRET_KEY` | Stripe API secret key | [dashboard.stripe.com](https://dashboard.stripe.com) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | Stripe Dashboard → Webhooks |
 
 ### Step 4: Configure OAuth Providers
 
@@ -77,19 +91,25 @@ In Vercel Dashboard → Project → Settings → Environment Variables:
    https://your-app.vercel.app
    ```
 
-#### Slack App Setup (Optional)
+#### Slack App Setup (Required)
 
 1. Go to [api.slack.com/apps](https://api.slack.com/apps)
 2. Create a new app or select existing
-3. Configure OAuth & Permissions:
-   - **Bot Token Scopes**: `chat:write`, `users:read`, `im:write`, `team:read`
+3. Configure **Slash Commands**:
+   - Command: `/attunly`
+   - Request URL: `https://your-app.vercel.app/api/slack/commands`
+   - Short Description: "Find help from your team"
+4. Configure **Interactivity**:
+   - Request URL: `https://your-app.vercel.app/api/slack/interactions`
+5. Configure OAuth & Permissions:
+   - **Bot Token Scopes**: `chat:write`, `users:read`, `im:write`, `team:read`, `commands`
    - **User Token Scopes**: `openid`, `profile`, `email`
-4. Add **Redirect URLs**:
+6. Add **Redirect URLs**:
    ```
    https://your-app.vercel.app/api/auth/slack/callback
    https://your-app.vercel.app/api/slack/oauth/callback
    ```
-5. (Optional) Enable **Incoming Webhooks** for fallback notifications
+7. (Optional) Enable **Incoming Webhooks** for fallback notifications
 
 ### Step 5: Deploy
 
@@ -113,11 +133,12 @@ curl -X POST https://your-app.vercel.app/api/admin/migrate \
 - [ ] Landing page loads
 - [ ] Email signup works
 - [ ] Google OAuth works
-- [ ] Slack OAuth works (if configured)
+- [ ] Slack OAuth works
 - [ ] Dashboard loads after login
-- [ ] Pods can be created
-- [ ] Nudges send notifications
-- [ ] Meetings can be scheduled
+- [ ] `/attunly` command works in Slack
+- [ ] AI matching returns relevant results
+- [ ] Slack DMs send successfully
+- [ ] Google Calendar shows availability
 
 ---
 

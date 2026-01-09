@@ -410,4 +410,4 @@ Voice:          Direct, outcome-focused, no jargon
 
 ---
 
-*Last updated: January 2025*
+*Last updated: January 2026*

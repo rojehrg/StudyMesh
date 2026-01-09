@@ -28,15 +28,18 @@ The question never gets asked. The work stays blocked.
 
 ## The Solution
 
-Attunly creates a lightweight layer of "who knows what" and "when are they free" that sits on top of your existing tools.
+Attunly is a **Slack-first** platform that creates a lightweight layer of "who knows what" and "when are they free" on top of your existing tools.
 
-**Web App** — Create a profile describing your expertise in natural language. Connect your Google Calendar.
+**Web App** — Set up your profile, connect Google Calendar, and manage your organization settings.
 
-**Slack Command** — Type `/attunly [what you need]` and get matched with someone who can help, see their availability, and send a low-pressure message.
+**Slack Command** — Type `/attunly [what you need]` and get matched with someone who can help, see their availability, and send a low-pressure message. Everything happens in Slack.
 
 ---
 
 ## Features
+
+### Slack-First Experience
+Use `/attunly` directly in Slack. No context switching. Find help, see availability, and send messages without leaving your workspace.
 
 ### Natural Language Profiles
 Describe what you know in your own words. No checkboxes, no skill matrices.
@@ -52,8 +55,8 @@ Connect Google Calendar to show actual free time, not just "online" status.
 ### Low-Friction Messaging
 Generates calm, low-pressure message drafts. Edit or send as-is.
 
-### Meeting Scheduling
-Book time directly through Attunly with Zoom or Google Meet integration.
+### Team Health Stats (Admin)
+Admins can view team metrics including active users and command send rates to understand how their team is using Attunly.
 
 ---
 
@@ -144,7 +147,7 @@ ZOOM_CLIENT_SECRET=your-zoom-client-secret
 
 | Layer | Technology |
 |-------|------------|
-| **Framework** | Next.js 15 (App Router) |
+| **Framework** | Next.js 16 (App Router, Turbopack) |
 | **Language** | TypeScript |
 | **Database** | PostgreSQL (Supabase) |
 | **ORM** | Drizzle ORM |
@@ -153,7 +156,7 @@ ZOOM_CLIENT_SECRET=your-zoom-client-secret
 | **AI** | Groq (Llama 3.1) for semantic matching |
 | **Integrations** | Slack API, Google Calendar API, Zoom API |
 | **Deployment** | Vercel |
-| **Analytics** | PostHog |
+| **Analytics** | PostHog, Sentry |
 
 ---
 
@@ -163,27 +166,28 @@ ZOOM_CLIENT_SECRET=your-zoom-client-secret
 src/
 ├── app/
 │   ├── (auth)/                 # Login, signup, forgot-password
-│   ├── (dashboard)/            # Main app pages
-│   │   ├── dashboard/          # Home dashboard
-│   │   ├── find-help/          # Search for expertise
-│   │   ├── meetings/           # Scheduled meetings
-│   │   ├── settings/           # User settings
-│   │   └── notifications/      # Nudges and alerts
+│   ├── (dashboard)/            # Main app pages (Slack-first UX)
+│   │   ├── dashboard/          # Status page with connection cards + activity stats
+│   │   ├── settings/           # Single-page settings (profile, integrations)
+│   │   └── classes/            # Pod/group management
+│   ├── (admin)/                # Admin analytics & org management
 │   ├── (onboarding)/           # First-time setup flow
+│   ├── pricing/                # Pricing page
 │   └── api/
 │       ├── slack/              # Slash command + interactions
 │       │   ├── commands/       # /attunly handler
-│       │   └── interactions/   # Modal submissions
+│       │   ├── interactions/   # Modal submissions
+│       │   ├── nudge/          # Send nudge notifications
+│       │   └── nudge-response/ # Handle nudge responses
 │       ├── auth/               # OAuth callbacks
 │       ├── calendar/           # Google Calendar integration
-│       ├── meetings/           # Meeting CRUD
-│       ├── availability/       # Overlap calculation
+│       ├── billing/            # Stripe billing integration
 │       └── find-help/          # AI-powered search
 ├── lib/
 │   ├── db/                     # Drizzle schema
-│   ├── slack/                  # Modal builder, message generator
-│   ├── ai/                     # Semantic search
-│   └── meeting-providers/      # Zoom integration
+│   ├── slack/                  # Modal builder, message generator, person suggester
+│   ├── ai/                     # Semantic search, lingo translator
+│   └── analytics/              # PostHog integration
 └── components/                 # React components
 ```
 
