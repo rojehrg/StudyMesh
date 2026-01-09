@@ -143,62 +143,22 @@ const TypingAnimation = () => {
   }, [displayText, isDeleting, scenarioIndex, currentScenario.phrase, scenarios.length]);
 
   return (
-    <div>
-      {/* Mobile: Static demo */}
-      <div className="lg:hidden">
-        <div className="bg-white rounded-xl shadow-lg border border-coffee-foam/50 overflow-hidden font-sans">
-          <div className="bg-[#3F0F40] px-4 py-2.5 flex items-center gap-2">
-            <span className="text-white/90 text-sm font-medium"># engineering</span>
-          </div>
-          <div className="p-4">
-            <div className="border border-gray-300 rounded-lg px-3 py-2.5 bg-white mb-4">
-              <div className="flex items-center text-sm">
-                <span className="text-gray-900 font-bold">/attunly</span>
-                <span className="ml-2 text-gray-700">need help with auth</span>
-              </div>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
-                <img src="/logo.svg" alt="Attunly" className="w-4 h-4 invert" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-800 mb-2">Found <strong>2 people</strong> who can help:</p>
-                <div className="p-2.5 bg-coffee-cream rounded-lg border border-coffee-foam">
-                  <div className="flex items-center gap-2.5">
-                    <div className="relative">
-                      <div className="w-9 h-9 rounded-lg bg-coffee-steamed flex items-center justify-center text-xs font-semibold text-coffee-mocha">LG</div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-green-500"></div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-coffee-espresso text-sm">Lisa G.</div>
-                      <p className="text-xs text-coffee-cortado">Free now · OAuth, SSO</p>
-                    </div>
-                    <button className="px-2.5 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">Ask</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop: Full animated demo */}
-      <div className="hidden lg:block">
-        <div className="bg-white rounded-xl shadow-xl border border-coffee-foam/50 overflow-hidden max-w-md ml-auto font-sans">
+    <div className="mt-8 lg:mt-0">
+      <div className="bg-white rounded-xl shadow-xl border border-coffee-foam/50 overflow-hidden lg:max-w-md lg:ml-auto font-sans">
         {/* Slack header */}
-        <div className="bg-[#3F0F40] px-4 py-3 flex items-center gap-2">
+        <div className="bg-[#3F0F40] px-3 lg:px-4 py-2.5 lg:py-3 flex items-center gap-2">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#EC6A5F]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#F4BF50]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#61C454]"></div>
+            <div className="w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full bg-[#EC6A5F]"></div>
+            <div className="w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full bg-[#F4BF50]"></div>
+            <div className="w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full bg-[#61C454]"></div>
           </div>
-          <span className="text-white/90 text-sm ml-3 font-medium"># {currentScenario.channel}</span>
+          <span className="text-white/90 text-sm ml-2 lg:ml-3 font-medium"># {currentScenario.channel}</span>
         </div>
 
         {/* Slack input area */}
-        <div className="p-4 bg-white">
-          <div className="border border-gray-300 rounded-lg px-4 py-3 bg-white">
-            <div className="flex items-center text-[15px]">
+        <div className="p-3 lg:p-4 bg-white">
+          <div className="border border-gray-300 rounded-lg px-3 lg:px-4 py-2.5 lg:py-3 bg-white">
+            <div className="flex items-center text-sm lg:text-[15px]">
               <span className="text-gray-900 font-bold">/attunly</span>
               <span className="ml-2 text-gray-700">{displayText}</span>
               <span className="inline-block w-0.5 h-[1.1em] bg-current text-gray-400 ml-0.5 animate-[blink_1s_step-end_infinite]"></span>
@@ -207,32 +167,32 @@ const TypingAnimation = () => {
 
           {/* Response preview */}
           <div
-            className={`mt-4 transition-all duration-500 ease-out ${
+            className={`mt-3 lg:mt-4 transition-all duration-500 ease-out ${
               showResponse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
             }`}
           >
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
-                <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
+            <div className="flex items-start gap-2.5 lg:gap-3">
+              <div className="w-8 lg:w-9 h-8 lg:h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
+                <img src="/logo.svg" alt="Attunly" className="w-4 lg:w-5 h-4 lg:h-5 invert" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-gray-900 text-[15px]">Attunly</span>
-                  <span className="text-[11px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-medium">APP</span>
-                  <span className="text-xs text-gray-400">12:34 PM</span>
+                  <span className="font-bold text-gray-900 text-sm lg:text-[15px]">Attunly</span>
+                  <span className="text-[10px] lg:text-[11px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-medium">APP</span>
+                  <span className="text-xs text-gray-400 hidden sm:inline">12:34 PM</span>
                 </div>
-                <p className="text-[15px] text-gray-800 leading-relaxed">
+                <p className="text-sm lg:text-[15px] text-gray-800 leading-relaxed">
                   Found <strong>{currentScenario.people.length} people</strong> who can help:
                 </p>
 
                 {currentScenario.people.map((person, index) => (
-                  <div key={person.initials} className={`${index === 0 ? 'mt-3' : 'mt-2'} p-3 bg-coffee-cream rounded-lg border border-coffee-foam`}>
-                    <div className="flex items-center gap-3">
+                  <div key={person.initials} className={`${index === 0 ? 'mt-2 lg:mt-3' : 'mt-2'} p-2.5 lg:p-3 bg-coffee-cream rounded-lg border border-coffee-foam`}>
+                    <div className="flex items-center gap-2.5 lg:gap-3">
                       <div className="relative">
-                        <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
+                        <div className="w-9 lg:w-10 h-9 lg:h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-xs lg:text-sm font-semibold text-coffee-mocha">
                           {person.initials}
                         </div>
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full border-2 border-white ${
                           person.status === 'green' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'
                         }`}></div>
                       </div>
@@ -240,7 +200,7 @@ const TypingAnimation = () => {
                         <div className="font-semibold text-coffee-espresso text-sm">{person.name}</div>
                         <p className="text-xs text-coffee-cortado">{person.availability} · {person.skills}</p>
                       </div>
-                      <button className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      <button className={`px-2.5 lg:px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                         index === 0
                           ? 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast'
                           : 'bg-white text-coffee-espresso border border-coffee-foam hover:bg-coffee-cream'
@@ -254,7 +214,6 @@ const TypingAnimation = () => {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
@@ -1028,56 +987,6 @@ const Footer = () => (
   </footer>
 );
 
-// Mobile Nav Component
-const MobileNav = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      {/* Hamburger button - mobile only */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden p-2 -mr-2 text-coffee-espresso"
-        aria-label="Toggle menu"
-      >
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
-
-      {/* Mobile menu overlay */}
-      {isOpen && (
-        <div className="md:hidden fixed inset-0 top-[60px] bg-coffee-paper z-40">
-          <div className="flex flex-col p-6 gap-4">
-            <Link
-              href="#pricing"
-              onClick={() => setIsOpen(false)}
-              className="text-lg font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors py-2"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/login"
-              onClick={() => setIsOpen(false)}
-              className="text-lg font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors py-2"
-            >
-              Log in
-            </Link>
-            <Button primary href="/signup" className="text-base py-3 px-6 mt-2">
-              <SlackIcon className="w-5 h-5 mr-2" />
-              Add to Slack
-            </Button>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
 // Main Page
 export default function AttunlyLanding() {
   return (
@@ -1116,7 +1025,27 @@ export default function AttunlyLanding() {
           </div>
 
           {/* Mobile nav */}
-          <MobileNav />
+          <div className="flex md:hidden items-center gap-2">
+            <Link
+              href="#pricing"
+              className="text-xs font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/login"
+              className="text-xs font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/signup"
+              className="flex items-center gap-1.5 px-3 py-2 bg-coffee-espresso text-coffee-paper rounded-lg text-xs font-medium hover:bg-coffee-roast transition-colors"
+            >
+              <SlackIcon className="w-3.5 h-3.5" />
+              Add to Slack
+            </Link>
+          </div>
         </div>
       </nav>
 
