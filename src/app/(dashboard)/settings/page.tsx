@@ -503,7 +503,6 @@ function SettingsContent() {
                   size="sm"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="text-coffee-mocha"
                 >
                   <Camera className="w-4 h-4 mr-2" aria-hidden="true" />
                   {profile.avatarUrl ? 'Change' : 'Upload'}
@@ -790,7 +789,7 @@ function SettingsContent() {
 
             {(plan === 'free' || plan === 'starter') && !subscription?.hasActiveSubscription && (
               <Button
-                className="w-full bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper"
+                className="w-full"
                 onClick={async () => {
                   try {
                     const response = await fetch('/api/billing/checkout', {

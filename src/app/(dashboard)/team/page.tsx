@@ -311,7 +311,6 @@ export default function TeamPage() {
               <Button
                 onClick={handleInvite}
                 disabled={!inviteEmail.trim() || inviting}
-                className="bg-coffee-espresso hover:bg-coffee-roast text-coffee-paper"
               >
                 {inviting ? (
                   <LottieLoader size="sm" className="w-4 h-4" aria-hidden="true" />
