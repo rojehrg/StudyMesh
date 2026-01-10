@@ -614,7 +614,7 @@ function SettingsContent() {
               </Button>
             ) : (
               <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69] text-white">
-                {slackConnecting ? <LottieLoader size="sm" className="w-4 h-4 mr-2" aria-hidden="true" /> : <Image src="/slack-icon.svg" alt="" width={16} height={16} className="mr-2 brightness-0 invert" />}
+                {slackConnecting && <LottieLoader size="sm" className="w-4 h-4 mr-2" aria-hidden="true" />}
                 Connect Slack
               </Button>
             )}
@@ -643,7 +643,6 @@ function SettingsContent() {
               </Button>
             ) : (
               <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6] text-white">
-                <Image src="/google-calendar-icon.svg" alt="" width={16} height={16} className="mr-2" />
                 Connect Calendar
               </Button>
             )}
@@ -672,7 +671,6 @@ function SettingsContent() {
               </Button>
             ) : (
               <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2] text-white">
-                <Image src="/zoom-icon.svg" alt="" width={16} height={16} className="mr-2" />
                 Connect Zoom
               </Button>
             )}
