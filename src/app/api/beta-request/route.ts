@@ -92,50 +92,72 @@ async function sendEmailNotification(data: {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: 'Georgia', serif; background-color: #faf8f5; margin: 0; padding: 0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #faf8f5; padding: 40px 20px;">
+<body style="font-family: Georgia, 'Times New Roman', serif; background-color: #faf8f5; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #faf8f5;">
     <tr>
-      <td align="center">
-        <table width="500" cellpadding="0" cellspacing="0" style="max-width: 500px; background: #fffdf9; border-radius: 16px; overflow: hidden; border: 1px solid #e8e4dc;">
-          <!-- Header -->
+      <td align="center" style="padding: 40px 20px;">
+        <table width="520" cellpadding="0" cellspacing="0" border="0" style="max-width: 520px; background: #fffdf9; border-radius: 16px; overflow: hidden; border: 1px solid #e8e4dc;">
+          <!-- Header with Logo -->
           <tr>
-            <td style="padding: 24px 32px; background: #1a1614; text-align: center;">
-              <span style="font-size: 18px; font-weight: 600; color: #fffdf9;">New Beta Request</span>
+            <td style="padding: 32px 32px 24px; text-align: center; border-bottom: 1px solid #e8e4dc;">
+              <img src="https://attunly.com/icon.png" alt="Attunly" width="48" height="48" style="display: block; margin: 0 auto 16px;" />
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #1a1614;">New Beta Request</h1>
+              <p style="margin: 8px 0 0; font-size: 15px; color: #6b5d54;">Someone wants early access to Attunly</p>
             </td>
           </tr>
           <!-- Content -->
           <tr>
             <td style="padding: 32px;">
-              <table width="100%" cellpadding="0" cellspacing="0">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e8e4dc;">
-                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b7355;">Email</span><br/>
-                    <span style="font-size: 16px; color: #1a1614; font-weight: 500;">${data.email}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e8e4dc;">
-                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b7355;">Company Size</span><br/>
-                    <span style="font-size: 16px; color: #1a1614;">${data.companySize} employees</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e8e4dc;">
-                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b7355;">Role</span><br/>
-                    <span style="font-size: 16px; color: #1a1614;">${data.role}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0;">
-                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #8b7355;">Blocker</span><br/>
-                    <span style="font-size: 15px; color: #5c4a3a; line-height: 1.5;">${data.blocker || "Not provided"}</span>
+                  <td style="padding: 16px; background: #f6f3f0; border-radius: 12px; margin-bottom: 16px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding-bottom: 16px; border-bottom: 1px solid #e8e4dc;">
+                          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8b7355; display: block; margin-bottom: 4px;">Email</span>
+                          <span style="font-size: 16px; color: #1a1614; font-weight: 600;">${data.email}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 16px 0; border-bottom: 1px solid #e8e4dc;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td width="50%" style="vertical-align: top;">
+                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8b7355; display: block; margin-bottom: 4px;">Company Size</span>
+                                <span style="font-size: 15px; color: #1a1614;">${data.companySize}</span>
+                              </td>
+                              <td width="50%" style="vertical-align: top;">
+                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8b7355; display: block; margin-bottom: 4px;">Role</span>
+                                <span style="font-size: 15px; color: #1a1614;">${data.role}</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-top: 16px;">
+                          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8b7355; display: block; margin-bottom: 4px;">What blocks them from getting help</span>
+                          <span style="font-size: 15px; color: #4a3f38; line-height: 1.5;">${data.blocker || "Not provided"}</span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
 
-              <div style="margin-top: 24px; text-align: center;">
-                <a href="${APP_URL}/admin/beta-requests" style="display: inline-block; background: #1a1614; color: #fffdf9; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500;">View All Requests</a>
-              </div>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px;">
+                <tr>
+                  <td align="center">
+                    <a href="${APP_URL}/admin/beta-requests" style="display: inline-block; background: #1a1614; color: #fffdf9; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">View All Requests</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px 32px; background: #f6f3f0; text-align: center; border-top: 1px solid #e8e4dc;">
+              <p style="margin: 0; font-size: 13px; color: #8b7355;">You're receiving this because someone requested beta access at attunly.com</p>
             </td>
           </tr>
         </table>
