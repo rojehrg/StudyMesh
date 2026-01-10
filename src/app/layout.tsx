@@ -34,11 +34,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Attunly",
+    images: [
+      {
+        url: "https://attunly.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Attunly - Ask for help in Slack, without the friction",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Attunly - Ask for help in Slack without overthinking",
     description: "Type /attunly in Slack. Get a calm draft that makes the ask easy to send.",
+    images: ["https://attunly.com/og-image.png"],
   },
   robots: {
     index: true,
