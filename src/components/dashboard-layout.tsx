@@ -43,7 +43,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
       prefetch={true}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-100 overflow-hidden whitespace-nowrap group",
+        "flex items-center gap-4 px-4 py-3 rounded-xl transition-colors duration-100 overflow-hidden whitespace-nowrap group",
         showActive
           ? "bg-coffee-cream/70 text-coffee-espresso font-medium"
           : "text-coffee-cortado hover:bg-coffee-cream/40 hover:text-coffee-mocha"
@@ -51,7 +51,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
       title={isCollapsed ? label : ""}
     >
       <div className="relative flex items-center">
-        <Icon className={cn("w-[18px] h-[18px] shrink-0", isPending && "animate-pulse")} />
+        <Icon className={cn("w-6 h-6 shrink-0", isPending && "animate-pulse")} />
         {badge ? (
           <span className={cn(
             "absolute -top-1.5 -right-1.5 bg-coffee-mocha text-coffee-paper text-[10px] font-bold min-w-[16px] h-[16px] flex items-center justify-center px-1 rounded-full z-10",
@@ -66,7 +66,7 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
         initial={false}
         animate={{ width: isCollapsed ? 0 : "auto", opacity: isCollapsed ? 0 : 1 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="overflow-hidden whitespace-nowrap text-sm"
+        className="overflow-hidden whitespace-nowrap text-base font-medium"
       >
         {label}
       </motion.span>
@@ -188,7 +188,7 @@ function DashboardLayoutBase({
         </div>
 
         {/* Nav Items */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto" aria-label="Main navigation">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto" aria-label="Main navigation">
           {navItems.map((item) => (
             <SidebarItem
               key={item.href}

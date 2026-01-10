@@ -13,7 +13,8 @@ import { LottieLoader, PageLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { usePlanFeatures, getPlanDisplayName, getPlanPricing } from "@/hooks/use-plan-features";
-import { Slack, Calendar, Video, Camera, X } from "lucide-react";
+import { Camera, X } from "lucide-react";
+import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileData {
@@ -596,7 +597,7 @@ function SettingsContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-[#4A154B]/10 rounded-lg flex items-center justify-center">
-                <Slack className="w-5 h-5 text-[#4A154B]" />
+                <Image src="/slack-icon.svg" alt="Slack" width={24} height={24} />
               </div>
               <div>
                 <p className="font-medium text-coffee-espresso">Slack</p>
@@ -614,8 +615,8 @@ function SettingsContent() {
                 Disconnect Slack
               </Button>
             ) : (
-              <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69]">
-                {slackConnecting ? <LottieLoader size="sm" className="w-4 h-4 mr-2" aria-hidden="true" /> : <Slack className="w-4 h-4 mr-2" aria-hidden="true" />}
+              <Button onClick={connectSlack} disabled={slackConnecting} className="bg-[#4A154B] hover:bg-[#611f69] text-white">
+                {slackConnecting ? <LottieLoader size="sm" className="w-4 h-4 mr-2" aria-hidden="true" /> : <Image src="/slack-icon.svg" alt="" width={16} height={16} className="mr-2 brightness-0 invert" />}
                 Connect Slack
               </Button>
             )}
@@ -627,7 +628,7 @@ function SettingsContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-blue-600" />
+                <Image src="/google-calendar-icon.svg" alt="Google Calendar" width={24} height={24} />
               </div>
               <div>
                 <p className="font-medium text-coffee-espresso">Google Calendar</p>
@@ -645,8 +646,8 @@ function SettingsContent() {
                 Disconnect Calendar
               </Button>
             ) : (
-              <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6]">
-                <Calendar className="w-4 h-4 mr-2" aria-hidden="true" />
+              <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6] text-white">
+                <Image src="/google-calendar-icon.svg" alt="" width={16} height={16} className="mr-2" />
                 Connect Calendar
               </Button>
             )}
@@ -658,7 +659,7 @@ function SettingsContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Video className="w-5 h-5 text-blue-500" />
+                <Image src="/zoom-icon.svg" alt="Zoom" width={24} height={24} />
               </div>
               <div>
                 <p className="font-medium text-coffee-espresso">Zoom</p>
@@ -676,8 +677,8 @@ function SettingsContent() {
                 Disconnect Zoom
               </Button>
             ) : (
-              <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2]">
-                <Video className="w-4 h-4 mr-2" aria-hidden="true" />
+              <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2] text-white">
+                <Image src="/zoom-icon.svg" alt="" width={16} height={16} className="mr-2" />
                 Connect Zoom
               </Button>
             )}
