@@ -342,7 +342,7 @@ function SettingsContent() {
 
   const connectSlack = () => {
     setSlackConnecting(true);
-    window.location.href = '/api/auth/slack';
+    window.location.href = '/api/slack/oauth';
   };
 
   const disconnectSlack = async () => {
