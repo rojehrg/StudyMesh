@@ -231,7 +231,7 @@ const Hero = () => (
           <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6">
             Ask for help in Slack.
             <br />
-            <span className="text-coffee-oat">Without the awkward part.</span>
+            <span className="text-coffee-oat">Without the friction.</span>
           </h1>
 
           <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch]">
@@ -497,81 +497,87 @@ const BeforeAfterDemo = () => {
         </div>
 
         {/* Insight Side Panel */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex flex-col justify-center">
           {activeTab === 'without' ? (
-            <div className="bg-coffee-roast/30 rounded-xl p-6 h-full border border-coffee-oat/20">
-              <p className="text-coffee-oat text-xs uppercase tracking-wide mb-4">The problem</p>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="space-y-5">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">3+ hours lost</p>
-                    <p className="text-coffee-steamed text-xs">Waiting for someone to notice</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">3+ hours</p>
+                    <p className="text-coffee-cortado text-sm">waiting for a reply</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              </div>
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">No clear answer</p>
-                    <p className="text-coffee-steamed text-xs">Just more guessing</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Wrong people</p>
+                    <p className="text-coffee-cortado text-sm">guessing who knows</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              </div>
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">Team interrupted</p>
-                    <p className="text-coffee-steamed text-xs">847 people pinged for nothing</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">847 pinged</p>
+                    <p className="text-coffee-cortado text-sm">everyone interrupted</p>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-coffee-cream/10 rounded-xl p-6 h-full border border-coffee-oat/30">
-              <p className="text-coffee-oat text-xs uppercase tracking-wide mb-4">The difference</p>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="space-y-5">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">10 minutes</p>
-                    <p className="text-coffee-steamed text-xs">From question to answer</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">10 minutes</p>
+                    <p className="text-coffee-cortado text-sm">question to answer</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              </div>
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">Right person found</p>
-                    <p className="text-coffee-steamed text-xs">AI matched by expertise</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Right expert</p>
+                    <p className="text-coffee-cortado text-sm">AI finds who knows</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              </div>
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-paper font-medium text-sm">One conversation</p>
-                    <p className="text-coffee-steamed text-xs">No channel noise</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Zero noise</p>
+                    <p className="text-coffee-cortado text-sm">direct conversation</p>
                   </div>
                 </div>
               </div>
@@ -852,9 +858,12 @@ const Trust = () => (
   <Section darker>
     <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">No new tools to learn</p>
 
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
+    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
       It&apos;s just a Slack command.
     </h2>
+    <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch]">
+      Ask for help in Slack, without the friction.
+    </p>
 
     <div className="grid gap-5">
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
