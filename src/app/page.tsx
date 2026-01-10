@@ -296,26 +296,6 @@ const TheMoment = () => (
   </section>
 );
 
-// Social Proof Section
-const SocialProof = () => (
-  <Section>
-    <div className="text-center relative">
-      {/* Arrow pointing to quote */}
-      <img
-        src="/arrow-brush.svg"
-        alt=""
-        className="absolute top-0 -left-28 w-24 h-24 rotate-[310deg] opacity-60"
-      />
-      <blockquote className="text-2xl md:text-3xl text-coffee-mocha leading-relaxed mb-6 max-w-[50ch] mx-auto">
-        &ldquo;New hires used to wait days before asking anyone anything. Now they ask in their first week.&rdquo;
-      </blockquote>
-      <p className="text-coffee-cortado">
-        — Engineering Manager, 45-person startup
-      </p>
-    </div>
-  </Section>
-);
-
 // Before/After Demo Section
 const BeforeAfterDemo = () => {
   const [activeTab, setActiveTab] = useState<'without' | 'with'>('without');
@@ -1245,7 +1225,6 @@ export default function AttunlyLanding() {
 
       <Hero />
       <TheMoment />
-      <SocialProof />
       <BeforeAfterDemo />
       <WhatsDifferentAndWhoUsesIt />
       <LingoTranslation />
