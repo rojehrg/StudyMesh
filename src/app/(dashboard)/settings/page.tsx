@@ -595,10 +595,8 @@ function SettingsContent() {
         {/* Slack */}
         <div className="bg-white rounded-xl border border-coffee-foam p-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#4A154B]/10 rounded-lg flex items-center justify-center">
-                <Image src="/slack-icon.svg" alt="Slack" width={24} height={24} />
-              </div>
+            <div className="flex items-center gap-4">
+              <Image src="/slack-icon.svg" alt="Slack" width={40} height={40} />
               <div>
                 <p className="font-medium text-coffee-espresso">Slack</p>
                 <p className="text-sm text-coffee-cortado">
@@ -626,10 +624,8 @@ function SettingsContent() {
         {/* Google Calendar */}
         <div className="bg-white rounded-xl border border-coffee-foam p-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Image src="/google-calendar-icon.svg" alt="Google Calendar" width={24} height={24} />
-              </div>
+            <div className="flex items-center gap-4">
+              <Image src="/google-calendar-icon.svg" alt="Google Calendar" width={40} height={40} />
               <div>
                 <p className="font-medium text-coffee-espresso">Google Calendar</p>
                 <p className="text-sm text-coffee-cortado">
@@ -657,10 +653,8 @@ function SettingsContent() {
         {/* Zoom */}
         <div className="bg-white rounded-xl border border-coffee-foam p-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Image src="/zoom-icon.svg" alt="Zoom" width={24} height={24} />
-              </div>
+            <div className="flex items-center gap-4">
+              <Image src="/zoom-icon.svg" alt="Zoom" width={40} height={40} />
               <div>
                 <p className="font-medium text-coffee-espresso">Zoom</p>
                 <p className="text-sm text-coffee-cortado">
