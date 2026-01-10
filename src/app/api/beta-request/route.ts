@@ -146,7 +146,7 @@ async function sendEmailNotification(data: {
 </html>
   `;
 
-  await fetch("https://api.mailersend.com/v1/email", {
+  const response = await fetch("https://api.mailersend.com/v1/email", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -159,4 +159,11 @@ async function sendEmailNotification(data: {
       html,
     }),
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    log.error("MailerSend API error", { status: response.status, error: errorText, to: notifyEmail });
+  } else {
+    log.info("Beta notification email sent", { to: notifyEmail, beta_email: data.email });
+  }
 }
