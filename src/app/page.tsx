@@ -304,7 +304,7 @@ const BeforeAfterDemo = () => {
       id="how-it-works"
       className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-espresso"
     >
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4">
             The difference is time.
@@ -340,6 +340,7 @@ const BeforeAfterDemo = () => {
           </div>
         </div>
 
+        <div className="grid lg:grid-cols-[1fr,280px] gap-6">
         {/* Mock Slack UI */}
         <div className="bg-[#1a1d21] rounded-xl shadow-2xl overflow-hidden font-sans ring-1 ring-coffee-oat/70 shadow-[0_0_60px_-12px_rgba(199,163,118,0.4)]">
           {/* Slack header */}
@@ -493,6 +494,90 @@ const BeforeAfterDemo = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Insight Side Panel */}
+        <div className="hidden lg:block">
+          {activeTab === 'without' ? (
+            <div className="bg-coffee-roast/30 rounded-xl p-6 h-full border border-coffee-oat/20">
+              <p className="text-coffee-oat text-xs uppercase tracking-wide mb-4">The problem</p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">3+ hours lost</p>
+                    <p className="text-coffee-steamed text-xs">Waiting for someone to notice</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">No clear answer</p>
+                    <p className="text-coffee-steamed text-xs">Just more guessing</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">Team interrupted</p>
+                    <p className="text-coffee-steamed text-xs">847 people pinged for nothing</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-coffee-cream/10 rounded-xl p-6 h-full border border-coffee-oat/30">
+              <p className="text-coffee-oat text-xs uppercase tracking-wide mb-4">The difference</p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">10 minutes</p>
+                    <p className="text-coffee-steamed text-xs">From question to answer</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">Right person found</p>
+                    <p className="text-coffee-steamed text-xs">AI matched by expertise</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-paper font-medium text-sm">One conversation</p>
+                    <p className="text-coffee-steamed text-xs">No channel noise</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </section>
@@ -774,7 +859,7 @@ const Trust = () => (
     <div className="grid gap-5">
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
         <h3 className="text-lg font-semibold text-coffee-espresso mb-2">2-minute setup</h3>
-        <p className="text-coffee-cortado">Describe what you know in plain English. Connect your calendar. Done.</p>
+        <p className="text-coffee-cortado">Tell Attunly what you know. Connect your calendar. That&apos;s it.</p>
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
@@ -787,8 +872,13 @@ const Trust = () => (
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
+        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">AI does the matching</h3>
+        <p className="text-coffee-cortado">Describe what you need. Attunly understands context and finds teammates who actually know it.</p>
+      </div>
+
+      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
         <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Low pressure for everyone</h3>
-        <p className="text-coffee-cortado">The message makes it easy to say yes or no. No guilt, no obligation. The receiver stays in control.</p>
+        <p className="text-coffee-cortado">The message makes it easy to say yes or no. No guilt, no obligation.</p>
       </div>
     </div>
   </Section>
@@ -845,36 +935,34 @@ const FAQ = () => {
 
   const faqs = [
     {
-      q: 'How does Attunly know who to suggest?',
-      a: 'When you set up your profile, you describe what you know in plain English. Our AI matches your questions to those expertise descriptions — not just keyword matching, but understanding context.',
+      q: 'How does the AI matching work?',
+      a: 'When teammates join, they describe what they know. When you ask a question, Attunly\'s AI understands the context and finds people whose expertise actually matches — not just keyword matching.',
     },
     {
-      q: 'What if I want to message someone not in the suggestions?',
-      a: 'The suggestions are just that — suggestions. You can search for anyone in your workspace and message them directly.',
+      q: 'What happens when I click "Ask"?',
+      a: 'Attunly drafts a message for you — clear, specific, and easy for them to respond to. They get a DM they can accept or decline with one click. No awkward back-and-forth.',
     },
     {
-      q: 'Does it require everyone on my team to sign up?',
-      a: 'Attunly works best when more people have profiles, but you can start with just a few. Anyone in your Slack workspace can receive messages.',
+      q: 'Do I need my whole team to sign up?',
+      a: 'Nope. Start with a few people. Attunly works better as more teammates add their expertise, but you can begin with just your immediate team.',
     },
     {
       q: 'Is my calendar data private?',
-      a: 'Yes. We only show free/busy status, never meeting details. Your calendar data is encrypted and never shared with other users or third parties.',
+      a: 'Yes. We only show free/busy status, never meeting details. Your calendar data is encrypted and never shared.',
     },
     {
-      q: 'What if I don\'t want to be disturbed?',
-      a: 'You control your availability. Set yourself as unavailable, and Attunly won\'t suggest you to others. You can also set office hours.',
+      q: 'Can I control when I\'m available?',
+      a: 'Completely. Set yourself as unavailable and Attunly won\'t suggest you. You can also set office hours so you only get requests during work time.',
     },
     {
-      q: 'What if I don\'t understand someone\'s technical jargon?',
-      a: 'Attunly automatically translates departmental terminology. When an engineer\'s expertise is described in technical terms, you\'ll see a plain-English version tailored to your department. No more "lost in translation" moments.',
+      q: 'What about cross-team jargon?',
+      a: 'Attunly translates automatically. If an engineer describes their expertise in technical terms, you\'ll see a version that makes sense for your department.',
     },
   ];
 
   return (
     <section className="px-4 md:px-12 lg:px-24 py-12 md:py-20 bg-coffee-paper">
       <div className="max-w-2xl mx-auto">
-        <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Questions</p>
-
         <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8">
           Common questions.
         </h2>
@@ -926,13 +1014,12 @@ const FinalCTA = () => (
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-      <Button primary href="/signup">
-        <SlackIcon />
-        Add to Slack
+      <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
+        Join the Beta
       </Button>
     </div>
 
-    <p className="text-sm text-coffee-latte">Free for teams up to 5 · Setup takes 2 minutes</p>
+    <p className="text-sm text-coffee-latte">We&apos;re onboarding teams now. Get early access.</p>
   </Section>
 );
 
@@ -974,45 +1061,34 @@ export default function AttunlyLanding() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-5">
             <Link
               href="/beta"
-              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+              className="text-base font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
               Join Beta
             </Link>
             <Link
               href="/login"
-              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+              className="text-base font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
               Log in
             </Link>
-            <Button primary href="/signup" className="text-sm py-2.5 px-5">
-              <SlackIcon className="w-4 h-4 mr-2" />
-              Add to Slack
-            </Button>
           </div>
 
           {/* Mobile nav */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-3">
             <Link
               href="/beta"
-              className="text-xs font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
               Join Beta
             </Link>
             <Link
               href="/login"
-              className="text-xs font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
+              className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
               Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="flex items-center gap-1.5 px-3 py-2 bg-coffee-espresso text-coffee-paper rounded-lg text-xs font-medium hover:bg-coffee-roast transition-colors"
-            >
-              <SlackIcon className="w-3.5 h-3.5" />
-              Add to Slack
             </Link>
           </div>
         </div>
