@@ -340,21 +340,9 @@ function SettingsContent() {
     }
   };
 
-  const connectSlack = async () => {
+  const connectSlack = () => {
     setSlackConnecting(true);
-    try {
-      const response = await fetch('/api/auth/slack/user');
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        toast.error('Failed to start Slack connection');
-        setSlackConnecting(false);
-      }
-    } catch {
-      toast.error('Failed to connect Slack');
-      setSlackConnecting(false);
-    }
+    window.location.href = '/api/auth/slack';
   };
 
   const disconnectSlack = async () => {
