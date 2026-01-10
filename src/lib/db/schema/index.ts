@@ -370,7 +370,23 @@ export const translationEvents = pgTable("translation_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ============================================
+// BETA REQUESTS
+// Collects beta signup requests from marketing site
+// ============================================
+
+export const betaRequests = pgTable("beta_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  companySize: text("company_size").notNull(),
+  role: text("role").notNull(),
+  blocker: text("blocker"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Type exports for TypeScript
+export type BetaRequest = typeof betaRequests.$inferSelect;
+export type NewBetaRequest = typeof betaRequests.$inferInsert;
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
 export type OrganizationMember = typeof organizationMembers.$inferSelect;

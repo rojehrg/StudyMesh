@@ -8,7 +8,7 @@
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogContext {
-  service?: 'slack' | 'email' | 'api' | 'auth' | 'meetings' | 'notifications' | 'billing' | 'stripe-webhook' | 'billing-enforcement' | 'organizations-api' | 'pods-api' | 'analytics' | 'admin' | 'calendar' | 'lingo-translator';
+  service?: 'slack' | 'email' | 'api' | 'auth' | 'meetings' | 'notifications' | 'billing' | 'stripe-webhook' | 'billing-enforcement' | 'organizations-api' | 'pods-api' | 'analytics' | 'admin' | 'calendar' | 'lingo-translator' | 'beta-request';
   requestId?: string;
   userId?: string;
   action?: string;

@@ -840,210 +840,6 @@ const Integrations = () => (
   </Section>
 );
 
-// Pricing Section
-const Pricing = () => {
-  const [isYearly, setIsYearly] = useState(false);
-
-  const plans = [
-    {
-      name: 'Free',
-      description: 'Try Attunly with a small team',
-      monthlyPrice: 0,
-      yearlyPrice: 0,
-      features: [
-        { text: 'Up to 5 team members', included: true },
-        { text: 'Basic expertise matching', included: true },
-        { text: 'Slack integration', included: true },
-        { text: 'AI-drafted messages', included: true },
-        { text: 'Calendar integration', included: false },
-        { text: 'Advanced analytics', included: false },
-        { text: 'Priority support', included: false },
-      ],
-      cta: 'Get Started Free',
-      popular: false,
-    },
-    {
-      name: 'Starter',
-      description: 'For growing teams',
-      monthlyPrice: 8,
-      yearlyPrice: 6,
-      features: [
-        { text: 'Up to 20 team members', included: true },
-        { text: 'AI-powered matching', included: true },
-        { text: 'Slack integration', included: true },
-        { text: 'AI-drafted messages', included: true },
-        { text: 'Calendar integration', included: true },
-        { text: 'Basic analytics', included: true },
-        { text: 'Priority support', included: false },
-      ],
-      cta: 'Start 14-Day Trial',
-      popular: false,
-    },
-    {
-      name: 'Pro',
-      description: 'For scaling organizations',
-      monthlyPrice: 15,
-      yearlyPrice: 12,
-      features: [
-        { text: 'Up to 100 team members', included: true },
-        { text: 'AI-powered matching', included: true },
-        { text: 'All integrations', included: true },
-        { text: 'AI-drafted messages', included: true },
-        { text: 'Calendar integration', included: true },
-        { text: 'Advanced analytics', included: true },
-        { text: 'Priority support', included: true },
-      ],
-      cta: 'Start 14-Day Trial',
-      popular: true,
-    },
-  ];
-
-  return (
-    <section
-      id="pricing"
-      className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper"
-    >
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Pricing</p>
-
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-            Simple, transparent pricing.
-            <br />
-            <span className="text-coffee-oat">Start free, scale as you grow.</span>
-          </h2>
-
-          <p className="text-lg text-coffee-cortado mb-8 max-w-[50ch] mx-auto">
-            No hidden fees. 14-day free trial on paid plans. Cancel anytime.
-          </p>
-
-          {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-3 bg-coffee-cream rounded-full p-1.5">
-            <button
-              onClick={() => setIsYearly(false)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                !isYearly
-                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
-                  : 'text-coffee-cortado hover:text-coffee-espresso'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsYearly(true)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                isYearly
-                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
-                  : 'text-coffee-cortado hover:text-coffee-espresso'
-              }`}
-            >
-              Yearly
-            </button>
-          </div>
-          {/* Always render to prevent layout shift */}
-          <p className={`text-sm text-coffee-roast font-medium mt-3 transition-opacity ${isYearly ? 'opacity-100' : 'opacity-0'}`}>
-            Save 25% with annual billing
-          </p>
-        </div>
-
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-xl p-5 md:p-6 ${
-                plan.popular
-                  ? 'bg-coffee-espresso text-coffee-paper ring-2 ring-coffee-espresso md:-mt-4 md:mb-4 md:py-10'
-                  : 'bg-coffee-cream border border-coffee-foam'
-              }`}
-            >
-              {plan.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-coffee-oat text-coffee-espresso text-xs font-semibold px-3 py-1 rounded-full">
-                  Most Popular
-                </span>
-              )}
-
-              <div className="mb-4">
-                <h3 className={`text-xl font-semibold mb-1 ${plan.popular ? 'text-coffee-paper' : 'text-coffee-espresso'}`}>
-                  {plan.name}
-                </h3>
-                <p className={`text-sm ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-cortado'}`}>
-                  {plan.description}
-                </p>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex items-baseline gap-1">
-                  <span className={`text-4xl font-bold ${plan.popular ? 'text-coffee-paper' : 'text-coffee-espresso'}`}>
-                    ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
-                  </span>
-                  <span className={plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}>
-                    /user/mo
-                  </span>
-                </div>
-                {plan.monthlyPrice === 0 ? (
-                  <p className={`text-sm mt-1 ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}`}>
-                    Free forever
-                  </p>
-                ) : isYearly ? (
-                  <p className={`text-sm mt-1 ${plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'}`}>
-                    Billed annually
-                  </p>
-                ) : null}
-              </div>
-
-              <Link
-                href="/signup"
-                className={`block w-full text-center px-6 py-3 rounded-lg font-medium transition-all duration-200 mb-6 ${
-                  plan.popular
-                    ? 'bg-coffee-paper text-coffee-espresso hover:bg-coffee-cream'
-                    : 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast'
-                }`}
-              >
-                {plan.cta}
-              </Link>
-
-              <div className="space-y-3">
-                {plan.features.map((feature, featureIndex) => (
-                  <div
-                    key={featureIndex}
-                    className={`flex items-center gap-3 text-sm ${
-                      feature.included
-                        ? plan.popular ? 'text-coffee-paper' : 'text-coffee-cortado'
-                        : plan.popular ? 'text-coffee-steamed' : 'text-coffee-latte'
-                    }`}
-                  >
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
-                      feature.included
-                        ? plan.popular ? 'bg-coffee-paper/20 text-coffee-paper' : 'bg-coffee-paper text-coffee-espresso'
-                        : plan.popular ? 'bg-coffee-steamed/20 text-coffee-steamed' : 'bg-coffee-foam text-coffee-latte'
-                    }`}>
-                      {feature.included ? '✓' : '–'}
-                    </span>
-                    <span className={!feature.included ? 'line-through' : ''}>
-                      {feature.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Enterprise CTA */}
-        <div className="mt-12 text-center">
-          <p className="text-coffee-cortado">
-            Need more than 100 users?{' '}
-            <Link href="/support" className="text-coffee-espresso font-medium hover:text-coffee-roast transition-colors">
-              Contact us for Enterprise pricing →
-            </Link>
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // FAQ Section - Accordion with flip arrows
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -1181,10 +977,10 @@ export default function AttunlyLanding() {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4">
             <Link
-              href="#pricing"
+              href="/beta"
               className="text-sm font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
-              Pricing
+              Join Beta
             </Link>
             <Link
               href="/login"
@@ -1201,10 +997,10 @@ export default function AttunlyLanding() {
           {/* Mobile nav */}
           <div className="flex md:hidden items-center gap-2">
             <Link
-              href="#pricing"
+              href="/beta"
               className="text-xs font-medium text-coffee-cortado hover:text-coffee-espresso transition-colors"
             >
-              Pricing
+              Join Beta
             </Link>
             <Link
               href="/login"
@@ -1229,7 +1025,6 @@ export default function AttunlyLanding() {
       <WhatsDifferentAndWhoUsesIt />
       <LingoTranslation />
       <Trust />
-      <Pricing />
       <FAQ />
       <FinalCTA />
       <Footer />
