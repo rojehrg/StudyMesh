@@ -243,15 +243,14 @@ const Hero = () => (
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
-            <Button primary href="/signup">
-              <SlackIcon />
-              Add to Slack
+            <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
+              Join the Beta
             </Button>
             <Button href="#how-it-works">See how it works →</Button>
           </div>
 
           <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
-            2-minute setup · Lives entirely in Slack · Free for small teams
+            2-minute setup · Lives entirely in Slack
           </p>
         </div>
 

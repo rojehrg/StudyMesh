@@ -729,7 +729,7 @@ function SettingsContent() {
         </section>
       )}
 
-      {/* Billing Section - Admin Only */}
+      {/* Billing Section - Commented out during beta
       {org?.isOwner && !billingLoading && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-coffee-espresso">Billing</h2>
@@ -792,6 +792,7 @@ function SettingsContent() {
           </div>
         </section>
       )}
+      */}
 
       {/* Privacy & Data */}
       <section className="space-y-4">
