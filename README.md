@@ -58,6 +58,13 @@ Generates calm, low-pressure message drafts. Edit or send as-is.
 ### Team Health Stats (Admin)
 Admins can view team metrics including active users and command send rates to understand how their team is using Attunly.
 
+### Momentum Locks
+Create time-bound commitments with automatic escalation. Type `/attunly lock` to:
+- Assign an owner and deadline for urgent work
+- Set a fallback person if the owner is blocked
+- Owner gets a DM with Start/Blocked/Done buttons
+- Daily cron escalates overdue locks to fallback
+
 ---
 
 ## How It Works
@@ -72,6 +79,11 @@ Admins can view team metrics including active users and command send rates to un
    → /attunly need help with the payments API
    → See who matches + their availability
    → Send a DM or schedule a meeting
+
+3. Use /attunly lock for urgent handoffs
+   → /attunly lock
+   → Assign owner, outcome, deadline
+   → Owner gets DM with action buttons
 ```
 
 ---
@@ -182,10 +194,12 @@ src/
 │       ├── auth/               # OAuth callbacks
 │       ├── calendar/           # Google Calendar integration
 │       ├── billing/            # Stripe billing integration
+│       ├── cron/               # Scheduled jobs (momentum locks)
 │       └── find-help/          # AI-powered search
 ├── lib/
 │   ├── db/                     # Drizzle schema
 │   ├── slack/                  # Modal builder, message generator, person suggester
+│   │   └── momentum-lock/      # Momentum Locks feature
 │   ├── ai/                     # Semantic search, lingo translator
 │   └── analytics/              # PostHog integration
 └── components/                 # React components
@@ -204,6 +218,22 @@ User types: /attunly need help with React hooks
 4. Modal opens with form
 5. User submits → src/app/api/slack/interactions/route.ts
 6. DM sent to recipient
+```
+
+---
+
+## Momentum Locks Flow
+
+```
+User types: /attunly lock
+
+1. Modal opens → src/lib/slack/momentum-lock/modal-builder.ts
+2. User fills in: Owner, Outcome, Deadline
+3. Submit → src/app/api/slack/interactions/route.ts
+4. Lock saved to database
+5. Owner receives DM with Start/Blocked/Done buttons
+6. Daily cron checks deadlines → src/app/api/cron/momentum-locks/route.ts
+7. Overdue locks escalated to fallback owner
 ```
 
 ---

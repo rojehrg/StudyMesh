@@ -139,6 +139,9 @@ curl -X POST https://your-app.vercel.app/api/admin/migrate \
 - [ ] AI matching returns relevant results
 - [ ] Slack DMs send successfully
 - [ ] Google Calendar shows availability
+- [ ] `/attunly lock` command opens modal
+- [ ] Lock owner receives DM with buttons
+- [ ] Start/Blocked/Done buttons work
 
 ---
 
@@ -229,6 +232,8 @@ echo "ENCRYPTION_KEY=$(openssl rand -hex 32)"
 | Feature | Description |
 |---------|-------------|
 | **Sign-in** | Alternative login method via Slack workspace |
+| **Ask for Help** | `/attunly [context]` - AI-powered help requests |
+| **Momentum Locks** | `/attunly lock` - Time-bound commitments with escalation |
 | **DM Notifications** | Nudges and meeting invites sent as Slack DMs |
 | **Webhook Fallback** | Channel mentions when DM unavailable |
 | **Workspace Context** | Organization = Slack Workspace |
