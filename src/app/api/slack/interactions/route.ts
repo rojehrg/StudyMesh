@@ -87,6 +87,8 @@ export async function POST(request: Request) {
       viewType: view?.type,
     });
 
+    console.log('[Slack Interactions] About to handle type:', type);
+
     switch (type) {
       case 'view_submission':
         return handleViewSubmission(payload);
@@ -104,6 +106,7 @@ export async function POST(request: Request) {
 
       case 'message_action':
         // Message shortcuts (right-click on message)
+        console.log('[Slack Interactions] Entering message_action handler');
         return handleMessageAction(payload);
 
       case 'shortcut':
