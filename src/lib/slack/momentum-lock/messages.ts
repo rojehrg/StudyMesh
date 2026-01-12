@@ -16,7 +16,7 @@ interface SlackBlock {
  *
  * Sent when the owner comes online (based on timezone + working hours)
  */
-export function buildWakeUpMessage(lock: MomentumLock, threadLink: string): {
+export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null): {
   text: string;
   blocks: SlackBlock[];
 } {
@@ -85,7 +85,9 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string): {
       elements: [
         {
           type: "mrkdwn",
-          text: `${urgencyEmoji} *${urgencyText}* | <${threadLink}|View thread>`,
+          text: threadLink
+            ? `${urgencyEmoji} *${urgencyText}* | <${threadLink}|View thread>`
+            : `${urgencyEmoji} *${urgencyText}*`,
         },
       ],
     },
@@ -150,7 +152,7 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string): {
  *
  * Sent when deadline is approaching and primary owner hasn't responded
  */
-export function buildEscalationMessage(lock: MomentumLock, threadLink: string): {
+export function buildEscalationMessage(lock: MomentumLock, threadLink: string | null): {
   text: string;
   blocks: SlackBlock[];
 } {
@@ -201,7 +203,9 @@ export function buildEscalationMessage(lock: MomentumLock, threadLink: string): 
       elements: [
         {
           type: "mrkdwn",
-          text: `<${threadLink}|View thread> • If you can't help, no worries—you can ignore this.`,
+          text: threadLink
+            ? `<${threadLink}|View thread> • If you can't help, no worries—you can ignore this.`
+            : `If you can't help, no worries—you can ignore this.`,
         },
       ],
     },
@@ -410,8 +414,9 @@ export function buildCompletionMessage(lock: MomentumLock): {
 export function generateThreadLink(
   workspaceId: string,
   channelId: string,
-  threadTs: string
-): string {
+  threadTs: string | null
+): string | null {
+  if (!threadTs) return null;
   // Convert thread_ts to link format (remove the dot)
   const linkTs = threadTs.replace('.', '');
   return `https://slack.com/archives/${channelId}/p${linkTs}`;
