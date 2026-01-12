@@ -30,8 +30,6 @@ export async function GET(request: Request) {
       "chat:write",         // Send messages
       "users:read",         // Read user info
       "im:write",           // Open DM channels
-      "channels:history",   // Read public channel messages (for Momentum Locks thread context)
-      "groups:history",     // Read private channel messages (for Momentum Locks thread context)
     ].join(",");
 
     // Use the user's ID with a cryptographically secure nonce as state for CSRF protection

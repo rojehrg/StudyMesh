@@ -410,7 +410,7 @@ export const momentumLocks = pgTable("momentum_locks", {
   id: uuid("id").primaryKey().defaultRandom(),
   workspaceId: text("workspace_id").notNull(),              // Slack team ID
   channelId: text("channel_id").notNull(),
-  threadTs: text("thread_ts").notNull(),
+  threadTs: text("thread_ts"),                               // Optional - only if created from thread
   createdByUserId: text("created_by_user_id").notNull(),    // Slack user who created the lock
   requesterUserId: text("requester_user_id").notNull(),     // Who needs the outcome
   ownerUserId: text("owner_user_id").notNull(),             // Who must deliver

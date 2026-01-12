@@ -25,7 +25,7 @@ interface SlackView {
 export interface LockModalConfig {
   triggerId: string;
   channelId: string;
-  threadTs: string;
+  threadTs?: string;
   requesterId: string;
   inference: InferredLock;
   threadParticipants?: Array<{ id: string; name: string }>;
@@ -33,7 +33,7 @@ export interface LockModalConfig {
 
 export interface LockModalPrivateMetadata {
   channelId: string;
-  threadTs: string;
+  threadTs?: string;
   requesterId: string;
 }
 

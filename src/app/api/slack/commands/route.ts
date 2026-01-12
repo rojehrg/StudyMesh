@@ -6,7 +6,7 @@ import { suggestPeople, getRequesterDepartment, getSuggestedPersonDepartment } f
 import { translateToLingo } from '@/lib/ai/lingo-translator';
 import { db } from '@/lib/db';
 import { commandEvents } from '@/lib/db/schema';
-import { handleLockCommand, isLockCommand, parseLockCommandText } from '@/lib/slack/momentum-lock/command-handler';
+import { handleLockCommand, isLockCommand } from '@/lib/slack/momentum-lock/command-handler';
 
 /**
  * Track command events for send rate measurement
@@ -163,16 +163,11 @@ export async function POST(request: Request) {
         });
       }
 
-      // Note: thread_ts is not available in slash commands by default
-      // User needs to invoke from a thread for context
       const result = await handleLockCommand({
         teamId,
         userId,
-        userName: userName || undefined,
         channelId,
         triggerId,
-        // thread_ts would come from message shortcut, not slash command
-        text: parseLockCommandText(text),
       });
 
       if (result.success) {

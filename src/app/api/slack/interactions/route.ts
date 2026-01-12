@@ -4,7 +4,6 @@ import { db } from '@/lib/db';
 import { commandEvents, momentumLocks, momentumLockEvents } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { createLogger } from '@/lib/logger';
-import { handleLockCommand } from '@/lib/slack/momentum-lock/command-handler';
 import {
   parseLockFormValues,
   CALLBACK_ID_DRAFT,
@@ -103,11 +102,6 @@ export async function POST(request: Request) {
 
       case 'block_actions':
         return handleBlockActions(payload);
-
-      case 'message_action':
-        // Message shortcuts (right-click on message)
-        console.log('[Slack Interactions] Entering message_action handler');
-        return handleMessageAction(payload);
 
       case 'shortcut':
         // Global shortcuts
@@ -792,60 +786,6 @@ async function sendConfirmationToSender(senderId: string, recipientId: string) {
   }
 }
 
-/**
- * Handle message action (right-click message shortcut)
- */
-async function handleMessageAction(payload: any) {
-  const { callback_id, trigger_id, user, team, channel, message } = payload;
-
-  console.log('[Slack Interactions] Message action payload:', JSON.stringify({
-    callback_id,
-    trigger_id,
-    userId: user?.id,
-    teamId: team?.id,
-    channelId: channel?.id,
-    messageTs: message?.ts,
-    threadTs: message?.thread_ts,
-  }));
-
-  // Handle "Create Momentum Lock" shortcut
-  if (callback_id === 'create_momentum_lock') {
-    try {
-      const threadTs = message?.thread_ts || message?.ts;
-
-      console.log('[Slack Interactions] Calling handleLockCommand with:', {
-        teamId: team?.id,
-        userId: user?.id,
-        channelId: channel?.id,
-        triggerId: trigger_id,
-        threadTs,
-      });
-
-      const result = await handleLockCommand({
-        teamId: team?.id,
-        userId: user?.id,
-        channelId: channel?.id,
-        triggerId: trigger_id,
-        threadTs,
-      });
-
-      console.log('[Slack Interactions] handleLockCommand result:', result);
-
-      if (!result.success) {
-        console.error('[Slack Interactions] Failed to handle lock shortcut:', result.error);
-      }
-
-      // Always return 200 to acknowledge the shortcut
-      return new NextResponse(null, { status: 200 });
-    } catch (error: any) {
-      console.error('[Slack Interactions] Error in handleMessageAction:', error.message, error.stack);
-      return new NextResponse(null, { status: 200 });
-    }
-  }
-
-  console.warn('[Slack Interactions] Unknown message action callback_id:', callback_id);
-  return NextResponse.json({ ok: true });
-}
 
 /**
  * Handle global shortcuts
@@ -955,11 +895,11 @@ async function handleLockModalSubmission(payload: any) {
 }
 
 /**
- * Post lock confirmation message to the thread
+ * Post lock confirmation - sends DM to owner with lock details
  */
 async function postLockConfirmation(params: {
   channelId: string;
-  threadTs: string;
+  threadTs?: string;
   lockId: string;
   ownerId: string;
   fallbackId?: string;
@@ -970,7 +910,7 @@ async function postLockConfirmation(params: {
   const botToken = process.env.SLACK_BOT_TOKEN;
   if (!botToken) return;
 
-  const { channelId, threadTs, ownerId, fallbackId, requiredOutcome, deadlineAt, requesterId } = params;
+  const { lockId, ownerId, fallbackId, requiredOutcome, deadlineAt, requesterId } = params;
 
   // Calculate relative time
   const now = new Date();
@@ -988,9 +928,23 @@ async function postLockConfirmation(params: {
     relativeTime = days === 1 ? '1 day' : `${days} days`;
   }
 
-  const fallbackText = fallbackId ? ` Fallback: <@${fallbackId}>.` : '';
-
   try {
+    // Send DM to owner with the lock details and action buttons
+    const openResponse = await fetch('https://slack.com/api/conversations.open', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ users: ownerId }),
+    });
+
+    const openResult = await openResponse.json();
+    if (!openResult.ok) {
+      log.error('Failed to open DM with owner', { error: openResult.error });
+      return;
+    }
+
     await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
@@ -998,15 +952,14 @@ async function postLockConfirmation(params: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        channel: channelId,
-        thread_ts: threadTs,
-        text: `Momentum Lock set for <@${ownerId}>. Deadline: ${relativeTime}.${fallbackText}`,
+        channel: openResult.channel.id,
+        text: `Momentum Lock from <@${requesterId}>: ${requiredOutcome}`,
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `*Momentum Lock set*\n\n<@${ownerId}> needs to: _${requiredOutcome}_`,
+              text: `*Momentum Lock*\n\n<@${requesterId}> needs you to: _${requiredOutcome}_`,
             },
           },
           {
@@ -1014,7 +967,32 @@ async function postLockConfirmation(params: {
             elements: [
               {
                 type: 'mrkdwn',
-                text: `Deadline: *${relativeTime}* | Requested by <@${requesterId}>${fallbackId ? ` | Fallback: <@${fallbackId}>` : ''}`,
+                text: `Deadline: *${relativeTime}*${fallbackId ? ` | Fallback: <@${fallbackId}>` : ''}`,
+              },
+            ],
+          },
+          {
+            type: 'actions',
+            elements: [
+              {
+                type: 'button',
+                text: { type: 'plain_text', text: 'Start', emoji: true },
+                style: 'primary',
+                action_id: 'momentum_lock_start',
+                value: lockId,
+              },
+              {
+                type: 'button',
+                text: { type: 'plain_text', text: 'Blocked', emoji: true },
+                action_id: 'momentum_lock_blocked',
+                value: lockId,
+              },
+              {
+                type: 'button',
+                text: { type: 'plain_text', text: 'Done', emoji: true },
+                style: 'primary',
+                action_id: 'momentum_lock_done',
+                value: lockId,
               },
             ],
           },
@@ -1022,9 +1000,9 @@ async function postLockConfirmation(params: {
       }),
     });
 
-    log.info('Lock confirmation posted to thread');
+    log.info('Lock confirmation DM sent to owner');
   } catch (error: any) {
-    log.error('Failed to post lock confirmation', { error: error.message });
+    log.error('Failed to send lock confirmation', { error: error.message });
   }
 }
 
