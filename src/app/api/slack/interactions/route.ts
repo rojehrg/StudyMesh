@@ -795,29 +795,52 @@ async function sendConfirmationToSender(senderId: string, recipientId: string) {
 async function handleMessageAction(payload: any) {
   const { callback_id, trigger_id, user, team, channel, message } = payload;
 
-  log.info('Message action received', { callback_id, userId: user?.id, channelId: channel?.id });
+  console.log('[Slack Interactions] Message action payload:', JSON.stringify({
+    callback_id,
+    trigger_id,
+    userId: user?.id,
+    teamId: team?.id,
+    channelId: channel?.id,
+    messageTs: message?.ts,
+    threadTs: message?.thread_ts,
+  }));
 
   // Handle "Create Momentum Lock" shortcut
   if (callback_id === 'create_momentum_lock') {
-    const threadTs = message?.thread_ts || message?.ts;
+    try {
+      const threadTs = message?.thread_ts || message?.ts;
 
-    const result = await handleLockCommand({
-      teamId: team?.id,
-      userId: user?.id,
-      channelId: channel?.id,
-      triggerId: trigger_id,
-      threadTs,
-    });
+      console.log('[Slack Interactions] Calling handleLockCommand with:', {
+        teamId: team?.id,
+        userId: user?.id,
+        channelId: channel?.id,
+        triggerId: trigger_id,
+        threadTs,
+      });
 
-    if (!result.success) {
-      log.error('Failed to handle lock shortcut', { error: result.error });
+      const result = await handleLockCommand({
+        teamId: team?.id,
+        userId: user?.id,
+        channelId: channel?.id,
+        triggerId: trigger_id,
+        threadTs,
+      });
+
+      console.log('[Slack Interactions] handleLockCommand result:', result);
+
+      if (!result.success) {
+        console.error('[Slack Interactions] Failed to handle lock shortcut:', result.error);
+      }
+
+      // Always return 200 to acknowledge the shortcut
+      return new NextResponse(null, { status: 200 });
+    } catch (error: any) {
+      console.error('[Slack Interactions] Error in handleMessageAction:', error.message, error.stack);
+      return new NextResponse(null, { status: 200 });
     }
-
-    // Always return 200 to acknowledge the shortcut
-    return new NextResponse(null, { status: 200 });
   }
 
-  log.warn('Unknown message action callback_id', { callback_id });
+  console.warn('[Slack Interactions] Unknown message action callback_id:', callback_id);
   return NextResponse.json({ ok: true });
 }
 
