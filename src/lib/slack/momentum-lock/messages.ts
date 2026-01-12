@@ -1,0 +1,418 @@
+/**
+ * Momentum Lock Message Builders
+ *
+ * Builds Slack messages for wake-up DMs, escalations, and notifications.
+ */
+
+import { type MomentumLock } from "@/lib/db/schema";
+
+interface SlackBlock {
+  type: string;
+  [key: string]: any;
+}
+
+/**
+ * Build wake-up DM message for lock owner
+ *
+ * Sent when the owner comes online (based on timezone + working hours)
+ */
+export function buildWakeUpMessage(lock: MomentumLock, threadLink: string): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const { requesterUserId, requiredOutcome, acceptableFallback, impactStatement, deadlineAt } = lock;
+
+  // Calculate remaining time
+  const now = new Date();
+  const deadline = new Date(deadlineAt);
+  const diff = deadline.getTime() - now.getTime();
+  const hoursRemaining = Math.max(0, Math.round(diff / (60 * 60 * 1000)));
+
+  let urgencyText: string;
+  let urgencyEmoji: string;
+  if (hoursRemaining <= 1) {
+    urgencyText = "less than 1 hour remaining";
+    urgencyEmoji = "🔴";
+  } else if (hoursRemaining <= 3) {
+    urgencyText = `${hoursRemaining} hours remaining`;
+    urgencyEmoji = "🟠";
+  } else if (hoursRemaining <= 8) {
+    urgencyText = `${hoursRemaining} hours remaining`;
+    urgencyEmoji = "🟡";
+  } else {
+    urgencyText = `${hoursRemaining} hours remaining`;
+    urgencyEmoji = "🟢";
+  }
+
+  const fallbackSection = acceptableFallback
+    ? `\n\n*If blocked:* _${acceptableFallback}_`
+    : "";
+
+  const impactSection = impactStatement
+    ? `\n\n*Why it matters:* ${impactStatement}`
+    : "";
+
+  const text = `While you were offline, the team set a Momentum Lock. ${requiredOutcome}`;
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: "Momentum Lock",
+        emoji: true,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `While you were offline, <@${requesterUserId}> set a commitment for you.`,
+      },
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*What's needed:*\n${requiredOutcome}${fallbackSection}${impactSection}`,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `${urgencyEmoji} *${urgencyText}* | <${threadLink}|View thread>`,
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      block_id: "wakeup_actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Start",
+            emoji: true,
+          },
+          style: "primary",
+          action_id: "momentum_lock_start",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "I'm Blocked",
+            emoji: true,
+          },
+          action_id: "momentum_lock_blocked",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Done",
+            emoji: true,
+          },
+          style: "primary",
+          action_id: "momentum_lock_done",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Need Context",
+            emoji: true,
+          },
+          action_id: "momentum_lock_context",
+          value: lock.id,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
+ * Build escalation DM message for fallback owner
+ *
+ * Sent when deadline is approaching and primary owner hasn't responded
+ */
+export function buildEscalationMessage(lock: MomentumLock, threadLink: string): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const { ownerUserId, requiredOutcome, acceptableFallback, deadlineAt } = lock;
+
+  // Calculate remaining time
+  const now = new Date();
+  const deadline = new Date(deadlineAt);
+  const diff = deadline.getTime() - now.getTime();
+  const hoursRemaining = Math.max(0, Math.round(diff / (60 * 60 * 1000)));
+
+  let timeText: string;
+  if (hoursRemaining <= 1) {
+    timeText = "less than 1 hour";
+  } else if (hoursRemaining < 24) {
+    timeText = `${hoursRemaining} hours`;
+  } else {
+    const days = Math.round(hoursRemaining / 24);
+    timeText = days === 1 ? "1 day" : `${days} days`;
+  }
+
+  const text = `Heads up. A Momentum Lock may need backup. The team is waiting on: ${requiredOutcome}`;
+
+  const fallbackHint = acceptableFallback
+    ? `\n\n💡 _Even partial progress counts: ${acceptableFallback}_`
+    : "\n\n💡 _Even a partial unblock keeps things moving._";
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Heads up.* A Momentum Lock may need backup.`,
+      },
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*The team is waiting on:*\n${requiredOutcome}\n\n*Original owner:* <@${ownerUserId}>\n*Time remaining:* ${timeText}${fallbackHint}`,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `<${threadLink}|View thread> • If you can't help, no worries—you can ignore this.`,
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      block_id: "escalation_actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "I Can Take This",
+            emoji: true,
+          },
+          style: "primary",
+          action_id: "momentum_lock_reassign_full",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "I Can Help Partially",
+            emoji: true,
+          },
+          action_id: "momentum_lock_reassign_partial",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "I Cannot Help",
+            emoji: true,
+          },
+          action_id: "momentum_lock_cannot_help",
+          value: lock.id,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
+ * Build blocked options menu message
+ *
+ * Shown as ephemeral when owner clicks "I'm Blocked"
+ */
+export function buildBlockedOptionsMessage(lockId: string): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const text = "What's blocking you?";
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "*What's blocking you?*\nChoose the option that best describes your situation:",
+      },
+    },
+    {
+      type: "actions",
+      block_id: "blocked_options",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Need input from someone",
+            emoji: true,
+          },
+          action_id: "blocked_need_input",
+          value: lockId,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Can ship partial version",
+            emoji: true,
+          },
+          action_id: "blocked_partial",
+          value: lockId,
+        },
+      ],
+    },
+    {
+      type: "actions",
+      block_id: "blocked_options_2",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Should be re-scoped",
+            emoji: true,
+          },
+          action_id: "blocked_rescope",
+          value: lockId,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Can't touch before they wake",
+            emoji: true,
+          },
+          action_id: "blocked_escalate_now",
+          value: lockId,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
+ * Build status update message for thread
+ */
+export function buildStatusUpdateMessage(
+  lockId: string,
+  status: 'started' | 'blocked' | 'done',
+  actorUserId: string,
+  details?: string
+): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  let emoji: string;
+  let statusText: string;
+
+  switch (status) {
+    case 'started':
+      emoji = "🚀";
+      statusText = `<@${actorUserId}> started working on this`;
+      break;
+    case 'blocked':
+      emoji = "⚠️";
+      statusText = `<@${actorUserId}> is blocked${details ? `: ${details}` : ''}`;
+      break;
+    case 'done':
+      emoji = "✅";
+      statusText = `<@${actorUserId}> completed this`;
+      break;
+  }
+
+  const text = `${emoji} ${statusText}`;
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `${emoji} *Lock Update:* ${statusText}`,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
+ * Build completion confirmation message
+ */
+export function buildCompletionMessage(lock: MomentumLock): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const text = `Lock completed. ${lock.requiredOutcome}`;
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Momentum Lock completed* ✅\n\n_${lock.requiredOutcome}_`,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `Delivered by <@${lock.ownerUserId}> • Requested by <@${lock.requesterUserId}>`,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
+ * Generate thread link from channel and thread_ts
+ */
+export function generateThreadLink(
+  workspaceId: string,
+  channelId: string,
+  threadTs: string
+): string {
+  // Convert thread_ts to link format (remove the dot)
+  const linkTs = threadTs.replace('.', '');
+  return `https://slack.com/archives/${channelId}/p${linkTs}`;
+}

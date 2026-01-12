@@ -25,11 +25,13 @@ export async function GET(request: Request) {
       );
     }
 
-    // Slack OAuth scopes needed to send DMs
+    // Slack OAuth scopes needed for Attunly features
     const scopes = [
-      "chat:write",      // Send messages
-      "users:read",      // Read user info
-      "im:write",        // Open DM channels
+      "chat:write",         // Send messages
+      "users:read",         // Read user info
+      "im:write",           // Open DM channels
+      "channels:history",   // Read public channel messages (for Momentum Locks thread context)
+      "groups:history",     // Read private channel messages (for Momentum Locks thread context)
     ].join(",");
 
     // Use the user's ID with a cryptographically secure nonce as state for CSRF protection

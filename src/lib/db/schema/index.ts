@@ -371,6 +371,74 @@ export const translationEvents = pgTable("translation_events", {
 });
 
 // ============================================
+// MOMENTUM LOCKS
+// Timezone-aware work handoff system
+// Prevents work from stalling across sleep cycles
+// ============================================
+
+// Lock status enum values
+export const MomentumLockStatus = {
+  DRAFT: 'draft',
+  ACTIVE: 'active',
+  STARTED: 'started',
+  BLOCKED: 'blocked',
+  DONE: 'done',
+  CANCELED: 'canceled',
+  EXPIRED: 'expired',
+} as const;
+
+export type MomentumLockStatusType = typeof MomentumLockStatus[keyof typeof MomentumLockStatus];
+
+// Lock event types
+export const MomentumLockEventType = {
+  CREATED: 'created',
+  CONFIRMED: 'confirmed',
+  DELIVERED: 'delivered',
+  STARTED: 'started',
+  BLOCKED: 'blocked',
+  DONE: 'done',
+  ESCALATED: 'escalated',
+  REASSIGNED: 'reassigned',
+  EXPIRED: 'expired',
+  CANCELED: 'canceled',
+} as const;
+
+export type MomentumLockEventTypeValue = typeof MomentumLockEventType[keyof typeof MomentumLockEventType];
+
+// Momentum Locks - lightweight contracts for timezone-aware handoffs
+export const momentumLocks = pgTable("momentum_locks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  workspaceId: text("workspace_id").notNull(),              // Slack team ID
+  channelId: text("channel_id").notNull(),
+  threadTs: text("thread_ts").notNull(),
+  createdByUserId: text("created_by_user_id").notNull(),    // Slack user who created the lock
+  requesterUserId: text("requester_user_id").notNull(),     // Who needs the outcome
+  ownerUserId: text("owner_user_id").notNull(),             // Who must deliver
+  fallbackUserId: text("fallback_user_id"),                 // Backup person (optional)
+  requiredOutcome: text("required_outcome").notNull(),      // One sentence describing what's needed
+  acceptableFallback: text("acceptable_fallback"),          // Fallback outcome if blocked
+  impactStatement: text("impact_statement"),                // Why it matters
+  deadlineAt: timestamp("deadline_at", { withTimezone: true }).notNull(),
+  ownerTimezone: text("owner_timezone"),
+  requesterTimezone: text("requester_timezone"),
+  status: text("status").notNull().default("draft"),        // draft, active, started, blocked, done, canceled, expired
+  escalationSentAt: timestamp("escalation_sent_at", { withTimezone: true }),
+  wakeUpDeliveredAt: timestamp("wake_up_delivered_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Momentum Lock Events - tracks all state transitions
+export const momentumLockEvents = pgTable("momentum_lock_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  lockId: uuid("lock_id").notNull().references(() => momentumLocks.id, { onDelete: "cascade" }),
+  eventType: text("event_type").notNull(),                  // created, confirmed, delivered, started, blocked, done, escalated, reassigned, expired, canceled
+  actorUserId: text("actor_user_id"),                       // Slack user who triggered the event (null for system events)
+  payload: jsonb("payload").default({}),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// ============================================
 // BETA REQUESTS
 // Collects beta signup requests from marketing site
 // ============================================
@@ -413,3 +481,7 @@ export type TermTranslation = typeof termTranslations.$inferSelect;
 export type NewTermTranslation = typeof termTranslations.$inferInsert;
 export type TranslationEvent = typeof translationEvents.$inferSelect;
 export type NewTranslationEvent = typeof translationEvents.$inferInsert;
+export type MomentumLock = typeof momentumLocks.$inferSelect;
+export type NewMomentumLock = typeof momentumLocks.$inferInsert;
+export type MomentumLockEvent = typeof momentumLockEvents.$inferSelect;
+export type NewMomentumLockEvent = typeof momentumLockEvents.$inferInsert;

@@ -6,6 +6,7 @@ import { suggestPeople, getRequesterDepartment, getSuggestedPersonDepartment } f
 import { translateToLingo } from '@/lib/ai/lingo-translator';
 import { db } from '@/lib/db';
 import { commandEvents } from '@/lib/db/schema';
+import { handleLockCommand, isLockCommand, parseLockCommandText } from '@/lib/slack/momentum-lock/command-handler';
 
 /**
  * Track command events for send rate measurement
@@ -148,6 +149,40 @@ export async function POST(request: Request) {
         response_type: 'ephemeral',
         text: 'Something went wrong. Please try again.',
       });
+    }
+
+    // Check for /attunly lock subcommand
+    if (isLockCommand(text)) {
+      console.log('[Slack Command] Routing to lock handler');
+      const channelId = params.get('channel_id');
+
+      if (!teamId || !userId || !channelId) {
+        return NextResponse.json({
+          response_type: 'ephemeral',
+          text: 'Missing required context. Please try again.',
+        });
+      }
+
+      // Note: thread_ts is not available in slash commands by default
+      // User needs to invoke from a thread for context
+      const result = await handleLockCommand({
+        teamId,
+        userId,
+        userName: userName || undefined,
+        channelId,
+        triggerId,
+        // thread_ts would come from message shortcut, not slash command
+        text: parseLockCommandText(text),
+      });
+
+      if (result.success) {
+        return new NextResponse(null, { status: 200 });
+      } else {
+        return NextResponse.json({
+          response_type: 'ephemeral',
+          text: result.error || 'Failed to create lock. Please try again.',
+        });
+      }
     }
 
     const botToken = process.env.SLACK_BOT_TOKEN;
