@@ -109,7 +109,7 @@ const RequestFlowAnimation = () => {
 
   return (
     <div className="mt-8 lg:mt-0">
-      <div className="bg-white rounded-xl shadow-xl border border-coffee-foam/50 overflow-hidden lg:max-w-md lg:ml-auto font-sans">
+      <div className="bg-white rounded-xl shadow-md border border-coffee-foam/50 overflow-hidden lg:max-w-md lg:ml-auto font-sans">
         {/* Slack header */}
         <div className="bg-[#3F0F40] px-3 lg:px-4 py-2.5 lg:py-3 flex items-center gap-2">
           <div className="flex gap-1.5">
@@ -128,8 +128,8 @@ const RequestFlowAnimation = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-bold text-gray-900 text-sm lg:text-[15px]">Attunly</span>
-                <span className="text-[10px] lg:text-[11px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-medium">APP</span>
+                <span className="font-bold text-coffee-espresso text-sm lg:text-[15px]">Attunly</span>
+                <span className="text-[10px] lg:text-[11px] text-coffee-latte bg-coffee-foam px-1.5 py-0.5 rounded font-medium">APP</span>
               </div>
 
               {/* Request card */}
@@ -147,12 +147,12 @@ const RequestFlowAnimation = () => {
               <div className="space-y-2">
                 <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
                   <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
-                  <span className="text-gray-600">{currentScenario.owner} saw your request and started</span>
+                  <span className="text-coffee-cortado">{currentScenario.owner} saw your request and started</span>
                 </div>
 
                 <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-gray-600">{currentScenario.owner} marked your request as done</span>
+                  <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
+                  <span className="text-coffee-cortado">{currentScenario.owner} marked your request as done</span>
                 </div>
               </div>
             </div>
@@ -282,7 +282,7 @@ const BeforeAfterDemo = () => {
 
         <div className="grid lg:grid-cols-[1fr,280px] gap-6">
         {/* Mock Slack UI */}
-        <div className="bg-[#1a1d21] rounded-xl shadow-2xl overflow-hidden font-sans ring-1 ring-coffee-oat/70 shadow-[0_0_60px_-12px_rgba(199,163,118,0.4)]">
+        <div className="bg-[#1a1d21] rounded-xl shadow-lg overflow-hidden font-sans ring-1 ring-coffee-oat/70">
           {/* Slack header */}
           <div className="bg-[#1a1d21] px-4 py-3 flex items-center gap-3 border-b border-white/10">
             <div className="flex gap-1.5">
@@ -301,7 +301,7 @@ const BeforeAfterDemo = () => {
               /* Without Attunly - The silence */
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-coffee-mocha flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
                     Y
                   </div>
                   <div>
@@ -323,7 +323,7 @@ const BeforeAfterDemo = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-coffee-mocha flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
                     Y
                   </div>
                   <div>
@@ -345,7 +345,7 @@ const BeforeAfterDemo = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-coffee-oat flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
                     S
                   </div>
                   <div>
@@ -404,7 +404,7 @@ const BeforeAfterDemo = () => {
                       </div>
 
                       <div className="flex items-center gap-2 text-white/80 text-sm">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
                         <span>2:30 PM &mdash; Sarah marked your request as done</span>
                       </div>
                     </div>
@@ -425,7 +425,7 @@ const BeforeAfterDemo = () => {
         <div className="hidden lg:flex flex-col justify-center">
           {activeTab === 'without' ? (
             <div className="space-y-5">
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -438,7 +438,7 @@ const BeforeAfterDemo = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -451,7 +451,7 @@ const BeforeAfterDemo = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -467,7 +467,7 @@ const BeforeAfterDemo = () => {
             </div>
           ) : (
             <div className="space-y-5">
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -481,7 +481,7 @@ const BeforeAfterDemo = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -494,7 +494,7 @@ const BeforeAfterDemo = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -688,7 +688,7 @@ const FAQ = () => {
               </div>
               <div
                 className={`overflow-hidden transition-all duration-200 ${
-                  openIndex === index ? 'max-h-40 pb-5' : 'max-h-0'
+                  openIndex === index ? 'max-h-96 pb-5' : 'max-h-0'
                 }`}
               >
                 <p className="text-coffee-cortado">{faq.a}</p>
@@ -752,7 +752,7 @@ export default function AttunlyLanding() {
       }}
     >
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-24 py-4 bg-coffee-paper/90 backdrop-blur-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-24 py-4 bg-coffee-paper/95 backdrop-blur-sm border-b border-coffee-foam">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="" className="w-7 h-7" />

@@ -5,10 +5,9 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Onboarding Flow', () => {
   // Skip these tests in CI unless we have test user setup
-  test.skip(({ }, testInfo) => {
-    // Skip if we don't have test credentials configured
-    return !process.env.TEST_USER_EMAIL
-  })
+  test.beforeEach(async () => {
+    test.skip(!process.env.TEST_USER_EMAIL, 'No test credentials configured');
+  });
 
   test.describe('Onboarding Page Structure', () => {
     test('onboarding page should show step indicator', async ({ page }) => {

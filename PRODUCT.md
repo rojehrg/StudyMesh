@@ -1,237 +1,196 @@
-# Attunly - Product Overview
+# Attunly - Product Rundown
 
-## What is Attunly?
-
-Attunly is a **Slack-first platform** that helps teams find and reach the right person to ask for help. It solves three common workplace problems:
-
-1. **"Who knows this?"** - You're stuck and don't know who to ask
-2. **"Are they free?"** - Calendars don't tell you if it's okay to interrupt
-3. **"How do I phrase this?"** - The message sits unsent because asking feels awkward
-
-Attunly creates a lightweight layer of "who knows what" and "when are they free" on top of Slack, making it easy to find help without the social friction.
+## One-Liner
+**A Slack layer that replaces silence with clarity when you're waiting on someone.**
 
 ---
 
-## Core Philosophy
+## The Problem
 
-- **Slack-first**: Everything happens in Slack. The web app is just for setup.
-- **Low friction**: Reduce the barriers to asking for help
-- **AI-assisted**: Smart matching and message generation, not manual skill matrices
-- **Calm UX**: Editorial feel, not typical SaaS dashboards
+When teams work across timezones, simple requests become day-long waits:
+- You send a message. No response. Did they see it?
+- They're 8 hours ahead. By the time they respond, you've lost a full day.
+- You don't want to nag, but you can't afford to just wait and hope.
+- The silence says nothing.
 
 ---
 
-## Features
+## The Solution
 
-### 1. Ask for Help (`/attunly`)
+Attunly gives you visibility into what's happening with your request:
+1. **You know when they saw it**
+2. **You know if they're blocked (and why)**
+3. **You know when it's done**
 
-The primary feature. Type `/attunly [what you need]` in any Slack channel or DM.
+---
 
-**What happens:**
-1. Modal opens in Slack
-2. Shows AI-suggested people who can help (based on expertise matching)
-3. Shows their availability (from Google Calendar)
-4. Pre-generates a low-pressure message draft
-5. User edits and sends
-6. Recipient gets a DM with clear sender attribution and a "Reply" button
+## Core Feature: Request a Response
 
-**AI Features:**
-- **Semantic matching**: Uses Groq (Llama 3.1) to match your request to people's expertise descriptions
-- **Message generation**: Creates calm, low-pressure message drafts
-- **Lingo translation**: If sender and recipient are in different departments, translates jargon (e.g., "sprint velocity" → "how fast the team ships")
+### How It Works
 
-**Example:**
+**Step 1: User types `/attunly` in Slack**
+
+A modal opens with three fields:
+- **Who do you need a response from?** (user picker)
+- **What do you need from them?** (one sentence)
+- **When do you need to hear back?** (dropdown: 2 hours, 4 hours, end of day, tomorrow, etc.)
+
+**Step 2: Owner receives a DM**
+
 ```
-/attunly need help debugging a React useEffect infinite loop
+@Sarah is waiting on you for:
+
+-> Confirm the API change is safe to ship
+
+By: in 4 hours
+
+[Start]  [Blocked]  [Done]
 ```
-→ Modal shows 3 people with React expertise, their availability, and a suggested message.
+
+**Step 3: Real-time visibility**
+
+| Owner Action | Requester Sees |
+|--------------|----------------|
+| Clicks "Start" | "Sarah saw your request and started looking into it" |
+| Clicks "Blocked" | "Sarah is blocked because: [their reason]" |
+| Clicks "Done" | "Sarah marked your request as done" |
 
 ---
 
-### 2. Momentum Locks (`/attunly lock`)
+## The Three Buttons
 
-For urgent, time-sensitive handoffs across timezones. Creates a trackable commitment with automatic escalation.
+The owner has exactly three options - nothing more:
 
-**What happens:**
-1. User types `/attunly lock`
-2. Modal opens with fields:
-   - **Owner**: Who needs to deliver
-   - **Outcome**: What needs to happen (one clear sentence)
-   - **Deadline**: When it's needed (2hrs, 4hrs, tomorrow, etc.)
-   - **Fallback** (optional): Backup person if owner is blocked
-   - **Acceptable fallback** (optional): What's okay if full delivery isn't possible
-3. On submit:
-   - Lock is saved to database
-   - Owner receives a DM with full context and action buttons
-
-**Owner's DM includes:**
-- What's needed
-- Deadline with countdown
-- Three buttons:
-  - **Start** - "I'm working on it"
-  - **Blocked** - Opens options (need input, partial delivery, rescope, escalate)
-  - **Done** - Mark complete
-
-**Blocked options:**
-- "I need input from someone else"
-- "I can ship a partial version"
-- "This should be re-scoped"
-- "I can't touch this before fallback wakes up" (triggers immediate escalation)
-
-**Automatic escalation:**
-- Daily cron job runs at 9am
-- Sends wake-up DMs to owners who haven't started
-- If deadline approaching and no response, escalates to fallback owner
-
-**Use case:**
-Team in SF needs designer in London to review mockups before standup. Create a Momentum Lock → Designer wakes up to a clear DM with exactly what's needed and when.
+| Button | What Happens |
+|--------|--------------|
+| **Start** | Requester notified they're working on it |
+| **Blocked** | Opens free-text modal: "What's getting in the way right now?" -> Requester sees the reason |
+| **Done** | Requester notified it's complete |
 
 ---
 
-### 3. Nudge Notifications
+## Data Model
 
-Internal system for sending help requests or offers between users.
+```
+momentum_locks
+|- workspace_id (Slack team)
+|- channel_id, thread_ts (context)
+|- requester_user_id (who needs the outcome)
+|- owner_user_id (who must deliver)
+|- required_outcome (one sentence)
+|- deadline_at (just for context)
+|- status: draft -> active -> started | blocked | done
+|- fallback_user_id (optional escalation)
 
-**Types:**
-- **Ask nudge**: "Can you help me with X?"
-- **Offer nudge**: "I can help you with X"
-
-**Delivery:**
-1. Tries Slack DM first (if user has connected Slack)
-2. Falls back to email if Slack unavailable
-3. Legacy webhook fallback for channel notifications
-
----
-
-### 4. Natural Language Profiles
-
-Users describe their expertise in their own words, not checkboxes.
-
-**Example profile:**
-> "I'm good at React hooks, debugging CSS issues, and explaining webpack configs. Happy to help with code reviews anytime."
-
-This text is semantically searched when someone uses `/attunly`.
-
-**Additional fields:**
-- Department (for lingo translation)
-- Knowledge areas (tags for keyword matching)
-- Google Calendar connection (for availability)
+momentum_lock_events
+|- lock_id
+|- event_type: created, started, blocked, done, escalated
+|- actor_user_id
+|- payload (JSONB - e.g., blocked reason)
+```
 
 ---
 
-### 5. AI-Powered Matching
-
-When someone asks for help, Attunly finds the best matches using:
-
-1. **Semantic search**: Groq compares the request to expertise descriptions
-2. **Keyword matching**: Checks knowledge area tags
-3. **Availability hints**: Shows "Available now" or "Has open hours"
-4. **Department context**: Factors in cross-team dynamics
-
----
-
-### 6. Lingo Translation
-
-Automatically translates departmental jargon when sender and recipient are in different departments.
-
-**Example:**
-- Engineering asks Sales: "need help with CRM integration"
-- Attunly shows: "They might call this 'Salesforce sync' or 'pipeline automation'"
-
-Uses organization-specific terminology glossary if configured.
-
----
-
-### 7. Google Calendar Integration
-
-Connect Google Calendar to show real availability:
-- "Available now" badge
-- "Has open hours today" indicator
-- Helps requesters know if it's a good time to reach out
-
----
-
-## Web App Pages
-
-The web app is primarily for setup and admin. Key pages:
-
-| Page | Purpose |
-|------|---------|
-| `/dashboard` | Status overview, connection cards, recent activity |
-| `/settings` | Profile, integrations (Slack, Google Calendar), preferences |
-| `/team` | View team members and their expertise |
-| `/find-help` | Web-based search (backup to Slack command) |
-
----
-
-## Slack Commands Summary
-
-| Command | What it does |
-|---------|--------------|
-| `/attunly [context]` | Find someone to help, send AI-drafted message |
-| `/attunly lock` | Create time-bound commitment with escalation |
-
----
-
-## User Journey
-
-### First-time setup (2 min)
-1. Sign up at attunly.com (email, Google, or Slack)
-2. Describe what you can help with
-3. Connect Google Calendar (optional but recommended)
-4. Connect Slack
-
-### Daily use
-1. Need help? Type `/attunly [what you need]` in Slack
-2. Pick a person, edit message if needed, send
-3. They get a DM, you get confirmation
-4. They reply directly in Slack
-
-### Urgent handoffs
-1. Type `/attunly lock`
-2. Assign owner, outcome, deadline
-3. They wake up to a clear action item
-4. Track status via Start/Blocked/Done buttons
-
----
-
-## Technical Architecture
+## Technical Stack
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Next.js 16 (App Router) |
-| Database | PostgreSQL (Supabase) |
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Database | Supabase (PostgreSQL) |
 | ORM | Drizzle |
 | Auth | Supabase Auth |
-| AI | Groq (Llama 3.1) |
-| Integrations | Slack API, Google Calendar API |
+| Styling | Tailwind + Coffee color palette |
+| UI | Radix primitives |
 | Hosting | Vercel |
+| Integrations | Slack API |
 
 ---
 
-## Key Differentiators
+## Brand Guidelines
 
-1. **Slack-native**: Not another app to check. Lives where work happens.
-2. **AI-first matching**: No manual skill matrices to maintain.
-3. **Low-pressure messaging**: Generated drafts reduce anxiety around asking.
-4. **Timezone-aware**: Momentum Locks solve async handoff pain.
-5. **Calm design**: Editorial feel, not enterprise software aesthetics.
+| Rule | Details |
+|------|---------|
+| Colors | Coffee palette only (espresso, cortado, latte, foam, cream, paper) |
+| Typography | Source Serif 4 (editorial feel) |
+| Icons | None (except Slack logo and mesh mark) |
+| Emojis | Never |
+| Tone | Calm, neutral, non-judgmental |
+
+---
+
+## Key Screens
+
+### Landing Page (attunly.com)
+- Hero: "Wait on people. Without the silence."
+- Interactive demo showing the before/after
+- Three value props: Request, See, Know
+- FAQ addressing "how is this different from DMing"
+
+### Beta Request (/beta)
+- Collects: email, company size, role, blocker
+- Currently onboarding distributed teams
+
+### Web App (authenticated)
+- `/dashboard` - Status overview
+- `/settings` - Profile, integrations
+- `/team` - Team members
+- `/find-help` - Web-based search (backup to Slack)
 
 ---
 
 ## Target Users
 
-- **Remote/hybrid teams** struggling with "who knows what"
-- **Cross-functional teams** with communication gaps between departments
-- **Globally distributed teams** needing reliable async handoffs
-- **Growing startups** where institutional knowledge isn't documented
+1. **Distributed teams** across timezones (SF + London, NYC + Singapore)
+2. **Remote-first companies** where async is the default
+3. **Growing startups** where "who knows what" isn't documented
+4. **Cross-functional teams** with handoffs between departments
 
 ---
 
-## Pricing
+## Key Differentiators
 
-- **Free tier**: Core features for small teams
-- **Pro tier**: Advanced features, higher limits
-- **Enterprise**: Custom integrations, SSO, admin controls
+| vs. DMing | vs. Project Management Tools |
+|-----------|------------------------------|
+| Visibility into status | Lightweight (3 buttons) |
+| Blocked is a first-class response | Lives in Slack, not another app |
+| No awkward follow-ups | No tickets, boards, or ceremonies |
 
-(See `/pricing` page for current details)
+---
+
+## Current Stage
+
+- **Beta** - onboarding distributed teams
+- **MVP Feature**: Simple request -> response flow with visibility
+- **Pricing**: Redirects to beta signup (no pricing set yet)
+
+---
+
+## API Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/slack/commands` | Handles `/attunly` slash command |
+| `POST /api/slack/interactions` | Handles button clicks and modal submissions |
+| `POST /api/beta-request` | Beta signup form submission |
+
+---
+
+## Metrics (North Star)
+
+**Send Rate** = Locks Sent / Modals Opened
+
+Tracked via `command_events` table:
+- `invoked` - `/attunly` typed
+- `modal_opened` - Modal displayed
+- `sent` - Lock created
+- `abandoned` - Modal closed without sending
+
+---
+
+## What's NOT in MVP
+
+- ~~Lingo Translation~~ (removed from pivot)
+- ~~Knowledge Graph~~ (still exists but not core)
+- ~~AI Matching~~ (still exists but not core)
+- Escalation cron job (schema exists, not fully implemented)
+- Fallback owner flow (schema exists, simplified for MVP)

@@ -134,6 +134,10 @@ ${context}
 Required outcome (one sentence):`;
 
   try {
+    // 2-second timeout to stay within Slack's response window
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -148,7 +152,10 @@ Required outcome (one sentence):`;
         max_tokens: 100,
         temperature: 0.3,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       log.error("Groq API error", { status: response.status });
@@ -161,7 +168,11 @@ Required outcome (one sentence):`;
     // Clean up the response - remove quotes, leading dashes, etc.
     return outcome?.replace(/^["'-\s]+|["'-\s]+$/g, '') || null;
   } catch (error: any) {
-    log.error("AI inference failed", { error: error.message });
+    if (error.name === 'AbortError') {
+      log.warn("Groq API timeout (outcome inference)");
+    } else {
+      log.error("AI inference failed", { error: error.message });
+    }
     return null;
   }
 }
@@ -188,6 +199,10 @@ ${context}
 Why it matters (one sentence):`;
 
   try {
+    // 2-second timeout to stay within Slack's response window
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -202,7 +217,10 @@ Why it matters (one sentence):`;
         max_tokens: 80,
         temperature: 0.3,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) return null;
 

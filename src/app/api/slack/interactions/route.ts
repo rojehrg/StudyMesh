@@ -252,6 +252,27 @@ async function handleLockAction(
       return NextResponse.json({ ok: true });
     }
 
+    // Authorization: verify user can perform this action
+    const isOwner = user.id === lock.ownerUserId;
+    const isFallback = user.id === lock.fallbackUserId;
+    const isRequester = user.id === lock.requesterUserId;
+
+    // Owner-only actions: Start, Blocked, Done
+    const ownerOnlyActions = ['momentum_lock_start', 'momentum_lock_blocked', 'momentum_lock_done', 'blocked_need_input', 'blocked_partial', 'blocked_rescope', 'blocked_escalate_now'];
+    if (ownerOnlyActions.includes(actionId) && !isOwner) {
+      log.warn('Unauthorized lock action attempt', { actionId, userId: user.id, ownerId: lock.ownerUserId });
+      await respondEphemeral(responseUrl, 'Only the assigned owner can perform this action.');
+      return NextResponse.json({ ok: true });
+    }
+
+    // Fallback-only actions: Reassign
+    const fallbackOnlyActions = ['momentum_lock_reassign_full', 'momentum_lock_reassign_partial', 'momentum_lock_cannot_help'];
+    if (fallbackOnlyActions.includes(actionId) && !isFallback) {
+      log.warn('Unauthorized fallback action attempt', { actionId, userId: user.id, fallbackId: lock.fallbackUserId });
+      await respondEphemeral(responseUrl, 'Only the fallback person can perform this action.');
+      return NextResponse.json({ ok: true });
+    }
+
     switch (actionId) {
       case 'momentum_lock_start':
         return handleStartAction(lock, user, responseUrl);

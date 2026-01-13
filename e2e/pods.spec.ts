@@ -21,9 +21,9 @@ test.describe('Pods (Classes)', () => {
 
 // Authenticated pod tests (would need test fixtures)
 test.describe('Pod Management (Authenticated)', () => {
-  test.skip(({ }, testInfo) => {
-    return !process.env.TEST_USER_EMAIL
-  })
+  test.beforeEach(async () => {
+    test.skip(!process.env.TEST_USER_EMAIL, 'No test credentials configured');
+  });
 
   test.describe('Create Pod', () => {
     test.skip('should show create pod form', async ({ page }) => {

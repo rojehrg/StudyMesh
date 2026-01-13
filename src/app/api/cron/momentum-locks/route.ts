@@ -27,26 +27,41 @@ const log = createLogger({ service: 'momentum-lock' });
 
 /**
  * Verify the cron request is legitimate
+ * Security: Requires CRON_SECRET in production to prevent external triggers
  */
 function verifyCronRequest(request: Request): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
+  const vercelCron = request.headers.get('x-vercel-cron');
 
   // In development, allow all requests
   if (process.env.NODE_ENV === 'development') {
     return true;
   }
 
-  // Vercel cron uses a Bearer token
-  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+  // Production security: require CRON_SECRET to be set
+  if (!cronSecret) {
+    log.error('CRON_SECRET not configured - rejecting cron request for security');
+    return false;
+  }
+
+  // Accept requests with valid Bearer token
+  if (authHeader === `Bearer ${cronSecret}`) {
     return true;
   }
 
-  // Vercel also sends x-vercel-cron header
-  const vercelCron = request.headers.get('x-vercel-cron');
-  if (vercelCron === '1') {
+  // Accept Vercel cron requests but only if they also have the secret in query params
+  // This allows Vercel's cron to work while preventing external header spoofing
+  const url = new URL(request.url);
+  const querySecret = url.searchParams.get('secret');
+  if (vercelCron === '1' && querySecret === cronSecret) {
     return true;
   }
+
+  log.warn('Unauthorized cron request attempt', {
+    hasAuthHeader: !!authHeader,
+    hasVercelCron: vercelCron === '1',
+  });
 
   return false;
 }

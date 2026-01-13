@@ -29,19 +29,14 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
   const hoursRemaining = Math.max(0, Math.round(diff / (60 * 60 * 1000)));
 
   let urgencyText: string;
-  let urgencyEmoji: string;
   if (hoursRemaining <= 1) {
-    urgencyText = "less than 1 hour remaining";
-    urgencyEmoji = "🔴";
+    urgencyText = "Less than 1 hour remaining";
   } else if (hoursRemaining <= 3) {
-    urgencyText = `${hoursRemaining} hours remaining`;
-    urgencyEmoji = "🟠";
+    urgencyText = `${hoursRemaining} hours remaining (soon)`;
   } else if (hoursRemaining <= 8) {
     urgencyText = `${hoursRemaining} hours remaining`;
-    urgencyEmoji = "🟡";
   } else {
     urgencyText = `${hoursRemaining} hours remaining`;
-    urgencyEmoji = "🟢";
   }
 
   const fallbackSection = acceptableFallback
@@ -86,8 +81,8 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
         {
           type: "mrkdwn",
           text: threadLink
-            ? `${urgencyEmoji} *${urgencyText}* | <${threadLink}|View thread>`
-            : `${urgencyEmoji} *${urgencyText}*`,
+            ? `*${urgencyText}* | <${threadLink}|View thread>`
+            : `*${urgencyText}*`,
         },
       ],
     },
@@ -177,8 +172,8 @@ export function buildEscalationMessage(lock: MomentumLock, threadLink: string | 
   const text = `Heads up. A Momentum Lock may need backup. The team is waiting on: ${requiredOutcome}`;
 
   const fallbackHint = acceptableFallback
-    ? `\n\n💡 _Even partial progress counts: ${acceptableFallback}_`
-    : "\n\n💡 _Even a partial unblock keeps things moving._";
+    ? `\n\n_Even partial progress counts: ${acceptableFallback}_`
+    : "\n\n_Even a partial unblock keeps things moving._";
 
   const blocks: SlackBlock[] = [
     {
@@ -342,25 +337,25 @@ export function buildStatusUpdateMessage(
   text: string;
   blocks: SlackBlock[];
 } {
-  let emoji: string;
   let statusText: string;
+  let prefix: string;
 
   switch (status) {
     case 'started':
-      emoji = "🚀";
+      prefix = "[Started]";
       statusText = `<@${actorUserId}> started working on this`;
       break;
     case 'blocked':
-      emoji = "⚠️";
+      prefix = "[Blocked]";
       statusText = `<@${actorUserId}> is blocked${details ? `: ${details}` : ''}`;
       break;
     case 'done':
-      emoji = "✅";
+      prefix = "[Done]";
       statusText = `<@${actorUserId}> completed this`;
       break;
   }
 
-  const text = `${emoji} ${statusText}`;
+  const text = `${prefix} ${statusText}`;
 
   const blocks: SlackBlock[] = [
     {
@@ -368,7 +363,7 @@ export function buildStatusUpdateMessage(
       elements: [
         {
           type: "mrkdwn",
-          text: `${emoji} *Lock Update:* ${statusText}`,
+          text: `*${prefix}* ${statusText}`,
         },
       ],
     },
@@ -391,7 +386,7 @@ export function buildCompletionMessage(lock: MomentumLock): {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Momentum Lock completed* ✅\n\n_${lock.requiredOutcome}_`,
+        text: `*Momentum Lock completed*\n\n_${lock.requiredOutcome}_`,
       },
     },
     {
@@ -399,7 +394,7 @@ export function buildCompletionMessage(lock: MomentumLock): {
       elements: [
         {
           type: "mrkdwn",
-          text: `Delivered by <@${lock.ownerUserId}> • Requested by <@${lock.requesterUserId}>`,
+          text: `Delivered by <@${lock.ownerUserId}> | Requested by <@${lock.requesterUserId}>`,
         },
       ],
     },

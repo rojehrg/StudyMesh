@@ -11,9 +11,9 @@ test.describe('Nudging System', () => {
 
 // Authenticated nudging tests
 test.describe('Nudging (Authenticated)', () => {
-  test.skip(({ }, testInfo) => {
-    return !process.env.TEST_USER_EMAIL
-  })
+  test.beforeEach(async () => {
+    test.skip(!process.env.TEST_USER_EMAIL, 'No test credentials configured');
+  });
 
   test.describe('Notifications Page', () => {
     test.skip('should display notifications page with tabs', async ({ page }) => {
