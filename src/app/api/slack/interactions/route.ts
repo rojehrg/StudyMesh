@@ -8,7 +8,11 @@ import {
   parseLockFormValues,
   CALLBACK_ID_DRAFT,
   CALLBACK_ID_EDIT,
+  CALLBACK_ID_BLOCKED_REASON,
+  buildBlockedReasonModal,
+  openModal,
   type LockModalPrivateMetadata,
+  type BlockedReasonMetadata,
 } from '@/lib/slack/momentum-lock/modal-builder';
 
 const log = createLogger({ service: 'momentum-lock' });
@@ -132,6 +136,11 @@ async function handleViewSubmission(payload: any) {
     return handleLockModalSubmission(payload);
   }
 
+  // Handle blocked reason modal submission
+  if (callback_id === CALLBACK_ID_BLOCKED_REASON) {
+    return handleBlockedReasonSubmission(payload);
+  }
+
   if (callback_id !== 'ask_for_help_submit') {
     console.warn('[Slack Interactions] Unknown callback_id:', callback_id);
     return NextResponse.json({ ok: true });
@@ -205,7 +214,7 @@ async function handleBlockActions(payload: any) {
 
     // Handle momentum lock actions
     if (actionId.startsWith('momentum_lock_') || actionId.startsWith('blocked_')) {
-      return handleLockAction(actionId, value, user, team, response_url);
+      return handleLockAction(actionId, value, user, team, response_url, payload);
     }
   }
 
@@ -220,7 +229,8 @@ async function handleLockAction(
   lockId: string,
   user: any,
   team: any,
-  responseUrl: string
+  responseUrl: string,
+  payload: any
 ): Promise<NextResponse> {
   log.info('Lock action received', { actionId, lockId, userId: user?.id });
 
@@ -247,7 +257,7 @@ async function handleLockAction(
         return handleStartAction(lock, user, responseUrl);
 
       case 'momentum_lock_blocked':
-        return handleBlockedAction(lock, user, responseUrl);
+        return handleBlockedAction(lock, user, responseUrl, payload);
 
       case 'momentum_lock_done':
         return handleDoneAction(lock, user, responseUrl);
@@ -303,34 +313,34 @@ async function handleStartAction(lock: any, user: any, responseUrl: string) {
     actorUserId: user.id,
   });
 
-  // Post update to thread
-  await postToThread(lock, `<@${user.id}> started working on this.`);
+  // Notify requester that owner started
+  await notifyRequester(lock, user.id, 'started');
 
-  // Update the DM message
-  await respondEphemeral(responseUrl, 'Great! You\'re now working on this lock. Good luck!');
+  // Confirm to owner
+  await respondEphemeral(responseUrl, 'Got it. The requester has been notified.');
 
   log.info('Lock started', { lockId: lock.id, userId: user.id });
   return NextResponse.json({ ok: true });
 }
 
 /**
- * Handle "Blocked" action - show options menu
+ * Handle "Blocked" action - open free-text modal for reason
+ * MVP: Simple free-text input instead of 4-option menu
  */
-async function handleBlockedAction(lock: any, user: any, responseUrl: string) {
-  const { buildBlockedOptionsMessage } = await import('@/lib/slack/momentum-lock/messages');
-  const message = buildBlockedOptionsMessage(lock.id);
+async function handleBlockedAction(lock: any, user: any, responseUrl: string, payload: any) {
+  // Open modal for blocked reason
+  const triggerId = payload.trigger_id;
+  if (!triggerId) {
+    await respondEphemeral(responseUrl, 'Something went wrong. Please try again.');
+    return NextResponse.json({ ok: true });
+  }
 
-  // Show ephemeral message with options
-  await fetch(responseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      replace_original: false,
-      response_type: 'ephemeral',
-      text: message.text,
-      blocks: message.blocks,
-    }),
-  });
+  const modal = buildBlockedReasonModal(lock.id);
+  const success = await openModal(triggerId, modal);
+
+  if (!success) {
+    await respondEphemeral(responseUrl, 'Failed to open the form. Please try again.');
+  }
 
   return NextResponse.json({ ok: true });
 }
@@ -350,13 +360,11 @@ async function handleDoneAction(lock: any, user: any, responseUrl: string) {
     actorUserId: user.id,
   });
 
-  // Post completion to thread
-  await postToThread(lock, `<@${user.id}> completed this. The lock is now resolved.`);
-
   // Notify requester
   await notifyRequester(lock, user.id, 'completed');
 
-  await respondEphemeral(responseUrl, 'Awesome! The lock has been marked as done. The requester has been notified.');
+  // Confirm to owner
+  await respondEphemeral(responseUrl, 'Done. The requester has been notified.');
 
   log.info('Lock completed', { lockId: lock.id, userId: user.id });
   return NextResponse.json({ ok: true });
@@ -585,8 +593,9 @@ async function postToThread(lock: any, text: string) {
 
 /**
  * Notify the requester about a status change
+ * MVP format: simple, clear updates
  */
-async function notifyRequester(lock: any, actorUserId: string, status: 'completed' | 'blocked') {
+async function notifyRequester(lock: any, actorUserId: string, status: 'started' | 'completed') {
   const botToken = process.env.SLACK_BOT_TOKEN;
   if (!botToken || lock.requesterUserId === actorUserId) return;
 
@@ -603,10 +612,12 @@ async function notifyRequester(lock: any, actorUserId: string, status: 'complete
     const openResult = await openResponse.json();
     if (!openResult.ok) return;
 
-    const statusEmoji = status === 'completed' ? '' : '';
-    const statusText = status === 'completed'
-      ? `<@${actorUserId}> completed the Momentum Lock you created: _${lock.requiredOutcome}_`
-      : `<@${actorUserId}> is blocked on the Momentum Lock: _${lock.requiredOutcome}_`;
+    let text: string;
+    if (status === 'started') {
+      text = `Update: <@${actorUserId}> saw your request and started looking into it.`;
+    } else {
+      text = `Update: <@${actorUserId}> marked your request as done.`;
+    }
 
     await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
@@ -616,9 +627,29 @@ async function notifyRequester(lock: any, actorUserId: string, status: 'complete
       },
       body: JSON.stringify({
         channel: openResult.channel.id,
-        text: `${statusEmoji} ${statusText}`,
+        text,
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text,
+            },
+          },
+          {
+            type: 'context',
+            elements: [
+              {
+                type: 'mrkdwn',
+                text: `Re: ${lock.requiredOutcome}`,
+              },
+            ],
+          },
+        ],
       }),
     });
+
+    log.info('Requester notified', { lockId: lock.id, status });
   } catch (error: any) {
     log.error('Failed to notify requester', { error: error.message });
   }
@@ -835,7 +866,7 @@ async function handleLockModalSubmission(payload: any) {
     });
   }
 
-  const { ownerId, fallbackId, requiredOutcome, acceptableFallback, deadlineAt } = formData;
+  const { ownerId, requiredOutcome, deadlineAt } = formData;
   const { channelId, threadTs, requesterId } = metadata;
 
   try {
@@ -847,9 +878,7 @@ async function handleLockModalSubmission(payload: any) {
       createdByUserId: user.id,
       requesterUserId: requesterId,
       ownerUserId: ownerId,
-      fallbackUserId: fallbackId || null,
       requiredOutcome,
-      acceptableFallback: acceptableFallback || null,
       deadlineAt,
       status: 'active',
     }).returning();
@@ -864,17 +893,15 @@ async function handleLockModalSubmission(payload: any) {
       payload: {
         requiredOutcome,
         deadlineAt: deadlineAt.toISOString(),
-        fallbackId,
       },
     });
 
-    // Post confirmation to the thread
+    // Send DM to owner immediately
     await postLockConfirmation({
       channelId,
       threadTs,
       lockId: newLock.id,
       ownerId,
-      fallbackId,
       requiredOutcome,
       deadlineAt,
       requesterId,
@@ -895,14 +922,145 @@ async function handleLockModalSubmission(payload: any) {
 }
 
 /**
+ * Handle blocked reason modal submission
+ * MVP: Simple free-text reason, notify requester immediately
+ */
+async function handleBlockedReasonSubmission(payload: any) {
+  const { user, team, view } = payload;
+  const values = view.state.values;
+
+  log.info('Blocked reason submitted', { userId: user?.id });
+
+  // Parse metadata to get lockId
+  let metadata: BlockedReasonMetadata;
+  try {
+    metadata = JSON.parse(view.private_metadata || '{}');
+  } catch {
+    log.error('Failed to parse blocked reason metadata');
+    return NextResponse.json({
+      response_action: 'errors',
+      errors: {
+        reason_block: 'Something went wrong. Please try again.',
+      },
+    });
+  }
+
+  const { lockId } = metadata;
+  const reason = values.reason_block?.reason_input?.value || '';
+
+  if (!reason.trim()) {
+    return NextResponse.json({
+      response_action: 'errors',
+      errors: {
+        reason_block: 'Please describe what\'s blocking you.',
+      },
+    });
+  }
+
+  try {
+    // Fetch the lock
+    const [lock] = await db
+      .select()
+      .from(momentumLocks)
+      .where(eq(momentumLocks.id, lockId));
+
+    if (!lock) {
+      log.error('Lock not found for blocked reason', { lockId });
+      return NextResponse.json({ response_action: 'clear' });
+    }
+
+    // Update status to blocked
+    await db
+      .update(momentumLocks)
+      .set({ status: 'blocked' })
+      .where(eq(momentumLocks.id, lockId));
+
+    // Log the event with reason
+    await db.insert(momentumLockEvents).values({
+      lockId,
+      eventType: 'blocked',
+      actorUserId: user.id,
+      payload: { reason },
+    });
+
+    // Notify requester with the blocked reason
+    await notifyRequesterBlocked(lock, user.id, reason);
+
+    log.info('Lock blocked with reason', { lockId, userId: user.id });
+
+    return NextResponse.json({ response_action: 'clear' });
+  } catch (error: any) {
+    log.error('Failed to handle blocked reason', { error: error.message });
+    return NextResponse.json({ response_action: 'clear' });
+  }
+}
+
+/**
+ * Notify requester that owner is blocked (with reason)
+ * MVP format: simple update message
+ */
+async function notifyRequesterBlocked(lock: any, actorUserId: string, reason: string) {
+  const botToken = process.env.SLACK_BOT_TOKEN;
+  if (!botToken || lock.requesterUserId === actorUserId) return;
+
+  try {
+    const openResponse = await fetch('https://slack.com/api/conversations.open', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ users: lock.requesterUserId }),
+    });
+
+    const openResult = await openResponse.json();
+    if (!openResult.ok) return;
+
+    await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        channel: openResult.channel.id,
+        text: `Update from <@${actorUserId}>: I'm blocked because "${reason}"`,
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: `*Update from <@${actorUserId}>*\n\nI'm blocked because: _"${reason}"_`,
+            },
+          },
+          {
+            type: 'context',
+            elements: [
+              {
+                type: 'mrkdwn',
+                text: `Re: ${lock.requiredOutcome}`,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    log.info('Requester notified of blocked status', { lockId: lock.id });
+  } catch (error: any) {
+    log.error('Failed to notify requester of blocked', { error: error.message });
+  }
+}
+
+/**
  * Post lock confirmation - sends DM to owner with lock details
+ * MVP format: simple, clear, 3 buttons
  */
 async function postLockConfirmation(params: {
   channelId: string;
   threadTs?: string;
   lockId: string;
   ownerId: string;
-  fallbackId?: string;
   requiredOutcome: string;
   deadlineAt: Date;
   requesterId: string;
@@ -910,7 +1068,7 @@ async function postLockConfirmation(params: {
   const botToken = process.env.SLACK_BOT_TOKEN;
   if (!botToken) return;
 
-  const { lockId, ownerId, fallbackId, requiredOutcome, deadlineAt, requesterId } = params;
+  const { lockId, ownerId, requiredOutcome, deadlineAt, requesterId } = params;
 
   // Calculate relative time
   const now = new Date();
@@ -920,12 +1078,12 @@ async function postLockConfirmation(params: {
   if (hours < 1) {
     relativeTime = 'less than 1 hour';
   } else if (hours === 1) {
-    relativeTime = '1 hour';
+    relativeTime = 'in 1 hour';
   } else if (hours < 24) {
-    relativeTime = `${hours} hours`;
+    relativeTime = `in ${hours} hours`;
   } else {
     const days = Math.round(hours / 24);
-    relativeTime = days === 1 ? '1 day' : `${days} days`;
+    relativeTime = days === 1 ? 'in 1 day' : `in ${days} days`;
   }
 
   try {
@@ -945,6 +1103,7 @@ async function postLockConfirmation(params: {
       return;
     }
 
+    // Owner DM - calm, neutral tone
     await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
@@ -953,13 +1112,13 @@ async function postLockConfirmation(params: {
       },
       body: JSON.stringify({
         channel: openResult.channel.id,
-        text: `Momentum Lock from <@${requesterId}>: ${requiredOutcome}`,
+        text: `<@${requesterId}> is waiting on you for: ${requiredOutcome}`,
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `*Momentum Lock*\n\n<@${requesterId}> needs you to: _${requiredOutcome}_`,
+              text: `<@${requesterId}> is waiting on you for:\n\n→ ${requiredOutcome}`,
             },
           },
           {
@@ -967,7 +1126,7 @@ async function postLockConfirmation(params: {
             elements: [
               {
                 type: 'mrkdwn',
-                text: `Deadline: *${relativeTime}*${fallbackId ? ` | Fallback: <@${fallbackId}>` : ''}`,
+                text: `By: ${relativeTime}`,
               },
             ],
           },
@@ -977,7 +1136,6 @@ async function postLockConfirmation(params: {
               {
                 type: 'button',
                 text: { type: 'plain_text', text: 'Start', emoji: true },
-                style: 'primary',
                 action_id: 'momentum_lock_start',
                 value: lockId,
               },
@@ -990,7 +1148,6 @@ async function postLockConfirmation(params: {
               {
                 type: 'button',
                 text: { type: 'plain_text', text: 'Done', emoji: true },
-                style: 'primary',
                 action_id: 'momentum_lock_done',
                 value: lockId,
               },

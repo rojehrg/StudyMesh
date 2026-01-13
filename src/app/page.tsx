@@ -64,83 +64,48 @@ const SlackIcon = ({ className = 'w-5 h-5 mr-2' }: { className?: string }) => (
   </svg>
 );
 
-// Typing animation component
-const TypingAnimation = () => {
+// Request flow animation component
+const RequestFlowAnimation = () => {
   const scenarios = [
     {
-      phrase: 'need help with the payments API',
-      channel: 'engineering',
-      people: [
-        { initials: 'SM', name: 'Sarah M.', role: 'Senior Backend Engineer', skills: 'Stripe, API design', availability: 'Free now', status: 'green' },
-        { initials: 'JK', name: 'James K.', role: 'Platform Engineer', skills: 'Payments, billing', availability: 'Free at 2pm', status: 'yellow' },
-      ],
+      owner: 'Sarah',
+      ownerInitials: 'SM',
+      outcome: 'Send updated API spec',
+      deadline: 'today at 5pm',
     },
     {
-      phrase: 'anyone know Figma prototyping?',
-      channel: 'design',
-      people: [
-        { initials: 'AL', name: 'Amy L.', role: 'Product Designer', skills: 'Figma, prototyping', availability: 'Free now', status: 'green' },
-        { initials: 'MR', name: 'Marcus R.', role: 'UX Designer', skills: 'Interaction design', availability: 'Free at 3pm', status: 'yellow' },
-      ],
+      owner: 'Marcus',
+      ownerInitials: 'MR',
+      outcome: 'Review the PR',
+      deadline: 'tomorrow morning',
     },
     {
-      phrase: 'stuck on a React hooks issue',
-      channel: 'frontend',
-      people: [
-        { initials: 'DW', name: 'Dana W.', role: 'Frontend Lead', skills: 'React, TypeScript', availability: 'Free now', status: 'green' },
-        { initials: 'KP', name: 'Kevin P.', role: 'UI Engineer', skills: 'React hooks, state', availability: 'Free in 30min', status: 'yellow' },
-      ],
-    },
-    {
-      phrase: 'help with database migrations',
-      channel: 'backend',
-      people: [
-        { initials: 'RN', name: 'Rachel N.', role: 'Database Admin', skills: 'PostgreSQL, migrations', availability: 'Free now', status: 'green' },
-        { initials: 'TH', name: 'Tom H.', role: 'Backend Engineer', skills: 'SQL, data modeling', availability: 'Free at 4pm', status: 'yellow' },
-      ],
-    },
-    {
-      phrase: 'questions about our auth flow',
-      channel: 'security',
-      people: [
-        { initials: 'LG', name: 'Lisa G.', role: 'Security Engineer', skills: 'OAuth, SSO', availability: 'Free now', status: 'green' },
-        { initials: 'CB', name: 'Chris B.', role: 'Identity Lead', skills: 'Auth, permissions', availability: 'Free at 1pm', status: 'yellow' },
-      ],
+      owner: 'Dana',
+      ownerInitials: 'DW',
+      outcome: 'Share design feedback',
+      deadline: 'end of day',
     },
   ];
 
-  const [displayText, setDisplayText] = useState('');
-  const [showResponse, setShowResponse] = useState(false);
   const [scenarioIndex, setScenarioIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [step, setStep] = useState(0); // 0: request, 1: started, 2: done
 
   const currentScenario = scenarios[scenarioIndex];
 
   useEffect(() => {
-    const currentPhrase = currentScenario.phrase;
+    const timings = [2500, 1500, 2000]; // Time to show each step
 
-    const timeout = setTimeout(
-      () => {
-        if (isDeleting) {
-          setDisplayText(currentPhrase.substring(0, displayText.length - 1));
-          if (displayText.length === 1) {
-            setIsDeleting(false);
-            setShowResponse(false);
-            setScenarioIndex((prev) => (prev + 1) % scenarios.length);
-          }
-        } else {
-          setDisplayText(currentPhrase.substring(0, displayText.length + 1));
-          if (displayText.length === currentPhrase.length - 1) {
-            setShowResponse(true);
-            setTimeout(() => setIsDeleting(true), 2500);
-          }
-        }
-      },
-      isDeleting ? 25 : displayText.length === 0 ? 300 : 50
-    );
+    const timeout = setTimeout(() => {
+      if (step < 2) {
+        setStep(step + 1);
+      } else {
+        setStep(0);
+        setScenarioIndex((prev) => (prev + 1) % scenarios.length);
+      }
+    }, timings[step]);
 
     return () => clearTimeout(timeout);
-  }, [displayText, isDeleting, scenarioIndex, currentScenario.phrase, scenarios.length]);
+  }, [step, scenarioIndex, scenarios.length]);
 
   return (
     <div className="mt-8 lg:mt-0">
@@ -152,64 +117,43 @@ const TypingAnimation = () => {
             <div className="w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full bg-[#F4BF50]"></div>
             <div className="w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full bg-[#61C454]"></div>
           </div>
-          <span className="text-white/90 text-sm ml-2 lg:ml-3 font-medium"># {currentScenario.channel}</span>
+          <span className="text-white/90 text-sm ml-2 lg:ml-3 font-medium">Attunly</span>
         </div>
 
-        {/* Slack input area */}
+        {/* Content */}
         <div className="p-3 lg:p-4 bg-white">
-          <div className="border border-gray-300 rounded-lg px-3 lg:px-4 py-2.5 lg:py-3 bg-white">
-            <div className="flex items-center text-sm lg:text-[15px]">
-              <span className="text-gray-900 font-bold">/attunly</span>
-              <span className="ml-2 text-gray-700">{displayText}</span>
-              <span className="inline-block w-0.5 h-[1.1em] bg-current text-gray-400 ml-0.5 animate-[blink_1s_step-end_infinite]"></span>
+          <div className="flex items-start gap-2.5 lg:gap-3">
+            <div className="w-8 lg:w-9 h-8 lg:h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
+              <img src="/logo.svg" alt="Attunly" className="w-4 lg:w-5 h-4 lg:h-5 invert" />
             </div>
-          </div>
-
-          {/* Response preview */}
-          <div
-            className={`mt-3 lg:mt-4 transition-all duration-500 ease-out ${
-              showResponse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-            }`}
-          >
-            <div className="flex items-start gap-2.5 lg:gap-3">
-              <div className="w-8 lg:w-9 h-8 lg:h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
-                <img src="/logo.svg" alt="Attunly" className="w-4 lg:w-5 h-4 lg:h-5 invert" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-bold text-gray-900 text-sm lg:text-[15px]">Attunly</span>
+                <span className="text-[10px] lg:text-[11px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-medium">APP</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-gray-900 text-sm lg:text-[15px]">Attunly</span>
-                  <span className="text-[10px] lg:text-[11px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-medium">APP</span>
-                  <span className="text-xs text-gray-400 hidden sm:inline">12:34 PM</span>
-                </div>
-                <p className="text-sm lg:text-[15px] text-gray-800 leading-relaxed">
-                  Found <strong>{currentScenario.people.length} people</strong> who can help:
-                </p>
 
-                {currentScenario.people.map((person, index) => (
-                  <div key={person.initials} className={`${index === 0 ? 'mt-2 lg:mt-3' : 'mt-2'} p-2.5 lg:p-3 bg-coffee-cream rounded-lg border border-coffee-foam`}>
-                    <div className="flex items-center gap-2.5 lg:gap-3">
-                      <div className="relative">
-                        <div className="w-9 lg:w-10 h-9 lg:h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-xs lg:text-sm font-semibold text-coffee-mocha">
-                          {person.initials}
-                        </div>
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 lg:w-3 h-2.5 lg:h-3 rounded-full border-2 border-white ${
-                          person.status === 'green' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'
-                        }`}></div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-coffee-espresso text-sm">{person.name}</div>
-                        <p className="text-xs text-coffee-cortado">{person.availability} · {person.skills}</p>
-                      </div>
-                      <button className={`px-2.5 lg:px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                        index === 0
-                          ? 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast'
-                          : 'bg-white text-coffee-espresso border border-coffee-foam hover:bg-coffee-cream'
-                      }`}>
-                        Ask
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              {/* Request card */}
+              <div className="p-3 bg-coffee-cream rounded-lg border border-coffee-foam mb-3">
+                <p className="text-sm text-coffee-espresso mb-2">
+                  <strong>You</strong> requested a response from <strong>{currentScenario.owner}</strong>:
+                </p>
+                <p className="text-sm text-coffee-mocha">
+                  &ldquo;{currentScenario.outcome}&rdquo;
+                </p>
+                <p className="text-xs text-coffee-cortado mt-2">By: {currentScenario.deadline}</p>
+              </div>
+
+              {/* Status updates */}
+              <div className="space-y-2">
+                <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
+                  <span className="text-gray-600">{currentScenario.owner} saw your request and started</span>
+                </div>
+
+                <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-gray-600">{currentScenario.owner} marked your request as done</span>
+                </div>
               </div>
             </div>
           </div>
@@ -226,20 +170,16 @@ const Hero = () => (
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left: Copy */}
         <div>
-          <p className="text-coffee-latte text-xs md:text-sm tracking-wide uppercase mb-4 md:mb-6">A Slack command</p>
+          <p className="text-coffee-latte text-xs md:text-sm tracking-wide uppercase mb-4 md:mb-6">A Slack layer</p>
 
           <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6">
-            Ask for help in Slack.
+            Wait on people.
             <br />
-            <span className="text-coffee-oat">Without the friction.</span>
+            <span className="text-coffee-oat">Without the silence.</span>
           </h1>
 
           <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch]">
-            Type{' '}
-            <code className="bg-coffee-cream px-1.5 md:px-2 py-0.5 rounded text-sm md:text-lg font-mono text-coffee-mocha">
-              /attunly
-            </code>{' '}
-            and describe what you need. See who knows it, when they&apos;re free, and send a message they can easily say yes or no to.
+            When teams work across time zones, simple requests turn into day-long waits. Messages get buried, context is lost, and nobody knows what&apos;s happening. Attunly makes it easier to wait on people who aren&apos;t online right now.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
@@ -250,12 +190,12 @@ const Hero = () => (
           </div>
 
           <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
-            2-minute setup · Lives entirely in Slack
+            No setup required · Lives entirely in Slack
           </p>
         </div>
 
         {/* Right: Mock Slack UI */}
-        <TypingAnimation />
+        <RequestFlowAnimation />
       </div>
     </div>
   </section>
@@ -269,16 +209,16 @@ const TheMoment = () => (
         <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
 
         <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
-          <p>You need help with something.</p>
+          <p>You sent a message. You need a response.</p>
           <p>
-            You&apos;re not sure who knows it. Not sure if they&apos;re busy. Not sure how to ask without sounding clueless.
+            They&apos;re in a different timezone. Or maybe just busy. Or maybe they saw it and forgot. You don&apos;t know.
           </p>
-          <p className="text-coffee-latte">So you don&apos;t ask. You guess. You wait. The work stays stuck.</p>
+          <p className="text-coffee-latte">So you wait. And wonder. And check Slack again. The silence says nothing.</p>
         </div>
 
         <div className="mt-10 pt-8 border-t border-coffee-steamed">
           <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-            Attunly handles the awkward part. You just describe what you need.
+            Attunly replaces silence with clarity. You know when they saw it. You know if they&apos;re blocked. You know what&apos;s happening.
           </p>
         </div>
       </div>
@@ -307,10 +247,10 @@ const BeforeAfterDemo = () => {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4">
-            The difference is time.
+            The difference is clarity.
           </h2>
           <p className="text-lg text-coffee-steamed max-w-[50ch] mx-auto">
-            Hours waiting for a maybe. Or minutes to the right person.
+            Hours of silence. Or knowing exactly what&apos;s happening.
           </p>
         </div>
 
@@ -351,17 +291,14 @@ const BeforeAfterDemo = () => {
               <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
             </div>
             <span className="text-white/70 text-sm font-medium ml-2">
-              {activeTab === 'without' ? '# general' : '# engineering'}
-            </span>
-            <span className="text-white/60 text-xs">
-              {activeTab === 'without' ? '847 members' : '24 members'}
+              {activeTab === 'without' ? 'DM with @sarah' : 'Attunly'}
             </span>
           </div>
 
           {/* Chat content - fixed height to prevent layout shift when switching tabs */}
           <div className="p-5 min-h-[420px]">
             {activeTab === 'without' ? (
-              /* Without Attunly - The anxiety */
+              /* Without Attunly - The silence */
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
@@ -370,10 +307,10 @@ const BeforeAfterDemo = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-white text-[15px]">You</span>
-                      <span className="text-xs text-white/60">2:34 PM</span>
+                      <span className="text-xs text-white/60">9:15 AM</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed">
-                      hey does anyone know how the auth flow works? I need to add a new OAuth provider but I&apos;m not sure where to start
+                      Hey Sarah, I need the updated API spec before I can finish my PR. Can you send it when you get a chance?
                     </p>
                   </div>
                 </div>
@@ -382,56 +319,56 @@ const BeforeAfterDemo = () => {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>3 hours later...</span>
+                  <span>4 hours later...</span>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    Y
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-white text-[15px]">You</span>
+                      <span className="text-xs text-white/60">1:22 PM</span>
+                    </div>
+                    <p className="text-[15px] text-white/90 leading-relaxed">
+                      Hey, just following up on this. No rush, just want to make sure you saw it
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-white/60 text-sm pl-12">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Next day...</span>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    M
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-[15px]">Mike</span>
-                      <span className="text-xs text-white/60">5:47 PM</span>
-                    </div>
-                    <p className="text-[15px] text-white/90 leading-relaxed">
-                      hmm not sure, maybe try asking in #backend?
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                     S
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-[15px]">Sara</span>
-                      <span className="text-xs text-white/60">5:52 PM</span>
+                      <span className="font-semibold text-white text-[15px]">Sarah</span>
+                      <span className="text-xs text-white/60">10:05 AM</span>
                     </div>
                     <p className="text-[15px] text-white/90 leading-relaxed">
-                      I think Jake worked on that? Or maybe it was the other team
+                      Oh sorry! I was waiting on something from the product team. Should have it today
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
                   <p className="text-white/50 text-sm text-center">
-                    Half a day lost. Still no answer.
+                    A full day of waiting. No visibility. No way to plan.
                   </p>
                 </div>
               </div>
             ) : (
-              /* With Attunly - The solution */
+              /* With Attunly - The clarity */
               <div className="space-y-4">
-                <div className="border border-white/20 rounded-lg px-4 py-3 bg-white/5">
-                  <div className="flex items-center text-[15px]">
-                    <span className="text-white font-semibold">/attunly</span>
-                    <span className="ml-2 text-white/80">need help with auth flow, adding OAuth provider</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 mt-5">
+                <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
                     <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
                   </div>
@@ -439,54 +376,42 @@ const BeforeAfterDemo = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold text-white text-[15px]">Attunly</span>
                       <span className="text-[11px] text-white/50 bg-white/10 px-1.5 py-0.5 rounded font-medium">APP</span>
-                      <span className="text-xs text-white/60">just now</span>
+                      <span className="text-xs text-white/60">9:15 AM</span>
                     </div>
-                    <p className="text-[15px] text-white/90 leading-relaxed mb-3">
-                      Found <strong>2 people</strong> who can help with authentication:
-                    </p>
 
-                    {/* Expert cards */}
-                    <div className="space-y-2">
-                      <div className="p-3 bg-coffee-cream rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
-                              LG
-                            </div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-green-500"></div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-coffee-espresso text-sm">Lisa G.</div>
-                            <p className="text-xs text-coffee-cortado">Free now · OAuth, SSO, Identity</p>
-                          </div>
-                          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">
-                            Ask
-                          </button>
-                        </div>
+                    {/* Request sent */}
+                    <div className="p-3 bg-coffee-cream rounded-lg mb-3">
+                      <p className="text-sm text-coffee-espresso mb-2">
+                        <strong>You</strong> requested a response from <strong>Sarah</strong>:
+                      </p>
+                      <p className="text-sm text-coffee-mocha">
+                        &ldquo;Send updated API spec&rdquo;
+                      </p>
+                      <p className="text-xs text-coffee-cortado mt-2">By: today at 5pm</p>
+                    </div>
+
+                    {/* Status updates */}
+                    <div className="space-y-3 mt-4">
+                      <div className="flex items-center gap-2 text-white/80 text-sm">
+                        <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
+                        <span>9:47 AM &mdash; Sarah saw your request and started looking into it</span>
                       </div>
 
-                      <div className="p-3 bg-coffee-cream rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
-                              CB
-                            </div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-yellow-500"></div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-coffee-espresso text-sm">Chris B.</div>
-                            <p className="text-xs text-coffee-cortado">Free at 3pm · Auth, Permissions</p>
-                          </div>
-                          <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-white text-coffee-espresso border border-coffee-foam">
-                            Ask
-                          </button>
-                        </div>
+                      <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                        <p className="text-white/80 text-sm">
+                          <strong className="text-white">10:15 AM</strong> &mdash; I&apos;m blocked because: &ldquo;Waiting on final field names from product. Should have them by noon.&rdquo;
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-white/80 text-sm">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span>2:30 PM &mdash; Sarah marked your request as done</span>
                       </div>
                     </div>
 
                     <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
                       <p className="text-white/70 text-sm text-center">
-                        Question answered in 10 minutes.
+                        You knew what was happening the whole time.
                       </p>
                     </div>
                   </div>
@@ -508,8 +433,8 @@ const BeforeAfterDemo = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">3+ hours</p>
-                    <p className="text-coffee-cortado text-sm">waiting for a reply</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">24+ hours</p>
+                    <p className="text-coffee-cortado text-sm">of waiting in silence</p>
                   </div>
                 </div>
               </div>
@@ -521,8 +446,8 @@ const BeforeAfterDemo = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">Wrong people</p>
-                    <p className="text-coffee-cortado text-sm">guessing who knows</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">No visibility</p>
+                    <p className="text-coffee-cortado text-sm">did they see it?</p>
                   </div>
                 </div>
               </div>
@@ -530,12 +455,12 @@ const BeforeAfterDemo = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">847 pinged</p>
-                    <p className="text-coffee-cortado text-sm">everyone interrupted</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Can&apos;t plan</p>
+                    <p className="text-coffee-cortado text-sm">your work is stuck</p>
                   </div>
                 </div>
               </div>
@@ -546,12 +471,26 @@ const BeforeAfterDemo = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
                     <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">10 minutes</p>
-                    <p className="text-coffee-cortado text-sm">question to answer</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Seen</p>
+                    <p className="text-coffee-cortado text-sm">you know they got it</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-coffee-espresso font-semibold text-lg">Honest updates</p>
+                    <p className="text-coffee-cortado text-sm">blocked? you&apos;ll know why</p>
                   </div>
                 </div>
               </div>
@@ -563,21 +502,8 @@ const BeforeAfterDemo = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">Right expert</p>
-                    <p className="text-coffee-cortado text-sm">AI finds who knows</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-coffee-paper rounded-2xl p-5 shadow-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-coffee-foam flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-coffee-espresso" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-coffee-espresso font-semibold text-lg">Zero noise</p>
-                    <p className="text-coffee-cortado text-sm">direct conversation</p>
+                    <p className="text-coffee-espresso font-semibold text-lg">Done</p>
+                    <p className="text-coffee-cortado text-sm">clear when it&apos;s complete</p>
                   </div>
                 </div>
               </div>
@@ -595,33 +521,29 @@ const WhatsDifferentAndWhoUsesIt = () => (
   <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper">
     <div className="max-w-5xl mx-auto">
       <div className="grid md:grid-cols-2 gap-12 md:gap-16">
-        {/* Left: The Gap */}
+        {/* Left: What Attunly Does */}
         <div>
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">The gap</p>
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">What it does</p>
 
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
-            Four questions
+            Three things.
             <br />
-            <span className="text-coffee-oat">Slack can&apos;t answer.</span>
+            <span className="text-coffee-oat">Nothing more.</span>
           </h2>
 
           <div className="space-y-4">
             {[
               {
-                title: '"Who knows this?"',
-                desc: "Attunly matches your question to teammates based on what they know.",
+                title: 'Request a response',
+                desc: "Ask one person for one thing. Clearly. With a deadline that's just context, not pressure.",
               },
               {
-                title: '"Are they actually free?"',
-                desc: 'Shows actual calendar availability, not just a green dot.',
+                title: 'See when they saw it',
+                desc: 'You know the moment they acknowledge your request. No more wondering.',
               },
               {
-                title: '"How do I phrase this?"',
-                desc: "Drafts a message for you. Clear, specific, and easy for them to say yes or no to.",
-              },
-              {
-                title: '"Do they speak my language?"',
-                desc: "Auto-translates jargon between departments. Sales-speak becomes engineering-speak.",
+                title: 'Get honest updates',
+                desc: 'If they\'re blocked, you\'ll know why. If they\'re done, you\'ll know when. Silence becomes clarity.',
               },
             ].map((item) => (
               <div
@@ -647,10 +569,10 @@ const WhatsDifferentAndWhoUsesIt = () => (
 
           <div className="space-y-4">
             {[
-              'The person who built it left months ago. No one knows who took over.',
-              'You\'re new. You don\'t know who knows what yet.',
-              'It\'s 4pm. You need someone free, not just online.',
-              'You don\'t want to ping #general and wait for maybes.',
+              'You sent a message yesterday. Still no response. Did they see it? Are they working on it? You have no idea.',
+              'Your teammate is 8 hours ahead. By the time they respond, you\'ve lost a full day.',
+              'You don\'t want to nag. But you also can\'t afford to just wait and hope.',
+              'A simple request shouldn\'t require a follow-up thread, a standup mention, and a Slack reminder.',
             ].map((moment) => (
               <div
                 key={moment}
@@ -666,193 +588,6 @@ const WhatsDifferentAndWhoUsesIt = () => (
   </section>
 );
 
-// Lingo Translation Section - matches BeforeAfterDemo style
-const LingoTranslation = () => {
-  const [activeTab, setActiveTab] = useState<'without' | 'with'>('without');
-
-  return (
-    <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Cross-team clarity</p>
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-            They speak engineering.
-            <br />
-            <span className="text-coffee-oat">You speak sales.</span>
-          </h2>
-          <p className="text-lg text-coffee-cortado max-w-[50ch] mx-auto">
-            Attunly translates your question so the right person understands it.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex bg-coffee-steamed/50 rounded-full p-1">
-            <button
-              onClick={() => setActiveTab('without')}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
-                activeTab === 'without'
-                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
-                  : 'text-coffee-cortado hover:text-coffee-espresso'
-              }`}
-            >
-              Without Attunly
-            </button>
-            <button
-              onClick={() => setActiveTab('with')}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
-                activeTab === 'with'
-                  ? 'bg-coffee-paper text-coffee-espresso shadow-sm'
-                  : 'text-coffee-cortado hover:text-coffee-espresso'
-              }`}
-            >
-              With Attunly
-            </button>
-          </div>
-        </div>
-
-        {/* Mock Slack UI */}
-        <div className="bg-[#1a1d21] rounded-xl shadow-2xl overflow-hidden font-sans ring-1 ring-coffee-oat/70">
-          {/* Slack header */}
-          <div className="bg-[#1a1d21] px-4 py-3 flex items-center gap-3 border-b border-white/10">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
-              <div className="w-3 h-3 rounded-full bg-[#febc2e]"></div>
-              <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
-            </div>
-            <span className="text-white/70 text-sm font-medium ml-2"># sales</span>
-          </div>
-
-          {/* Chat content */}
-          <div className="p-5 min-h-[320px]">
-            {activeTab === 'without' ? (
-              /* Without Attunly - Lost in translation */
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    J
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-[15px]">Jordan (Sales)</span>
-                      <span className="text-xs text-white/60">10:15 AM</span>
-                    </div>
-                    <p className="text-[15px] text-white/90 leading-relaxed">
-                      Hey @engineering — our deal velocity is tanking. Can someone help figure out why prospects are dropping off?
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-white/60 text-sm pl-12">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>45 minutes later...</span>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    A
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-[15px]">Alex (Engineering)</span>
-                      <span className="text-xs text-white/60">11:02 AM</span>
-                    </div>
-                    <p className="text-[15px] text-white/90 leading-relaxed">
-                      Deal velocity? Is that a metric we track? Not sure what system that&apos;s in.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    M
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white text-[15px]">Maria (Engineering)</span>
-                      <span className="text-xs text-white/60">11:08 AM</span>
-                    </div>
-                    <p className="text-[15px] text-white/90 leading-relaxed">
-                      Might be CRM-related? Or maybe ask product?
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
-                  <p className="text-white/50 text-sm text-center">
-                    Different departments, different languages. Question goes unanswered.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              /* With Attunly - Translated */
-              <div className="space-y-4">
-                <div className="border border-white/20 rounded-lg px-4 py-3 bg-white/5">
-                  <div className="flex items-center text-[15px]">
-                    <span className="text-white font-semibold">/attunly</span>
-                    <span className="ml-2 text-white/80">deal velocity is tanking, prospects dropping off</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 mt-5">
-                  <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
-                    <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold text-white text-[15px]">Attunly</span>
-                      <span className="text-[11px] text-white/50 bg-white/10 px-1.5 py-0.5 rounded font-medium">APP</span>
-                    </div>
-
-                    {/* Translation callout */}
-                    <div className="p-3 bg-coffee-cream rounded-lg mb-3">
-                      <p className="text-xs text-coffee-latte mb-1">Translated for Engineering:</p>
-                      <p className="text-sm text-coffee-espresso">
-                        &ldquo;Lead conversion rate in the sales pipeline is declining. Looking for help diagnosing funnel drop-off points.&rdquo;
-                      </p>
-                    </div>
-
-                    <p className="text-[15px] text-white/90 leading-relaxed mb-3">
-                      Found <strong>2 people</strong> who can help:
-                    </p>
-
-                    {/* Expert card */}
-                    <div className="p-3 bg-coffee-cream rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className="w-10 h-10 rounded-lg bg-coffee-steamed flex items-center justify-center text-sm font-semibold text-coffee-mocha">
-                            SP
-                          </div>
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-coffee-cream bg-coffee-espresso"></div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-coffee-espresso text-sm">Sam P.</div>
-                          <p className="text-xs text-coffee-cortado">Free now · Analytics, Funnels, Conversion</p>
-                        </div>
-                        <button className="px-3 py-1.5 text-xs font-medium rounded-md bg-coffee-espresso text-coffee-paper">
-                          Ask
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
-                      <p className="text-white/70 text-sm text-center">
-                        Same question. Now everyone understands.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // Trust Section
 const Trust = () => (
   <Section darker>
@@ -862,13 +597,13 @@ const Trust = () => (
       It&apos;s just a Slack command.
     </h2>
     <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch]">
-      Ask for help in Slack, without the friction.
+      Request a response. Get clarity. That&apos;s it.
     </p>
 
     <div className="grid gap-5">
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">2-minute setup</h3>
-        <p className="text-coffee-cortado">Tell Attunly what you know. Connect your calendar. That&apos;s it.</p>
+        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">No setup required</h3>
+        <p className="text-coffee-cortado">Install the Slack app. Start using it. No profiles to fill out, no onboarding.</p>
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
@@ -881,58 +616,13 @@ const Trust = () => (
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">AI does the matching</h3>
-        <p className="text-coffee-cortado">Describe what you need. Attunly understands context and finds teammates who actually know it.</p>
+        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Lightweight for the owner</h3>
+        <p className="text-coffee-cortado">Three buttons: Start, Blocked, Done. Takes 2 seconds to respond. No pressure, no guilt.</p>
       </div>
 
       <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Low pressure for everyone</h3>
-        <p className="text-coffee-cortado">The message makes it easy to say yes or no. No guilt, no obligation.</p>
-      </div>
-    </div>
-  </Section>
-);
-
-// Integrations Section
-const Integrations = () => (
-  <Section darker>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Works with your tools</p>
-
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-10">
-      No new apps to learn.
-    </h2>
-
-    <div className="grid gap-5">
-      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-[#4A154B] flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-coffee-espresso">Slack</h3>
-        </div>
-        <p className="text-coffee-cortado">
-          Type <code className="bg-coffee-cream px-1.5 py-0.5 rounded text-sm text-coffee-mocha">/attunly</code> in any channel.
-          Get suggestions, send messages, all without leaving Slack.
-        </p>
-      </div>
-
-      <div className="card-hover p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-white border border-coffee-foam flex items-center justify-center">
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-coffee-espresso">Google Calendar</h3>
-        </div>
-        <p className="text-coffee-cortado">
-          See when teammates are actually free. Not just "online" — actually available for a call or a quick chat.
-        </p>
+        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Honest by design</h3>
+        <p className="text-coffee-cortado">&ldquo;Blocked&rdquo; is a first-class response. Better to know why someone can&apos;t help than to wonder in silence.</p>
       </div>
     </div>
   </Section>
@@ -944,28 +634,28 @@ const FAQ = () => {
 
   const faqs = [
     {
-      q: 'How does the AI matching work?',
-      a: 'When teammates join, they describe what they know. When you ask a question, Attunly\'s AI understands the context and finds people whose expertise actually matches — not just keyword matching.',
+      q: 'How is this different from just DMing someone?',
+      a: 'When you DM someone, you have no idea if they saw it, if they\'re working on it, or if they\'re stuck. Attunly gives you visibility: you know when they saw your request, and if they\'re blocked, you\'ll know why.',
     },
     {
-      q: 'What happens when I click "Ask"?',
-      a: 'Attunly drafts a message for you — clear, specific, and easy for them to respond to. They get a DM they can accept or decline with one click. No awkward back-and-forth.',
+      q: 'What does the person receiving the request see?',
+      a: 'They get a clear DM with what you need and when you need it by. They can click Start, Blocked, or Done. If they\'re blocked, they explain why. It takes seconds.',
     },
     {
-      q: 'Do I need my whole team to sign up?',
-      a: 'Nope. Start with a few people. Attunly works better as more teammates add their expertise, but you can begin with just your immediate team.',
+      q: 'Does this add more Slack noise?',
+      a: 'Less, actually. Instead of follow-up messages, reminder pings, and "hey just checking in" threads, you get one clean request and real-time updates. The conversation stays quiet.',
     },
     {
-      q: 'Is my calendar data private?',
-      a: 'Yes. We only show free/busy status, never meeting details. Your calendar data is encrypted and never shared.',
+      q: 'What if they can\'t do it by my deadline?',
+      a: 'The deadline is just context, not pressure. If they click Blocked, you\'ll know immediately and can adjust. That honesty is the whole point.',
     },
     {
-      q: 'Can I control when I\'m available?',
-      a: 'Completely. Set yourself as unavailable and Attunly won\'t suggest you. You can also set office hours so you only get requests during work time.',
+      q: 'Do I need to set anything up?',
+      a: 'Just install the Slack app. No profiles, no onboarding, no expertise mapping. You can start using it right away.',
     },
     {
-      q: 'What about cross-team jargon?',
-      a: 'Attunly translates automatically. If an engineer describes their expertise in technical terms, you\'ll see a version that makes sense for your department.',
+      q: 'Does this work for distributed teams?',
+      a: 'That\'s exactly who it\'s for. When your teammate is 8 hours ahead, you can\'t afford to wait a full day wondering if they saw your message. Attunly gives you clarity across timezones.',
     },
   ];
 
@@ -1015,11 +705,11 @@ const FAQ = () => {
 const FinalCTA = () => (
   <Section className="text-center" id="install" darker>
     <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
-      Stop guessing. Start asking.
+      Replace silence with clarity.
     </h2>
 
     <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto">
-      One command. The right person. A message they can actually respond to.
+      Request a response. See when they saw it. Know what&apos;s happening.
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
@@ -1028,7 +718,7 @@ const FinalCTA = () => (
       </Button>
     </div>
 
-    <p className="text-sm text-coffee-latte">We&apos;re onboarding teams now. Get early access.</p>
+    <p className="text-sm text-coffee-latte">We&apos;re onboarding distributed teams now. Get early access.</p>
   </Section>
 );
 
@@ -1107,7 +797,6 @@ export default function AttunlyLanding() {
       <TheMoment />
       <BeforeAfterDemo />
       <WhatsDifferentAndWhoUsesIt />
-      <LingoTranslation />
       <Trust />
       <FAQ />
       <FinalCTA />

@@ -44,12 +44,9 @@ const CALLBACK_ID_EDIT = "momentum_lock_edit";
  * Build the main lock creation modal
  */
 export function buildLockDraftModal(config: LockModalConfig): SlackView {
-  const { channelId, threadTs, requesterId, inference, threadParticipants } = config;
+  const { channelId, threadTs, requesterId, inference } = config;
 
   const deadlineOptions = getDeadlineOptions();
-  const defaultDeadline = inference.deadline
-    ? inference.deadline.toISOString()
-    : deadlineOptions[2].value; // Tomorrow morning
 
   const metadata: LockModalPrivateMetadata = {
     channelId,
@@ -58,21 +55,11 @@ export function buildLockDraftModal(config: LockModalConfig): SlackView {
   };
 
   const blocks: SlackBlock[] = [
-    // Header section
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: "*Create a Momentum Lock*\nSet clear expectations for when this work needs to be done.",
-      },
-    },
-    { type: "divider" },
-
-    // Primary Owner
+    // Owner - who do you need a response from
     {
       type: "input",
       block_id: "owner_block",
-      label: { type: "plain_text", text: "Who needs to deliver?", emoji: true },
+      label: { type: "plain_text", text: "Who do you need a response from?" },
       element: {
         type: "users_select",
         action_id: "owner_select",
@@ -81,106 +68,54 @@ export function buildLockDraftModal(config: LockModalConfig): SlackView {
       },
     },
 
-    // Fallback Owner (optional)
-    {
-      type: "input",
-      block_id: "fallback_block",
-      optional: true,
-      label: { type: "plain_text", text: "Fallback (if they're blocked)", emoji: true },
-      element: {
-        type: "users_select",
-        action_id: "fallback_select",
-        placeholder: { type: "plain_text", text: "Select a backup person" },
-        ...(inference.fallbackOwner && { initial_user: inference.fallbackOwner }),
-      },
-    },
-
-    // Required Outcome
+    // Required Outcome - what do you need from them
     {
       type: "input",
       block_id: "outcome_block",
-      label: { type: "plain_text", text: "What needs to happen?", emoji: true },
+      label: { type: "plain_text", text: "What do you need from them?" },
       element: {
         type: "plain_text_input",
         action_id: "outcome_input",
-        placeholder: { type: "plain_text", text: "e.g., Review and approve the PR" },
+        placeholder: { type: "plain_text", text: "e.g., Confirm the API change is safe to ship" },
         ...(inference.requiredOutcome && { initial_value: inference.requiredOutcome }),
         max_length: 200,
       },
       hint: {
         type: "plain_text",
-        text: "One clear sentence describing the deliverable.",
+        text: "One sentence is enough. This helps them understand what you're waiting on.",
       },
     },
 
-    // Acceptable Fallback (optional)
-    {
-      type: "input",
-      block_id: "fallback_outcome_block",
-      optional: true,
-      label: { type: "plain_text", text: "Acceptable fallback outcome", emoji: true },
-      element: {
-        type: "plain_text_input",
-        action_id: "fallback_outcome_input",
-        placeholder: { type: "plain_text", text: "e.g., Leave comments with concerns" },
-        max_length: 200,
-      },
-      hint: {
-        type: "plain_text",
-        text: "What's acceptable if full delivery isn't possible?",
-      },
-    },
-
-    // Deadline
+    // Deadline - when do you need to hear back
     {
       type: "input",
       block_id: "deadline_block",
-      label: { type: "plain_text", text: "When do you need this?", emoji: true },
+      label: { type: "plain_text", text: "When do you need to hear back?" },
       element: {
         type: "static_select",
         action_id: "deadline_select",
-        placeholder: { type: "plain_text", text: "Select deadline" },
+        placeholder: { type: "plain_text", text: "Select a time" },
         initial_option: {
-          text: { type: "plain_text", text: deadlineOptions[2].label },
-          value: deadlineOptions[2].value,
+          text: { type: "plain_text", text: deadlineOptions[1].label },
+          value: deadlineOptions[1].value,
         },
         options: deadlineOptions.map(opt => ({
           text: { type: "plain_text", text: opt.label },
           value: opt.value,
         })),
       },
-    },
-
-    // Context hint
-    {
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: "💡 The owner will receive a message when they wake up with everything they need to act.",
-        },
-      ],
+      hint: {
+        type: "plain_text",
+        text: "This is just for context. It's okay if they can't respond by then.",
+      },
     },
   ];
-
-  // If inference confidence is low, show a hint
-  if (inference.confidence === 'low') {
-    blocks.splice(2, 0, {
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: "⚠️ _Couldn't infer all details from the thread. Please fill in the blanks._",
-        },
-      ],
-    });
-  }
 
   return {
     type: "modal",
     callback_id: CALLBACK_ID_DRAFT,
-    title: { type: "plain_text", text: "Momentum Lock" },
-    submit: { type: "plain_text", text: "Create Lock" },
+    title: { type: "plain_text", text: "Request a response" },
+    submit: { type: "plain_text", text: "Send" },
     close: { type: "plain_text", text: "Cancel" },
     blocks,
     private_metadata: JSON.stringify(metadata),
@@ -296,18 +231,14 @@ export function buildMissingFieldModal(
  */
 export interface ParsedLockForm {
   ownerId: string;
-  fallbackId?: string;
   requiredOutcome: string;
-  acceptableFallback?: string;
   deadlineAt: Date;
 }
 
 export function parseLockFormValues(values: Record<string, any>): ParsedLockForm | null {
   try {
     const ownerId = values.owner_block?.owner_select?.selected_user;
-    const fallbackId = values.fallback_block?.fallback_select?.selected_user;
     const requiredOutcome = values.outcome_block?.outcome_input?.value;
-    const acceptableFallback = values.fallback_outcome_block?.fallback_outcome_input?.value;
     const deadlineValue = values.deadline_block?.deadline_select?.selected_option?.value;
 
     if (!ownerId || !requiredOutcome) {
@@ -316,15 +247,54 @@ export function parseLockFormValues(values: Record<string, any>): ParsedLockForm
 
     return {
       ownerId,
-      fallbackId: fallbackId || undefined,
       requiredOutcome,
-      acceptableFallback: acceptableFallback || undefined,
       deadlineAt: deadlineValue ? new Date(deadlineValue) : new Date(Date.now() + 16 * 60 * 60 * 1000),
     };
   } catch {
     return null;
   }
 }
+
+/**
+ * Build modal for blocked reason (free-text input)
+ */
+export interface BlockedReasonMetadata {
+  lockId: string;
+}
+
+const CALLBACK_ID_BLOCKED_REASON = "momentum_lock_blocked_reason";
+
+export function buildBlockedReasonModal(lockId: string): SlackView {
+  const metadata: BlockedReasonMetadata = { lockId };
+
+  return {
+    type: "modal",
+    callback_id: CALLBACK_ID_BLOCKED_REASON,
+    title: { type: "plain_text", text: "What's getting in the way?" },
+    submit: { type: "plain_text", text: "Send" },
+    close: { type: "plain_text", text: "Cancel" },
+    blocks: [
+      {
+        type: "input",
+        block_id: "reason_block",
+        label: { type: "plain_text", text: "What's getting in the way right now?" },
+        element: {
+          type: "plain_text_input",
+          action_id: "reason_input",
+          multiline: true,
+          max_length: 500,
+        },
+        hint: {
+          type: "plain_text",
+          text: "A short answer is fine.",
+        },
+      },
+    ],
+    private_metadata: JSON.stringify(metadata),
+  };
+}
+
+export { CALLBACK_ID_DRAFT, CALLBACK_ID_EDIT, CALLBACK_ID_BLOCKED_REASON };
 
 /**
  * Open a modal via Slack API
@@ -362,5 +332,3 @@ export async function openModal(triggerId: string, view: SlackView): Promise<boo
     return false;
   }
 }
-
-export { CALLBACK_ID_DRAFT, CALLBACK_ID_EDIT };

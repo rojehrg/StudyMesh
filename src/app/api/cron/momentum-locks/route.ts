@@ -1,10 +1,11 @@
 /**
  * Momentum Locks Cron Job
  *
- * Runs every 15 minutes to:
- * 1. Deliver wake-up DMs to owners who are now "awake" (based on timezone)
- * 2. Check for locks approaching deadline and send escalations
- * 3. Mark expired locks
+ * MVP: Only marks expired locks.
+ *
+ * Disabled for MVP:
+ * - Wake-up deliveries (DMs sent immediately on lock creation)
+ * - Escalations (no fallback owners in MVP)
  */
 
 import { NextResponse } from 'next/server';
@@ -312,21 +313,19 @@ export async function GET(request: Request) {
   log.info('Cron job started');
 
   try {
-    // Process all jobs in parallel
-    const [wakeUps, escalations, expirations] = await Promise.all([
-      processWakeUpDeliveries(),
-      processEscalations(),
-      processExpirations(),
-    ]);
+    // MVP: Only process expirations
+    // Wake-up and escalation disabled (DMs sent immediately, no fallback)
+    const expirations = await processExpirations();
 
-    log.info('Cron job completed', { wakeUps, escalations, expirations });
+    log.info('Cron job completed', { expirations });
 
     return NextResponse.json({
       success: true,
       processed: {
-        wakeUps,
-        escalations,
         expirations,
+        // MVP: disabled
+        wakeUps: 0,
+        escalations: 0,
       },
     });
   } catch (error: any) {
