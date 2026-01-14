@@ -241,6 +241,23 @@ async function handleLockAction(
     return NextResponse.json({ ok: true });
   }
 
+  // FAST PATH: For blocked action, open modal immediately before any DB queries
+  // Trigger IDs expire in 3 seconds, so we can't wait for DB
+  // Validation happens when the modal is submitted
+  if (actionId === 'momentum_lock_blocked') {
+    const triggerId = payload.trigger_id;
+    if (!triggerId) {
+      await respondEphemeral(responseUrl, 'Something went wrong. Please try again.');
+      return NextResponse.json({ ok: true });
+    }
+    const modal = buildBlockedReasonModal(lockId);
+    const success = await openModal(triggerId, modal);
+    if (!success) {
+      await respondEphemeral(responseUrl, 'Failed to open the form. Please try again.');
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   try {
     // Fetch the lock
     const [lock] = await db
@@ -1133,6 +1150,29 @@ async function handleBlockedReasonSubmission(payload: any) {
     if (!lock) {
       log.error('Lock not found for blocked reason', { lockId });
       return NextResponse.json({ response_action: 'clear' });
+    }
+
+    // Validate: check terminal states
+    const TERMINAL_STATES = ['done', 'canceled', 'expired'];
+    if (TERMINAL_STATES.includes(lock.status)) {
+      log.info('Blocked attempted on terminal lock', { lockId, status: lock.status });
+      return NextResponse.json({
+        response_action: 'errors',
+        errors: {
+          reason_block: 'This lock is already complete.',
+        },
+      });
+    }
+
+    // Validate: only owner can mark as blocked
+    if (user.id !== lock.ownerUserId) {
+      log.warn('Non-owner attempted blocked', { userId: user.id, ownerId: lock.ownerUserId });
+      return NextResponse.json({
+        response_action: 'errors',
+        errors: {
+          reason_block: 'Only the assigned owner can mark this as blocked.',
+        },
+      });
     }
 
     // Update status to blocked
