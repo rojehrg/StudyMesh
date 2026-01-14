@@ -260,24 +260,24 @@ function BillingContent() {
 
   const getStatusBadge = (status: string, isOnTrial?: boolean) => {
     if (isOnTrial) {
-      return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Trial</Badge>;
+      return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">Trial</Badge>;
     }
 
     // Dodo status values: active, on_hold, cancelled, expired
     switch (status) {
       case "active":
-        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">Active</Badge>;
+        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100">Active</Badge>;
       case "trialing":
-        return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Trial</Badge>;
+        return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">Trial</Badge>;
       case "on_hold":
-        return <Badge className="bg-amber-100 text-amber-800 border-amber-200">On Hold</Badge>;
+        return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">On Hold</Badge>;
       case "cancelled":
       case "canceled":
-        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam">Cancelled</Badge>;
+        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam hover:bg-coffee-cream">Cancelled</Badge>;
       case "expired":
-        return <Badge className="bg-red-100 text-red-800 border-red-200">Expired</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">Expired</Badge>;
       default:
-        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam">Inactive</Badge>;
+        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam hover:bg-coffee-cream">Inactive</Badge>;
     }
   };
 
