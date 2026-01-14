@@ -239,11 +239,11 @@ function SettingsContent() {
 
         if (error) throw error;
         setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
+        setTimeout(() => setSaveStatus('idle'), 3000);
       } catch {
         setSaveStatus('error');
       }
-    }, 1000);
+    }, 500);
   };
 
   const handleExpertiseChange = (text: string) => {
@@ -642,7 +642,7 @@ function SettingsContent() {
                 Disconnect Calendar
               </Button>
             ) : (
-              <Button onClick={connectGoogleCalendar} className="bg-[#4285F4] hover:bg-[#3367D6] text-white">
+              <Button onClick={connectGoogleCalendar} className="bg-coffee-mocha hover:bg-coffee-espresso text-white">
                 Connect Calendar
               </Button>
             )}
@@ -670,7 +670,7 @@ function SettingsContent() {
                 Disconnect Zoom
               </Button>
             ) : (
-              <Button onClick={connectZoom} className="bg-[#2D8CFF] hover:bg-[#2681f2] text-white">
+              <Button onClick={connectZoom} className="bg-coffee-mocha hover:bg-coffee-espresso text-white">
                 Connect Zoom
               </Button>
             )}

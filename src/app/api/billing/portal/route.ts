@@ -85,6 +85,16 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check if user has permission to view billing
+    const context = await getUserOrgContext();
+    if (!context) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!hasPermission(context.role, Permission.BILLING_VIEW)) {
+      return NextResponse.json({ error: 'Permission denied: billing view requires appropriate role' }, { status: 403 });
+    }
+
     // Get user's organization
     const { data: profile } = await supabase
       .from('profiles')

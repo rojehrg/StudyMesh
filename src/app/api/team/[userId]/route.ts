@@ -12,6 +12,7 @@ import {
   requirePermission,
   Permission,
   getUserOrgContext,
+  hasPermission,
   canManageUser,
   canAssignRoleToUser,
   OrganizationRole,
@@ -31,6 +32,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!context) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    // Check permission to view team members
+    if (!hasPermission(context.role, Permission.TEAM_VIEW)) {
+      return NextResponse.json({ error: 'Permission denied' }, { status: 403 });
     }
 
     const supabase = await createClient();

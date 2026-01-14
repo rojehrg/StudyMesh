@@ -13,6 +13,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { LottieLoader } from "@/components/loading-states";
+import { useToast } from "@/hooks/use-toast";
 import {
   Search,
   Sparkles,
@@ -38,6 +39,7 @@ interface Match {
   department: string | null;
   timezone: string | null;
   slack_connected: boolean;
+  slack_handle: string | null;
   translated_expertise?: string | null;
   translation_info?: {
     from_dept: string;
@@ -52,6 +54,7 @@ export default function FindHelpPage() {
   const [searched, setSearched] = useState(false);
   const [searchType, setSearchType] = useState<"ai" | "text" | "none">("none");
   const [selectedPerson, setSelectedPerson] = useState<Match | null>(null);
+  const { toast } = useToast();
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;
@@ -93,10 +96,25 @@ export default function FindHelpPage() {
   };
 
   const handleAskForHelp = (person: Match) => {
-    // For now, redirect to a Slack DM or show contact info
-    // In the future, this could open the NudgeDialog
-    if (person.slack_connected) {
-      setSelectedPerson(person);
+    if (person.slack_handle) {
+      // Person has Slack connected - show instructions to use /attunly command
+      toast({
+        title: "Request help in Slack",
+        description: `Use /attunly ${person.slack_handle} in Slack to request help from ${person.first_name}.`,
+      });
+    } else if (person.slack_connected) {
+      // Slack connected but no handle (edge case)
+      toast({
+        title: "Request help in Slack",
+        description: `Use /attunly in Slack to request help from ${person.first_name}.`,
+      });
+    } else {
+      // Person hasn't connected Slack
+      toast({
+        title: "Slack not connected",
+        description: `${person.first_name} hasn't connected Slack yet. Try reaching out another way.`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -282,7 +300,11 @@ export default function FindHelpPage() {
                         Ask
                       </Button>
                     ) : (
-                      <Button size="sm" variant="outline" disabled>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleAskForHelp(match)}
+                      >
                         <Slack className="w-4 h-4 mr-1" />
                         No Slack
                       </Button>

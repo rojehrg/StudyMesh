@@ -219,8 +219,8 @@ export default async function DashboardPage() {
           isCalendarConnected ? "border-coffee-foam" : "border-coffee-foam/50"
         }`}>
           <div className="p-5 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-              <Calendar className="w-5 h-5 text-blue-600" />
+            <div className="w-11 h-11 rounded-lg bg-coffee-cream flex items-center justify-center shrink-0">
+              <Calendar className="w-5 h-5 text-coffee-mocha" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">

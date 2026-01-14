@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getUserOrgContext } from '@/lib/rbac';
+import { getUserOrgContext, hasPermission, Permission } from '@/lib/rbac';
 import {
   computeEdges,
   calculateExpertiseDepth,
@@ -38,6 +38,14 @@ export async function GET() {
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
+      );
+    }
+
+    // Check permission to view organization data
+    if (!hasPermission(context.role, Permission.ORG_VIEW)) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       );
     }
 

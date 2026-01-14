@@ -43,8 +43,26 @@ export async function getUserOrgContext(): Promise<UserOrgContext | null> {
 
   if (!org) return null;
 
-  // Determine role based on ownership
-  const role: OrganizationRoleType = org.owner_id === user.id ? 'owner' : 'member';
+  // Determine role - check if owner first, then check organization_members for admin
+  let role: OrganizationRoleType = OrganizationRole.MEMBER;
+
+  if (org.owner_id === user.id) {
+    role = OrganizationRole.OWNER;
+  } else {
+    // Check organization_members for admin role
+    const { data: membership } = await supabase
+      .from('organization_members')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('organization_id', org.id)
+      .maybeSingle();
+
+    if (membership?.role === 'admin') {
+      role = OrganizationRole.ADMIN;
+    } else if (membership?.role === 'owner') {
+      role = OrganizationRole.OWNER;
+    }
+  }
 
   return {
     userId: user.id,

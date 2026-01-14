@@ -11,7 +11,7 @@ import {
   Users,
   CreditCard01,
 } from "react-coolicons";
-import { FileText, LayoutGrid, Search } from "lucide-react";
+import { BarChart2, FileText, LayoutGrid, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { OnboardingTour } from "@/components/onboarding-tour";
 import { RealtimeProvider, useRealtime } from "@/components/realtime-provider";
 import { CelebrationProvider } from "@/components/celebration-provider";
+import { usePlanFeatures } from "@/hooks/use-plan-features";
 
 interface SidebarItemProps {
   icon: any;
@@ -92,7 +93,8 @@ function DashboardLayoutBase({
   pathname,
   handleLogout,
   unreadCount = 0,
-  userId
+  userId,
+  hasAdvancedAnalytics = false
 }: {
   children: React.ReactNode;
   profile: any;
@@ -104,6 +106,7 @@ function DashboardLayoutBase({
   handleLogout: () => void;
   unreadCount?: number;
   userId?: string;
+  hasAdvancedAnalytics?: boolean;
 }) {
   const supabase = createClient();
   const [orgName, setOrgName] = useState<string | null>(null);
@@ -138,6 +141,7 @@ function DashboardLayoutBase({
     { icon: LayoutGrid, label: "Directory", href: "/groups" },
     { icon: Users, label: "Manage", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
+    ...(hasAdvancedAnalytics ? [{ icon: BarChart2, label: "Analytics", href: "/analytics" }] : []),
     { icon: CreditCard01, label: "Billing", href: "/billing" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
@@ -330,7 +334,8 @@ function DashboardLayoutWithRealtime({
   setIsMobileOpen,
   pathname,
   handleLogout,
-  userId
+  userId,
+  hasAdvancedAnalytics
 }: {
   children: React.ReactNode;
   profile: any;
@@ -341,6 +346,7 @@ function DashboardLayoutWithRealtime({
   pathname: string;
   handleLogout: () => void;
   userId: string;
+  hasAdvancedAnalytics: boolean;
 }) {
   const { newNotificationCount } = useRealtime();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -381,6 +387,7 @@ function DashboardLayoutWithRealtime({
       handleLogout={handleLogout}
       unreadCount={unreadCount}
       userId={userId}
+      hasAdvancedAnalytics={hasAdvancedAnalytics}
     >
       {children}
     </DashboardLayoutBase>
@@ -395,7 +402,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const { hasFeature, loading: planLoading } = usePlanFeatures();
 
+  // Check if user has advanced analytics feature
+  const hasAdvancedAnalytics = hasFeature('advancedAnalytics');
 
   useEffect(() => {
     loadProfile();
@@ -446,6 +456,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           pathname={pathname}
           handleLogout={handleLogout}
           userId={userId}
+          hasAdvancedAnalytics={hasAdvancedAnalytics}
         >
           {children}
         </DashboardLayoutWithRealtime>
@@ -464,9 +475,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       pathname={pathname}
       handleLogout={handleLogout}
       unreadCount={0}
+      hasAdvancedAnalytics={hasAdvancedAnalytics}
     >
       {children}
     </DashboardLayoutBase>
   );
 }
-

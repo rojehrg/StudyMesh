@@ -52,7 +52,8 @@ export async function POST(request: Request) {
         department,
         timezone,
         availability,
-        slack_user_id
+        slack_user_id,
+        slack_handle
       `)
       .eq('organization_id', profile.organization_id)
       .neq('user_id', user.id)
@@ -118,6 +119,7 @@ export async function POST(request: Request) {
             timezone: p.timezone,
             availability_slots: p.availability?.slots || [],
             slack_connected: !!p.slack_user_id,
+            slack_handle: p.slack_handle || null,
           };
         });
 
@@ -201,7 +203,8 @@ export async function POST(request: Request) {
             department,
             timezone,
             availability,
-            slack_user_id
+            slack_user_id,
+            slack_handle
           `)
           .eq('organization_id', profile.organization_id)
           .neq('user_id', user.id)
@@ -236,6 +239,7 @@ export async function POST(request: Request) {
             timezone: p.timezone,
             availability_slots: p.availability?.slots || [],
             slack_connected: !!p.slack_user_id,
+            slack_handle: p.slack_handle || null,
           };
         });
 

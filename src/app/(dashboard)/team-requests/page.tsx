@@ -1,35 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Users, Timer, PlayCircle, PauseCircle } from "lucide-react";
-
-// Helper function to format relative time
-function formatRelativeTime(date: Date, options?: { addSuffix?: boolean }): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const isPast = diffMs > 0;
-  const absDiffMs = Math.abs(diffMs);
-
-  const minutes = Math.floor(absDiffMs / (1000 * 60));
-  const hours = Math.floor(absDiffMs / (1000 * 60 * 60));
-  const days = Math.floor(absDiffMs / (1000 * 60 * 60 * 24));
-
-  let result: string;
-  if (minutes < 1) {
-    result = "less than a minute";
-  } else if (minutes < 60) {
-    result = `${minutes}m`;
-  } else if (hours < 24) {
-    result = `${hours}h`;
-  } else {
-    result = `${days}d`;
-  }
-
-  if (options?.addSuffix) {
-    return isPast ? `${result} ago` : `in ${result}`;
-  }
-  return result;
-}
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, Users, Timer, PlayCircle, PauseCircle, ShieldAlert } from "lucide-react";
+import { PageLoader } from "@/components/loading-states";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Permission } from "@/lib/rbac/permissions";
 
 // Status badge configurations
 const STATUS_CONFIG = {
@@ -78,6 +56,17 @@ interface TeamLock {
   owner_user_id: string;
   requester_user_id: string;
   impact_statement: string | null;
+}
+
+interface OrgData {
+  slack_team_id: string;
+  name: string | null;
+}
+
+interface ProfileData {
+  slack_user_id: string | null;
+  organization_id: string;
+  first_name: string | null;
 }
 
 function StatusBadge({ status }: { status: LockStatus }) {
@@ -201,77 +190,134 @@ function EmptyState() {
   );
 }
 
-export default async function TeamRequestsPage() {
-  const supabase = await createClient();
+export default function TeamRequestsPage() {
+  const router = useRouter();
+  const supabase = createClient();
+  const { loading: permLoading, membership } = usePermissions();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [org, setOrg] = useState<OrgData | null>(null);
+  const [allLocks, setAllLocks] = useState<TeamLock[]>([]);
+  const [members, setMembers] = useState<Map<string, TeamMember>>(new Map());
 
-  if (!user) {
-    redirect("/login");
-  }
+  const loadData = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch user's profile with organization
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("slack_user_id, organization_id, first_name")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!profile?.organization_id) {
-    redirect("/dashboard");
-  }
-
-  // Get organization's Slack team ID
-  const { data: org } = await supabase
-    .from("organizations")
-    .select("slack_team_id, name")
-    .eq("id", profile.organization_id)
-    .maybeSingle();
-
-  if (!org?.slack_team_id) {
-    redirect("/dashboard");
-  }
-
-  // Fetch all active momentum locks for the team
-  const { data: teamLocks, error: locksError } = await supabase
-    .from("momentum_locks")
-    .select("*")
-    .eq("workspace_id", org.slack_team_id)
-    .in("status", ["active", "started", "blocked"])
-    .order("deadline_at", { ascending: true });
-
-  if (locksError) {
-    console.error("Error fetching team locks:", locksError);
-  }
-
-  const allLocks = (teamLocks || []) as TeamLock[];
-
-  // Get unique user IDs from locks
-  const userIds = new Set<string>();
-  for (const lock of allLocks) {
-    userIds.add(lock.owner_user_id);
-    userIds.add(lock.requester_user_id);
-  }
-
-  // Fetch profiles for these users
-  const members = new Map<string, TeamMember>();
-  if (userIds.size > 0) {
-    const { data: memberProfiles } = await supabase
-      .from("profiles")
-      .select("slack_user_id, first_name, last_name")
-      .in("slack_user_id", Array.from(userIds));
-
-    for (const p of memberProfiles || []) {
-      if (p.slack_user_id) {
-        members.set(p.slack_user_id, {
-          slackUserId: p.slack_user_id,
-          firstName: p.first_name,
-          lastName: p.last_name,
-        });
+      if (!user) {
+        router.push("/login");
+        return;
       }
+
+      // Fetch user's profile with organization
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("slack_user_id, organization_id, first_name")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!profileData?.organization_id) {
+        router.push("/dashboard");
+        return;
+      }
+
+      setProfile(profileData);
+
+      // Get organization's Slack team ID
+      const { data: orgData } = await supabase
+        .from("organizations")
+        .select("slack_team_id, name")
+        .eq("id", profileData.organization_id)
+        .maybeSingle();
+
+      if (!orgData?.slack_team_id) {
+        router.push("/dashboard");
+        return;
+      }
+
+      setOrg(orgData);
+
+      // Fetch all active momentum locks for the team
+      const { data: teamLocks, error: locksError } = await supabase
+        .from("momentum_locks")
+        .select("*")
+        .eq("workspace_id", orgData.slack_team_id)
+        .in("status", ["active", "started", "blocked"])
+        .order("deadline_at", { ascending: true });
+
+      if (locksError) {
+        console.error("Error fetching team locks:", locksError);
+      }
+
+      const locks = (teamLocks || []) as TeamLock[];
+      setAllLocks(locks);
+
+      // Get unique user IDs from locks
+      const userIds = new Set<string>();
+      for (const lock of locks) {
+        userIds.add(lock.owner_user_id);
+        userIds.add(lock.requester_user_id);
+      }
+
+      // Fetch profiles for these users
+      const membersMap = new Map<string, TeamMember>();
+      if (userIds.size > 0) {
+        const { data: memberProfiles } = await supabase
+          .from("profiles")
+          .select("slack_user_id, first_name, last_name")
+          .in("slack_user_id", Array.from(userIds));
+
+        for (const p of memberProfiles || []) {
+          if (p.slack_user_id) {
+            membersMap.set(p.slack_user_id, {
+              slackUserId: p.slack_user_id,
+              firstName: p.first_name,
+              lastName: p.last_name,
+            });
+          }
+        }
+      }
+      setMembers(membersMap);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
     }
+  }, [supabase, router]);
+
+  useEffect(() => {
+    if (!permLoading && membership?.isAdmin) {
+      loadData();
+    } else if (!permLoading) {
+      setLoading(false);
+    }
+  }, [permLoading, membership?.isAdmin, loadData]);
+
+  if (permLoading || loading) {
+    return <PageLoader />;
+  }
+
+  // Check if user has permission to view team requests (admin/owner only)
+  if (!membership?.isAdmin) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 text-center">
+        <ShieldAlert className="w-12 h-12 text-coffee-latte mx-auto mb-4" />
+        <h1 className="text-xl font-semibold text-coffee-espresso mb-2">
+          Access Restricted
+        </h1>
+        <p className="text-coffee-cortado mb-6">
+          You don't have permission to view team requests. This page is only available to admins and owners.
+        </p>
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-sm text-coffee-cortado hover:text-coffee-espresso transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Link>
+      </div>
+    );
   }
 
   // Categorize locks
@@ -312,7 +358,7 @@ export default async function TeamRequestsPage() {
               Team Requests
             </h1>
             <p className="text-coffee-cortado mt-1">
-              {org.name ? `${org.name} - ` : ""}What the team is waiting on
+              {org?.name ? `${org.name} - ` : ""}What the team is waiting on
             </p>
           </div>
         </div>
@@ -362,7 +408,7 @@ export default async function TeamRequestsPage() {
                 key={lock.id}
                 lock={lock}
                 members={members}
-                currentUserId={profile.slack_user_id || ""}
+                currentUserId={profile?.slack_user_id || ""}
               />
             ))}
           </div>
@@ -382,7 +428,7 @@ export default async function TeamRequestsPage() {
                 key={lock.id}
                 lock={lock}
                 members={members}
-                currentUserId={profile.slack_user_id || ""}
+                currentUserId={profile?.slack_user_id || ""}
               />
             ))}
           </div>
@@ -402,7 +448,7 @@ export default async function TeamRequestsPage() {
                 key={lock.id}
                 lock={lock}
                 members={members}
-                currentUserId={profile.slack_user_id || ""}
+                currentUserId={profile?.slack_user_id || ""}
               />
             ))}
           </div>
