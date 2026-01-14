@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { verifySlackRequest } from '@/lib/slack/verify-signature';
 import { db } from '@/lib/db';
-import { commandEvents, momentumLocks, momentumLockEvents } from '@/lib/db/schema';
+import { commandEvents, momentumLocks, momentumLockEvents, profiles } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { createLogger } from '@/lib/logger';
+import { getTimezoneAbbrev } from '@/lib/availability';
 import {
   parseLockFormValues,
   CALLBACK_ID_DRAFT,
@@ -14,6 +15,7 @@ import {
   type LockModalPrivateMetadata,
   type BlockedReasonMetadata,
 } from '@/lib/slack/momentum-lock/modal-builder';
+import { isWithinWorkingHours } from '@/lib/slack/momentum-lock/reminders';
 
 const log = createLogger({ service: 'momentum-lock' });
 
@@ -252,6 +254,14 @@ async function handleLockAction(
       return NextResponse.json({ ok: true });
     }
 
+    // Check for terminal states - no further actions allowed
+    const TERMINAL_STATES = ['done', 'canceled', 'expired'];
+    if (TERMINAL_STATES.includes(lock.status)) {
+      log.info('Action attempted on terminal lock', { lockId, status: lock.status, actionId });
+      await respondEphemeral(responseUrl, 'This lock is already complete. No further actions available.');
+      return NextResponse.json({ ok: true });
+    }
+
     // Authorization: verify user can perform this action
     const isOwner = user.id === lock.ownerUserId;
     const isFallback = user.id === lock.fallbackUserId;
@@ -328,10 +338,20 @@ async function handleStartAction(lock: any, user: any, responseUrl: string) {
     .set({ status: 'started' })
     .where(eq(momentumLocks.id, lock.id));
 
+  // Calculate analytics data for the event payload
+  const now = new Date();
+  const createdAt = new Date(lock.createdAt);
+  const minutesSinceCreation = Math.round((now.getTime() - createdAt.getTime()) / (1000 * 60));
+  const ownerWasInWorkingHours = isWithinWorkingHours(lock.ownerTimezone);
+
   await db.insert(momentumLockEvents).values({
     lockId: lock.id,
     eventType: 'started',
     actorUserId: user.id,
+    payload: {
+      minutesSinceCreation,
+      ownerWasInWorkingHours,
+    },
   });
 
   // Notify requester that owner started
@@ -340,7 +360,7 @@ async function handleStartAction(lock: any, user: any, responseUrl: string) {
   // Confirm to owner
   await respondEphemeral(responseUrl, 'Got it. The requester has been notified.');
 
-  log.info('Lock started', { lockId: lock.id, userId: user.id });
+  log.info('Lock started', { lockId: lock.id, userId: user.id, minutesSinceCreation, ownerWasInWorkingHours });
   return NextResponse.json({ ok: true });
 }
 
@@ -383,11 +403,24 @@ async function handleDoneAction(lock: any, user: any, responseUrl: string) {
     .set({ status: 'done' })
     .where(eq(momentumLocks.id, lock.id));
 
+  // Calculate analytics data for the event payload
+  const now = new Date();
+  const createdAt = new Date(lock.createdAt);
+  const minutesToComplete = Math.round((now.getTime() - createdAt.getTime()) / (1000 * 60));
+  const wasEscalated = lock.escalationSentAt !== null;
+
   await db.insert(momentumLockEvents).values({
     lockId: lock.id,
     eventType: 'done',
     actorUserId: user.id,
+    payload: {
+      minutesToComplete,
+      wasEscalated,
+    },
   });
+
+  // Update the original DM to show completed status (removes buttons)
+  await updateLockMessage(lock, 'completed');
 
   // Notify requester
   await notifyRequester(lock, user.id, 'completed');
@@ -395,7 +428,7 @@ async function handleDoneAction(lock: any, user: any, responseUrl: string) {
   // Confirm to owner
   await respondEphemeral(responseUrl, 'Done. The requester has been notified.');
 
-  log.info('Lock completed', { lockId: lock.id, userId: user.id });
+  log.info('Lock completed', { lockId: lock.id, userId: user.id, minutesToComplete, wasEscalated });
   return NextResponse.json({ ok: true });
 }
 
@@ -704,6 +737,85 @@ async function respondEphemeral(responseUrl: string, text: string) {
 }
 
 /**
+ * Update the original DM message when lock status changes
+ * Uses chat.update to modify the message (remove buttons, show status)
+ */
+async function updateLockMessage(lock: any, newStatus: 'completed' | 'blocked' | 'started') {
+  const botToken = process.env.SLACK_BOT_TOKEN;
+  if (!botToken) return;
+
+  // Check if we have DM tracking info
+  if (!lock.dmChannelId || !lock.dmMessageTs) {
+    log.warn('Cannot update lock message - no DM tracking info', { lockId: lock.id });
+    return;
+  }
+
+  try {
+    // Build updated message based on status
+    let statusText: string;
+    let statusEmoji: string;
+
+    switch (newStatus) {
+      case 'completed':
+        statusText = 'Completed';
+        statusEmoji = 'white_check_mark';
+        break;
+      case 'blocked':
+        statusText = 'Blocked';
+        statusEmoji = 'warning';
+        break;
+      case 'started':
+        statusText = 'In Progress';
+        statusEmoji = 'hourglass_flowing_sand';
+        break;
+    }
+
+    const updatedBlocks = [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `<@${lock.requesterUserId}> was waiting on you for:\n\n→ ${lock.requiredOutcome}`,
+        },
+      },
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `:${statusEmoji}: *${statusText}*`,
+          },
+        ],
+      },
+    ];
+
+    const response = await fetch('https://slack.com/api/chat.update', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        channel: lock.dmChannelId,
+        ts: lock.dmMessageTs,
+        text: `${statusText}: ${lock.requiredOutcome}`,
+        blocks: updatedBlocks,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.ok) {
+      log.info('Lock message updated', { lockId: lock.id, newStatus });
+    } else {
+      log.warn('Failed to update lock message', { lockId: lock.id, error: result.error });
+    }
+  } catch (error: any) {
+    log.error('Error updating lock message', { lockId: lock.id, error: error.message });
+  }
+}
+
+/**
  * Sends a DM to a Slack user with strong sender attribution and reply button.
  */
 async function sendSlackDM(
@@ -899,6 +1011,27 @@ async function handleLockModalSubmission(payload: any) {
   const { channelId, threadTs, requesterId } = metadata;
 
   try {
+    // Fetch owner and requester timezones from their profiles
+    const [ownerProfile] = await db
+      .select({ timezone: profiles.timezone })
+      .from(profiles)
+      .where(eq(profiles.slackUserId, ownerId));
+
+    const [requesterProfile] = await db
+      .select({ timezone: profiles.timezone })
+      .from(profiles)
+      .where(eq(profiles.slackUserId, requesterId));
+
+    const ownerTimezone = ownerProfile?.timezone || 'America/New_York';
+    const requesterTimezone = requesterProfile?.timezone || 'America/New_York';
+
+    log.info('Fetched timezones for lock', {
+      ownerId,
+      ownerTimezone,
+      requesterId,
+      requesterTimezone
+    });
+
     // Create the lock in the database
     const [newLock] = await db.insert(momentumLocks).values({
       workspaceId: team.id,
@@ -909,10 +1042,12 @@ async function handleLockModalSubmission(payload: any) {
       ownerUserId: ownerId,
       requiredOutcome,
       deadlineAt,
+      ownerTimezone,
+      requesterTimezone,
       status: 'active',
     }).returning();
 
-    log.info('Lock created', { lockId: newLock.id, ownerId, deadlineAt });
+    log.info('Lock created', { lockId: newLock.id, ownerId, deadlineAt, ownerTimezone, requesterTimezone });
 
     // Log the creation event
     await db.insert(momentumLockEvents).values({
@@ -934,6 +1069,8 @@ async function handleLockModalSubmission(payload: any) {
       requiredOutcome,
       deadlineAt,
       requesterId,
+      ownerTimezone,
+      requesterTimezone,
     });
 
     return NextResponse.json({
@@ -1083,7 +1220,7 @@ async function notifyRequesterBlocked(lock: any, actorUserId: string, reason: st
 
 /**
  * Post lock confirmation - sends DM to owner with lock details
- * MVP format: simple, clear, 3 buttons
+ * MVP format: simple, clear, 3 buttons with timezone context
  */
 async function postLockConfirmation(params: {
   channelId: string;
@@ -1093,11 +1230,13 @@ async function postLockConfirmation(params: {
   requiredOutcome: string;
   deadlineAt: Date;
   requesterId: string;
+  ownerTimezone: string;
+  requesterTimezone: string;
 }) {
   const botToken = process.env.SLACK_BOT_TOKEN;
   if (!botToken) return;
 
-  const { lockId, ownerId, requiredOutcome, deadlineAt, requesterId } = params;
+  const { lockId, ownerId, requiredOutcome, deadlineAt, requesterId, ownerTimezone, requesterTimezone } = params;
 
   // Calculate relative time
   const now = new Date();
@@ -1114,6 +1253,34 @@ async function postLockConfirmation(params: {
     const days = Math.round(hours / 24);
     relativeTime = days === 1 ? 'in 1 day' : `in ${days} days`;
   }
+
+  // Format times in each timezone for display
+  const ownerTzAbbrev = getTimezoneAbbrev(ownerTimezone);
+  const requesterTzAbbrev = getTimezoneAbbrev(requesterTimezone);
+
+  // Format requester's current time in owner's message
+  const requesterCurrentTime = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: requesterTimezone,
+  }).format(now);
+
+  // Format deadline in owner's timezone
+  const deadlineInOwnerTz = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: ownerTimezone,
+  }).format(deadlineAt);
+
+  // Build timezone context line showing requester's current time
+  const timezoneContext = ownerTimezone !== requesterTimezone
+    ? `<@${requesterId}> (${requesterCurrentTime} ${requesterTzAbbrev}) is waiting on you`
+    : `<@${requesterId}> is waiting on you`;
+
+  // Build deadline display in owner's timezone
+  const deadlineDisplay = `Deadline: ${deadlineInOwnerTz} ${ownerTzAbbrev} (${relativeTime})`;
 
   try {
     // Send DM to owner with the lock details and action buttons
@@ -1132,22 +1299,24 @@ async function postLockConfirmation(params: {
       return;
     }
 
-    // Owner DM - calm, neutral tone
-    await fetch('https://slack.com/api/chat.postMessage', {
+    const dmChannelId = openResult.channel.id;
+
+    // Owner DM - calm, neutral tone with timezone context
+    const messageResponse = await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${botToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        channel: openResult.channel.id,
-        text: `<@${requesterId}> is waiting on you for: ${requiredOutcome}`,
+        channel: dmChannelId,
+        text: `${timezoneContext} for: ${requiredOutcome}`,
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `<@${requesterId}> is waiting on you for:\n\n→ ${requiredOutcome}`,
+              text: `${timezoneContext} for:\n\n→ ${requiredOutcome}`,
             },
           },
           {
@@ -1155,7 +1324,7 @@ async function postLockConfirmation(params: {
             elements: [
               {
                 type: 'mrkdwn',
-                text: `By: ${relativeTime}`,
+                text: deadlineDisplay,
               },
             ],
           },
@@ -1186,7 +1355,22 @@ async function postLockConfirmation(params: {
       }),
     });
 
-    log.info('Lock confirmation DM sent to owner');
+    const messageResult = await messageResponse.json();
+
+    // Store DM channel and message timestamp for later updates
+    if (messageResult.ok && messageResult.ts) {
+      await db
+        .update(momentumLocks)
+        .set({
+          dmChannelId,
+          dmMessageTs: messageResult.ts,
+        })
+        .where(eq(momentumLocks.id, lockId));
+
+      log.info('Lock confirmation DM sent and tracked', { lockId, dmChannelId, dmMessageTs: messageResult.ts });
+    } else {
+      log.warn('Lock confirmation DM sent but failed to track', { lockId, error: messageResult.error });
+    }
   } catch (error: any) {
     log.error('Failed to send lock confirmation', { error: error.message });
   }

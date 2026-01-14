@@ -44,6 +44,10 @@ interface AnalyticsData {
   completionRate: number;
   averageResolutionHours: number | null;
 
+  // New analytics metrics
+  averageResponseMinutes: number | null; // Time from creation to first "started" event
+  blockRate: number; // % of locks that have a "blocked" event
+
   // This month vs last month
   locksThisMonth: number;
   locksLastMonth: number;
@@ -209,6 +213,64 @@ function AnalyticsContent() {
         }
       }
 
+      // Calculate average response time (time from creation to first "started" event)
+      let averageResponseMinutes: number | null = null;
+      const lockIds = locks.map((l) => l.id);
+
+      if (lockIds.length > 0) {
+        const { data: startedEvents } = await supabase
+          .from("momentum_lock_events")
+          .select("lock_id, created_at, payload")
+          .in("lock_id", lockIds.slice(0, 100))
+          .eq("event_type", "started");
+
+        if (startedEvents && startedEvents.length > 0) {
+          const responseTimes: number[] = [];
+          const lockMap = new Map(locks.map((l) => [l.id, l]));
+
+          startedEvents.forEach((event) => {
+            const lock = lockMap.get(event.lock_id);
+            if (lock) {
+              // Check if payload has minutesSinceCreation (new enhanced payload)
+              const payload = event.payload as { minutesSinceCreation?: number } | null;
+              if (payload?.minutesSinceCreation !== undefined) {
+                responseTimes.push(payload.minutesSinceCreation);
+              } else {
+                // Fallback: calculate from timestamps
+                const minutes =
+                  (new Date(event.created_at).getTime() - new Date(lock.created_at).getTime()) /
+                  (1000 * 60);
+                if (minutes > 0 && minutes < 10080) {
+                  // Ignore outliers > 7 days
+                  responseTimes.push(minutes);
+                }
+              }
+            }
+          });
+
+          if (responseTimes.length > 0) {
+            averageResponseMinutes =
+              Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length);
+          }
+        }
+      }
+
+      // Calculate block rate (% of locks that have a "blocked" event)
+      let blockRate = 0;
+      if (lockIds.length > 0) {
+        const { data: blockedEvents } = await supabase
+          .from("momentum_lock_events")
+          .select("lock_id")
+          .in("lock_id", lockIds.slice(0, 100))
+          .eq("event_type", "blocked");
+
+        if (blockedEvents && blockedEvents.length > 0) {
+          // Count unique locks that have been blocked
+          const uniqueBlockedLocks = new Set(blockedEvents.map((e) => e.lock_id));
+          blockRate = Math.round((uniqueBlockedLocks.size / Math.min(lockIds.length, 100)) * 100);
+        }
+      }
+
       // Team member stats
       const ownerCounts = new Map<string, { owned: number; completed: number }>();
       locks.forEach((lock) => {
@@ -253,6 +315,8 @@ function AnalyticsContent() {
         activeLocks,
         completionRate,
         averageResolutionHours,
+        averageResponseMinutes,
+        blockRate,
         locksThisMonth,
         locksLastMonth,
         completedThisMonth,
@@ -275,6 +339,8 @@ function AnalyticsContent() {
     activeLocks: 0,
     completionRate: 0,
     averageResolutionHours: null,
+    averageResponseMinutes: null,
+    blockRate: 0,
     locksThisMonth: 0,
     locksLastMonth: 0,
     completedThisMonth: 0,
@@ -288,6 +354,13 @@ function AnalyticsContent() {
     if (hours < 1) return `${Math.round(hours * 60)}m`;
     if (hours < 24) return `${Math.round(hours)}h`;
     return `${Math.round(hours / 24)}d`;
+  };
+
+  const formatResponseTime = (minutes: number | null): string => {
+    if (minutes === null) return "—";
+    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 1440) return `${Math.round(minutes / 60)}h`;
+    return `${Math.round(minutes / 1440)}d`;
   };
 
   const getTrendIndicator = (current: number, previous: number) => {
@@ -497,6 +570,45 @@ function AnalyticsContent() {
                     {analyticsData.blockedLocks}
                   </p>
                   <p className="text-xs text-coffee-latte mt-1">Needs attention</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Response Metrics Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Average Response Time */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.27 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-coffee-cortado">Avg Response Time</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {formatResponseTime(analyticsData.averageResponseMinutes)}
+                  </p>
+                  <p className="text-xs text-coffee-latte mt-1">Time to first action</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Block Rate */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-coffee-cortado">Block Rate</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {analyticsData.blockRate}%
+                  </p>
+                  <p className="text-xs text-coffee-latte mt-1">Locks encountering blockers</p>
                 </div>
               </div>
             </motion.div>

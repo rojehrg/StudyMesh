@@ -430,6 +430,8 @@ export const momentumLocks = pgTable("momentum_locks", {
   status: text("status").notNull().default("draft"),        // draft, active, started, blocked, done, canceled, expired
   escalationSentAt: timestamp("escalation_sent_at", { withTimezone: true }),
   wakeUpDeliveredAt: timestamp("wake_up_delivered_at", { withTimezone: true }),
+  dmChannelId: text("dm_channel_id"),                       // DM channel ID for message updates
+  dmMessageTs: text("dm_message_ts"),                       // DM message timestamp for updates
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

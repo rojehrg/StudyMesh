@@ -5,10 +5,70 @@
  */
 
 import { type MomentumLock } from "@/lib/db/schema";
+import { getTimezoneAbbrev } from "@/lib/availability";
 
 interface SlackBlock {
   type: string;
   [key: string]: any;
+}
+
+/**
+ * Format a time in a specific timezone
+ */
+function formatTimeInTimezone(date: Date, timezone: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: timezone,
+  }).format(date);
+}
+
+/**
+ * Build timezone context block for messages
+ * Shows "Your time: 9am PT | Their time: 12pm ET" format
+ */
+export function buildTimezoneContextBlock(
+  ownerTimezone: string | null,
+  requesterTimezone: string | null,
+  now: Date = new Date()
+): SlackBlock | null {
+  const ownerTz = ownerTimezone || 'America/New_York';
+  const requesterTz = requesterTimezone || 'America/New_York';
+
+  // If timezones are the same, no need to show context
+  if (ownerTz === requesterTz) {
+    return null;
+  }
+
+  const ownerTime = formatTimeInTimezone(now, ownerTz);
+  const requesterTime = formatTimeInTimezone(now, requesterTz);
+  const ownerTzAbbrev = getTimezoneAbbrev(ownerTz);
+  const requesterTzAbbrev = getTimezoneAbbrev(requesterTz);
+
+  return {
+    type: 'context',
+    elements: [
+      {
+        type: 'mrkdwn',
+        text: `Your time: ${ownerTime} ${ownerTzAbbrev} | Their time: ${requesterTime} ${requesterTzAbbrev}`,
+      },
+    ],
+  };
+}
+
+/**
+ * Format deadline with timezone context for owner
+ * Returns "Deadline: 5pm your time" format
+ */
+export function formatDeadlineForOwner(
+  deadlineAt: Date,
+  ownerTimezone: string | null
+): string {
+  const ownerTz = ownerTimezone || 'America/New_York';
+  const deadlineTime = formatTimeInTimezone(deadlineAt, ownerTz);
+  const ownerTzAbbrev = getTimezoneAbbrev(ownerTz);
+  return `Deadline: ${deadlineTime} ${ownerTzAbbrev}`;
 }
 
 /**
@@ -20,7 +80,7 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
   text: string;
   blocks: SlackBlock[];
 } {
-  const { requesterUserId, requiredOutcome, acceptableFallback, impactStatement, deadlineAt } = lock;
+  const { requesterUserId, requiredOutcome, acceptableFallback, impactStatement, deadlineAt, ownerTimezone, requesterTimezone } = lock;
 
   // Calculate remaining time
   const now = new Date();
@@ -47,6 +107,12 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
     ? `\n\n*Why it matters:* ${impactStatement}`
     : "";
 
+  // Format deadline in owner's timezone
+  const deadlineDisplay = formatDeadlineForOwner(deadline, ownerTimezone);
+
+  // Build timezone context block (shows "Your time | Their time" if different)
+  const timezoneContextBlock = buildTimezoneContextBlock(ownerTimezone, requesterTimezone, now);
+
   const text = `While you were offline, the team set a Momentum Lock. ${requiredOutcome}`;
 
   const blocks: SlackBlock[] = [
@@ -65,6 +131,8 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
         text: `While you were offline, <@${requesterUserId}> set a commitment for you.`,
       },
     },
+    // Add timezone context block if timezones differ
+    ...(timezoneContextBlock ? [timezoneContextBlock] : []),
     {
       type: "divider",
     },
@@ -81,8 +149,8 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
         {
           type: "mrkdwn",
           text: threadLink
-            ? `*${urgencyText}* | <${threadLink}|View thread>`
-            : `*${urgencyText}*`,
+            ? `*${deadlineDisplay}* (${urgencyText}) | <${threadLink}|View thread>`
+            : `*${deadlineDisplay}* (${urgencyText})`,
         },
       ],
     },
@@ -416,7 +484,7 @@ export function buildReminderMessage(
   text: string;
   blocks: SlackBlock[];
 } {
-  const { requesterUserId, requiredOutcome, acceptableFallback, deadlineAt } = lock;
+  const { requesterUserId, requiredOutcome, acceptableFallback, deadlineAt, ownerTimezone, requesterTimezone } = lock;
 
   // Calculate remaining time
   const now = new Date();
@@ -444,6 +512,12 @@ export function buildReminderMessage(
     ? `\n\n*If blocked:* _${acceptableFallback}_`
     : "";
 
+  // Format deadline in owner's timezone
+  const deadlineDisplay = formatDeadlineForOwner(deadline, ownerTimezone);
+
+  // Build timezone context block (shows "Your time | Their time" if different)
+  const timezoneContextBlock = buildTimezoneContextBlock(ownerTimezone, requesterTimezone, now);
+
   const blocks: SlackBlock[] = [
     {
       type: "section",
@@ -454,14 +528,16 @@ export function buildReminderMessage(
           : `*Friendly reminder*\n\n<@${requesterUserId}> is waiting on:\n_${requiredOutcome}_${fallbackSection}`,
       },
     },
+    // Add timezone context block if timezones differ
+    ...(timezoneContextBlock ? [timezoneContextBlock] : []),
     {
       type: "context",
       elements: [
         {
           type: "mrkdwn",
           text: threadLink
-            ? `*${timeText} remaining* | <${threadLink}|View thread>`
-            : `*${timeText} remaining*`,
+            ? `*${deadlineDisplay}* (${timeText} remaining) | <${threadLink}|View thread>`
+            : `*${deadlineDisplay}* (${timeText} remaining)`,
         },
       ],
     },
