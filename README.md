@@ -5,7 +5,7 @@
 <h1 align="center">Attunly</h1>
 
 <p align="center">
-  <strong>Find the right person to ask. Remove the friction of reaching out.</strong>
+  <strong>Micro-tickets for Slack. Get responses, not silence.</strong>
 </p>
 
 <p align="center">
@@ -19,71 +19,63 @@
 
 ## The Problem
 
-At work, asking for help is harder than it should be:
-- **"Who knows this?"** — You're stuck and don't know who to ask
-- **"Are they free?"** — Calendars don't tell you if it's okay to interrupt
-- **"How do I phrase this?"** — The message sits in the text box, unsent
-
-The question never gets asked. The work stays blocked.
+Async work breaks down when requests go unanswered:
+- **"Did they see my message?"** — No visibility into whether someone is working on it
+- **"When will I hear back?"** — No deadline, no accountability
+- **"Should I follow up?"** — Awkward to ping again, so work stays blocked
 
 ## The Solution
 
-Attunly is a **Slack-first** platform that creates a lightweight layer of "who knows what" and "when are they free" on top of your existing tools.
+**Momentum Locks** — lightweight async accountability embedded in Slack.
 
-**Web App** — Set up your profile, connect Google Calendar, and manage your organization settings.
+Type `/attunly` to create a lock:
+- Assign an **owner** who needs to respond
+- Set a **deadline** for when you need to hear back
+- Owner gets a DM with **Start / Blocked / Done** buttons
+- You get notified when status changes
 
-**Slack Command** — Type `/attunly [what you need]` and get matched with someone who can help, see their availability, and send a low-pressure message. Everything happens in Slack.
+No more wondering. No more waiting.
 
 ---
 
 ## Features
 
-### Slack-First Experience
-Use `/attunly` directly in Slack. No context switching. Find help, see availability, and send messages without leaving your workspace.
+### Slack-Native
+Everything happens in Slack. No context switching, no separate app to check.
 
-### Natural Language Profiles
-Describe what you know in your own words. No checkboxes, no skill matrices.
+### Status Tracking
+Owner clicks **Start** when they begin, **Blocked** if stuck, **Done** when complete. You see every update.
 
-> "I'm good at React hooks, debugging CSS issues, and explaining webpack configs"
+### Deadlines
+Set clear expectations. Owner sees when you need a response.
 
-### AI-Powered Matching
-Using Groq's LLM, Attunly semantically matches help requests to expertise profiles—not just keyword matching.
+### Blocked Flow
+When owner clicks **Blocked**, they explain what's in the way. You get notified immediately so you can help unblock.
 
-### Real Availability
-Connect Google Calendar to show actual free time, not just "online" status.
-
-### Low-Friction Messaging
-Generates calm, low-pressure message drafts. Edit or send as-is.
-
-### Team Health Stats (Admin)
-Admins can view team metrics including active users and command send rates to understand how their team is using Attunly.
-
-### Momentum Locks
-Create time-bound commitments with automatic escalation. Type `/attunly lock` to:
-- Assign an owner and deadline for urgent work
-- Set a fallback person if the owner is blocked
-- Owner gets a DM with Start/Blocked/Done buttons
-- Daily cron escalates overdue locks to fallback
+### Analytics
+Dashboard shows completion rates, response times, and team patterns.
 
 ---
 
 ## How It Works
 
 ```
-1. Create your profile (2 min)
-   → Sign up at attunly.com
-   → Describe what you can help with
-   → Connect Google Calendar
+1. Type /attunly in Slack
+   → Modal opens
 
-2. Use /attunly in Slack
-   → /attunly need help with the payments API
-   → See who matches + their availability
-   → Send a DM or schedule a meeting
+2. Fill in the form
+   → Who do you need a response from?
+   → What do you need from them?
+   → When do you need to hear back?
 
-3. Use /attunly lock for urgent handoffs
-   → /attunly lock
-   → Assign owner, outcome, deadline
-   → Owner gets DM with action buttons
+3. Owner gets a DM
+   → Sees your request with action buttons
+   → Clicks Start when working on it
+   → Clicks Done when complete
+
+4. You stay informed
+   → Get notified on status changes
+   → No need to follow up manually
 ```
 
 ---
@@ -95,8 +87,6 @@ Create time-bound commitments with automatic escalation. Type `/attunly lock` to
 - Node.js 18+
 - Supabase project
 - Slack app with slash command
-- Google Cloud project (Calendar API)
-- Groq API key (free tier available)
 
 ### Installation
 
@@ -131,26 +121,14 @@ DATABASE_URL=postgresql://...
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Security
-ADMIN_SECRET=your-admin-secret
-ENCRYPTION_KEY=your-32-char-encryption-key
-
 # Slack
 SLACK_CLIENT_ID=your-client-id
 SLACK_CLIENT_SECRET=your-client-secret
 SLACK_SIGNING_SECRET=your-signing-secret
 SLACK_BOT_TOKEN=xoxb-your-bot-token
 
-# Google Calendar
-GOOGLE_CLIENT_ID=your-client-id
-GOOGLE_CLIENT_SECRET=your-client-secret
-
-# AI Matching
-GROQ_API_KEY=your-groq-api-key
-
-# Optional: Zoom
-ZOOM_CLIENT_ID=your-zoom-client-id
-ZOOM_CLIENT_SECRET=your-zoom-client-secret
+# Optional: Stripe
+STRIPE_SECRET_KEY=your-stripe-secret-key
 ```
 
 ---
@@ -163,12 +141,10 @@ ZOOM_CLIENT_SECRET=your-zoom-client-secret
 | **Language** | TypeScript |
 | **Database** | PostgreSQL (Supabase) |
 | **ORM** | Drizzle ORM |
-| **Auth** | Supabase Auth (Email, Google, Slack OAuth) |
+| **Auth** | Supabase Auth |
 | **Styling** | Tailwind CSS (Custom coffee palette) |
-| **AI** | Groq (Llama 3.1) for semantic matching |
-| **Integrations** | Slack API, Google Calendar API, Zoom API |
+| **Integrations** | Slack API |
 | **Deployment** | Vercel |
-| **Analytics** | PostHog, Sentry |
 
 ---
 
@@ -177,63 +153,43 @@ ZOOM_CLIENT_SECRET=your-zoom-client-secret
 ```
 src/
 ├── app/
-│   ├── (auth)/                 # Login, signup, forgot-password
-│   ├── (dashboard)/            # Main app pages (Slack-first UX)
-│   │   ├── dashboard/          # Status page with connection cards + activity stats
-│   │   ├── settings/           # Single-page settings (profile, integrations)
-│   │   └── classes/            # Pod/group management
-│   ├── (admin)/                # Admin analytics & org management
-│   ├── (onboarding)/           # First-time setup flow
-│   ├── pricing/                # Pricing page
+│   ├── (auth)/                 # Login, signup
+│   ├── (dashboard)/            # Main app pages
+│   │   ├── dashboard/          # Home with activity
+│   │   ├── analytics/          # Lock metrics
+│   │   ├── team/               # Team management
+│   │   └── settings/           # User settings
+│   ├── (onboarding)/           # First-time setup
 │   └── api/
-│       ├── slack/              # Slash command + interactions
+│       ├── slack/
 │       │   ├── commands/       # /attunly handler
-│       │   ├── interactions/   # Modal submissions
-│       │   ├── nudge/          # Send nudge notifications
-│       │   └── nudge-response/ # Handle nudge responses
-│       ├── auth/               # OAuth callbacks
-│       ├── calendar/           # Google Calendar integration
-│       ├── billing/            # Stripe billing integration
-│       ├── cron/               # Scheduled jobs (momentum locks)
-│       └── find-help/          # AI-powered search
+│       │   ├── interactions/   # Button clicks, modals
+│       │   └── events/         # Slack events
+│       ├── cron/
+│       │   └── momentum-locks/ # Deadline reminders
+│       └── billing/            # Stripe integration
 ├── lib/
 │   ├── db/                     # Drizzle schema
-│   ├── slack/                  # Modal builder, message generator, person suggester
-│   │   └── momentum-lock/      # Momentum Locks feature
-│   ├── ai/                     # Semantic search, lingo translator
-│   └── analytics/              # PostHog integration
+│   ├── slack/
+│   │   └── momentum-lock/      # Lock creation, messages, modals
+│   └── analytics/              # Event tracking
 └── components/                 # React components
 ```
 
 ---
 
-## Slack Command Flow
+## Momentum Lock Flow
 
 ```
-User types: /attunly need help with React hooks
-
-1. Command received → src/app/api/slack/commands/route.ts
-2. AI generates message draft → src/lib/slack/message-generator.ts
-3. Person suggestions fetched → src/lib/slack/person-suggester.ts
-4. Modal opens with form
-5. User submits → src/app/api/slack/interactions/route.ts
-6. DM sent to recipient
-```
-
----
-
-## Momentum Locks Flow
-
-```
-User types: /attunly lock
+User types: /attunly
 
 1. Modal opens → src/lib/slack/momentum-lock/modal-builder.ts
 2. User fills in: Owner, Outcome, Deadline
 3. Submit → src/app/api/slack/interactions/route.ts
-4. Lock saved to database
+4. Lock saved to momentum_locks table
 5. Owner receives DM with Start/Blocked/Done buttons
-6. Daily cron checks deadlines → src/app/api/cron/momentum-locks/route.ts
-7. Overdue locks escalated to fallback owner
+6. Button clicks update status and notify requester
+7. Cron job sends deadline reminders
 ```
 
 ---
@@ -263,5 +219,5 @@ Private - All rights reserved.
 ---
 
 <p align="center">
-  Built with care for teams that want to help each other.
+  Built for teams that want accountability without micromanagement.
 </p>
