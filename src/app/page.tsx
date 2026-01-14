@@ -191,7 +191,7 @@ const Hero = () => (
           </div>
 
           <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
-            Used by 50+ distributed teams · No setup required
+            No setup required
           </p>
         </div>
 
