@@ -9,19 +9,52 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { usePlanFeatures } from "@/hooks/use-plan-features";
 import Link from "next/link";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+
+interface DailyActivity {
+  day: string;
+  created: number;
+  completed: number;
+}
+
+interface TeamMemberStats {
+  userId: string;
+  name: string;
+  locksOwned: number;
+  locksCompleted: number;
+  avgResolutionHours: number | null;
+}
 
 interface AnalyticsData {
   // Overview metrics
   totalLocks: number;
   completedLocks: number;
+  blockedLocks: number;
+  activeLocks: number;
   completionRate: number;
   averageResolutionHours: number | null;
-  activeLocks: number;
 
-  // This month stats
+  // This month vs last month
   locksThisMonth: number;
+  locksLastMonth: number;
   completedThisMonth: number;
-  blockedThisMonth: number;
+  completedLastMonth: number;
+
+  // Daily activity (last 7 days)
+  dailyActivity: DailyActivity[];
+
+  // Team stats
+  teamStats: TeamMemberStats[];
 }
 
 function AnalyticsContent() {
@@ -43,13 +76,14 @@ function AnalyticsContent() {
   const loadAnalyticsData = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         router.push("/login");
         return;
       }
 
-      // Get user's profile and org
       const { data: profile } = await supabase
         .from("profiles")
         .select("organization_id")
@@ -61,7 +95,6 @@ function AnalyticsContent() {
         return;
       }
 
-      // Get the org's slack_team_id
       const { data: org } = await supabase
         .from("organizations")
         .select("slack_team_id")
@@ -69,150 +102,163 @@ function AnalyticsContent() {
         .single();
 
       if (!org?.slack_team_id) {
-        // No Slack connected, show empty state
-        setAnalyticsData({
-          totalLocks: 0,
-          completedLocks: 0,
-          completionRate: 0,
-          averageResolutionHours: null,
-          activeLocks: 0,
-          locksThisMonth: 0,
-          completedThisMonth: 0,
-          blockedThisMonth: 0,
-        });
+        setAnalyticsData(getEmptyAnalytics());
         setLoading(false);
         return;
       }
 
       const workspaceId = org.slack_team_id;
+      const now = new Date();
 
-      // Calculate start of month
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
+      // Calculate date ranges
+      const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      // Fetch all metrics in parallel
-      const [
-        totalLocksResult,
-        completedLocksResult,
-        activeLocksResult,
-        locksThisMonthResult,
-        completedThisMonthResult,
-        blockedThisMonthResult,
-        resolutionTimesResult,
-      ] = await Promise.all([
-        // Total locks (all time)
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId),
+      // Fetch all locks for this workspace
+      const { data: allLocks } = await supabase
+        .from("momentum_locks")
+        .select("id, status, created_at, owner_user_id")
+        .eq("workspace_id", workspaceId);
 
-        // Completed locks (all time)
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId)
-          .eq("status", "done"),
+      const locks = allLocks || [];
 
-        // Active locks (current)
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId)
-          .in("status", ["active", "started"]),
-
-        // Locks this month
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId)
-          .gte("created_at", startOfMonth.toISOString()),
-
-        // Completed this month
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId)
-          .eq("status", "done")
-          .gte("created_at", startOfMonth.toISOString()),
-
-        // Blocked this month
-        supabase
-          .from("momentum_locks")
-          .select("*", { count: "exact", head: true })
-          .eq("workspace_id", workspaceId)
-          .eq("status", "blocked")
-          .gte("created_at", startOfMonth.toISOString()),
-
-        // Get completed locks with their events for resolution time calculation
-        supabase
-          .from("momentum_locks")
-          .select("id, created_at")
-          .eq("workspace_id", workspaceId)
-          .eq("status", "done")
-          .limit(100),
-      ]);
-
-      const totalLocks = totalLocksResult.count || 0;
-      const completedLocks = completedLocksResult.count || 0;
-      const activeLocks = activeLocksResult.count || 0;
-      const locksThisMonth = locksThisMonthResult.count || 0;
-      const completedThisMonth = completedThisMonthResult.count || 0;
-      const blockedThisMonth = blockedThisMonthResult.count || 0;
-
-      // Calculate completion rate
+      // Calculate basic metrics
+      const totalLocks = locks.length;
+      const completedLocks = locks.filter((l) => l.status === "done").length;
+      const blockedLocks = locks.filter((l) => l.status === "blocked").length;
+      const activeLocks = locks.filter((l) => ["active", "started"].includes(l.status)).length;
       const completionRate = totalLocks > 0 ? Math.round((completedLocks / totalLocks) * 100) : 0;
 
-      // Calculate average resolution time from events
+      // This month vs last month
+      const locksThisMonth = locks.filter(
+        (l) => new Date(l.created_at) >= startOfThisMonth
+      ).length;
+      const locksLastMonth = locks.filter(
+        (l) =>
+          new Date(l.created_at) >= startOfLastMonth &&
+          new Date(l.created_at) <= endOfLastMonth
+      ).length;
+      const completedThisMonth = locks.filter(
+        (l) => l.status === "done" && new Date(l.created_at) >= startOfThisMonth
+      ).length;
+      const completedLastMonth = locks.filter(
+        (l) =>
+          l.status === "done" &&
+          new Date(l.created_at) >= startOfLastMonth &&
+          new Date(l.created_at) <= endOfLastMonth
+      ).length;
+
+      // Daily activity (last 7 days)
+      const dailyActivity: DailyActivity[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+
+        const created = locks.filter(
+          (l) => new Date(l.created_at) >= dayStart && new Date(l.created_at) < dayEnd
+        ).length;
+        const completed = locks.filter(
+          (l) =>
+            l.status === "done" &&
+            new Date(l.created_at) >= dayStart &&
+            new Date(l.created_at) < dayEnd
+        ).length;
+
+        dailyActivity.push({
+          day: dayStart.toLocaleDateString("en-US", { weekday: "short" }),
+          created,
+          completed,
+        });
+      }
+
+      // Calculate average resolution time
       let averageResolutionHours: number | null = null;
+      const completedLockIds = locks.filter((l) => l.status === "done").map((l) => l.id);
 
-      if (resolutionTimesResult.data && resolutionTimesResult.data.length > 0) {
-        const lockIds = resolutionTimesResult.data.map((l) => l.id);
-
-        // Get "done" events for these locks
+      if (completedLockIds.length > 0) {
         const { data: doneEvents } = await supabase
           .from("momentum_lock_events")
           .select("lock_id, created_at")
-          .in("lock_id", lockIds)
+          .in("lock_id", completedLockIds.slice(0, 100))
           .eq("event_type", "done");
 
         if (doneEvents && doneEvents.length > 0) {
-          // Create a map of lock_id to done time
-          const doneTimeMap = new Map<string, string>();
-          doneEvents.forEach((event) => {
-            doneTimeMap.set(event.lock_id, event.created_at);
-          });
-
-          // Calculate resolution times
           const resolutionTimes: number[] = [];
-          resolutionTimesResult.data.forEach((lock) => {
-            const doneTime = doneTimeMap.get(lock.id);
-            if (doneTime) {
-              const createdAt = new Date(lock.created_at).getTime();
-              const completedAt = new Date(doneTime).getTime();
-              const hoursToResolve = (completedAt - createdAt) / (1000 * 60 * 60);
-              if (hoursToResolve > 0) {
-                resolutionTimes.push(hoursToResolve);
+          const lockMap = new Map(locks.map((l) => [l.id, l]));
+
+          doneEvents.forEach((event) => {
+            const lock = lockMap.get(event.lock_id);
+            if (lock) {
+              const hours =
+                (new Date(event.created_at).getTime() - new Date(lock.created_at).getTime()) /
+                (1000 * 60 * 60);
+              if (hours > 0 && hours < 720) {
+                // Ignore outliers > 30 days
+                resolutionTimes.push(hours);
               }
             }
           });
 
           if (resolutionTimes.length > 0) {
-            const totalHours = resolutionTimes.reduce((sum, h) => sum + h, 0);
-            averageResolutionHours = Math.round((totalHours / resolutionTimes.length) * 10) / 10;
+            averageResolutionHours =
+              Math.round((resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length) * 10) / 10;
           }
+        }
+      }
+
+      // Team member stats
+      const ownerCounts = new Map<string, { owned: number; completed: number }>();
+      locks.forEach((lock) => {
+        const current = ownerCounts.get(lock.owner_user_id) || { owned: 0, completed: 0 };
+        current.owned++;
+        if (lock.status === "done") current.completed++;
+        ownerCounts.set(lock.owner_user_id, current);
+      });
+
+      // Get profile names for top owners
+      const topOwnerIds = Array.from(ownerCounts.entries())
+        .sort((a, b) => b[1].owned - a[1].owned)
+        .slice(0, 5)
+        .map(([id]) => id);
+
+      let teamStats: TeamMemberStats[] = [];
+      if (topOwnerIds.length > 0) {
+        const { data: ownerProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, first_name, last_name")
+          .in("user_id", topOwnerIds);
+
+        if (ownerProfiles) {
+          teamStats = topOwnerIds.map((userId) => {
+            const profile = ownerProfiles.find((p) => p.user_id === userId);
+            const stats = ownerCounts.get(userId) || { owned: 0, completed: 0 };
+            return {
+              userId,
+              name: profile ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "Unknown" : "Unknown",
+              locksOwned: stats.owned,
+              locksCompleted: stats.completed,
+              avgResolutionHours: null,
+            };
+          });
         }
       }
 
       setAnalyticsData({
         totalLocks,
         completedLocks,
+        blockedLocks,
+        activeLocks,
         completionRate,
         averageResolutionHours,
-        activeLocks,
         locksThisMonth,
+        locksLastMonth,
         completedThisMonth,
-        blockedThisMonth,
+        completedLastMonth,
+        dailyActivity,
+        teamStats,
       });
     } catch (error) {
       console.error("Error loading analytics data:", error);
@@ -222,26 +268,43 @@ function AnalyticsContent() {
     }
   };
 
+  const getEmptyAnalytics = (): AnalyticsData => ({
+    totalLocks: 0,
+    completedLocks: 0,
+    blockedLocks: 0,
+    activeLocks: 0,
+    completionRate: 0,
+    averageResolutionHours: null,
+    locksThisMonth: 0,
+    locksLastMonth: 0,
+    completedThisMonth: 0,
+    completedLastMonth: 0,
+    dailyActivity: [],
+    teamStats: [],
+  });
+
   const formatResolutionTime = (hours: number | null): string => {
-    if (hours === null) return "N/A";
+    if (hours === null) return "—";
     if (hours < 1) return `${Math.round(hours * 60)}m`;
-    if (hours < 24) return `${hours}h`;
-    const days = Math.round(hours / 24 * 10) / 10;
-    return `${days}d`;
+    if (hours < 24) return `${Math.round(hours)}h`;
+    return `${Math.round(hours / 24)}d`;
+  };
+
+  const getTrendIndicator = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? { text: "New", color: "text-emerald-600" } : null;
+    const change = Math.round(((current - previous) / previous) * 100);
+    if (change > 0) return { text: `+${change}%`, color: "text-emerald-600" };
+    if (change < 0) return { text: `${change}%`, color: "text-red-500" };
+    return { text: "0%", color: "text-coffee-latte" };
   };
 
   if (loading || planLoading) {
     return <PageLoader />;
   }
 
-  // Access denied state for free users
   if (!hasAdvancedAnalytics) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="max-w-2xl mx-auto py-8"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto py-8">
         <div className="bg-white rounded-xl border border-coffee-foam p-8 text-center space-y-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-coffee-espresso">Analytics</h1>
@@ -249,19 +312,6 @@ function AnalyticsContent() {
               Advanced analytics are available on Starter and higher plans.
             </p>
           </div>
-
-          <div className="bg-coffee-cream rounded-lg p-6 space-y-4">
-            <p className="text-coffee-mocha font-medium">
-              Unlock detailed insights into your team&apos;s momentum locks:
-            </p>
-            <ul className="text-sm text-coffee-cortado space-y-2 text-left max-w-md mx-auto">
-              <li>Track total locks and completion rates</li>
-              <li>Monitor average resolution times</li>
-              <li>View monthly trends and patterns</li>
-              <li>Identify bottlenecks and blockers</li>
-            </ul>
-          </div>
-
           <Link href="/billing">
             <Button className="bg-coffee-espresso hover:bg-coffee-mocha text-white">
               Upgrade to Starter
@@ -274,155 +324,269 @@ function AnalyticsContent() {
 
   if (!analyticsData) {
     return (
-      <div className="max-w-2xl mx-auto py-8">
+      <div className="max-w-4xl mx-auto py-8">
         <p className="text-coffee-cortado">Unable to load analytics.</p>
       </div>
     );
   }
 
+  const pieData = [
+    { name: "Completed", value: analyticsData.completedLocks, color: "#8c7b70" },
+    { name: "Active", value: analyticsData.activeLocks, color: "#c4b5a9" },
+    { name: "Blocked", value: analyticsData.blockedLocks, color: "#e8e2dc" },
+  ].filter((d) => d.value > 0);
+
+  const monthTrend = getTrendIndicator(analyticsData.locksThisMonth, analyticsData.locksLastMonth);
+  const completionTrend = getTrendIndicator(analyticsData.completedThisMonth, analyticsData.completedLastMonth);
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="max-w-4xl mx-auto space-y-8 py-4"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-8 py-4">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-coffee-espresso">Analytics</h1>
         <p className="text-coffee-cortado mt-1">
-          Track your team&apos;s momentum lock performance
+          Insights into your team&apos;s momentum locks
         </p>
       </div>
 
-      {/* Overview Cards */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-coffee-espresso">Overview</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Total Locks */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Total Locks</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.totalLocks}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">All time</p>
-          </motion.div>
-
-          {/* Completion Rate */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Completion Rate</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.completionRate}%
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">
-              {analyticsData.completedLocks} of {analyticsData.totalLocks} done
-            </p>
-          </motion.div>
-
-          {/* Average Resolution Time */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Avg Resolution</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {formatResolutionTime(analyticsData.averageResolutionHours)}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">Time to completion</p>
-          </motion.div>
-
-          {/* Active Locks */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Active Locks</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.activeLocks}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">Currently in progress</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* This Month Stats */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-coffee-espresso">This Month</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Locks Created */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Locks Created</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.locksThisMonth}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">
-              {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-            </p>
-          </motion.div>
-
-          {/* Completed */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Completed</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.completedThisMonth}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">Marked as done</p>
-          </motion.div>
-
-          {/* Blocked */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl border border-coffee-foam p-5"
-          >
-            <p className="text-sm text-coffee-cortado mb-1">Blocked</p>
-            <p className="text-3xl font-bold text-coffee-espresso">
-              {analyticsData.blockedThisMonth}
-            </p>
-            <p className="text-xs text-coffee-latte mt-1">Encountered blockers</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Empty State */}
-      {analyticsData.totalLocks === 0 && (
+      {analyticsData.totalLocks === 0 ? (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bg-coffee-cream rounded-xl p-8 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl border border-coffee-foam p-12 text-center"
         >
-          <p className="text-coffee-mocha font-medium mb-2">No momentum locks yet</p>
-          <p className="text-sm text-coffee-cortado">
-            Create your first momentum lock in Slack using /lock to start tracking your team&apos;s progress.
-          </p>
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="w-16 h-16 bg-coffee-cream rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-coffee-latte" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-coffee-espresso">No data yet</h2>
+            <p className="text-coffee-cortado">
+              Create your first momentum lock in Slack using <code className="bg-coffee-cream px-2 py-0.5 rounded text-sm">/attunly</code> to start tracking progress.
+            </p>
+          </div>
         </motion.div>
+      ) : (
+        <>
+          {/* Top Row - Key Metrics + Donut */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Completion Rate Donut */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6 lg:row-span-2"
+            >
+              <h3 className="text-sm font-medium text-coffee-cortado mb-4">Status Breakdown</h3>
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <ResponsiveContainer width={200} height={200}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={85}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => [value ?? 0, "Locks"]}
+                        contentStyle={{
+                          background: "#fffcf9",
+                          border: "1px solid #e8e2dc",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-3xl font-bold text-coffee-espresso">
+                      {analyticsData.completionRate}%
+                    </span>
+                    <span className="text-xs text-coffee-latte">completed</span>
+                  </div>
+                </div>
+                <div className="flex gap-4 mt-4 text-sm">
+                  {pieData.map((item) => (
+                    <div key={item.name} className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
+                      <span className="text-coffee-cortado">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Key Metrics */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-coffee-cortado">Total Locks</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {analyticsData.totalLocks}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-coffee-cortado">This month</p>
+                  <p className="text-lg font-semibold text-coffee-espresso">
+                    {analyticsData.locksThisMonth}
+                  </p>
+                  {monthTrend && (
+                    <p className={`text-xs ${monthTrend.color}`}>{monthTrend.text} vs last</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-coffee-cortado">Avg Resolution</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {formatResolutionTime(analyticsData.averageResolutionHours)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-coffee-cortado">Completed</p>
+                  <p className="text-lg font-semibold text-coffee-espresso">
+                    {analyticsData.completedThisMonth}
+                  </p>
+                  {completionTrend && (
+                    <p className={`text-xs ${completionTrend.color}`}>{completionTrend.text} vs last</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Active / Blocked */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6 lg:col-span-2"
+            >
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <p className="text-sm text-coffee-cortado">Active Right Now</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {analyticsData.activeLocks}
+                  </p>
+                  <p className="text-xs text-coffee-latte mt-1">In progress</p>
+                </div>
+                <div>
+                  <p className="text-sm text-coffee-cortado">Currently Blocked</p>
+                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
+                    {analyticsData.blockedLocks}
+                  </p>
+                  <p className="text-xs text-coffee-latte mt-1">Needs attention</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Activity Chart */}
+          {analyticsData.dailyActivity.some((d) => d.created > 0 || d.completed > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <h3 className="text-sm font-medium text-coffee-cortado mb-4">Last 7 Days Activity</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={analyticsData.dailyActivity} barGap={4}>
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#8c7b70", fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#8c7b70", fontSize: 12 }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fffcf9",
+                      border: "1px solid #e8e2dc",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                    }}
+                  />
+                  <Bar dataKey="created" name="Created" fill="#8c7b70" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="completed" name="Completed" fill="#c4b5a9" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-6 mt-2">
+                <div className="flex items-center gap-1.5 text-sm">
+                  <div className="w-3 h-3 rounded bg-coffee-mocha" />
+                  <span className="text-coffee-cortado">Created</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm">
+                  <div className="w-3 h-3 rounded bg-coffee-latte" />
+                  <span className="text-coffee-cortado">Completed</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Team Leaderboard */}
+          {analyticsData.teamStats.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
+            >
+              <h3 className="text-sm font-medium text-coffee-cortado mb-4">Team Activity</h3>
+              <div className="space-y-3">
+                {analyticsData.teamStats.map((member, index) => (
+                  <div
+                    key={member.userId}
+                    className="flex items-center justify-between py-2 border-b border-coffee-foam last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full bg-coffee-cream flex items-center justify-center text-xs font-medium text-coffee-mocha">
+                        {index + 1}
+                      </span>
+                      <span className="text-coffee-espresso font-medium">{member.name}</span>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm">
+                      <div className="text-right">
+                        <span className="text-coffee-espresso font-medium">{member.locksOwned}</span>
+                        <span className="text-coffee-latte ml-1">assigned</span>
+                      </div>
+                      <div className="text-right min-w-[80px]">
+                        <span className="text-coffee-espresso font-medium">{member.locksCompleted}</span>
+                        <span className="text-coffee-latte ml-1">done</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </>
       )}
     </motion.div>
   );
