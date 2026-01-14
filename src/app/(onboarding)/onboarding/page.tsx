@@ -162,8 +162,8 @@ export default function OnboardingPage() {
     );
   }
 
-  // Validation - reduced minimum to 10 chars for aboutMe
-  const isStep1Valid = formData.firstName && formData.lastName && formData.role && formData.aboutMe.trim().length >= 10;
+  // Validation - minimum 50 chars for aboutMe helps AI matching
+  const isStep1Valid = formData.firstName && formData.lastName && formData.role && formData.aboutMe.trim().length >= 50;
 
   // Count completed fields for progress indicator
   const completedFields = [
@@ -309,16 +309,16 @@ export default function OnboardingPage() {
                       onBlur={() => setTouched({...touched, aboutMe: true})}
                       placeholder="I've been in product for 5 years, specializing in B2B SaaS. I can help with roadmap prioritization, stakeholder management, and writing PRDs. Currently learning more about AI/ML product strategy and would love to connect with folks who have experience there."
                       className={`min-h-[140px] bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none resize-none font-sans text-[15px] ${
-                        touched.aboutMe && formData.aboutMe.trim().length < 10 ? 'border-red-300' : 'border-coffee-foam'
+                        touched.aboutMe && formData.aboutMe.trim().length < 50 ? 'border-red-300' : 'border-coffee-foam'
                       }`}
                     />
                     <div className="flex items-center justify-between mt-1.5">
                       <p className="text-xs text-coffee-latte">
                         Write naturally — our AI uses this to match you with teammates.
                       </p>
-                      {touched.aboutMe && formData.aboutMe.trim().length < 10 && (
+                      {touched.aboutMe && formData.aboutMe.trim().length < 50 && (
                         <p className="text-xs text-red-500">
-                          {formData.aboutMe.trim().length}/10 characters
+                          {formData.aboutMe.trim().length}/50 characters
                         </p>
                       )}
                     </div>
@@ -393,20 +393,15 @@ export default function OnboardingPage() {
                   >
                     ← Back
                   </button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSubmit(false)}
-                    disabled={loading}
-                    className="border-coffee-foam text-coffee-mocha hover:bg-coffee-cream h-11 px-6"
-                  >
-                    {loading ? <LottieLoader size="sm" className="w-5 h-5 mr-2" /> : null}
-                    Skip for now
-                  </Button>
                 </div>
 
-                <p className="text-xs text-coffee-latte text-center mt-4">
-                  You can always connect Slack later in Settings.
-                </p>
+                <button
+                  onClick={() => handleSubmit(false)}
+                  disabled={loading}
+                  className="text-sm text-coffee-latte hover:text-coffee-cortado transition-colors mt-4"
+                >
+                  Skip for now — you can connect Slack later in Settings
+                </button>
               </motion.div>
             )}
 

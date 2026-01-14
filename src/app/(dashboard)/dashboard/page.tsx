@@ -156,26 +156,32 @@ export default async function DashboardPage() {
       {isFullySetup && (
         <div className="bg-white rounded-xl border border-coffee-foam shadow-sm p-5">
           <h3 className="text-sm font-medium text-coffee-mocha mb-4">This week</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-coffee-cream/60 flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-coffee-mocha" />
+          {nudgesSent === 0 && nudgesReceived === 0 ? (
+            <p className="text-sm text-coffee-cortado">
+              No activity yet. Try <code className="bg-coffee-foam/80 px-1.5 py-0.5 rounded text-xs font-mono text-coffee-mocha">/attunly</code> in Slack to get started.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-coffee-cream/60 flex items-center justify-center">
+                  <MessageSquare className="w-4 h-4 text-coffee-mocha" />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold text-coffee-espresso">{nudgesSent}</p>
+                  <p className="text-xs text-coffee-cortado">asks sent</p>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-semibold text-coffee-espresso">{nudgesSent}</p>
-                <p className="text-xs text-coffee-cortado">asks sent</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-coffee-cream/60 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-coffee-mocha" />
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold text-coffee-espresso">{nudgesReceived}</p>
+                  <p className="text-xs text-coffee-cortado">people helped</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-coffee-cream/60 flex items-center justify-center">
-                <Users className="w-4 h-4 text-coffee-mocha" />
-              </div>
-              <div>
-                <p className="text-2xl font-semibold text-coffee-espresso">{nudgesReceived}</p>
-                <p className="text-xs text-coffee-cortado">people helped</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
 

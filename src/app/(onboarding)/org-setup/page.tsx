@@ -292,6 +292,9 @@ export default function OrgSetupPage() {
                   maxLength={6}
                   onKeyDown={e => e.key === 'Enter' && handleJoinOrg()}
                 />
+                <p className="text-xs text-coffee-latte text-center">
+                  Ask your team admin for this 6-character code
+                </p>
               </div>
 
               <div className="mt-8 flex justify-between items-center">

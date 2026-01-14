@@ -412,15 +412,10 @@ export default function FindHelpPage() {
 
               <div className="pt-4 border-t border-coffee-foam">
                 <p className="text-sm text-coffee-cortado mb-3">
-                  Use Slack to reach out:
+                  Ready to reach out?
                 </p>
-                <div className="p-4 bg-coffee-cream/30 rounded-lg">
-                  <code className="text-sm text-coffee-espresso">
-                    /attunly ask @{selectedPerson.first_name?.toLowerCase()} {query}
-                  </code>
-                </div>
-                <p className="text-xs text-coffee-latte mt-2">
-                  Or just send them a direct message on Slack
+                <p className="text-sm text-coffee-cortado">
+                  Type <code className="bg-coffee-cream/80 px-1.5 py-0.5 rounded text-xs font-mono text-coffee-mocha">/attunly</code> in Slack to request their help, or send them a direct message.
                 </p>
               </div>
             </div>

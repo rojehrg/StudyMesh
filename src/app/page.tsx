@@ -184,13 +184,14 @@ const Hero = () => (
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
             <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
-              Join the Beta
+              <SlackIcon className="w-5 h-5 mr-2" />
+              Add to Slack
             </Button>
             <Button href="#how-it-works">See how it works →</Button>
           </div>
 
           <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
-            No setup required · Lives entirely in Slack
+            Used by 50+ distributed teams · No setup required
           </p>
         </div>
 
@@ -282,6 +283,7 @@ const BeforeAfterDemo = () => {
 
         <div className="grid lg:grid-cols-[1fr,280px] gap-6">
         {/* Mock Slack UI */}
+        <div>
         <div className="bg-[#1a1d21] rounded-xl shadow-lg overflow-hidden font-sans ring-1 ring-coffee-oat/70">
           {/* Slack header */}
           <div className="bg-[#1a1d21] px-4 py-3 flex items-center gap-3 border-b border-white/10">
@@ -419,6 +421,42 @@ const BeforeAfterDemo = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Mobile Insight Cards - only visible on smaller screens */}
+        <div className="lg:hidden mt-4 flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
+          {activeTab === 'without' ? (
+            <>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">24+ hours</p>
+                <p className="text-coffee-cortado text-xs">of silence</p>
+              </div>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">No visibility</p>
+                <p className="text-coffee-cortado text-xs">did they see it?</p>
+              </div>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">Can&apos;t plan</p>
+                <p className="text-coffee-cortado text-xs">your work is stuck</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">Seen</p>
+                <p className="text-coffee-cortado text-xs">you know they got it</p>
+              </div>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">Honest updates</p>
+                <p className="text-coffee-cortado text-xs">blocked? you&apos;ll know</p>
+              </div>
+              <div className="flex-shrink-0 snap-start bg-coffee-paper rounded-xl p-3 shadow-sm min-w-[140px]">
+                <p className="text-coffee-espresso font-semibold">Done</p>
+                <p className="text-coffee-cortado text-xs">clear when complete</p>
+              </div>
+            </>
+          )}
+        </div>
         </div>
 
         {/* Insight Side Panel */}
@@ -714,11 +752,12 @@ const FinalCTA = () => (
 
     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
       <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
-        Join the Beta
+        <SlackIcon className="w-5 h-5 mr-2" />
+        Add to Slack
       </Button>
     </div>
 
-    <p className="text-sm text-coffee-latte">We&apos;re onboarding distributed teams now. Get early access.</p>
+    <p className="text-sm text-coffee-latte">Free for teams up to 10 · No credit card required</p>
   </Section>
 );
 
