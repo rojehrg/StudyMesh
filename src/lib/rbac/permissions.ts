@@ -75,7 +75,7 @@ const rolePermissions: Record<OrganizationRoleType, PermissionType[]> = {
   ],
 
   [OrganizationRole.ADMIN]: [
-    // Admin can manage team and settings, but NOT billing or org deletion
+    // Admin can manage team, settings, and billing, but NOT org deletion
     Permission.ORG_VIEW,
     Permission.ORG_EDIT,
     // No ORG_DELETE
@@ -83,8 +83,8 @@ const rolePermissions: Record<OrganizationRoleType, PermissionType[]> = {
     Permission.TEAM_INVITE,
     Permission.TEAM_REMOVE,
     Permission.TEAM_CHANGE_ROLE,
-    Permission.BILLING_VIEW, // Can view but not manage
-    // No BILLING_MANAGE
+    Permission.BILLING_VIEW,
+    Permission.BILLING_MANAGE, // Admins can manage billing for enterprise needs
     Permission.SETTINGS_VIEW,
     Permission.SETTINGS_EDIT,
     Permission.INTEGRATIONS_VIEW,

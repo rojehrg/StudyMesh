@@ -1,0 +1,529 @@
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CreditCard01, ArrowRightMd, Users } from "react-coolicons";
+import { Lock, LockOpen, AlertTriangle } from "lucide-react";
+import { PageLoader, LottieLoader } from "@/components/loading-states";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { usePlanFeatures, getPlanDisplayName, getPlanPricing } from "@/hooks/use-plan-features";
+
+interface BillingData {
+  plan: string;
+  status: string;
+  seats: number;
+  periodEnd: string | null;
+  hasDodoCustomer: boolean;
+  hasActiveSubscription: boolean;
+  isOwner: boolean;
+  isOnTrial?: boolean;
+  trialPlan?: string | null;
+  trialEndsAt?: string | null;
+  trialDaysRemaining?: number;
+}
+
+interface UsageStats {
+  totalMembers: number;
+  momentumLocksThisMonth: number;
+  activeLocks: number;
+  maxSeats: number;
+}
+
+function BillingContent() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [billingData, setBillingData] = useState<BillingData | null>(null);
+  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const { subscription, plan, loading: planLoading } = usePlanFeatures();
+  const supabase = createClient();
+
+  useEffect(() => {
+    loadBillingData();
+  }, []);
+
+  const loadBillingData = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      // Get user's profile and org
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("organization_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!profile?.organization_id) {
+        router.push("/dashboard");
+        return;
+      }
+
+      // Check if user is owner or admin
+      const { data: org } = await supabase
+        .from("organizations")
+        .select("id, owner_id, subscription_plan, subscription_status, subscription_seats, subscription_period_end, trial_plan, trial_ends_at, dodo_customer_id, dodo_subscription_id")
+        .eq("id", profile.organization_id)
+        .single();
+
+      if (!org) {
+        router.push("/dashboard");
+        return;
+      }
+
+      // Check if user is owner
+      const isOwner = org.owner_id === user.id;
+
+      // Check if user is admin via organization_members
+      const { data: memberData } = await supabase
+        .from("organization_members")
+        .select("role")
+        .eq("organization_id", org.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const isAdminRole = memberData?.role === "admin" || memberData?.role === "owner";
+      const hasAccess = isOwner || isAdminRole;
+
+      if (!hasAccess) {
+        toast.error("Access denied. Only owners and admins can view billing.");
+        router.push("/dashboard");
+        return;
+      }
+
+      setIsAdmin(hasAccess);
+
+      // Calculate trial status
+      let isOnTrial = false;
+      let trialDaysRemaining = 0;
+      let effectivePlan = org.subscription_plan || "free";
+
+      if (org.subscription_status === "trialing" && org.trial_ends_at) {
+        const trialEnds = new Date(org.trial_ends_at);
+        const now = new Date();
+
+        if (now <= trialEnds) {
+          isOnTrial = true;
+          trialDaysRemaining = Math.ceil((trialEnds.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+          effectivePlan = org.trial_plan || org.subscription_plan || "free";
+        }
+      }
+
+      setBillingData({
+        plan: effectivePlan,
+        status: org.subscription_status || "inactive",
+        seats: org.subscription_seats || 1,
+        periodEnd: org.subscription_period_end,
+        hasDodoCustomer: !!org.dodo_customer_id,
+        hasActiveSubscription: !!org.dodo_subscription_id && org.subscription_status === "active",
+        isOwner,
+        isOnTrial,
+        trialPlan: org.trial_plan,
+        trialEndsAt: org.trial_ends_at,
+        trialDaysRemaining,
+      });
+
+      // Get usage stats
+      const { count: memberCount } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("organization_id", org.id);
+
+      // Get momentum locks for this month from the org's Slack workspace
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      // Get the org's slack_team_id
+      const { data: orgWithSlack } = await supabase
+        .from("organizations")
+        .select("slack_team_id")
+        .eq("id", org.id)
+        .single();
+
+      let locksThisMonth = 0;
+      let activeLocks = 0;
+
+      if (orgWithSlack?.slack_team_id) {
+        const { count: monthlyLockCount } = await supabase
+          .from("momentum_locks")
+          .select("*", { count: "exact", head: true })
+          .eq("workspace_id", orgWithSlack.slack_team_id)
+          .gte("created_at", startOfMonth.toISOString());
+
+        const { count: activeLocksCount } = await supabase
+          .from("momentum_locks")
+          .select("*", { count: "exact", head: true })
+          .eq("workspace_id", orgWithSlack.slack_team_id)
+          .in("status", ["active", "started"]);
+
+        locksThisMonth = monthlyLockCount || 0;
+        activeLocks = activeLocksCount || 0;
+      }
+
+      // Get max seats for the plan
+      const planFeatures: Record<string, number> = {
+        free: 5,
+        starter: 20,
+        pro: 100,
+        enterprise: -1,
+      };
+
+      setUsageStats({
+        totalMembers: memberCount || 0,
+        momentumLocksThisMonth: locksThisMonth,
+        activeLocks,
+        maxSeats: planFeatures[effectivePlan] || 5,
+      });
+
+    } catch (error) {
+      console.error("Error loading billing data:", error);
+      toast.error("Failed to load billing information");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    if (!billingData?.isOwner) {
+      toast.error("Only the organization owner can manage billing");
+      return;
+    }
+
+    setPortalLoading(true);
+    try {
+      const response = await fetch("/api/billing/portal", { method: "POST" });
+      const data = await response.json();
+
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else if (data.supportEmail) {
+        // Dodo doesn't have a self-service portal, show contact info
+        toast.info(`To manage your subscription, contact support at ${data.supportEmail}`);
+      } else {
+        toast.error(data.error || "Failed to open billing portal");
+      }
+    } catch {
+      toast.error("Failed to open billing portal");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    if (!billingData?.isOwner) {
+      toast.error("Only the organization owner can upgrade the plan");
+      return;
+    }
+
+    setCheckoutLoading(true);
+    try {
+      const response = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: "pro",
+          billingPeriod: "monthly",
+          seats: Math.max(usageStats?.totalMembers || 5, 5),
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Failed to start checkout");
+      }
+    } catch {
+      toast.error("Failed to start checkout");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status: string, isOnTrial?: boolean) => {
+    if (isOnTrial) {
+      return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Trial</Badge>;
+    }
+
+    // Dodo status values: active, on_hold, cancelled, expired
+    switch (status) {
+      case "active":
+        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">Active</Badge>;
+      case "trialing":
+        return <Badge className="bg-amber-100 text-amber-800 border-amber-200">Trial</Badge>;
+      case "on_hold":
+        return <Badge className="bg-amber-100 text-amber-800 border-amber-200">On Hold</Badge>;
+      case "cancelled":
+      case "canceled":
+        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam">Cancelled</Badge>;
+      case "expired":
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Expired</Badge>;
+      default:
+        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam">Inactive</Badge>;
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  if (loading || planLoading) {
+    return <PageLoader />;
+  }
+
+  if (!billingData || !usageStats) {
+    return (
+      <div className="max-w-2xl mx-auto py-8">
+        <p className="text-coffee-cortado">Unable to load billing information.</p>
+      </div>
+    );
+  }
+
+  const planName = getPlanDisplayName(billingData.plan as any);
+  const pricing = getPlanPricing(billingData.plan as any);
+  const showUpgrade = billingData.plan === "free" || billingData.plan === "starter";
+  const seatUsagePercent = usageStats.maxSeats === -1 ? 0 : (usageStats.totalMembers / usageStats.maxSeats) * 100;
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto space-y-8 py-4">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-coffee-espresso">Billing & Usage</h1>
+        <p className="text-coffee-cortado mt-1">Manage your subscription and view usage statistics</p>
+      </div>
+
+      {/* Subscription Info */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-coffee-espresso">Current Subscription</h2>
+
+        <div className="bg-white rounded-xl border border-coffee-foam p-5 space-y-4">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <p className="text-xl font-semibold text-coffee-espresso">{planName} Plan</p>
+                {getStatusBadge(billingData.status, billingData.isOnTrial)}
+              </div>
+              <p className="text-coffee-cortado">
+                {billingData.plan === "free"
+                  ? "Free forever"
+                  : `$${pricing.monthly}/seat/month`}
+              </p>
+            </div>
+            {billingData.isOnTrial && billingData.trialDaysRemaining && (
+              <div className="text-right">
+                <p className="text-sm text-amber-600 font-medium">
+                  {billingData.trialDaysRemaining} days left in trial
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Billing Details */}
+          <div className="pt-4 border-t border-coffee-foam space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-coffee-cortado">Status</span>
+              <span className="text-coffee-espresso font-medium capitalize">
+                {billingData.isOnTrial ? "Trialing" : billingData.status}
+              </span>
+            </div>
+            {billingData.periodEnd && billingData.hasActiveSubscription && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-coffee-cortado">Next billing date</span>
+                <span className="text-coffee-espresso font-medium">
+                  {formatDate(billingData.periodEnd)}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-coffee-cortado">Seat usage</span>
+              <span className="text-coffee-espresso font-medium">
+                {usageStats.totalMembers} of {usageStats.maxSeats === -1 ? "Unlimited" : usageStats.maxSeats} seats used
+              </span>
+            </div>
+          </div>
+
+          {/* Seat Usage Bar */}
+          {usageStats.maxSeats !== -1 && (
+            <div className="space-y-2">
+              <div className="w-full bg-coffee-cream rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all ${
+                    seatUsagePercent >= 90 ? "bg-red-400" : seatUsagePercent >= 70 ? "bg-amber-400" : "bg-coffee-mocha"
+                  }`}
+                  style={{ width: `${Math.min(seatUsagePercent, 100)}%` }}
+                />
+              </div>
+              {seatUsagePercent >= 90 && (
+                <div className="flex items-center gap-2 text-sm text-amber-600">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>You are approaching your seat limit. Consider upgrading.</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="pt-4 border-t border-coffee-foam flex flex-wrap gap-3">
+            {billingData.hasActiveSubscription && billingData.isOwner && (
+              <Button
+                variant="outline"
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+              >
+                {portalLoading ? (
+                  <LottieLoader size="sm" className="w-4 h-4 mr-2" />
+                ) : (
+                  <CreditCard01 className="w-4 h-4 mr-2" />
+                )}
+                Manage Subscription
+              </Button>
+            )}
+
+            {showUpgrade && billingData.isOwner && (
+              <Button
+                onClick={handleUpgrade}
+                disabled={checkoutLoading}
+                className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
+              >
+                {checkoutLoading ? (
+                  <LottieLoader size="sm" className="w-4 h-4 mr-2" />
+                ) : (
+                  <ArrowRightMd className="w-4 h-4 mr-2" />
+                )}
+                Upgrade Plan
+              </Button>
+            )}
+
+            {!billingData.isOwner && (
+              <p className="text-sm text-coffee-cortado">
+                Contact your organization owner to manage billing.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Usage Stats */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-coffee-espresso">Usage Statistics</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Total Members */}
+          <div className="bg-white rounded-xl border border-coffee-foam p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-coffee-cream rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-coffee-mocha" />
+              </div>
+              <p className="text-sm text-coffee-cortado">Team Members</p>
+            </div>
+            <p className="text-2xl font-bold text-coffee-espresso">
+              {usageStats.totalMembers}
+            </p>
+            <p className="text-xs text-coffee-latte mt-1">
+              {usageStats.maxSeats === -1 ? "Unlimited" : `of ${usageStats.maxSeats} seats`}
+            </p>
+          </div>
+
+          {/* Momentum Locks This Month */}
+          <div className="bg-white rounded-xl border border-coffee-foam p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-coffee-cream rounded-lg flex items-center justify-center">
+                <LockOpen className="w-5 h-5 text-coffee-mocha" />
+              </div>
+              <p className="text-sm text-coffee-cortado">Locks This Month</p>
+            </div>
+            <p className="text-2xl font-bold text-coffee-espresso">
+              {usageStats.momentumLocksThisMonth}
+            </p>
+            <p className="text-xs text-coffee-latte mt-1">Momentum locks created</p>
+          </div>
+
+          {/* Active Locks */}
+          <div className="bg-white rounded-xl border border-coffee-foam p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-coffee-cream rounded-lg flex items-center justify-center">
+                <Lock className="w-5 h-5 text-coffee-mocha" />
+              </div>
+              <p className="text-sm text-coffee-cortado">Active Locks</p>
+            </div>
+            <p className="text-2xl font-bold text-coffee-espresso">
+              {usageStats.activeLocks}
+            </p>
+            <p className="text-xs text-coffee-latte mt-1">Currently in progress</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Plan Features */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-coffee-espresso">Plan Features</h2>
+
+        <div className="bg-white rounded-xl border border-coffee-foam p-5">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">Max Seats</span>
+              <span className="text-coffee-espresso font-medium">
+                {usageStats.maxSeats === -1 ? "Unlimited" : usageStats.maxSeats}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">Custom Branding</span>
+              <span className="text-coffee-espresso font-medium">
+                {["pro", "enterprise"].includes(billingData.plan) ? "Yes" : "No"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">Advanced Analytics</span>
+              <span className="text-coffee-espresso font-medium">
+                {["starter", "pro", "enterprise"].includes(billingData.plan) ? "Yes" : "No"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">Priority Support</span>
+              <span className="text-coffee-espresso font-medium">
+                {["pro", "enterprise"].includes(billingData.plan) ? "Yes" : "No"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">SSO Integration</span>
+              <span className="text-coffee-espresso font-medium">
+                {billingData.plan === "enterprise" ? "Yes" : "No"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-coffee-cortado">API Access</span>
+              <span className="text-coffee-espresso font-medium">
+                {["pro", "enterprise"].includes(billingData.plan) ? "Yes" : "No"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </motion.div>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <BillingContent />
+    </Suspense>
+  );
+}

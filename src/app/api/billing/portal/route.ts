@@ -1,70 +1,73 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { stripe } from '@/lib/billing';
 import { createLogger } from '@/lib/logger';
+import { getUserOrgContext, hasPermission, Permission } from '@/lib/rbac';
 
 const log = createLogger({ service: 'billing', action: 'portal' });
+
+// Support email for subscription management requests
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@attunly.com';
 
 /**
  * POST /api/billing/portal
  *
- * Creates a Stripe billing portal session for subscription management.
+ * Returns subscription management information.
+ * Dodo Payments doesn't have a self-service portal like Stripe,
+ * so we provide support contact information instead.
  */
 export async function POST() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    // Check if user has permission to manage billing (owner or admin)
+    const context = await getUserOrgContext();
+    if (!context) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's organization
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('organization_id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (!profile?.organization_id) {
-      return NextResponse.json({ error: 'Organization required' }, { status: 400 });
+    if (!hasPermission(context.role, Permission.BILLING_MANAGE)) {
+      return NextResponse.json({ error: 'Permission denied: billing management requires owner or admin role' }, { status: 403 });
     }
 
-    // Get organization details separately
+    const supabase = await createClient();
+
+    // Get organization details with Dodo customer info
     const { data: org } = await supabase
       .from('organizations')
-      .select('id, owner_id, stripe_customer_id')
-      .eq('id', profile.organization_id)
+      .select('id, dodo_customer_id, dodo_subscription_id, subscription_status, subscription_plan')
+      .eq('id', context.organizationId)
       .single();
 
     if (!org) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
     }
 
-    // Only org owner can access billing portal
-    if (org.owner_id !== user.id) {
-      return NextResponse.json({ error: 'Only organization owner can manage billing' }, { status: 403 });
+    // If no active subscription, redirect to billing page
+    if (!org.dodo_subscription_id) {
+      return NextResponse.json({
+        success: true,
+        url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
+        message: 'No active subscription found',
+      });
     }
 
-    if (!org.stripe_customer_id) {
-      return NextResponse.json({ error: 'No billing account found' }, { status: 400 });
-    }
-
-    // Create portal session
-    const session = await stripe.billingPortal.sessions.create({
-      customer: org.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+    // For now, return support email for subscription management
+    // In the future, this could be updated to use Dodo's customer portal if available
+    log.info('Billing portal requested', {
+      organizationId: org.id,
+      subscriptionId: org.dodo_subscription_id
     });
-
-    log.info('Created billing portal session', { organizationId: org.id });
 
     return NextResponse.json({
       success: true,
-      url: session.url,
+      supportEmail: SUPPORT_EMAIL,
+      message: 'To manage your subscription, please contact support',
+      subscription: {
+        status: org.subscription_status,
+        plan: org.subscription_plan,
+      },
     });
   } catch (error: any) {
     log.error('Billing portal error', { error: error.message });
-    return NextResponse.json({ error: 'Failed to create portal session' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to get billing information' }, { status: 500 });
   }
 }
 
@@ -99,7 +102,7 @@ export async function GET() {
     // Get organization subscription details including trial info
     const { data: org } = await supabase
       .from('organizations')
-      .select('id, owner_id, stripe_customer_id, stripe_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end, trial_plan, trial_started_at, trial_ends_at')
+      .select('id, owner_id, dodo_customer_id, dodo_subscription_id, subscription_status, subscription_plan, subscription_seats, subscription_period_end, trial_plan, trial_started_at, trial_ends_at')
       .eq('id', profile.organization_id)
       .single();
 
@@ -133,8 +136,8 @@ export async function GET() {
         status: org.subscription_status || 'inactive',
         seats: org.subscription_seats || 1,
         periodEnd: org.subscription_period_end,
-        hasStripeCustomer: !!org.stripe_customer_id,
-        hasActiveSubscription: !!org.stripe_subscription_id && org.subscription_status === 'active',
+        hasDodoCustomer: !!org.dodo_customer_id,
+        hasActiveSubscription: !!org.dodo_subscription_id && org.subscription_status === 'active',
         isOwner: org.owner_id === user.id,
         // Trial info
         isOnTrial,

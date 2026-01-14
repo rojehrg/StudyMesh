@@ -37,6 +37,12 @@ export const organizations = pgTable("organizations", {
   // Stripe billing integration
   stripeCustomerId: text("stripe_customer_id").unique(),
   stripeSubscriptionId: text("stripe_subscription_id"),
+
+  // Dodo Payments billing integration
+  dodoCustomerId: text("dodo_customer_id"),
+  dodoSubscriptionId: text("dodo_subscription_id"),
+
+  // Subscription details (shared across payment providers)
   subscriptionStatus: text("subscription_status").default("inactive"), // inactive, active, past_due, canceled
   subscriptionPlan: text("subscription_plan").default("free"), // free, starter, pro, enterprise
   subscriptionSeats: integer("subscription_seats").default(1),

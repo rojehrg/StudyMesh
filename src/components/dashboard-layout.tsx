@@ -9,6 +9,7 @@ import {
   HamburgerLg,
   LogOut,
   Users,
+  CreditCard01,
 } from "react-coolicons";
 import { FileText, LayoutGrid, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -137,6 +138,7 @@ function DashboardLayoutBase({
     { icon: LayoutGrid, label: "Directory", href: "/groups" },
     { icon: Users, label: "Manage", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
+    { icon: CreditCard01, label: "Billing", href: "/billing" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
