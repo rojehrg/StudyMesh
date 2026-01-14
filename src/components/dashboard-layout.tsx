@@ -11,7 +11,7 @@ import {
   Users,
   CreditCard01,
 } from "react-coolicons";
-import { BarChart2, FileText, LayoutGrid, Search } from "lucide-react";
+import { BarChart2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -137,9 +137,7 @@ function DashboardLayoutBase({
   // Minimal sidebar for Slack-first experience
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
-    { icon: Search, label: "Find Help", href: "/find-help" },
-    { icon: LayoutGrid, label: "Directory", href: "/groups" },
-    { icon: Users, label: "Manage", href: "/team" },
+    { icon: Users, label: "Team", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
     ...(hasAdvancedAnalytics ? [{ icon: BarChart2, label: "Analytics", href: "/analytics" }] : []),
     { icon: CreditCard01, label: "Billing", href: "/billing" },
