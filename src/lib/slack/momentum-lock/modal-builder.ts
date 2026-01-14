@@ -302,9 +302,14 @@ export { CALLBACK_ID_DRAFT, CALLBACK_ID_EDIT, CALLBACK_ID_BLOCKED_REASON };
 export async function openModal(triggerId: string, view: SlackView): Promise<boolean> {
   const token = process.env.SLACK_BOT_TOKEN;
   if (!token) {
-    console.error("SLACK_BOT_TOKEN not set");
+    console.error("[Modal] SLACK_BOT_TOKEN not set");
     return false;
   }
+
+  console.log("[Modal] Opening modal", {
+    callback_id: view.callback_id,
+    trigger_id_prefix: triggerId.substring(0, 20),
+  });
 
   try {
     // 2.5-second timeout (Slack trigger_id expires after 3 seconds)
@@ -329,16 +334,21 @@ export async function openModal(triggerId: string, view: SlackView): Promise<boo
     const data = await response.json();
 
     if (!data.ok) {
-      console.error("Failed to open modal:", data.error, data.response_metadata);
+      console.error("[Modal] Slack API error:", {
+        error: data.error,
+        response_metadata: data.response_metadata,
+        callback_id: view.callback_id,
+      });
       return false;
     }
 
+    console.log("[Modal] Modal opened successfully", { callback_id: view.callback_id });
     return true;
   } catch (error: any) {
     if (error.name === 'AbortError') {
-      console.error("Slack modal API timeout");
+      console.error("[Modal] Timeout - trigger_id may have expired");
     } else {
-      console.error("Error opening modal:", error);
+      console.error("[Modal] Exception:", error.message);
     }
     return false;
   }

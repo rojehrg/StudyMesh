@@ -349,18 +349,26 @@ async function handleStartAction(lock: any, user: any, responseUrl: string) {
  * MVP: Simple free-text input instead of 4-option menu
  */
 async function handleBlockedAction(lock: any, user: any, responseUrl: string, payload: any) {
-  // Open modal for blocked reason
   const triggerId = payload.trigger_id;
+
+  log.info('Blocked action received', { lockId: lock.id, hasTriggerId: !!triggerId });
+
   if (!triggerId) {
+    log.error('No trigger_id for blocked action', { lockId: lock.id });
     await respondEphemeral(responseUrl, 'Something went wrong. Please try again.');
     return NextResponse.json({ ok: true });
   }
 
   const modal = buildBlockedReasonModal(lock.id);
+  log.info('Opening blocked reason modal', { lockId: lock.id });
+
   const success = await openModal(triggerId, modal);
 
   if (!success) {
+    log.error('Failed to open blocked modal', { lockId: lock.id });
     await respondEphemeral(responseUrl, 'Failed to open the form. Please try again.');
+  } else {
+    log.info('Blocked modal opened successfully', { lockId: lock.id });
   }
 
   return NextResponse.json({ ok: true });
