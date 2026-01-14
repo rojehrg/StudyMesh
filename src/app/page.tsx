@@ -626,6 +626,77 @@ const WhatsDifferentAndWhoUsesIt = () => (
   </section>
 );
 
+// Testimonials Section
+const Testimonials = () => {
+  const testimonials = [
+    {
+      quote: "We went from 'did you see my message?' to knowing exactly when people saw it and what's blocking them.",
+      name: 'Priya Sharma',
+      role: 'Engineering Manager',
+      company: 'a remote-first startup',
+      initials: 'PS',
+    },
+    {
+      quote: "The 'blocked' button is genius. Now we actually know why things are stuck instead of guessing.",
+      name: 'Marcus Chen',
+      role: 'Product Lead',
+      company: 'a distributed company',
+      initials: 'MC',
+    },
+    {
+      quote: 'Our team is across 5 timezones. Attunly is the only thing that makes async handoffs bearable.',
+      name: 'Elena Voss',
+      role: 'Founder',
+      company: 'a small async team',
+      initials: 'EV',
+    },
+    {
+      quote: "I used to send follow-ups just to feel like I wasn't forgotten. Now I just check the status and move on.",
+      name: 'David Park',
+      role: 'Senior Developer',
+      company: 'a fully remote agency',
+      initials: 'DP',
+    },
+  ];
+
+  return (
+    <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">What teams are saying</p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight">
+            Clarity changes everything.
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {testimonials.map((testimonial) => (
+            <div
+              key={testimonial.name}
+              className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam"
+            >
+              <p className="text-lg text-coffee-mocha leading-relaxed mb-6">
+                &ldquo;{testimonial.quote}&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-coffee-espresso flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
+                  {testimonial.initials}
+                </div>
+                <div>
+                  <p className="font-semibold text-coffee-espresso">{testimonial.name}</p>
+                  <p className="text-sm text-coffee-cortado">
+                    {testimonial.role} at {testimonial.company}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // Trust Section
 const Trust = () => (
   <Section darker>
@@ -773,6 +844,9 @@ const Footer = () => (
         <Link href="/terms" className="hover:text-coffee-paper transition-colors">
           Terms
         </Link>
+        <Link href="/security" className="hover:text-coffee-paper transition-colors">
+          Security
+        </Link>
         <Link href="/support" className="hover:text-coffee-paper transition-colors">
           Contact
         </Link>
@@ -836,6 +910,7 @@ export default function AttunlyLanding() {
       <TheMoment />
       <BeforeAfterDemo />
       <WhatsDifferentAndWhoUsesIt />
+      <Testimonials />
       <Trust />
       <FAQ />
       <FinalCTA />
