@@ -24,6 +24,25 @@ const DODO_PRODUCT_IDS: Record<string, string | undefined> = {
   enterprise: process.env.DODO_PRODUCT_ENTERPRISE,
 };
 
+// Plan configuration
+const PLAN_CONFIG = {
+  starter: {
+    minSeats: 1,
+    maxSeats: 10,
+    isPerSeat: false, // Flat $19/mo
+  },
+  pro: {
+    minSeats: 10,
+    maxSeats: 500,
+    isPerSeat: true, // $8/seat/mo
+  },
+  enterprise: {
+    minSeats: 50,
+    maxSeats: 10000,
+    isPerSeat: true, // Custom pricing
+  },
+};
+
 type PlanName = 'starter' | 'pro' | 'enterprise';
 
 /**
@@ -44,12 +63,36 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { plan } = body as {
+    const { plan, seats } = body as {
       plan: PlanName;
+      seats?: number;
     };
 
     if (!plan || !['starter', 'pro', 'enterprise'].includes(plan)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
+    }
+
+    // Enterprise requires contact sales
+    if (plan === 'enterprise') {
+      return NextResponse.json({
+        success: false,
+        contactSales: true,
+        message: 'Enterprise plans require a custom quote. Please contact sales@attunly.com'
+      });
+    }
+
+    const planConfig = PLAN_CONFIG[plan];
+
+    // Validate seats for per-seat plans
+    let quantity = 1;
+    if (planConfig.isPerSeat) {
+      const requestedSeats = seats || planConfig.minSeats;
+      if (requestedSeats < planConfig.minSeats || requestedSeats > planConfig.maxSeats) {
+        return NextResponse.json({
+          error: `${plan} plan requires between ${planConfig.minSeats} and ${planConfig.maxSeats} seats`
+        }, { status: 400 });
+      }
+      quantity = requestedSeats;
     }
 
     const supabase = await createClient();
@@ -104,12 +147,14 @@ export async function POST(request: Request) {
         name: userName,
       },
       product_id: productId,
-      quantity: 1,
+      quantity, // 1 for Starter (flat), seat count for Pro (per-seat)
       payment_link: true,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
       metadata: {
         organization_id: org.id,
         user_id: context.userId,
+        plan, // Include plan name for webhook handler
+        seats: String(quantity),
       },
     });
 

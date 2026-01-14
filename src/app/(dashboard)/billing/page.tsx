@@ -10,7 +10,7 @@ import { Lock, LockOpen, AlertTriangle } from "lucide-react";
 import { PageLoader, LottieLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { usePlanFeatures, getPlanDisplayName, getPlanPricing } from "@/hooks/use-plan-features";
+import { usePlanFeatures, getPlanDisplayName } from "@/hooks/use-plan-features";
 
 interface BillingData {
   plan: string;
@@ -41,6 +41,8 @@ function BillingContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"starter" | "pro" | null>(null);
+  const [selectedSeats, setSelectedSeats] = useState(10);
 
   const { subscription, plan, loading: planLoading } = usePlanFeatures();
   const supabase = createClient();
@@ -175,9 +177,9 @@ function BillingContent() {
       // Get max seats for the plan
       const planFeatures: Record<string, number> = {
         free: 5,
-        starter: 20,
-        pro: 100,
-        enterprise: -1,
+        starter: 10, // Flat $19/mo up to 10 seats
+        pro: 500, // $8/seat/mo, min 10 seats
+        enterprise: -1, // Unlimited, custom pricing
       };
 
       setUsageStats({
@@ -221,7 +223,7 @@ function BillingContent() {
     }
   };
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (plan: "starter" | "pro") => {
     if (!billingData?.isOwner) {
       toast.error("Only the organization owner can upgrade the plan");
       return;
@@ -233,12 +235,16 @@ function BillingContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          plan: "pro",
-          billingPeriod: "monthly",
-          seats: Math.max(usageStats?.totalMembers || 5, 5),
+          plan,
+          seats: plan === "pro" ? selectedSeats : undefined,
         }),
       });
       const data = await response.json();
+
+      if (data.contactSales) {
+        toast.info(data.message);
+        return;
+      }
 
       if (data.success && data.url) {
         window.location.href = data.url;
@@ -297,9 +303,24 @@ function BillingContent() {
   }
 
   const planName = getPlanDisplayName(billingData.plan as any);
-  const pricing = getPlanPricing(billingData.plan as any);
   const showUpgrade = billingData.plan === "free" || billingData.plan === "starter";
   const seatUsagePercent = usageStats.maxSeats === -1 ? 0 : (usageStats.totalMembers / usageStats.maxSeats) * 100;
+
+  // Get pricing display for current plan
+  const getPricingDisplay = (plan: string) => {
+    switch (plan) {
+      case "free":
+        return "Free forever";
+      case "starter":
+        return "$19/month (up to 10 seats)";
+      case "pro":
+        return `$8/seat/month (${billingData.seats} seats = $${billingData.seats * 8}/mo)`;
+      case "enterprise":
+        return "Custom pricing";
+      default:
+        return "Free";
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto space-y-8 py-4">
@@ -321,9 +342,7 @@ function BillingContent() {
                 {getStatusBadge(billingData.status, billingData.isOnTrial)}
               </div>
               <p className="text-coffee-cortado">
-                {billingData.plan === "free"
-                  ? "Free forever"
-                  : `$${pricing.monthly}/seat/month`}
+                {getPricingDisplay(billingData.plan)}
               </p>
             </div>
             {billingData.isOnTrial && billingData.trialDaysRemaining && (
@@ -396,19 +415,123 @@ function BillingContent() {
               </Button>
             )}
 
-            {showUpgrade && billingData.isOwner && (
-              <Button
-                onClick={handleUpgrade}
-                disabled={checkoutLoading}
-                className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
-              >
-                {checkoutLoading ? (
-                  <LottieLoader size="sm" className="w-4 h-4 mr-2" />
-                ) : (
-                  <ArrowRightMd className="w-4 h-4 mr-2" />
+            {showUpgrade && billingData.isOwner && !selectedPlan && (
+              <div className="flex gap-2">
+                {billingData.plan === "free" && (
+                  <Button
+                    onClick={() => setSelectedPlan("starter")}
+                    variant="outline"
+                    className="border-coffee-foam hover:border-coffee-latte"
+                  >
+                    Upgrade to Starter
+                  </Button>
                 )}
-                Upgrade Plan
-              </Button>
+                <Button
+                  onClick={() => setSelectedPlan("pro")}
+                  className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
+                >
+                  <ArrowRightMd className="w-4 h-4 mr-2" />
+                  {billingData.plan === "free" ? "Upgrade to Pro" : "Upgrade to Pro"}
+                </Button>
+              </div>
+            )}
+
+            {/* Plan Selection UI */}
+            {selectedPlan && billingData.isOwner && (
+              <div className="w-full bg-coffee-cream rounded-lg p-4 space-y-4">
+                {selectedPlan === "starter" && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-coffee-espresso">Starter Plan</p>
+                        <p className="text-sm text-coffee-cortado">$19/month flat rate, up to 10 seats</p>
+                      </div>
+                      <p className="text-xl font-bold text-coffee-espresso">$19/mo</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedPlan(null)}
+                        className="border-coffee-foam"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => handleUpgrade("starter")}
+                        disabled={checkoutLoading}
+                        className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
+                      >
+                        {checkoutLoading ? (
+                          <LottieLoader size="sm" className="w-4 h-4 mr-2" />
+                        ) : null}
+                        Continue to Checkout
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {selectedPlan === "pro" && (
+                  <>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-semibold text-coffee-espresso">Pro Plan</p>
+                        <p className="text-sm text-coffee-cortado">$8/seat/month, minimum 10 seats</p>
+                      </div>
+                      <p className="text-xl font-bold text-coffee-espresso">${selectedSeats * 8}/mo</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="text-sm text-coffee-cortado">Number of seats:</label>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedSeats(Math.max(10, selectedSeats - 5))}
+                          disabled={selectedSeats <= 10}
+                          className="border-coffee-foam w-8 h-8 p-0"
+                        >
+                          -
+                        </Button>
+                        <input
+                          type="number"
+                          value={selectedSeats}
+                          onChange={(e) => setSelectedSeats(Math.max(10, Math.min(500, parseInt(e.target.value) || 10)))}
+                          className="w-20 text-center border border-coffee-foam rounded-md py-1 text-coffee-espresso bg-white"
+                          min={10}
+                          max={500}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedSeats(Math.min(500, selectedSeats + 5))}
+                          disabled={selectedSeats >= 500}
+                          className="border-coffee-foam w-8 h-8 p-0"
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedPlan(null)}
+                        className="border-coffee-foam"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => handleUpgrade("pro")}
+                        disabled={checkoutLoading}
+                        className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
+                      >
+                        {checkoutLoading ? (
+                          <LottieLoader size="sm" className="w-4 h-4 mr-2" />
+                        ) : null}
+                        Continue to Checkout
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
 
             {!billingData.isOwner && (
