@@ -270,7 +270,7 @@ export function buildBlockedReasonModal(lockId: string): SlackView {
   return {
     type: "modal",
     callback_id: CALLBACK_ID_BLOCKED_REASON,
-    title: { type: "plain_text", text: "What's getting in the way?" },
+    title: { type: "plain_text", text: "What's blocking you?" },
     submit: { type: "plain_text", text: "Send" },
     close: { type: "plain_text", text: "Cancel" },
     blocks: [
