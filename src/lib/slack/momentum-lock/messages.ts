@@ -404,6 +404,114 @@ export function buildCompletionMessage(lock: MomentumLock): {
 }
 
 /**
+ * Build reminder DM message for lock owner
+ *
+ * Sent as deadline approaches to remind owner
+ */
+export function buildReminderMessage(
+  lock: MomentumLock,
+  threadLink: string | null,
+  isUrgent: boolean = false
+): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const { requesterUserId, requiredOutcome, acceptableFallback, deadlineAt } = lock;
+
+  // Calculate remaining time
+  const now = new Date();
+  const deadline = new Date(deadlineAt);
+  const diff = deadline.getTime() - now.getTime();
+  const hoursRemaining = Math.max(0, Math.round(diff / (60 * 60 * 1000)));
+
+  let timeText: string;
+  if (hoursRemaining <= 1) {
+    timeText = "less than 1 hour";
+  } else if (hoursRemaining < 24) {
+    timeText = `${hoursRemaining} hours`;
+  } else {
+    const days = Math.round(hoursRemaining / 24);
+    timeText = days === 1 ? "1 day" : `${days} days`;
+  }
+
+  const header = isUrgent
+    ? "Deadline approaching soon"
+    : "Friendly reminder";
+
+  const text = `${header}: ${requiredOutcome} (${timeText} remaining)`;
+
+  const fallbackSection = acceptableFallback
+    ? `\n\n*If blocked:* _${acceptableFallback}_`
+    : "";
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: isUrgent
+          ? `*Deadline approaching soon*\n\n<@${requesterUserId}> is waiting on:\n_${requiredOutcome}_${fallbackSection}`
+          : `*Friendly reminder*\n\n<@${requesterUserId}> is waiting on:\n_${requiredOutcome}_${fallbackSection}`,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: threadLink
+            ? `*${timeText} remaining* | <${threadLink}|View thread>`
+            : `*${timeText} remaining*`,
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      block_id: "reminder_actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Start",
+            emoji: true,
+          },
+          style: "primary",
+          action_id: "momentum_lock_start",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "I'm Blocked",
+            emoji: true,
+          },
+          action_id: "momentum_lock_blocked",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Done",
+            emoji: true,
+          },
+          style: "primary",
+          action_id: "momentum_lock_done",
+          value: lock.id,
+        },
+      ],
+    },
+  ];
+
+  return { text, blocks };
+}
+
+/**
  * Generate thread link from channel and thread_ts
  */
 export function generateThreadLink(
