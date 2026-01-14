@@ -4,13 +4,10 @@ This file provides context for Claude when working on the Attunly codebase.
 
 ## Project Overview
 
-**Attunly** is a Slack-first expertise finder for teams. Users connect Slack, describe their expertise, and the app matches people who need help with people who can provide it.
+**Attunly** is a Slack-first micro-ticket system for teams. The core feature is **Momentum Locks** - lightweight async accountability requests embedded in Slack.
 
-Key features:
-- **Find Help** - AI-powered search to find teammates with relevant expertise
-- **Knowledge Graph** - Visual network of team expertise and connections
-- **Lingo Translation** - Translates departmental jargon between teams (e.g., Sales → Engineering)
-- **Slack Integration** - `/attunly` command for finding help directly in Slack
+Key feature:
+- **Momentum Locks** - Request responses from teammates with deadlines, track status (Start → Blocked → Done), and get notifications
 
 ## Tech Stack
 
@@ -19,8 +16,6 @@ Key features:
 - **ORM:** Drizzle
 - **Styling:** Tailwind CSS with custom coffee color palette
 - **UI Components:** Radix UI primitives
-- **Animation:** Framer Motion (minimal usage)
-- **AI:** Groq (free tier) for semantic search and lingo translation
 - **Payments:** Stripe
 - **Testing:** Vitest + Playwright
 
@@ -31,28 +26,24 @@ src/
 ├── app/
 │   ├── (dashboard)/     # Authenticated app pages
 │   │   ├── dashboard/   # Main dashboard
-│   │   ├── find-help/   # AI expertise search
-│   │   ├── groups/      # Knowledge graph view
+│   │   ├── analytics/   # Lock analytics
 │   │   ├── team/        # Team management
 │   │   └── settings/    # User settings
 │   ├── (auth)/          # Login/signup flows
 │   ├── (onboarding)/    # New user onboarding
 │   ├── api/             # API routes
-│   │   ├── slack/       # Slack webhooks & commands
-│   │   ├── graph/       # Knowledge graph data
-│   │   ├── find-help/   # Search API
+│   │   ├── slack/       # Slack webhooks, commands, interactions
+│   │   ├── cron/        # Momentum lock reminders
 │   │   └── billing/     # Stripe integration
 │   └── page.tsx         # Landing page
 ├── components/
 │   ├── ui/              # Radix-based primitives
-│   ├── knowledge-graph/ # Graph visualization
 │   └── loading-states.tsx
 ├── lib/
 │   ├── supabase/        # Supabase client (server/client)
-│   ├── ai/              # Groq integrations
-│   │   ├── semantic-search.ts
-│   │   └── lingo-translator.ts
 │   ├── slack/           # Slack API helpers
+│   │   └── momentum-lock/  # Lock creation, messages, modals
+│   ├── db/              # Drizzle schema and queries
 │   └── rbac.ts          # Role-based access control
 ```
 
@@ -115,33 +106,24 @@ npm run test:e2e     # Run Playwright tests
 
 ## Key Files
 
-- `src/lib/ai/lingo-translator.ts` - Cross-department jargon translation
-- `src/lib/ai/semantic-search.ts` - AI-powered expertise matching
-- `src/app/api/slack/commands/route.ts` - Slack slash command handler
-- `src/app/api/graph/route.ts` - Knowledge graph data API
+- `src/app/api/slack/commands/route.ts` - `/attunly` slash command (opens lock modal)
+- `src/app/api/slack/interactions/route.ts` - Button clicks, modal submissions
+- `src/lib/slack/momentum-lock/` - Lock creation, messages, inference, modals
+- `src/lib/db/schema/index.ts` - Database schema (momentum_locks, momentum_lock_events)
 - `src/lib/rbac.ts` - Auth context and permissions
 
 ## Database
 
-Profiles table key fields:
-- `user_id`, `organization_id`
-- `first_name`, `last_name`
-- `department`, `major`
-- `expertise_text` - Free-form expertise description
-- `knowledge_areas` - Array of skill tags
-- `availability` - JSONB with `currentlyAvailable` boolean
-
-## Testing Seeds
-
-```bash
-npx tsx scripts/seed-test-users.ts  # Add fake users for testing
-```
+Key tables:
+- `momentum_locks` - Lock records (owner, requester, deadline, status)
+- `momentum_lock_events` - Event log (started, blocked, done)
+- `profiles` - User profiles with Slack ID, timezone
 
 ## Environment Variables
 
 Required in `.env.local`:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `GROQ_API_KEY` (for AI features)
+- `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`
 - `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`
 - `STRIPE_SECRET_KEY`
