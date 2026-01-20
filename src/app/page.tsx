@@ -145,12 +145,12 @@ const RequestFlowAnimation = () => {
 
               {/* Status updates */}
               <div className="space-y-2">
-                <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`flex items-center gap-2 text-sm transition-all duration-200 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
                   <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
                   <span className="text-coffee-cortado">{currentScenario.owner} saw your request and started</span>
                 </div>
 
-                <div className={`flex items-center gap-2 text-sm transition-all duration-300 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`flex items-center gap-2 text-sm transition-all duration-200 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
                   <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
                   <span className="text-coffee-cortado">{currentScenario.owner} marked your request as done</span>
                 </div>
@@ -165,20 +165,20 @@ const RequestFlowAnimation = () => {
 
 // Hero Section
 const Hero = () => (
-  <section className="min-h-screen flex flex-col justify-center px-4 md:px-12 lg:px-24 pt-20 md:pt-24 pb-12 md:pb-16 bg-coffee-paper">
+  <section className="min-h-dvh flex flex-col justify-center px-4 md:px-12 lg:px-24 pt-20 md:pt-24 pb-12 md:pb-16 bg-coffee-paper">
     <div className="max-w-5xl mx-auto w-full">
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left: Copy */}
         <div>
-          <p className="text-coffee-latte text-xs md:text-sm tracking-wide uppercase mb-4 md:mb-6">A Slack layer</p>
+          <p className="text-coffee-latte text-xs md:text-sm uppercase mb-4 md:mb-6">A Slack layer</p>
 
-          <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6">
+          <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6 text-balance">
             Wait on people.
             <br />
             <span className="text-coffee-oat">Without the silence.</span>
           </h1>
 
-          <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch]">
+          <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch] text-pretty">
             When teams work across time zones, simple requests turn into day-long waits. Messages get buried, context is lost, and nobody knows what&apos;s happening. Attunly makes it easier to wait on people who aren&apos;t online right now.
           </p>
 
@@ -207,7 +207,7 @@ const TheMoment = () => (
   <section className="relative px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream overflow-visible">
     <div className="max-w-5xl mx-auto">
       <div className="max-w-2xl">
-        <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">You know this feeling</p>
+        <p className="text-coffee-latte text-sm uppercase mb-4">You know this feeling</p>
 
         <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
           <p>You sent a message. You need a response.</p>
@@ -247,10 +247,10 @@ const BeforeAfterDemo = () => {
     >
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4">
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4 text-balance">
             The difference is clarity.
           </h2>
-          <p className="text-lg text-coffee-steamed max-w-[50ch] mx-auto">
+          <p className="text-lg text-coffee-steamed max-w-[50ch] mx-auto text-pretty">
             Hours of silence. Or knowing exactly what&apos;s happening.
           </p>
         </div>
@@ -561,9 +561,9 @@ const WhatsDifferentAndWhoUsesIt = () => (
       <div className="grid md:grid-cols-2 gap-12 md:gap-16">
         {/* Left: What Attunly Does */}
         <div>
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">What it does</p>
+          <p className="text-coffee-latte text-sm uppercase mb-4">What it does</p>
 
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
             Three things.
             <br />
             <span className="text-coffee-oat">Nothing more.</span>
@@ -597,9 +597,9 @@ const WhatsDifferentAndWhoUsesIt = () => (
 
         {/* Right: Sound Familiar */}
         <div>
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">Sound familiar?</p>
+          <p className="text-coffee-latte text-sm uppercase mb-4">Sound familiar?</p>
 
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch]">
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
             Moments Attunly
             <br />
             <span className="text-coffee-oat">was made for.</span>
@@ -663,8 +663,8 @@ const Testimonials = () => {
     <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">What teams are saying</p>
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight">
+          <p className="text-coffee-latte text-sm uppercase mb-4">What teams are saying</p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight text-balance">
             Clarity changes everything.
           </h2>
         </div>
@@ -700,12 +700,12 @@ const Testimonials = () => {
 // Trust Section
 const Trust = () => (
   <Section darker>
-    <p className="text-coffee-latte text-sm tracking-wide uppercase mb-4">No new tools to learn</p>
+    <p className="text-coffee-latte text-sm uppercase mb-4">No new tools to learn</p>
 
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
+    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
       It&apos;s just a Slack command.
     </h2>
-    <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch]">
+    <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch] text-pretty">
       Request a response. Get clarity. That&apos;s it.
     </p>
 
@@ -771,7 +771,7 @@ const FAQ = () => {
   return (
     <section className="px-4 md:px-12 lg:px-24 py-12 md:py-20 bg-coffee-paper">
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8">
+        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 text-balance">
           Common questions.
         </h2>
 
@@ -813,11 +813,11 @@ const FAQ = () => {
 // Final CTA Section
 const FinalCTA = () => (
   <Section className="text-center" id="install" darker>
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4">
+    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
       Replace silence with clarity.
     </h2>
 
-    <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto">
+    <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto text-pretty">
       Request a response. See when they saw it. Know what&apos;s happening.
     </p>
 

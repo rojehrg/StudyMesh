@@ -441,12 +441,12 @@ function SettingsContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-coffee-espresso">Settings</h1>
+          <h1 className="text-2xl font-bold text-coffee-espresso text-balance">Settings</h1>
           <p className="text-coffee-cortado mt-1">Manage your profile and integrations</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-coffee-cortado">
           {saveStatus === 'saving' && <><LottieLoader size="sm" className="w-4 h-4" /> Saving...</>}
-          {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-emerald-600" /> Saved</>}
+          {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-coffee-mocha" /> Saved</>}
           {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-red-500" /> Error</>}
           {saveStatus === 'idle' && <><WifiHigh className="h-4 w-4" /> Auto-save</>}
         </div>
@@ -579,7 +579,7 @@ function SettingsContent() {
           <div className="flex items-center justify-between text-xs text-coffee-cortado">
             <span>{profile.expertiseText?.length || 0}/500 characters</span>
             {profile.expertiseText && !expertiseSaving && (
-              <span className="flex items-center gap-1 text-emerald-600">
+              <span className="flex items-center gap-1 text-coffee-mocha">
                 <CheckBig className="w-3 h-3" />
                 Saved
               </span>
@@ -703,7 +703,7 @@ function SettingsContent() {
                   {org.inviteCode}
                 </div>
                 <Button onClick={copyInviteCode} variant="outline" size="icon" className="shrink-0">
-                  {copiedInvite ? <CheckBig className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  {copiedInvite ? <CheckBig className="w-4 h-4 text-coffee-mocha" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
               <p className="text-xs text-coffee-cortado mt-2">Share this code to invite teammates</p>

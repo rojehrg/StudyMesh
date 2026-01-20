@@ -122,7 +122,7 @@ export default async function DashboardPage() {
     <div className="max-w-xl mx-auto space-y-6 py-8">
       {/* Welcome Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-semibold text-coffee-espresso tracking-tight">
+        <h1 className="text-3xl font-semibold text-coffee-espresso tracking-tight text-balance">
           {isFirstTimeUser && isSlackConnected ? "Ready to get started" : isFullySetup ? "You're all set" : "Welcome"}{profile.first_name ? `, ${profile.first_name}` : ''}!
         </h1>
         <p className="text-coffee-cortado mt-2">
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-coffee-espresso">Slack</h3>
                 {isSlackConnected ? (
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-coffee-mocha" />
                 ) : (
                   <XCircle className="w-4 h-4 text-coffee-oat" />
                 )}
@@ -226,7 +226,7 @@ export default async function DashboardPage() {
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-coffee-espresso">Calendar</h3>
                 {isCalendarConnected ? (
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-coffee-mocha" />
                 ) : (
                   <span className="text-xs text-coffee-latte">Optional</span>
                 )}

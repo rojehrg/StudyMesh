@@ -156,7 +156,7 @@ export default function OnboardingPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-coffee-paper flex items-center justify-center">
+      <div className="min-h-dvh bg-coffee-paper flex items-center justify-center">
         <LottieLoader size="lg" />
       </div>
     );
@@ -175,7 +175,7 @@ export default function OnboardingPage() {
 
   return (
     <div
-      className="min-h-screen bg-coffee-paper"
+      className="min-h-dvh bg-coffee-paper"
       style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
     >
       {/* Header */}
@@ -226,7 +226,7 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
               >
-                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1 text-balance">
                   Tell us about yourself
                 </h1>
                 <p className="text-coffee-cortado mb-6">
@@ -353,7 +353,7 @@ export default function OnboardingPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
               >
-                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+                <h1 className="text-2xl font-semibold text-coffee-espresso mb-1 text-balance">
                   Connect Slack
                 </h1>
                 <p className="text-coffee-cortado mb-6">

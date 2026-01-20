@@ -364,9 +364,9 @@ function AnalyticsContent() {
   };
 
   const getTrendIndicator = (current: number, previous: number) => {
-    if (previous === 0) return current > 0 ? { text: "New", color: "text-emerald-600" } : null;
+    if (previous === 0) return current > 0 ? { text: "New", color: "text-coffee-mocha" } : null;
     const change = Math.round(((current - previous) / previous) * 100);
-    if (change > 0) return { text: `+${change}%`, color: "text-emerald-600" };
+    if (change > 0) return { text: `+${change}%`, color: "text-coffee-mocha" };
     if (change < 0) return { text: `${change}%`, color: "text-red-500" };
     return { text: "0%", color: "text-coffee-latte" };
   };
@@ -380,7 +380,7 @@ function AnalyticsContent() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto py-8">
         <div className="bg-white rounded-xl border border-coffee-foam p-8 text-center space-y-6">
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-coffee-espresso">Analytics</h1>
+            <h1 className="text-2xl font-bold text-coffee-espresso text-balance">Analytics</h1>
             <p className="text-coffee-cortado">
               Advanced analytics are available on Starter and higher plans.
             </p>
@@ -416,7 +416,7 @@ function AnalyticsContent() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-8 py-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-coffee-espresso">Analytics</h1>
+        <h1 className="text-2xl font-bold text-coffee-espresso text-balance">Analytics</h1>
         <p className="text-coffee-cortado mt-1">
           Insights into your team&apos;s momentum locks
         </p>

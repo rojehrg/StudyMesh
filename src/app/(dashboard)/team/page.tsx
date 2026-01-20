@@ -221,7 +221,7 @@ export default function TeamPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center">
         <ShieldAlert className="w-12 h-12 text-coffee-latte mx-auto mb-4" />
-        <h1 className="text-xl font-semibold text-coffee-espresso mb-2">
+        <h1 className="text-xl font-semibold text-coffee-espresso mb-2 text-balance">
           Access Restricted
         </h1>
         <p className="text-coffee-cortado">
@@ -285,7 +285,7 @@ export default function TeamPage() {
                   aria-label={copiedCode ? "Copied invite code" : "Copy invite code"}
                 >
                   {copiedCode ? (
-                    <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                    <Check className="w-4 h-4 text-coffee-mocha" aria-hidden="true" />
                   ) : (
                     <Copy className="w-4 h-4" aria-hidden="true" />
                   )}

@@ -59,7 +59,7 @@ export default function BetaPage() {
 
   return (
     <div
-      className="min-h-screen bg-coffee-paper flex flex-col"
+      className="min-h-dvh bg-coffee-paper flex flex-col"
       style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
     >
       {/* Simple header */}
@@ -81,10 +81,10 @@ export default function BetaPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl md:text-3xl font-semibold text-coffee-espresso mb-3">
+              <h1 className="text-2xl md:text-3xl font-semibold text-coffee-espresso mb-3 text-balance">
                 {message}
               </h1>
-              <p className="text-coffee-cortado mb-8">
+              <p className="text-coffee-cortado mb-8 text-pretty">
                 We'll reach out when it's your turn to join.
               </p>
               <Link
@@ -101,10 +101,10 @@ export default function BetaPage() {
             // Form state
             <>
               <div className="text-center mb-8">
-                <h1 className="text-2xl md:text-3xl font-semibold text-coffee-espresso mb-3">
+                <h1 className="text-2xl md:text-3xl font-semibold text-coffee-espresso mb-3 text-balance">
                   Join the private beta
                 </h1>
-                <p className="text-coffee-cortado">
+                <p className="text-coffee-cortado text-pretty">
                   Be the first to help your team find the right expert, instantly.
                 </p>
               </div>

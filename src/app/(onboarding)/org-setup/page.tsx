@@ -140,7 +140,7 @@ export default function OrgSetupPage() {
 
   return (
     <div
-      className="min-h-screen bg-coffee-paper"
+      className="min-h-dvh bg-coffee-paper"
       style={{ fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif' }}
     >
       {/* Header */}
@@ -171,7 +171,7 @@ export default function OrgSetupPage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-semibold text-coffee-espresso mb-2">Join your team</h1>
+                <h1 className="text-3xl font-semibold text-coffee-espresso mb-2 text-balance">Join your team</h1>
                 <p className="text-coffee-cortado">Create a new organization or join an existing one</p>
               </div>
 
@@ -221,7 +221,7 @@ export default function OrgSetupPage() {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
             >
-              <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+              <h1 className="text-2xl font-semibold text-coffee-espresso mb-1 text-balance">
                 Create Organization
               </h1>
               <p className="text-coffee-cortado mb-6">
@@ -272,7 +272,7 @@ export default function OrgSetupPage() {
               animate={{ opacity: 1, x: 0 }}
               className="bg-white rounded-2xl border border-coffee-foam p-8 shadow-sm"
             >
-              <h1 className="text-2xl font-semibold text-coffee-espresso mb-1">
+              <h1 className="text-2xl font-semibold text-coffee-espresso mb-1 text-balance">
                 Join Organization
               </h1>
               <p className="text-coffee-cortado mb-6">

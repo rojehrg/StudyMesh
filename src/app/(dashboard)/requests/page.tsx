@@ -70,7 +70,7 @@ const STATUS_CONFIG = {
   },
   done: {
     label: "Completed",
-    color: "bg-emerald-100 text-emerald-700",
+    color: "bg-coffee-cream text-coffee-mocha",
     icon: CheckCircle,
   },
   canceled: {
@@ -220,10 +220,10 @@ function LockCard({
 
       {/* Response Time Stats */}
       {lock.status === "done" && lockEvents.length > 1 && (
-        <div className="px-5 py-3 border-t border-coffee-foam/50 bg-emerald-50/50">
+        <div className="px-5 py-3 border-t border-coffee-foam/50 bg-coffee-cream/50">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
-            <span className="text-sm text-emerald-700">
+            <CheckCircle className="w-4 h-4 text-coffee-mocha" />
+            <span className="text-sm text-coffee-mocha">
               Completed in {formatRelativeTime(new Date(lock.created_at))}
             </span>
           </div>
@@ -339,7 +339,7 @@ export default async function RequestHistoryPage() {
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
         </Link>
-        <h1 className="text-2xl font-semibold text-coffee-espresso">Request History</h1>
+        <h1 className="text-2xl font-semibold text-coffee-espresso text-balance">Request History</h1>
         <p className="text-coffee-cortado mt-1">
           Track your momentum locks and their progress
         </p>
