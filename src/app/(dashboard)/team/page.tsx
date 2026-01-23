@@ -202,13 +202,14 @@ export default function TeamPage() {
   };
 
   const getRoleBadgeClass = (role: string) => {
+    // Coffee palette only - no blue, purple, green, or red
     switch (role) {
       case "owner":
-        return "bg-amber-100 text-amber-700 border-amber-200";
+        return "bg-coffee-steamed text-coffee-roast border-coffee-latte hover:bg-coffee-steamed";
       case "admin":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-coffee-foam text-coffee-mocha border-coffee-latte hover:bg-coffee-foam";
       default:
-        return "bg-coffee-cream text-coffee-mocha border-coffee-foam";
+        return "bg-coffee-cream text-coffee-cortado border-coffee-foam hover:bg-coffee-cream";
     }
   };
 
@@ -429,7 +430,7 @@ export default function TeamPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      className="h-8 w-8 text-coffee-roast hover:text-coffee-roast hover:bg-coffee-roast/10"
                       onClick={() => handleRemove(member.user_id, name)}
                       disabled={removingId === member.user_id}
                       aria-label={`Remove ${name} from organization`}

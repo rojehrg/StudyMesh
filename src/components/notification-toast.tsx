@@ -40,15 +40,15 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
   const getIcon = () => {
     switch (notification?.type) {
       case 'nudge':
-        return <Zap className="w-5 h-5 text-violet-400" />;
+        return <Zap className="w-5 h-5 text-coffee-cortado" />;
       case 'nudge_response':
-        return <MessageCircle className="w-5 h-5 text-green-400" />;
+        return <MessageCircle className="w-5 h-5 text-coffee-mocha" />;
       case 'new_match':
-        return <Sparkles className="w-5 h-5 text-amber-400" />;
+        return <Sparkles className="w-5 h-5 text-coffee-oat" />;
       case 'meeting_invite':
-        return <Calendar className="w-5 h-5 text-blue-400" />;
+        return <Calendar className="w-5 h-5 text-coffee-cortado" />;
       default:
-        return <Bell className="w-5 h-5 text-violet-400" />;
+        return <Bell className="w-5 h-5 text-coffee-cortado" />;
     }
   };
 
@@ -74,17 +74,17 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
   const getAccentColor = () => {
     switch (notification?.type) {
       case 'nudge':
-        return 'border-l-violet-500 bg-violet-500/10';
+        return 'border-l-coffee-cortado bg-coffee-cortado/10';
       case 'nudge_response':
         return notification.metadata?.accepted
-          ? 'border-l-green-500 bg-green-500/10'
-          : 'border-l-gray-500 bg-gray-500/10';
+          ? 'border-l-coffee-mocha bg-coffee-mocha/10'
+          : 'border-l-coffee-latte bg-coffee-latte/10';
       case 'new_match':
-        return 'border-l-amber-500 bg-amber-500/10';
+        return 'border-l-coffee-oat bg-coffee-oat/10';
       case 'meeting_invite':
-        return 'border-l-blue-500 bg-blue-500/10';
+        return 'border-l-coffee-cortado bg-coffee-cortado/10';
       default:
-        return 'border-l-violet-500 bg-violet-500/10';
+        return 'border-l-coffee-cortado bg-coffee-cortado/10';
     }
   };
 

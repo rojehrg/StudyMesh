@@ -640,7 +640,7 @@ export function ScheduleMeetingDialog({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded bg-coffee-mocha flex items-center justify-center">
                         <Video className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">

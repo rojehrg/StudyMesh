@@ -55,17 +55,17 @@ const STATUS_CONFIG = {
   },
   active: {
     label: "Active",
-    color: "bg-amber-100 text-amber-700",
+    color: "bg-coffee-oat/20 text-coffee-oat",
     icon: Timer,
   },
   started: {
     label: "In Progress",
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-coffee-steamed text-coffee-mocha",
     icon: PlayCircle,
   },
   blocked: {
     label: "Blocked",
-    color: "bg-red-100 text-red-700",
+    color: "bg-coffee-roast/20 text-coffee-roast",
     icon: PauseCircle,
   },
   done: {
@@ -188,11 +188,11 @@ function LockCard({
       </div>
 
       {/* Deadline */}
-      <div className={`px-5 py-3 border-t border-coffee-foam/50 ${isOverdue ? "bg-red-50" : "bg-coffee-cream/20"}`}>
+      <div className={`px-5 py-3 border-t border-coffee-foam/50 ${isOverdue ? "bg-coffee-roast/10" : "bg-coffee-cream/20"}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className={`w-4 h-4 ${isOverdue ? "text-red-500" : "text-coffee-cortado"}`} />
-            <span className={`text-sm ${isOverdue ? "text-red-600 font-medium" : "text-coffee-cortado"}`}>
+            <Clock className={`w-4 h-4 ${isOverdue ? "text-coffee-roast" : "text-coffee-cortado"}`} />
+            <span className={`text-sm ${isOverdue ? "text-coffee-roast font-medium" : "text-coffee-cortado"}`}>
               {isOverdue ? "Overdue" : "Due"} {formatRelativeTime(deadline, { addSuffix: true })}
             </span>
           </div>

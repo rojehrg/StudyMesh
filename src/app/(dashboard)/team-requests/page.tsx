@@ -18,22 +18,22 @@ const STATUS_CONFIG = {
   },
   active: {
     label: "Active",
-    color: "bg-amber-100 text-amber-700",
+    color: "bg-coffee-oat/20 text-coffee-oat",
     icon: Timer,
   },
   started: {
     label: "In Progress",
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-coffee-steamed text-coffee-mocha",
     icon: PlayCircle,
   },
   blocked: {
     label: "Blocked",
-    color: "bg-red-100 text-red-700",
+    color: "bg-coffee-roast/20 text-coffee-roast",
     icon: PauseCircle,
   },
   done: {
     label: "Completed",
-    color: "bg-emerald-100 text-emerald-700",
+    color: "bg-coffee-cream text-coffee-mocha",
     icon: CheckCircle,
   },
 } as const;
@@ -158,7 +158,7 @@ function TeamLockRow({
         <div className="shrink-0 text-right">
           <div
             className={`text-sm font-medium ${
-              isOverdue ? "text-red-600" : "text-coffee-cortado"
+              isOverdue ? "text-coffee-roast" : "text-coffee-cortado"
             }`}
           >
             {timeText}
@@ -375,16 +375,16 @@ export default function TeamRequestsPage() {
           </div>
           {overdueLocks.length > 0 && (
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-500" />
-              <span className="text-sm text-red-600 font-medium">
+              <AlertCircle className="w-4 h-4 text-coffee-roast" />
+              <span className="text-sm text-coffee-roast font-medium">
                 {overdueLocks.length} overdue
               </span>
             </div>
           )}
           {blockedCount > 0 && (
             <div className="flex items-center gap-2">
-              <PauseCircle className="w-4 h-4 text-amber-500" />
-              <span className="text-sm text-amber-600">
+              <PauseCircle className="w-4 h-4 text-coffee-oat" />
+              <span className="text-sm text-coffee-oat">
                 {blockedCount} blocked
               </span>
             </div>
@@ -398,7 +398,7 @@ export default function TeamRequestsPage() {
       {/* Overdue Section */}
       {overdueLocks.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-medium text-red-600 mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-medium text-coffee-roast mb-3 flex items-center gap-2">
             <AlertCircle className="w-4 h-4" />
             Overdue ({overdueLocks.length})
           </h2>
@@ -418,7 +418,7 @@ export default function TeamRequestsPage() {
       {/* Urgent Section */}
       {urgentLocks.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-sm font-medium text-amber-600 mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-medium text-coffee-oat mb-3 flex items-center gap-2">
             <Clock className="w-4 h-4" />
             Due Soon ({urgentLocks.length})
           </h2>

@@ -112,7 +112,7 @@ export default function UsersPage() {
           placeholder="Search by name, email, or organization..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-coffee-oat focus:border-transparent"
         />
       </div>
 
@@ -136,8 +136,8 @@ export default function UsersPage() {
                 <tr key={user.id} className="text-sm hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
-                        <span className="text-violet-600 font-medium text-sm">
+                      <div className="w-8 h-8 rounded-full bg-coffee-cream flex items-center justify-center">
+                        <span className="text-coffee-cortado font-medium text-sm">
                           {user.first_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                         </span>
                       </div>
@@ -163,14 +163,14 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     {user.slack_connected ? (
-                      <CheckBig className="w-4 h-4 text-green-600" />
+                      <CheckBig className="w-4 h-4 text-coffee-mocha" />
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     {user.onboarding_completed ? (
-                      <CheckBig className="w-4 h-4 text-green-600" />
+                      <CheckBig className="w-4 h-4 text-coffee-mocha" />
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}

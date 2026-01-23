@@ -260,22 +260,22 @@ function BillingContent() {
 
   const getStatusBadge = (status: string, isOnTrial?: boolean) => {
     if (isOnTrial) {
-      return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">Trial</Badge>;
+      return <Badge className="bg-coffee-oat/20 text-coffee-oat border-coffee-oat/30 hover:bg-coffee-oat/20">Trial</Badge>;
     }
 
     // Dodo status values: active, on_hold, cancelled, expired
     switch (status) {
       case "active":
-        return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100">Active</Badge>;
+        return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam hover:bg-coffee-cream">Active</Badge>;
       case "trialing":
-        return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">Trial</Badge>;
+        return <Badge className="bg-coffee-oat/20 text-coffee-oat border-coffee-oat/30 hover:bg-coffee-oat/20">Trial</Badge>;
       case "on_hold":
-        return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">On Hold</Badge>;
+        return <Badge className="bg-coffee-oat/20 text-coffee-oat border-coffee-oat/30 hover:bg-coffee-oat/20">On Hold</Badge>;
       case "cancelled":
       case "canceled":
         return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam hover:bg-coffee-cream">Cancelled</Badge>;
       case "expired":
-        return <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">Expired</Badge>;
+        return <Badge className="bg-coffee-roast/20 text-coffee-roast border-coffee-roast/30 hover:bg-coffee-roast/20">Expired</Badge>;
       default:
         return <Badge className="bg-coffee-cream text-coffee-mocha border-coffee-foam hover:bg-coffee-cream">Inactive</Badge>;
     }
@@ -347,7 +347,7 @@ function BillingContent() {
             </div>
             {billingData.isOnTrial && billingData.trialDaysRemaining && (
               <div className="text-right">
-                <p className="text-sm text-amber-600 font-medium">
+                <p className="text-sm text-coffee-oat font-medium">
                   {billingData.trialDaysRemaining} days left in trial
                 </p>
               </div>
@@ -384,13 +384,13 @@ function BillingContent() {
               <div className="w-full bg-coffee-cream rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${
-                    seatUsagePercent >= 90 ? "bg-red-400" : seatUsagePercent >= 70 ? "bg-amber-400" : "bg-coffee-mocha"
+                    seatUsagePercent >= 90 ? "bg-coffee-roast" : seatUsagePercent >= 70 ? "bg-coffee-oat" : "bg-coffee-mocha"
                   }`}
                   style={{ width: `${Math.min(seatUsagePercent, 100)}%` }}
                 />
               </div>
               {seatUsagePercent >= 90 && (
-                <div className="flex items-center gap-2 text-sm text-amber-600">
+                <div className="flex items-center gap-2 text-sm text-coffee-oat">
                   <AlertTriangle className="w-4 h-4" />
                   <span>You are approaching your seat limit. Consider upgrading.</span>
                 </div>

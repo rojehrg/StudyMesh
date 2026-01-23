@@ -46,9 +46,10 @@ function SidebarItem({ icon: Icon, label, href, isCollapsed, isActive, isPending
       onClick={onClick}
       className={cn(
         "flex items-center gap-4 px-4 py-3 rounded-xl transition-colors duration-100 overflow-hidden whitespace-nowrap group",
+        "focus-visible:ring-2 focus-visible:ring-coffee-oat focus-visible:outline-none",
         showActive
-          ? "bg-coffee-cream/70 text-coffee-espresso font-medium"
-          : "text-coffee-cortado hover:bg-coffee-cream/40 hover:text-coffee-mocha"
+          ? "bg-coffee-cream text-coffee-mocha border-l-2 border-coffee-mocha font-medium"
+          : "text-coffee-cortado hover:bg-coffee-foam hover:text-coffee-mocha"
       )}
       title={isCollapsed ? label : ""}
     >
@@ -137,6 +138,7 @@ function DashboardLayoutBase({
   // Minimal sidebar for Slack-first experience
   // Users do everything in Slack - web is just for settings
   const navItems: Array<{ icon: any; label: string; href: string; badge?: number }> = [
+    { icon: BarChart2, label: "Dashboard", href: "/dashboard" },
     { icon: Users, label: "Team", href: "/team" },
     { icon: FileText, label: "Audit Log", href: "/audit-log" },
     ...(hasAdvancedAnalytics ? [{ icon: BarChart2, label: "Analytics", href: "/analytics" }] : []),
@@ -152,7 +154,7 @@ function DashboardLayoutBase({
       {/* Skip Link for Keyboard Navigation */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-coffee-espresso focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee-mocha"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-coffee-espresso focus:text-coffee-paper focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-coffee-oat"
       >
         Skip to main content
       </a>
@@ -169,7 +171,7 @@ function DashboardLayoutBase({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 bg-white border-r border-coffee-foam transition-all duration-300 ease-in-out flex flex-col",
+          "fixed inset-y-0 left-0 z-30 bg-coffee-paper border-r border-coffee-foam transition-all duration-300 ease-in-out flex flex-col",
           isCollapsed ? "w-20" : "w-64",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
@@ -255,7 +257,7 @@ function DashboardLayoutBase({
 
               <button
                 onClick={handleLogout}
-                className="text-coffee-latte hover:text-coffee-mocha p-1 rounded transition-colors active:scale-95 shrink-0 focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-1"
+                className="text-coffee-latte hover:text-coffee-mocha p-1 rounded transition-colors active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coffee-oat focus-visible:ring-offset-1"
                 aria-label="Log out"
               >
                 <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
@@ -301,10 +303,10 @@ function DashboardLayoutBase({
         onClick={() => setIsCollapsed(!isCollapsed)}
         className={cn(
           "hidden md:flex fixed top-1/2 -translate-y-1/2 z-40",
-          "bg-white border border-coffee-foam",
+          "bg-coffee-paper border border-coffee-foam",
           "rounded-r-lg p-1.5 shadow-sm hover:shadow-md",
-          "text-coffee-cortado hover:text-coffee-espresso transition-all duration-300 active:scale-95",
-          "focus:outline-none focus:ring-2 focus:ring-coffee-mocha focus:ring-offset-1",
+          "text-coffee-cortado hover:text-coffee-mocha transition-all duration-300 active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coffee-oat focus-visible:ring-offset-1",
           isCollapsed ? "left-[5rem]" : "left-[16rem]"
         )}
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}

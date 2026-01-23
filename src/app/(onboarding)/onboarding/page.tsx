@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                        First name <span className="text-red-400">*</span>
+                        First name <span className="text-coffee-roast">*</span>
                       </Label>
                       <Input
                         id="firstName"
@@ -247,16 +247,16 @@ export default function OnboardingPage() {
                         placeholder="Jane"
                         autoComplete="off"
                         className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
-                          touched.firstName && !formData.firstName ? 'border-red-300' : 'border-coffee-foam'
+                          touched.firstName && !formData.firstName ? 'border-coffee-roast' : 'border-coffee-foam'
                         }`}
                       />
                       {touched.firstName && !formData.firstName && (
-                        <p className="text-xs text-red-500 mt-1">First name is required</p>
+                        <p className="text-xs text-coffee-roast mt-1">First name is required</p>
                       )}
                     </div>
                     <div>
                       <Label htmlFor="lastName" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                        Last name <span className="text-red-400">*</span>
+                        Last name <span className="text-coffee-roast">*</span>
                       </Label>
                       <Input
                         id="lastName"
@@ -266,18 +266,18 @@ export default function OnboardingPage() {
                         placeholder="Smith"
                         autoComplete="off"
                         className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
-                          touched.lastName && !formData.lastName ? 'border-red-300' : 'border-coffee-foam'
+                          touched.lastName && !formData.lastName ? 'border-coffee-roast' : 'border-coffee-foam'
                         }`}
                       />
                       {touched.lastName && !formData.lastName && (
-                        <p className="text-xs text-red-500 mt-1">Last name is required</p>
+                        <p className="text-xs text-coffee-roast mt-1">Last name is required</p>
                       )}
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="role" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                      Your role <span className="text-red-400">*</span>
+                      Your role <span className="text-coffee-roast">*</span>
                     </Label>
                     <Input
                       id="role"
@@ -287,17 +287,17 @@ export default function OnboardingPage() {
                       placeholder="e.g. Senior Product Manager"
                       autoComplete="off"
                       className={`h-11 bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none font-sans [&:-webkit-autofill]:shadow-[0_0_0_30px_white_inset] ${
-                        touched.role && !formData.role ? 'border-red-300' : 'border-coffee-foam'
+                        touched.role && !formData.role ? 'border-coffee-roast' : 'border-coffee-foam'
                       }`}
                     />
                     {touched.role && !formData.role && (
-                      <p className="text-xs text-red-500 mt-1">Role is required</p>
+                      <p className="text-xs text-coffee-roast mt-1">Role is required</p>
                     )}
                   </div>
 
                   <div>
                     <Label htmlFor="aboutMe" className="text-sm font-medium text-coffee-mocha mb-1.5 block">
-                      About you <span className="text-red-400">*</span>
+                      About you <span className="text-coffee-roast">*</span>
                     </Label>
                     <p className="text-sm text-coffee-latte mb-2">
                       What do you know? What can you help with? What are you learning?
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
                       onBlur={() => setTouched({...touched, aboutMe: true})}
                       placeholder="I've been in product for 5 years, specializing in B2B SaaS. I can help with roadmap prioritization, stakeholder management, and writing PRDs. Currently learning more about AI/ML product strategy and would love to connect with folks who have experience there."
                       className={`min-h-[140px] bg-white text-coffee-espresso placeholder:text-coffee-latte focus:border-coffee-mocha focus:ring-1 focus:ring-coffee-mocha/30 focus:outline-none resize-none font-sans text-[15px] ${
-                        touched.aboutMe && formData.aboutMe.trim().length < 50 ? 'border-red-300' : 'border-coffee-foam'
+                        touched.aboutMe && formData.aboutMe.trim().length < 50 ? 'border-coffee-roast' : 'border-coffee-foam'
                       }`}
                     />
                     <div className="flex items-center justify-between mt-1.5">
@@ -317,7 +317,7 @@ export default function OnboardingPage() {
                         Write naturally — our AI uses this to match you with teammates.
                       </p>
                       {touched.aboutMe && formData.aboutMe.trim().length < 50 && (
-                        <p className="text-xs text-red-500">
+                        <p className="text-xs text-coffee-roast">
                           {formData.aboutMe.trim().length}/50 characters
                         </p>
                       )}

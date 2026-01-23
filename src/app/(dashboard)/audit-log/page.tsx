@@ -136,13 +136,13 @@ function getActionIcon(action: string) {
 
 // Get badge color for action category
 function getActionBadgeClass(action: string) {
-  if (action.startsWith('member.')) return "bg-blue-100 text-blue-700";
-  if (action.startsWith('user.')) return "bg-purple-100 text-purple-700";
-  if (action.startsWith('integration.')) return "bg-emerald-100 text-emerald-700";
-  if (action.startsWith('billing.')) return "bg-amber-100 text-amber-700";
-  if (action.startsWith('data.') || action.startsWith('account.')) return "bg-red-100 text-red-700";
+  if (action.startsWith('member.')) return "bg-coffee-cream text-coffee-cortado";
+  if (action.startsWith('user.')) return "bg-coffee-cream text-coffee-cortado";
+  if (action.startsWith('integration.')) return "bg-coffee-cream text-coffee-mocha";
+  if (action.startsWith('billing.')) return "bg-coffee-cream text-coffee-oat";
+  if (action.startsWith('data.') || action.startsWith('account.')) return "bg-coffee-cream text-coffee-roast";
   if (action.startsWith('org.')) return "bg-coffee-cream text-coffee-mocha";
-  return "bg-gray-100 text-gray-700";
+  return "bg-coffee-cream text-coffee-cortado";
 }
 
 // Format action name for display

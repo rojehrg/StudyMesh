@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { PageLoader } from "@/components/loading-states";
+import { PageLoader, Skeleton } from "@/components/loading-states";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { usePlanFeatures } from "@/hooks/use-plan-features";
@@ -15,11 +15,17 @@ import {
   Cell,
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+
+// ============================================
+// Types
+// ============================================
 
 interface DailyActivity {
   day: string;
@@ -35,6 +41,67 @@ interface TeamMemberStats {
   avgResolutionHours: number | null;
 }
 
+interface FunnelStage {
+  stage: string;
+  count: number;
+  percentage: number;
+  dropOffRate: number;
+}
+
+interface BlockerStat {
+  reason: string;
+  count: number;
+  percentage: number;
+}
+
+interface TimeZoneStat {
+  timezone: string;
+  count: number;
+  percentage: number;
+}
+
+interface ResponseTimeByHour {
+  hour: number;
+  averageMinutes: number;
+  count: number;
+}
+
+interface TrendDataPoint {
+  date: string;
+  created: number;
+  started: number;
+  completed: number;
+  blocked: number;
+}
+
+interface InsightsData {
+  funnel: {
+    stages: FunnelStage[];
+    totalCreated: number;
+    totalCompleted: number;
+    overallConversionRate: number;
+  };
+  timeMetrics: {
+    averageTimeToStart: number | null;
+    averageTimeToComplete: number | null;
+    averageTimeToBlock: number | null;
+    medianResolutionTime: number | null;
+  };
+  blockAnalysis: {
+    blockRate: number;
+    topBlockers: BlockerStat[];
+  };
+  teamDistribution: {
+    timezones: TimeZoneStat[];
+  };
+  responsePatterns: {
+    byHour: ResponseTimeByHour[];
+    peakHour: number | null;
+    slowestHour: number | null;
+  };
+  trends: TrendDataPoint[];
+}
+
 interface AnalyticsData {
   // Overview metrics
   totalLocks: number;
@@ -45,8 +112,8 @@ interface AnalyticsData {
   averageResolutionHours: number | null;
 
   // New analytics metrics
-  averageResponseMinutes: number | null; // Time from creation to first "started" event
-  blockRate: number; // % of locks that have a "blocked" event
+  averageResponseMinutes: number | null;
+  blockRate: number;
 
   // This month vs last month
   locksThisMonth: number;
@@ -61,10 +128,429 @@ interface AnalyticsData {
   teamStats: TeamMemberStats[];
 }
 
+// ============================================
+// Stat Card Component
+// ============================================
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  trend?: { text: string; color: string } | null;
+  secondaryValue?: string | number;
+  secondaryLabel?: string;
+  delay?: number;
+}
+
+function StatCard({ title, value, subtitle, trend, secondaryValue, secondaryLabel, delay = 0 }: StatCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-coffee-cortado">{title}</p>
+          <p className="text-3xl font-bold text-coffee-espresso mt-1">{value}</p>
+          {subtitle && <p className="text-xs text-coffee-latte mt-1">{subtitle}</p>}
+        </div>
+        {(secondaryValue !== undefined || trend) && (
+          <div className="text-right">
+            {secondaryLabel && <p className="text-sm text-coffee-cortado">{secondaryLabel}</p>}
+            {secondaryValue !== undefined && (
+              <p className="text-lg font-semibold text-coffee-espresso">{secondaryValue}</p>
+            )}
+            {trend && <p className={`text-xs ${trend.color}`}>{trend.text}</p>}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// Funnel Chart Component
+// ============================================
+
+interface FunnelChartProps {
+  stages: FunnelStage[];
+  delay?: number;
+}
+
+function FunnelChart({ stages, delay = 0 }: FunnelChartProps) {
+  if (stages.length === 0) return null;
+
+  const maxCount = Math.max(...stages.map((s) => s.count), 1);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <h3 className="text-sm font-medium text-coffee-cortado mb-4">Lock Completion Funnel</h3>
+      <div className="space-y-4">
+        {stages.map((stage, index) => (
+          <div key={stage.stage} className="relative">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-medium text-coffee-espresso">{stage.stage}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-coffee-cortado">{stage.count} locks</span>
+                <span className="text-sm font-medium text-coffee-espresso">{stage.percentage}%</span>
+              </div>
+            </div>
+            <div className="h-8 bg-coffee-cream rounded-lg overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${(stage.count / maxCount) * 100}%` }}
+                transition={{ delay: delay + index * 0.1, duration: 0.5 }}
+                className="h-full bg-coffee-mocha rounded-lg"
+              />
+            </div>
+            {index < stages.length - 1 && stage.dropOffRate > 0 && (
+              <div className="absolute -bottom-3 right-0 text-xs text-coffee-latte">
+                {stage.dropOffRate}% drop-off
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 pt-4 border-t border-coffee-foam">
+        <div className="flex justify-between text-sm">
+          <span className="text-coffee-cortado">Overall Conversion</span>
+          <span className="font-semibold text-coffee-espresso">
+            {stages.length > 0 ? stages[stages.length - 1].percentage : 0}%
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// Time Metrics Card Component
+// ============================================
+
+interface TimeMetricsCardProps {
+  timeMetrics: InsightsData["timeMetrics"];
+  delay?: number;
+}
+
+function TimeMetricsCard({ timeMetrics, delay = 0 }: TimeMetricsCardProps) {
+  const formatTime = (minutes: number | null): string => {
+    if (minutes === null) return "-";
+    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 1440) return `${Math.round(minutes / 60)}h`;
+    return `${Math.round(minutes / 1440)}d`;
+  };
+
+  const metrics = [
+    { label: "Avg Time to Start", value: formatTime(timeMetrics.averageTimeToStart) },
+    { label: "Avg Time to Complete", value: formatTime(timeMetrics.averageTimeToComplete) },
+    { label: "Median Resolution", value: formatTime(timeMetrics.medianResolutionTime) },
+    { label: "Avg Time to Block", value: formatTime(timeMetrics.averageTimeToBlock) },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <h3 className="text-sm font-medium text-coffee-cortado mb-4">Time to Each Status</h3>
+      <div className="grid grid-cols-2 gap-4">
+        {metrics.map((metric) => (
+          <div key={metric.label} className="text-center p-3 bg-coffee-cream/50 rounded-lg">
+            <p className="text-2xl font-bold text-coffee-espresso">{metric.value}</p>
+            <p className="text-xs text-coffee-cortado mt-1">{metric.label}</p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// Top Blockers Card Component
+// ============================================
+
+interface TopBlockersCardProps {
+  blockRate: number;
+  topBlockers: BlockerStat[];
+  delay?: number;
+}
+
+function TopBlockersCard({ blockRate, topBlockers, delay = 0 }: TopBlockersCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-coffee-cortado">Top Blockers</h3>
+        <span className="text-sm font-semibold text-coffee-espresso">{blockRate}% block rate</span>
+      </div>
+      {topBlockers.length === 0 ? (
+        <p className="text-sm text-coffee-latte text-center py-4">No blockers recorded yet</p>
+      ) : (
+        <div className="space-y-3">
+          {topBlockers.map((blocker, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-coffee-espresso truncate">{blocker.reason}</p>
+                <div className="mt-1 h-2 bg-coffee-cream rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-coffee-latte rounded-full"
+                    style={{ width: `${blocker.percentage}%` }}
+                  />
+                </div>
+              </div>
+              <span className="ml-3 text-sm text-coffee-cortado">{blocker.count}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ============================================
+// Timezone Distribution Card Component
+// ============================================
+
+interface TimezoneCardProps {
+  timezones: TimeZoneStat[];
+  delay?: number;
+}
+
+function TimezoneCard({ timezones, delay = 0 }: TimezoneCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <h3 className="text-sm font-medium text-coffee-cortado mb-4">Team Time Zone Distribution</h3>
+      {timezones.length === 0 ? (
+        <p className="text-sm text-coffee-latte text-center py-4">No timezone data available</p>
+      ) : (
+        <div className="space-y-2">
+          {timezones.slice(0, 5).map((tz) => (
+            <div key={tz.timezone} className="flex items-center justify-between">
+              <span className="text-sm text-coffee-espresso">{tz.timezone}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-2 bg-coffee-cream rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-coffee-mocha rounded-full"
+                    style={{ width: `${tz.percentage}%` }}
+                  />
+                </div>
+                <span className="text-xs text-coffee-cortado w-8 text-right">{tz.percentage}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ============================================
+// Response Time by Hour Card Component
+// ============================================
+
+interface ResponseTimeChartProps {
+  byHour: ResponseTimeByHour[];
+  peakHour: number | null;
+  slowestHour: number | null;
+  delay?: number;
+}
+
+function ResponseTimeChart({ byHour, peakHour, slowestHour, delay = 0 }: ResponseTimeChartProps) {
+  const formatHour = (hour: number): string => {
+    if (hour === 0) return "12am";
+    if (hour === 12) return "12pm";
+    if (hour < 12) return `${hour}am`;
+    return `${hour - 12}pm`;
+  };
+
+  // Prepare data for all 24 hours, filling in zeros for missing hours
+  const chartData = Array.from({ length: 24 }, (_, hour) => {
+    const found = byHour.find((h) => h.hour === hour);
+    return {
+      hour,
+      hourLabel: formatHour(hour),
+      averageMinutes: found?.averageMinutes || 0,
+      count: found?.count || 0,
+    };
+  });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-coffee-cortado">Response Time by Hour</h3>
+        <div className="flex gap-4 text-xs">
+          {peakHour !== null && (
+            <span className="text-coffee-mocha">Fastest: {formatHour(peakHour)}</span>
+          )}
+          {slowestHour !== null && (
+            <span className="text-coffee-latte">Slowest: {formatHour(slowestHour)}</span>
+          )}
+        </div>
+      </div>
+      {byHour.length === 0 ? (
+        <p className="text-sm text-coffee-latte text-center py-8">Not enough data to show patterns</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={chartData} barSize={8}>
+            <XAxis
+              dataKey="hourLabel"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#8c7b70", fontSize: 10 }}
+              interval={5}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#8c7b70", fontSize: 10 }}
+              tickFormatter={(value) => (value < 60 ? `${value}m` : `${Math.round(value / 60)}h`)}
+            />
+            <Tooltip
+              formatter={(value) =>
+                typeof value === 'number'
+                  ? (value < 60 ? [`${value}m`, "Avg Response"] : [`${Math.round(value / 60)}h`, "Avg Response"])
+                  : [String(value ?? 0), "Avg Response"]
+              }
+              contentStyle={{
+                background: "#fffcf9",
+                border: "1px solid #e8e2dc",
+                borderRadius: "8px",
+                fontSize: "12px",
+              }}
+            />
+            <Bar dataKey="averageMinutes" fill="#8c7b70" radius={[2, 2, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </motion.div>
+  );
+}
+
+// ============================================
+// Trends Chart Component
+// ============================================
+
+interface TrendsChartProps {
+  trends: TrendDataPoint[];
+  delay?: number;
+}
+
+function TrendsChart({ trends, delay = 0 }: TrendsChartProps) {
+  if (trends.length === 0) return null;
+
+  const formattedData = trends.map((t) => ({
+    ...t,
+    dateLabel: new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  }));
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-white rounded-xl border border-coffee-foam p-6"
+    >
+      <h3 className="text-sm font-medium text-coffee-cortado mb-4">14-Day Trend</h3>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={formattedData}>
+          <XAxis
+            dataKey="dateLabel"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#8c7b70", fontSize: 10 }}
+            interval="preserveStartEnd"
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#8c7b70", fontSize: 10 }}
+            allowDecimals={false}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "#fffcf9",
+              border: "1px solid #e8e2dc",
+              borderRadius: "8px",
+              fontSize: "12px",
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="created"
+            name="Created"
+            stroke="#1a1614"
+            strokeWidth={2}
+            dot={{ fill: "#1a1614", strokeWidth: 0, r: 3 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="completed"
+            name="Completed"
+            stroke="#8c7b70"
+            strokeWidth={2}
+            dot={{ fill: "#8c7b70", strokeWidth: 0, r: 3 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="blocked"
+            name="Blocked"
+            stroke="#d4cbc4"
+            strokeWidth={2}
+            dot={{ fill: "#d4cbc4", strokeWidth: 0, r: 3 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+      <div className="flex justify-center gap-6 mt-2">
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="w-3 h-3 rounded bg-coffee-espresso" />
+          <span className="text-coffee-cortado">Created</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="w-3 h-3 rounded bg-coffee-mocha" />
+          <span className="text-coffee-cortado">Completed</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-sm">
+          <div className="w-3 h-3 rounded bg-coffee-latte" />
+          <span className="text-coffee-cortado">Blocked</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// Main Analytics Content
+// ============================================
+
 function AnalyticsContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [insightsData, setInsightsData] = useState<InsightsData | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(true);
 
   const { hasFeature, loading: planLoading } = usePlanFeatures();
   const supabase = createClient();
@@ -74,8 +560,26 @@ function AnalyticsContent() {
   useEffect(() => {
     if (!planLoading) {
       loadAnalyticsData();
+      loadInsightsData();
     }
   }, [planLoading]);
+
+  const loadInsightsData = async () => {
+    setInsightsLoading(true);
+    try {
+      const response = await fetch("/api/analytics/insights");
+      if (response.ok) {
+        const json = await response.json();
+        if (json.success && json.data) {
+          setInsightsData(json.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading insights data:", error);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
 
   const loadAnalyticsData = async () => {
     setLoading(true);
@@ -118,7 +622,6 @@ function AnalyticsContent() {
       const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
       // Fetch all locks for this workspace
       const { data: allLocks } = await supabase
@@ -200,7 +703,6 @@ function AnalyticsContent() {
                 (new Date(event.created_at).getTime() - new Date(lock.created_at).getTime()) /
                 (1000 * 60 * 60);
               if (hours > 0 && hours < 720) {
-                // Ignore outliers > 30 days
                 resolutionTimes.push(hours);
               }
             }
@@ -213,7 +715,7 @@ function AnalyticsContent() {
         }
       }
 
-      // Calculate average response time (time from creation to first "started" event)
+      // Calculate average response time
       let averageResponseMinutes: number | null = null;
       const lockIds = locks.map((l) => l.id);
 
@@ -231,17 +733,14 @@ function AnalyticsContent() {
           startedEvents.forEach((event) => {
             const lock = lockMap.get(event.lock_id);
             if (lock) {
-              // Check if payload has minutesSinceCreation (new enhanced payload)
               const payload = event.payload as { minutesSinceCreation?: number } | null;
               if (payload?.minutesSinceCreation !== undefined) {
                 responseTimes.push(payload.minutesSinceCreation);
               } else {
-                // Fallback: calculate from timestamps
                 const minutes =
                   (new Date(event.created_at).getTime() - new Date(lock.created_at).getTime()) /
                   (1000 * 60);
                 if (minutes > 0 && minutes < 10080) {
-                  // Ignore outliers > 7 days
                   responseTimes.push(minutes);
                 }
               }
@@ -255,7 +754,7 @@ function AnalyticsContent() {
         }
       }
 
-      // Calculate block rate (% of locks that have a "blocked" event)
+      // Calculate block rate
       let blockRate = 0;
       if (lockIds.length > 0) {
         const { data: blockedEvents } = await supabase
@@ -265,7 +764,6 @@ function AnalyticsContent() {
           .eq("event_type", "blocked");
 
         if (blockedEvents && blockedEvents.length > 0) {
-          // Count unique locks that have been blocked
           const uniqueBlockedLocks = new Set(blockedEvents.map((e) => e.lock_id));
           blockRate = Math.round((uniqueBlockedLocks.size / Math.min(lockIds.length, 100)) * 100);
         }
@@ -280,7 +778,6 @@ function AnalyticsContent() {
         ownerCounts.set(lock.owner_user_id, current);
       });
 
-      // Get profile names for top owners
       const topOwnerIds = Array.from(ownerCounts.entries())
         .sort((a, b) => b[1].owned - a[1].owned)
         .slice(0, 5)
@@ -350,14 +847,14 @@ function AnalyticsContent() {
   });
 
   const formatResolutionTime = (hours: number | null): string => {
-    if (hours === null) return "—";
+    if (hours === null) return "-";
     if (hours < 1) return `${Math.round(hours * 60)}m`;
     if (hours < 24) return `${Math.round(hours)}h`;
     return `${Math.round(hours / 24)}d`;
   };
 
   const formatResponseTime = (minutes: number | null): string => {
-    if (minutes === null) return "—";
+    if (minutes === null) return "-";
     if (minutes < 60) return `${minutes}m`;
     if (minutes < 1440) return `${Math.round(minutes / 60)}h`;
     return `${Math.round(minutes / 1440)}d`;
@@ -367,7 +864,7 @@ function AnalyticsContent() {
     if (previous === 0) return current > 0 ? { text: "New", color: "text-coffee-mocha" } : null;
     const change = Math.round(((current - previous) / previous) * 100);
     if (change > 0) return { text: `+${change}%`, color: "text-coffee-mocha" };
-    if (change < 0) return { text: `${change}%`, color: "text-red-500" };
+    if (change < 0) return { text: `${change}%`, color: "text-coffee-cortado" };
     return { text: "0%", color: "text-coffee-latte" };
   };
 
@@ -405,7 +902,7 @@ function AnalyticsContent() {
 
   const pieData = [
     { name: "Completed", value: analyticsData.completedLocks, color: "#8c7b70" },
-    { name: "Active", value: analyticsData.activeLocks, color: "#c4b5a9" },
+    { name: "Active", value: analyticsData.activeLocks, color: "#d4cbc4" },
     { name: "Blocked", value: analyticsData.blockedLocks, color: "#e8e2dc" },
   ].filter((d) => d.value > 0);
 
@@ -413,7 +910,7 @@ function AnalyticsContent() {
   const completionTrend = getTrendIndicator(analyticsData.completedThisMonth, analyticsData.completedLastMonth);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-8 py-4">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-6xl mx-auto space-y-8 py-4">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-coffee-espresso text-balance">Analytics</h1>
@@ -442,26 +939,58 @@ function AnalyticsContent() {
         </motion.div>
       ) : (
         <>
-          {/* Top Row - Key Metrics + Donut */}
+          {/* Top Row - Key Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Total Locks"
+              value={analyticsData.totalLocks}
+              secondaryLabel="This month"
+              secondaryValue={analyticsData.locksThisMonth}
+              trend={monthTrend}
+              delay={0.1}
+            />
+            <StatCard
+              title="Avg Resolution"
+              value={formatResolutionTime(analyticsData.averageResolutionHours)}
+              secondaryLabel="Completed"
+              secondaryValue={analyticsData.completedThisMonth}
+              trend={completionTrend}
+              delay={0.15}
+            />
+            <StatCard
+              title="Avg Response Time"
+              value={formatResponseTime(analyticsData.averageResponseMinutes)}
+              subtitle="Time to first action"
+              delay={0.2}
+            />
+            <StatCard
+              title="Block Rate"
+              value={`${analyticsData.blockRate}%`}
+              subtitle="Locks encountering blockers"
+              delay={0.25}
+            />
+          </div>
+
+          {/* Status Overview Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Completion Rate Donut */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-xl border border-coffee-foam p-6 lg:row-span-2"
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-xl border border-coffee-foam p-6"
             >
               <h3 className="text-sm font-medium text-coffee-cortado mb-4">Status Breakdown</h3>
               <div className="flex flex-col items-center">
                 <div className="relative">
-                  <ResponsiveContainer width={200} height={200}>
+                  <ResponsiveContainer width={180} height={180}>
                     <PieChart>
                       <Pie
                         data={pieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={85}
+                        innerRadius={55}
+                        outerRadius={75}
                         paddingAngle={2}
                         dataKey="value"
                       >
@@ -481,7 +1010,7 @@ function AnalyticsContent() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-3xl font-bold text-coffee-espresso">
+                    <span className="text-2xl font-bold text-coffee-espresso">
                       {analyticsData.completionRate}%
                     </span>
                     <span className="text-xs text-coffee-latte">completed</span>
@@ -498,128 +1027,71 @@ function AnalyticsContent() {
               </div>
             </motion.div>
 
-            {/* Key Metrics */}
+            {/* Active / Blocked Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="bg-white rounded-xl border border-coffee-foam p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-coffee-cortado">Total Locks</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {analyticsData.totalLocks}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-coffee-cortado">This month</p>
-                  <p className="text-lg font-semibold text-coffee-espresso">
-                    {analyticsData.locksThisMonth}
-                  </p>
-                  {monthTrend && (
-                    <p className={`text-xs ${monthTrend.color}`}>{monthTrend.text} vs last</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-xl border border-coffee-foam p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-coffee-cortado">Avg Resolution</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {formatResolutionTime(analyticsData.averageResolutionHours)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-coffee-cortado">Completed</p>
-                  <p className="text-lg font-semibold text-coffee-espresso">
-                    {analyticsData.completedThisMonth}
-                  </p>
-                  {completionTrend && (
-                    <p className={`text-xs ${completionTrend.color}`}>{completionTrend.text} vs last</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Active / Blocked */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ delay: 0.35 }}
               className="bg-white rounded-xl border border-coffee-foam p-6 lg:col-span-2"
             >
+              <h3 className="text-sm font-medium text-coffee-cortado mb-4">Current Status</h3>
               <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <p className="text-sm text-coffee-cortado">Active Right Now</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {analyticsData.activeLocks}
-                  </p>
-                  <p className="text-xs text-coffee-latte mt-1">In progress</p>
+                <div className="text-center p-4 bg-coffee-cream/50 rounded-lg">
+                  <p className="text-4xl font-bold text-coffee-espresso">{analyticsData.activeLocks}</p>
+                  <p className="text-sm text-coffee-cortado mt-1">Active Right Now</p>
                 </div>
-                <div>
-                  <p className="text-sm text-coffee-cortado">Currently Blocked</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {analyticsData.blockedLocks}
-                  </p>
-                  <p className="text-xs text-coffee-latte mt-1">Needs attention</p>
+                <div className="text-center p-4 bg-coffee-cream/50 rounded-lg">
+                  <p className="text-4xl font-bold text-coffee-espresso">{analyticsData.blockedLocks}</p>
+                  <p className="text-sm text-coffee-cortado mt-1">Currently Blocked</p>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Response Metrics Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Average Response Time */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.27 }}
-              className="bg-white rounded-xl border border-coffee-foam p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-coffee-cortado">Avg Response Time</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {formatResponseTime(analyticsData.averageResponseMinutes)}
-                  </p>
-                  <p className="text-xs text-coffee-latte mt-1">Time to first action</p>
-                </div>
-              </div>
-            </motion.div>
+          {/* Funnel Section */}
+          {insightsData && insightsData.funnel.stages.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <FunnelChart stages={insightsData.funnel.stages} delay={0.4} />
+              <TimeMetricsCard timeMetrics={insightsData.timeMetrics} delay={0.45} />
+            </div>
+          )}
 
-            {/* Block Rate */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.28 }}
-              className="bg-white rounded-xl border border-coffee-foam p-6"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-coffee-cortado">Block Rate</p>
-                  <p className="text-3xl font-bold text-coffee-espresso mt-1">
-                    {analyticsData.blockRate}%
-                  </p>
-                  <p className="text-xs text-coffee-latte mt-1">Locks encountering blockers</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          {/* Block Analysis and Timezone Section */}
+          {insightsData && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TopBlockersCard
+                blockRate={insightsData.blockAnalysis.blockRate}
+                topBlockers={insightsData.blockAnalysis.topBlockers}
+                delay={0.5}
+              />
+              <TimezoneCard
+                timezones={insightsData.teamDistribution.timezones}
+                delay={0.55}
+              />
+            </div>
+          )}
 
-          {/* Activity Chart */}
+          {/* Response Time by Hour */}
+          {insightsData && insightsData.responsePatterns.byHour.length > 0 && (
+            <ResponseTimeChart
+              byHour={insightsData.responsePatterns.byHour}
+              peakHour={insightsData.responsePatterns.peakHour}
+              slowestHour={insightsData.responsePatterns.slowestHour}
+              delay={0.6}
+            />
+          )}
+
+          {/* Trends Chart */}
+          {insightsData && insightsData.trends.length > 0 && (
+            <TrendsChart trends={insightsData.trends} delay={0.65} />
+          )}
+
+          {/* Activity Chart - Last 7 Days */}
           {analyticsData.dailyActivity.some((d) => d.created > 0 || d.completed > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.7 }}
               className="bg-white rounded-xl border border-coffee-foam p-6"
             >
               <h3 className="text-sm font-medium text-coffee-cortado mb-4">Last 7 Days Activity</h3>
@@ -646,7 +1118,7 @@ function AnalyticsContent() {
                     }}
                   />
                   <Bar dataKey="created" name="Created" fill="#8c7b70" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="completed" name="Completed" fill="#c4b5a9" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="completed" name="Completed" fill="#d4cbc4" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
               <div className="flex justify-center gap-6 mt-2">
@@ -667,7 +1139,7 @@ function AnalyticsContent() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
+              transition={{ delay: 0.75 }}
               className="bg-white rounded-xl border border-coffee-foam p-6"
             >
               <h3 className="text-sm font-medium text-coffee-cortado mb-4">Team Activity</h3>

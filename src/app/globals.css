@@ -53,154 +53,154 @@
 
 @layer base {
   :root {
-    /* ===== LIGHT MODE - Clean, calm, easy on eyes ===== */
+    /* ===== LIGHT MODE - Coffee palette ===== */
 
-    /* Background - Neutral off-white #f5f5f5 */
-    --background: 0 0% 96%;
-    --foreground: 220 13% 18%;
+    /* Background - coffee-paper #fffcf9 */
+    --background: 30 100% 99%;
+    --foreground: 18 10% 9%;
 
-    /* Cards - Pure white for contrast against off-white bg */
+    /* Cards - Pure white for contrast */
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
+    --card-foreground: 18 10% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 18%;
+    --popover-foreground: 18 10% 9%;
 
-    /* Primary - Calm, soft violet (not too saturated) */
-    --primary: 262 45% 58%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - coffee-mocha #5c4a3d */
+    --primary: 24 20% 30%;
+    --primary-foreground: 30 100% 99%;
 
-    /* Secondary - Subtle off-white between bg and card */
-    --secondary: 0 0% 98%;
-    --secondary-foreground: 220 13% 30%;
+    /* Secondary - coffee-cream #f6f3f0 */
+    --secondary: 30 23% 96%;
+    --secondary-foreground: 24 13% 39%;
 
-    /* Accent - Subtle hover state */
-    --accent: 0 0% 94%;
-    --accent-foreground: 220 13% 18%;
+    /* Accent - coffee-oat #c9a57b */
+    --accent: 35 41% 63%;
+    --accent-foreground: 18 10% 9%;
 
-    /* Muted - Subtle section backgrounds */
-    --muted: 0 0% 98%;
-    --muted-foreground: 220 9% 46%;
+    /* Muted - coffee-steamed #d4cbc4 */
+    --muted: 26 14% 80%;
+    --muted-foreground: 24 13% 39%;
 
-    /* Destructive - Soft red */
-    --destructive: 0 45% 55%;
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive - coffee-roast #3d2e26 */
+    --destructive: 16 25% 19%;
+    --destructive-foreground: 30 100% 99%;
 
-    /* Success - Refined emerald green */
-    --success: 158 45% 42%;
-    --success-foreground: 0 0% 100%;
+    /* Success - coffee-cortado #6b5d54 */
+    --success: 24 13% 37%;
+    --success-foreground: 30 100% 99%;
 
-    /* Warning - Amber */
-    --warning: 38 90% 50%;
-    --warning-foreground: 38 90% 10%;
+    /* Warning - coffee-oat #c9a57b */
+    --warning: 35 41% 63%;
+    --warning-foreground: 18 10% 9%;
 
-    /* Info - Calm blue (softer) */
-    --info: 210 70% 55%;
-    --info-foreground: 0 0% 100%;
+    /* Info - coffee-latte #8a7d73 */
+    --info: 24 10% 50%;
+    --info-foreground: 30 100% 99%;
 
-    /* Borders - More visible for better contrast */
-    --border: 220 10% 88%;
-    --input: 220 10% 88%;
-    --ring: 262 45% 58%;
+    /* Borders - coffee-foam #e8e2dc */
+    --border: 30 18% 89%;
+    --input: 30 18% 89%;
+    --ring: 35 41% 63%;
 
     /* Radius */
     --radius: 0.625rem;
 
-    /* Chart colors - Softer mix */
-    --chart-1: 262 45% 58%;
-    --chart-2: 340 55% 55%;
-    --chart-3: 210 70% 55%;
-    --chart-4: 152 45% 42%;
-    --chart-5: 38 80% 50%;
+    /* Chart colors - Coffee palette */
+    --chart-1: 24 20% 30%;
+    --chart-2: 16 25% 19%;
+    --chart-3: 35 41% 63%;
+    --chart-4: 24 13% 37%;
+    --chart-5: 24 10% 50%;
   }
 
   .dark {
-    /* ===== DARK MODE - Clean charcoal/gray palette ===== */
+    /* ===== DARK MODE - Coffee palette ===== */
 
-    /* Background - Deep charcoal */
-    --background: 220 10% 7%;
-    --foreground: 0 0% 95%;
+    /* Background - Deep coffee-espresso #1a1614 */
+    --background: 18 10% 9%;
+    --foreground: 30 18% 89%;
 
-    /* Cards - Elevated charcoal */
-    --card: 220 8% 12%;
-    --card-foreground: 0 0% 95%;
+    /* Cards - Elevated coffee */
+    --card: 16 15% 14%;
+    --card-foreground: 30 18% 89%;
 
     /* Popover - Slightly lighter for depth */
-    --popover: 220 8% 14%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 16 15% 16%;
+    --popover-foreground: 30 18% 89%;
 
-    /* Primary - Bright violet (brand color) */
-    --primary: 262 83% 68%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - coffee-oat #c9a57b (brighter for dark mode) */
+    --primary: 35 41% 63%;
+    --primary-foreground: 18 10% 9%;
 
-    /* Secondary - Neutral dark gray */
-    --secondary: 220 8% 18%;
-    --secondary-foreground: 0 0% 90%;
+    /* Secondary - Neutral dark coffee */
+    --secondary: 16 15% 20%;
+    --secondary-foreground: 30 18% 89%;
 
-    /* Accent - Visible hover highlight (must contrast with card 12%) */
-    --accent: 220 8% 24%;
-    --accent-foreground: 0 0% 95%;
+    /* Accent - coffee-oat lighter */
+    --accent: 35 35% 45%;
+    --accent-foreground: 30 18% 89%;
 
-    /* Muted - For subtle backgrounds (visibility on dark) */
-    --muted: 220 8% 20%;
-    --muted-foreground: 220 5% 70%;  /* High contrast for readable text */
+    /* Muted - For subtle backgrounds */
+    --muted: 16 15% 22%;
+    --muted-foreground: 24 10% 65%;
 
-    /* Destructive - Soft coral */
-    --destructive: 0 50% 58%;
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive - coffee-roast lighter for dark mode */
+    --destructive: 16 25% 35%;
+    --destructive-foreground: 30 100% 99%;
 
-    /* Success - Refined emerald green (sophisticated, modern) */
-    --success: 158 50% 48%;
-    --success-foreground: 0 0% 100%;
+    /* Success - coffee-cortado lighter */
+    --success: 24 13% 50%;
+    --success-foreground: 30 100% 99%;
 
-    /* Warning - Bright amber */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 10%;
+    /* Warning - coffee-oat */
+    --warning: 35 41% 63%;
+    --warning-foreground: 18 10% 9%;
 
-    /* Info - Clear blue */
-    --info: 217 91% 60%;
-    --info-foreground: 0 0% 100%;
+    /* Info - coffee-latte lighter */
+    --info: 24 10% 60%;
+    --info-foreground: 18 10% 9%;
 
     /* Borders - Visible for component separation */
-    --border: 220 8% 24%;
-    --input: 220 8% 20%;
-    --ring: 262 83% 68%;
+    --border: 16 15% 28%;
+    --input: 16 15% 24%;
+    --ring: 35 41% 63%;
 
-    /* Chart colors - Vibrant for visibility */
-    --chart-1: 262 83% 68%;
-    --chart-2: 340 75% 65%;
-    --chart-3: 217 91% 60%;
-    --chart-4: 152 55% 45%;
-    --chart-5: 38 92% 50%;
+    /* Chart colors - Coffee palette for visibility */
+    --chart-1: 35 41% 63%;
+    --chart-2: 16 25% 40%;
+    --chart-3: 24 13% 55%;
+    --chart-4: 24 10% 60%;
+    --chart-5: 30 18% 70%;
   }
 
   /* Force light mode on pages with .light class (overrides dark mode) */
   .light {
-    --background: 0 0% 96%;
-    --foreground: 220 13% 18%;
+    --background: 30 100% 99%;
+    --foreground: 18 10% 9%;
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
+    --card-foreground: 18 10% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 18%;
-    --primary: 262 45% 58%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 98%;
-    --secondary-foreground: 220 13% 30%;
-    --accent: 0 0% 94%;
-    --accent-foreground: 220 13% 18%;
-    --muted: 0 0% 98%;
-    --muted-foreground: 220 9% 46%;
-    --destructive: 0 45% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 158 45% 42%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 90% 50%;
-    --warning-foreground: 38 90% 10%;
-    --info: 210 70% 55%;
-    --info-foreground: 0 0% 100%;
-    --border: 220 10% 88%;
-    --input: 220 10% 88%;
-    --ring: 262 45% 58%;
+    --popover-foreground: 18 10% 9%;
+    --primary: 24 20% 30%;
+    --primary-foreground: 30 100% 99%;
+    --secondary: 30 23% 96%;
+    --secondary-foreground: 24 13% 39%;
+    --accent: 35 41% 63%;
+    --accent-foreground: 18 10% 9%;
+    --muted: 26 14% 80%;
+    --muted-foreground: 24 13% 39%;
+    --destructive: 16 25% 19%;
+    --destructive-foreground: 30 100% 99%;
+    --success: 24 13% 37%;
+    --success-foreground: 30 100% 99%;
+    --warning: 35 41% 63%;
+    --warning-foreground: 18 10% 9%;
+    --info: 24 10% 50%;
+    --info-foreground: 30 100% 99%;
+    --border: 30 18% 89%;
+    --input: 30 18% 89%;
+    --ring: 35 41% 63%;
   }
 }
 
@@ -220,6 +220,76 @@
     max-width: 100%;
     height: auto;
   }
+}
+
+/* ===== DARK MODE TRANSITIONS ===== */
+/* Smooth color transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Respect user's motion preferences - WCAG 2.1 AA compliance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  /* Disable shimmer animations */
+  .skeleton-shimmer,
+  .animate-shimmer {
+    animation: none !important;
+  }
+}
+
+/* Elements that should NOT transition (performance optimization) */
+.no-transition,
+.no-transition *,
+pre,
+code,
+canvas,
+video,
+iframe {
+  transition: none !important;
+}
+
+/* Skeleton shimmer animation - works in both light and dark mode */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Dark mode specific shimmer - slightly more visible */
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.15) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
 }
 
 /* Animations */
@@ -335,10 +405,19 @@
   color: hsl(var(--foreground));
 }
 
-/* Focus */
+/* ===== ACCESSIBILITY - FOCUS STYLES (WCAG 2.1 AA) ===== */
+/* Use focus-visible for keyboard-only focus indicators */
+/* Ring color: coffee-oat (#7a6d62) */
+
+/* Global focus-visible style for all focusable elements */
 :focus-visible {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid #7a6d62;
   outline-offset: 2px;
+}
+
+/* Remove outline on mouse click - focus-visible handles keyboard focus */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Glass Effect */
@@ -386,13 +465,20 @@
   border-radius: var(--radius);
 }
 
-/* Enhanced focus states - subtle, not distracting */
+/* Enhanced focus states for form elements - using coffee-oat for consistency */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid hsl(var(--primary) / 0.3);
+  outline: 2px solid #7a6d62;
   outline-offset: 2px;
   border-radius: var(--radius);
+}
+
+/* Remove focus on mouse click for form elements */
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Override browser autofill styles */
@@ -405,16 +491,27 @@ input:-webkit-autofill:active {
   caret-color: #1a1614 !important;
 }
 
-/* Remove focus outlines from buttons - they have their own hover states */
+/* Keyboard focus for buttons - coffee-oat ring */
 button:focus-visible {
+  outline: 2px solid #7a6d62;
+  outline-offset: 2px;
+}
+
+/* Remove focus on mouse click for buttons */
+button:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Remove focus outlines from dropdown menu items */
+/* Keyboard focus for menu items - coffee-oat ring */
 [role="menuitem"]:focus-visible,
-[role="menuitem"]:focus,
-[data-radix-collection-item]:focus-visible,
-[data-radix-collection-item]:focus {
+[data-radix-collection-item]:focus-visible {
+  outline: 2px solid #7a6d62;
+  outline-offset: -2px;
+}
+
+/* Remove focus on mouse click for menu items */
+[role="menuitem"]:focus:not(:focus-visible),
+[data-radix-collection-item]:focus:not(:focus-visible) {
   outline: none;
 }
 

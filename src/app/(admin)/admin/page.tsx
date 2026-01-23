@@ -42,8 +42,8 @@ function StatCard({ icon: Icon, label, value, subtext, href }: {
           <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
           {subtext && <p className="mt-1 text-sm text-gray-500">{subtext}</p>}
         </div>
-        <div className="p-3 bg-violet-100 rounded-lg">
-          <Icon className="w-6 h-6 text-violet-600" />
+        <div className="p-3 bg-coffee-cream rounded-lg">
+          <Icon className="w-6 h-6 text-coffee-cortado" />
         </div>
       </div>
     </div>
@@ -163,8 +163,8 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">Failed to load stats: {error}</p>
+      <div className="bg-coffee-roast/10 border border-coffee-roast/30 rounded-lg p-4">
+        <p className="text-coffee-roast">Failed to load stats: {error}</p>
       </div>
     );
   }
@@ -173,9 +173,9 @@ export default function AdminDashboard() {
 
   const planColors: Record<string, string> = {
     free: "bg-gray-100 text-gray-700",
-    starter: "bg-blue-100 text-blue-700",
-    pro: "bg-violet-100 text-violet-700",
-    enterprise: "bg-amber-100 text-amber-700",
+    starter: "bg-coffee-mocha/20 text-coffee-mocha",
+    pro: "bg-coffee-cream text-coffee-espresso",
+    enterprise: "bg-coffee-oat/20 text-coffee-oat",
   };
 
   return (
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
             <TrendingUp className="w-5 h-5 text-gray-500" />
             <h2 className="text-lg font-semibold text-gray-900">Recent Organizations</h2>
           </div>
-          <Link href="/admin/organizations" className="text-sm text-violet-600 hover:text-violet-700 font-medium">
+          <Link href="/admin/organizations" className="text-sm text-coffee-cortado hover:text-coffee-espresso font-medium">
             View all
           </Link>
         </div>
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
               {stats.recentOrganizations.map((org) => (
                 <tr key={org.id} className="text-sm">
                   <td className="py-3">
-                    <Link href={`/admin/organizations/${org.id}`} className="font-medium text-gray-900 hover:text-violet-600">
+                    <Link href={`/admin/organizations/${org.id}`} className="font-medium text-gray-900 hover:text-coffee-cortado">
                       {org.name}
                     </Link>
                   </td>

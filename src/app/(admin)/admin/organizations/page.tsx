@@ -25,9 +25,9 @@ const PLANS = ["free", "starter", "pro", "enterprise"];
 
 const planColors: Record<string, string> = {
   free: "bg-gray-100 text-gray-700 border-gray-200",
-  starter: "bg-blue-100 text-blue-700 border-blue-200",
-  pro: "bg-violet-100 text-violet-700 border-violet-200",
-  enterprise: "bg-amber-100 text-amber-700 border-amber-200",
+  starter: "bg-coffee-mocha/20 text-coffee-mocha border-coffee-mocha/30",
+  pro: "bg-coffee-cream text-coffee-espresso border-coffee-foam",
+  enterprise: "bg-coffee-oat/20 text-coffee-oat border-coffee-oat/30",
 };
 
 export default function OrganizationsPage() {
@@ -165,7 +165,7 @@ export default function OrganizationsPage() {
           placeholder="Search by name, email, or invite code..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-coffee-oat focus:border-transparent"
         />
       </div>
 
@@ -189,8 +189,8 @@ export default function OrganizationsPage() {
                 <tr key={org.id} className="text-sm hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
-                        <Building01 className="w-4 h-4 text-violet-600" />
+                      <div className="w-8 h-8 rounded-lg bg-coffee-cream flex items-center justify-center">
+                        <Building01 className="w-4 h-4 text-coffee-cortado" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{org.name}</p>
@@ -231,7 +231,7 @@ export default function OrganizationsPage() {
                           href={`https://dashboard.stripe.com/customers/${org.stripe_customer_id}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-violet-600 hover:text-violet-700 font-medium"
+                          className="text-xs text-coffee-cortado hover:text-coffee-espresso font-medium"
                         >
                           Stripe
                         </a>

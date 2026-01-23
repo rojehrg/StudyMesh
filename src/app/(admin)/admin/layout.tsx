@@ -96,7 +96,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Link>
           <div className="h-6 w-px bg-gray-200" />
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-coffee-mocha flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
             <span className="font-semibold text-gray-900">Admin Console</span>

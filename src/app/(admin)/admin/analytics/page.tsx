@@ -13,8 +13,8 @@ export default function AnalyticsPage() {
 
       {/* PostHog Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center mx-auto">
-          <TrendingUp className="w-8 h-8 text-violet-600" />
+        <div className="w-16 h-16 rounded-full bg-coffee-cream flex items-center justify-center mx-auto">
+          <TrendingUp className="w-8 h-8 text-coffee-cortado" />
         </div>
         <h2 className="mt-4 text-lg font-semibold text-gray-900">PostHog Analytics</h2>
         <p className="mt-2 text-gray-500 max-w-md mx-auto">
@@ -25,7 +25,7 @@ export default function AnalyticsPage() {
           href="https://us.posthog.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg font-medium hover:bg-violet-700 transition-colors"
+          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-coffee-mocha text-white rounded-lg font-medium hover:bg-coffee-espresso transition-colors"
         >
           Open PostHog Dashboard
           <ArrowRightMd className="w-4 h-4" />

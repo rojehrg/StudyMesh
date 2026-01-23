@@ -447,7 +447,7 @@ function SettingsContent() {
         <div className="flex items-center gap-2 text-sm text-coffee-cortado">
           {saveStatus === 'saving' && <><LottieLoader size="sm" className="w-4 h-4" /> Saving...</>}
           {saveStatus === 'saved' && <><CheckBig className="h-4 w-4 text-coffee-mocha" /> Saved</>}
-          {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-red-500" /> Error</>}
+          {saveStatus === 'error' && <><WifiOff className="h-4 w-4 text-coffee-roast" /> Error</>}
           {saveStatus === 'idle' && <><WifiHigh className="h-4 w-4" /> Auto-save</>}
         </div>
       </div>
@@ -502,7 +502,7 @@ function SettingsContent() {
                     size="sm"
                     onClick={handleAvatarRemove}
                     disabled={avatarUploading}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    className="text-coffee-roast hover:text-coffee-roast hover:bg-coffee-roast/10"
                   >
                     <X className="w-4 h-4 mr-1" aria-hidden="true" />
                     Remove
@@ -608,7 +608,7 @@ function SettingsContent() {
               </div>
             </div>
             {profile.slackConnected ? (
-              <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
+              <Button variant="outline" size="sm" onClick={disconnectSlack} className="text-coffee-roast hover:text-coffee-roast border-coffee-roast/30 hover:bg-coffee-roast/10">
                 <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
                 Disconnect Slack
               </Button>
@@ -637,7 +637,7 @@ function SettingsContent() {
               </div>
             </div>
             {meetingProviders.googleCalendar ? (
-              <Button variant="outline" size="sm" onClick={disconnectGoogleCalendar} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
+              <Button variant="outline" size="sm" onClick={disconnectGoogleCalendar} className="text-coffee-roast hover:text-coffee-roast border-coffee-roast/30 hover:bg-coffee-roast/10">
                 <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
                 Disconnect Calendar
               </Button>
@@ -665,7 +665,7 @@ function SettingsContent() {
               </div>
             </div>
             {meetingProviders.zoom ? (
-              <Button variant="outline" size="sm" onClick={disconnectZoom} className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50">
+              <Button variant="outline" size="sm" onClick={disconnectZoom} className="text-coffee-roast hover:text-coffee-roast border-coffee-roast/30 hover:bg-coffee-roast/10">
                 <LinkBreak className="w-4 h-4 mr-2" aria-hidden="true" />
                 Disconnect Zoom
               </Button>
@@ -838,8 +838,8 @@ function SettingsContent() {
           <div className="border-t border-coffee-foam pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
-                  <TrashFull className="w-5 h-5 text-red-500" />
+                <div className="w-10 h-10 bg-coffee-roast/10 rounded-lg flex items-center justify-center">
+                  <TrashFull className="w-5 h-5 text-coffee-roast" />
                 </div>
                 <div>
                   <p className="font-medium text-coffee-espresso">Delete Account</p>
@@ -849,7 +849,7 @@ function SettingsContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-red-500 hover:text-red-500 border-red-200 hover:bg-red-50"
+                className="text-coffee-roast hover:text-coffee-roast border-coffee-roast/30 hover:bg-coffee-roast/10"
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <TrashFull className="w-4 h-4 mr-2" />
@@ -861,9 +861,9 @@ function SettingsContent() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl"
+                className="mt-4 p-4 bg-coffee-roast/10 border border-coffee-roast/30 rounded-xl"
               >
-                <p className="text-sm font-medium text-red-600 mb-2">
+                <p className="text-sm font-medium text-coffee-roast mb-2">
                   This action cannot be undone.
                 </p>
                 <p className="text-sm text-coffee-cortado mb-3">
