@@ -15,6 +15,8 @@ import { eq, and, isNull, lt, gt } from 'drizzle-orm';
 import { createLogger } from '@/lib/logger';
 import {
   buildWakeUpMessage,
+  buildProactiveDeadlineAlert,
+  shouldSendProactiveAlert,
   generateThreadLink,
 } from '@/lib/slack/momentum-lock/messages';
 import { processAllRemindersAndEscalations } from '@/lib/slack/momentum-lock/reminders';
@@ -300,6 +302,83 @@ async function processEscalationChain(): Promise<{ escalated: number; skipped: n
 }
 
 /**
+ * Process proactive deadline alerts
+ *
+ * At 75% elapsed time, notify requester if lock hasn't started.
+ * This is a "supernatural" feature - prevents surprise at deadline.
+ *
+ * We track alerts via a separate field to avoid re-sending.
+ */
+async function processProactiveAlerts(): Promise<{ sent: number; skipped: number }> {
+  const now = new Date();
+
+  // Find active locks that haven't been started
+  const activeLocks = await db
+    .select()
+    .from(momentumLocks)
+    .where(
+      and(
+        eq(momentumLocks.status, 'active'),
+        gt(momentumLocks.deadlineAt, now) // Not yet expired
+      )
+    );
+
+  let sent = 0;
+  let skipped = 0;
+
+  for (const lock of activeLocks) {
+    // Check if we should send a proactive alert
+    if (!shouldSendProactiveAlert(lock)) {
+      continue;
+    }
+
+    // Check if we've already sent an alert (using escalationSentAt as proxy for now)
+    // TODO: Add dedicated proactive_alert_sent_at field
+    if (lock.escalationSentAt) {
+      skipped++;
+      continue;
+    }
+
+    // Generate thread link
+    const threadLink = generateThreadLink(lock.workspaceId, lock.channelId, lock.threadTs);
+
+    // Build and send proactive alert to requester
+    const message = buildProactiveDeadlineAlert(lock, threadLink);
+    const messageSent = await sendDM(lock.requesterUserId, message);
+
+    if (messageSent) {
+      // Mark alert as sent (using escalationSentAt as proxy)
+      await db
+        .update(momentumLocks)
+        .set({ escalationSentAt: new Date() })
+        .where(eq(momentumLocks.id, lock.id));
+
+      // Log event
+      await db.insert(momentumLockEvents).values({
+        lockId: lock.id,
+        eventType: 'escalation_triggered',
+        payload: {
+          type: 'proactive_deadline_alert',
+          sentTo: lock.requesterUserId,
+          sentAt: now.toISOString(),
+          reason: 'lock_not_started_at_75_percent',
+        },
+      });
+
+      sent++;
+      log.info('Proactive deadline alert sent', {
+        lockId: lock.id,
+        requesterUserId: lock.requesterUserId,
+      });
+    } else {
+      skipped++;
+    }
+  }
+
+  return { sent, skipped };
+}
+
+/**
  * Process expirations
  *
  * Mark locks as expired if deadline has passed
@@ -348,11 +427,12 @@ export async function GET(request: Request) {
   log.info('Cron job started');
 
   try {
-    // Process all: expirations, wake-ups, escalation chain, and reminders
-    const [expirations, wakeUps, escalationChainResults, reminderResults] = await Promise.all([
+    // Process all: expirations, wake-ups, escalation chain, proactive alerts, and reminders
+    const [expirations, wakeUps, escalationChainResults, proactiveAlerts, reminderResults] = await Promise.all([
       processExpirations(),
       processWakeUpDeliveries(),
       processEscalationChain(),
+      processProactiveAlerts(),
       processAllRemindersAndEscalations(),
     ]);
 
@@ -361,6 +441,8 @@ export async function GET(request: Request) {
       wakeUps,
       escalations: escalationChainResults.escalated,
       escalationsSkipped: escalationChainResults.skipped,
+      proactiveAlerts: proactiveAlerts.sent,
+      proactiveAlertsSkipped: proactiveAlerts.skipped,
       reminders: reminderResults.reminders.sent,
     });
 
@@ -371,6 +453,8 @@ export async function GET(request: Request) {
         wakeUps,
         escalations: escalationChainResults.escalated,
         escalationsSkipped: escalationChainResults.skipped,
+        proactiveAlerts: proactiveAlerts.sent,
+        proactiveAlertsSkipped: proactiveAlerts.skipped,
         reminders: reminderResults.reminders.sent,
       },
     });

@@ -164,8 +164,8 @@ const RequestFlowAnimation = () => {
   const currentScenario = scenarios[scenarioIndex];
 
   useEffect(() => {
-    // Increased timings for smoother pacing - gives users more time to absorb each state
-    const timings = [3000, 2000, 2500]; // Time to show each step
+    // Longer timings for smoother pacing - gives users more time to absorb each state
+    const timings = [3500, 2500, 3000]; // Time to show each step
 
     const timeout = setTimeout(() => {
       if (step < 2) {
@@ -220,18 +220,24 @@ const RequestFlowAnimation = () => {
                 <AnimatePresence>
                   {step >= 1 && (
                     <motion.div
-                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 16, scale: 0.92 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.96 }}
                       transition={{
                         type: 'spring',
-                        stiffness: 300,
-                        damping: 25,
-                        duration: 0.5,
+                        stiffness: 180,
+                        damping: 22,
+                        mass: 1,
+                        duration: 0.6,
                       }}
                       className="flex items-center gap-2 text-sm"
                     >
-                      <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.15 }}
+                        className="w-2 h-2 rounded-full bg-coffee-oat"
+                      />
                       <span className="text-coffee-cortado">{currentScenario.owner} saw your request and started</span>
                     </motion.div>
                   )}
@@ -240,19 +246,25 @@ const RequestFlowAnimation = () => {
                 <AnimatePresence>
                   {step >= 2 && (
                     <motion.div
-                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 16, scale: 0.92 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.96 }}
                       transition={{
                         type: 'spring',
-                        stiffness: 300,
-                        damping: 25,
-                        duration: 0.5,
-                        delay: 0.1, // Staggered delay for second element
+                        stiffness: 180,
+                        damping: 22,
+                        mass: 1,
+                        duration: 0.6,
+                        delay: 0.15,
                       }}
                       className="flex items-center gap-2 text-sm"
                     >
-                      <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.25 }}
+                        className="w-2 h-2 rounded-full bg-coffee-espresso"
+                      />
                       <span className="text-coffee-cortado">{currentScenario.owner} marked your request as done</span>
                     </motion.div>
                   )}
@@ -286,8 +298,14 @@ const Hero = () => (
           </StaggerItem>
 
           <StaggerItem>
-            <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch] text-pretty">
-              When your teammate is 8 hours ahead, a simple request becomes a day-long wait. You sent a message. Did they see it? Are they blocked? You have no idea. Attunly gives you clarity while they sleep.
+            <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-4 max-w-[60ch] text-pretty">
+              Task trackers tell you what's done. Attunly tells you what's happening.
+            </p>
+          </StaggerItem>
+
+          <StaggerItem>
+            <p className="text-base md:text-lg text-coffee-latte leading-relaxed mb-8 md:mb-10 max-w-[60ch] text-pretty">
+              When your teammate is 8 hours ahead, a simple request becomes a day-long wait. Did they see it? Are they blocked? Attunly replaces silence with clarity.
             </p>
           </StaggerItem>
 
@@ -335,8 +353,20 @@ const TheMoment = () => (
 
           <div className="mt-10 pt-8 border-t border-coffee-steamed">
             <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-              Knowing someone is blocked is better than wondering if they forgot. Attunly replaces silence with clarity, no matter how many hours apart you are.
+              Clarity over silence. Knowing someone is blocked is better than wondering if they forgot.
             </p>
+          </div>
+
+          {/* Research-backed insight */}
+          <div className="mt-6 grid grid-cols-2 gap-4 max-w-md">
+            <div className="p-3 bg-coffee-paper rounded-lg border border-coffee-foam">
+              <p className="text-2xl font-semibold text-coffee-espresso">35%</p>
+              <p className="text-xs text-coffee-cortado">feel ignored when messages are read but not responded to</p>
+            </div>
+            <div className="p-3 bg-coffee-paper rounded-lg border border-coffee-foam">
+              <p className="text-2xl font-semibold text-coffee-espresso">8+ hrs</p>
+              <p className="text-xs text-coffee-cortado">timezone gaps reduce collaboration by 37%</p>
+            </div>
           </div>
         </div>
       </FadeIn>
@@ -422,14 +452,15 @@ const BeforeAfterDemo = () => {
               /* Without Attunly - The silence */
               <motion.div
                 key="without"
-                initial={{ opacity: 0, x: -20, scale: 0.98 }}
+                initial={{ opacity: 0, x: -24, scale: 0.96 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 20, scale: 0.98 }}
+                exit={{ opacity: 0, x: 24, scale: 0.96 }}
                 transition={{
                   type: 'spring',
-                  stiffness: 350,
-                  damping: 30,
-                  duration: 0.5,
+                  stiffness: 220,
+                  damping: 26,
+                  mass: 0.9,
+                  duration: 0.55,
                 }}
                 className="space-y-4"
               >
@@ -502,14 +533,15 @@ const BeforeAfterDemo = () => {
               /* With Attunly - The clarity */
               <motion.div
                 key="with"
-                initial={{ opacity: 0, x: 20, scale: 0.98 }}
+                initial={{ opacity: 0, x: 24, scale: 0.96 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -20, scale: 0.98 }}
+                exit={{ opacity: 0, x: -24, scale: 0.96 }}
                 transition={{
                   type: 'spring',
-                  stiffness: 350,
-                  damping: 30,
-                  duration: 0.5,
+                  stiffness: 220,
+                  damping: 26,
+                  mass: 0.9,
+                  duration: 0.55,
                 }}
                 className="space-y-4"
               >
@@ -699,9 +731,67 @@ const BeforeAfterDemo = () => {
   );
 };
 
+// Competitive Comparison Section
+const CompetitiveComparison = () => (
+  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper">
+    <div className="max-w-5xl mx-auto">
+      <FadeIn>
+        <div className="text-center mb-12">
+          <p className="text-coffee-latte text-sm uppercase mb-4">Why this is different</p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
+            Jira tracks issues.
+            <br />
+            <span className="text-coffee-oat">Attunly tracks attention.</span>
+          </h2>
+          <p className="text-lg text-coffee-cortado max-w-[50ch] mx-auto text-pretty">
+            Task tools track work state, not human state. Attunly uniquely tracks acknowledgment, blocked status, and intent.
+          </p>
+        </div>
+      </FadeIn>
+
+      <StaggerContainer staggerDelay={0.08} className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            tool: 'Jira',
+            gap: 'Shows what needs to be done. No visibility into when someone actually sees a ticket or starts thinking about it.',
+            positioning: 'Jira tracks issues. Attunly tracks attention.',
+          },
+          {
+            tool: 'Linear',
+            gap: 'Moves fast within a team. Doesn\'t solve the handoff gap when your teammate is asleep.',
+            positioning: 'Linear moves fast. Attunly keeps you informed.',
+          },
+          {
+            tool: 'Slack',
+            gap: 'Shows presence. Doesn\'t tell you if they saw your specific message or what\'s blocking them.',
+            positioning: 'Slack shows presence. Attunly shows progress.',
+          },
+          {
+            tool: 'Email',
+            gap: 'Read receipts feel invasive. No way to know if someone is stuck without explicitly asking.',
+            positioning: 'Email creates anxiety. Attunly creates clarity.',
+          },
+        ].map((item) => (
+          <StaggerItem key={item.tool}>
+            <HoverScale scale={1.02}>
+              <div className="p-5 bg-coffee-cream rounded-xl border border-coffee-foam h-full transition-shadow duration-200 hover:shadow-md">
+                <p className="font-semibold text-coffee-espresso mb-2">{item.tool}</p>
+                <p className="text-coffee-cortado text-sm mb-4">{item.gap}</p>
+                <p className="text-coffee-mocha text-xs font-medium border-t border-coffee-foam pt-3 mt-auto">
+                  {item.positioning}
+                </p>
+              </div>
+            </HoverScale>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+    </div>
+  </section>
+);
+
 // What's Different + Who Uses It Combined Section
 const WhatsDifferentAndWhoUsesIt = () => (
-  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper">
+  <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
     <div className="max-w-5xl mx-auto">
       <div className="grid md:grid-cols-2 gap-12 md:gap-16">
         {/* Left: What Attunly Does */}
@@ -719,20 +809,20 @@ const WhatsDifferentAndWhoUsesIt = () => (
               {[
                 {
                   title: 'Request a response',
-                  desc: "Ask one person for one thing. Clearly. With a deadline that's just context, not pressure.",
+                  desc: "Ask one person for one thing. With a deadline that's context, not pressure.",
                 },
                 {
                   title: 'See when they saw it',
-                  desc: 'You know the moment they acknowledge your request. No more wondering.',
+                  desc: 'Know the moment they acknowledge. Silence becomes geography, not neglect.',
                 },
                 {
                   title: 'Get honest updates',
-                  desc: 'If they\'re blocked, you\'ll know why. If they\'re done, you\'ll know when. Silence becomes clarity.',
+                  desc: 'Blocked? You\'ll know why. Done? You\'ll know when. Clarity over silence.',
                 },
               ].map((item) => (
                 <StaggerItem key={item.title}>
                   <HoverScale scale={1.01}>
-                    <div className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam transition-shadow duration-200 hover:shadow-md">
+                    <div className="p-4 bg-coffee-paper rounded-xl border border-coffee-foam transition-shadow duration-200 hover:shadow-md">
                       <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
                       <p className="text-coffee-cortado text-sm">{item.desc}</p>
                     </div>
@@ -762,7 +852,7 @@ const WhatsDifferentAndWhoUsesIt = () => (
                 'A simple request shouldn\'t require a follow-up thread, a standup mention, and a Slack reminder.',
               ].map((moment, index) => (
                 <StaggerItem key={index}>
-                  <div className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam">
+                  <div className="p-4 bg-coffee-paper rounded-xl border border-coffee-foam">
                     <p className="text-coffee-mocha text-sm">{moment}</p>
                   </div>
                 </StaggerItem>
@@ -1208,6 +1298,7 @@ export default function AttunlyLanding() {
       <Hero />
       <TheMoment />
       <BeforeAfterDemo />
+      <CompetitiveComparison />
       <WhatsDifferentAndWhoUsesIt />
       <SocialProof />
       <Testimonials />

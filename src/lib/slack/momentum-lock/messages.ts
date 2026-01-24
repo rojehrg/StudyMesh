@@ -100,6 +100,58 @@ export function formatTheirTime(
 }
 
 /**
+ * Format owner name with their local time for display
+ * Returns "Sarah (11:47pm their time)" format
+ *
+ * This is a "supernatural" feature that reframes silence as geography,
+ * helping requesters understand that lack of response may simply be
+ * due to timezone differences rather than neglect.
+ */
+export function formatOwnerWithTimezone(
+  ownerName: string,
+  ownerTimezone: string | null,
+  now: Date = new Date()
+): string {
+  if (!ownerTimezone) {
+    return ownerName;
+  }
+
+  const time = formatTimeInTimezone(now, ownerTimezone);
+  return `${ownerName} (${time} their time)`;
+}
+
+/**
+ * Get relative timezone context between requester and owner
+ * Returns descriptive string like "8 hours ahead" or "same timezone"
+ */
+export function getTimezoneGapDescription(
+  requesterTimezone: string | null,
+  ownerTimezone: string | null
+): string | null {
+  const reqTz = requesterTimezone || 'America/New_York';
+  const ownTz = ownerTimezone || 'America/New_York';
+
+  if (reqTz === ownTz) {
+    return null;
+  }
+
+  const now = new Date();
+  const reqTime = new Date(now.toLocaleString('en-US', { timeZone: reqTz }));
+  const ownTime = new Date(now.toLocaleString('en-US', { timeZone: ownTz }));
+  const diffMs = ownTime.getTime() - reqTime.getTime();
+  const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+
+  if (diffHours === 0) {
+    return null;
+  }
+
+  const absHours = Math.abs(diffHours);
+  const direction = diffHours > 0 ? 'ahead' : 'behind';
+
+  return `${absHours} hour${absHours !== 1 ? 's' : ''} ${direction}`;
+}
+
+/**
  * Build timezone context block for messages
  * Shows "Your time: 9am PT | Their time: 12pm ET" format
  */
@@ -213,6 +265,23 @@ export function buildWakeUpMessage(lock: MomentumLock, threadLink: string | null
         text: `While you were offline, <@${requesterUserId}> set a commitment for you.`,
       },
     },
+    // Show timezone gap context (supernatural feature: reframes silence as geography)
+    ...(requesterTimezone && requesterTimezone !== ownerTimezone
+      ? [
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: (() => {
+                  const gap = getTimezoneGapDescription(ownerTimezone, requesterTimezone);
+                  return gap ? `They are ${gap} from you` : '';
+                })(),
+              },
+            ],
+          },
+        ].filter(block => block.elements[0].text !== '')
+      : []),
     // Show requester's timezone context if different
     ...(requesterTimeContext
       ? [
@@ -754,6 +823,169 @@ export function generateThreadLink(
   // Convert thread_ts to link format (remove the dot)
   const linkTs = threadTs.replace('.', '');
   return `https://slack.com/archives/${channelId}/p${linkTs}`;
+}
+
+// ============================================
+// PROACTIVE DEADLINE ALERTS (SUPERNATURAL)
+// ============================================
+
+/**
+ * Build proactive deadline alert message for requester
+ *
+ * Sent at 75% elapsed time when lock hasn't started.
+ * This is a "supernatural" feature - we notify before it becomes urgent,
+ * giving the requester time to adjust or escalate if needed.
+ *
+ * Key insight: "Prevents surprise at deadline"
+ */
+export function buildProactiveDeadlineAlert(
+  lock: MomentumLock,
+  threadLink: string | null
+): {
+  text: string;
+  blocks: SlackBlock[];
+} {
+  const { ownerUserId, requiredOutcome, deadlineAt, ownerTimezone, status, acceptableFallback } = lock;
+
+  const now = new Date();
+  const deadline = new Date(deadlineAt);
+  const hoursRemaining = (deadline.getTime() - now.getTime()) / (60 * 60 * 1000);
+  const timeText = formatHoursUntilDeadline(hoursRemaining);
+
+  // Get owner's current local time for context
+  const ownerTimeContext = ownerTimezone ? formatTheirTime(ownerTimezone, now) : null;
+
+  // Determine if owner might be sleeping/offline
+  let sleepContext = '';
+  if (ownerTimezone) {
+    const ownerHour = parseInt(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: ownerTimezone,
+        hour: 'numeric',
+        hour12: false,
+      }).format(now),
+      10
+    );
+    if (ownerHour >= 22 || ownerHour < 7) {
+      sleepContext = ' (likely sleeping)';
+    } else if (ownerHour >= 18 || ownerHour < 9) {
+      sleepContext = ' (outside working hours)';
+    }
+  }
+
+  const text = `Heads up: Your request to ${ownerUserId} hasn't started yet. Deadline: ${timeText}.`;
+
+  const fallbackNote = acceptableFallback
+    ? `\n\nYou defined an acceptable fallback: _${acceptableFallback}_`
+    : '';
+
+  const blocks: SlackBlock[] = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: "Proactive Update",
+        emoji: false,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Your request to <@${ownerUserId}> hasn't started yet.*\n\n_${requiredOutcome}_${fallbackNote}`,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `*${timeText}* until deadline${ownerTimeContext ? ` | ${ownerTimeContext}${sleepContext}` : ''}`,
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "This is a heads-up, not an alarm. The owner may be working on something before they update status.",
+      },
+    },
+  ];
+
+  // Add thread link if available
+  if (threadLink) {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `<${threadLink}|View thread>`,
+        },
+      ],
+    });
+  }
+
+  blocks.push(
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      block_id: "proactive_alert_actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Escalate Now",
+            emoji: false,
+          },
+          action_id: "momentum_lock_manual_escalate",
+          value: lock.id,
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "Dismiss",
+            emoji: false,
+          },
+          action_id: "momentum_lock_dismiss_alert",
+          value: lock.id,
+        },
+      ],
+    }
+  );
+
+  return { text, blocks };
+}
+
+/**
+ * Check if a lock should receive a proactive deadline alert
+ *
+ * Criteria:
+ * - Status is still 'active' (not started)
+ * - 75% or more of time has elapsed
+ * - Alert hasn't been sent yet (tracked via escalation_sent_at as proxy)
+ */
+export function shouldSendProactiveAlert(lock: MomentumLock): boolean {
+  if (lock.status !== 'active') {
+    return false;
+  }
+
+  const now = new Date();
+  const created = new Date(lock.createdAt);
+  const deadline = new Date(lock.deadlineAt);
+
+  const totalDuration = deadline.getTime() - created.getTime();
+  const elapsed = now.getTime() - created.getTime();
+  const percentElapsed = (elapsed / totalDuration) * 100;
+
+  return percentElapsed >= 75;
 }
 
 // ============================================
