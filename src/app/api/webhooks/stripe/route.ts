@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { stripe, updateSubscriptionFromStripe, logBillingEvent } from '@/lib/billing';
-import { audit } from '@/lib/audit';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger({ service: 'stripe-webhook' });
@@ -235,12 +234,9 @@ async function handleSubscriptionUpdated(
     cancelAtPeriodEnd: (subscription as unknown as { cancel_at_period_end: boolean }).cancel_at_period_end,
   });
 
-  // Log audit event for subscription changes
   if (eventType === 'customer.subscription.created') {
-    await audit.subscriptionCreated(org.id, null, newPlan);
     log.info('Subscription created', { organizationId: org.id, plan: newPlan });
   } else if (oldPlan !== newPlan) {
-    await audit.subscriptionUpdated(org.id, null, oldPlan, newPlan);
     log.info('Subscription updated', { organizationId: org.id, oldPlan, newPlan });
   }
 }
@@ -294,9 +290,6 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription, eve
     previousPlan,
     canceledAt: (subscription as unknown as { canceled_at: number | null }).canceled_at,
   });
-
-  // Log audit event for cancellation
-  await audit.subscriptionCancelled(org.id, null);
 
   log.info('Subscription canceled, reverted to free', { organizationId: org.id, previousPlan });
 }

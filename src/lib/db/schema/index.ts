@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, jsonb, integer, time, index } from "drizzle-orm/pg-core";
 
 /**
  * ATTUNLY DATABASE SCHEMA
@@ -266,69 +266,6 @@ export const commandEvents = pgTable("command_events", {
 });
 
 // ============================================
-// AUDIT LOGGING SYSTEM
-// Tracks all admin/sensitive actions for compliance
-// ============================================
-
-// Audit action types
-export const AuditAction = {
-  // Authentication
-  USER_LOGIN: 'user.login',
-  USER_LOGOUT: 'user.logout',
-  USER_PASSWORD_CHANGE: 'user.password_change',
-
-  // Team management
-  MEMBER_INVITED: 'member.invited',
-  MEMBER_JOINED: 'member.joined',
-  MEMBER_REMOVED: 'member.removed',
-  MEMBER_ROLE_CHANGED: 'member.role_changed',
-
-  // Organization
-  ORG_SETTINGS_UPDATED: 'org.settings_updated',
-  ORG_NAME_CHANGED: 'org.name_changed',
-
-  // Integrations
-  SLACK_CONNECTED: 'integration.slack_connected',
-  SLACK_DISCONNECTED: 'integration.slack_disconnected',
-  CALENDAR_CONNECTED: 'integration.calendar_connected',
-  CALENDAR_DISCONNECTED: 'integration.calendar_disconnected',
-  ZOOM_CONNECTED: 'integration.zoom_connected',
-  ZOOM_DISCONNECTED: 'integration.zoom_disconnected',
-
-  // Billing
-  SUBSCRIPTION_CREATED: 'billing.subscription_created',
-  SUBSCRIPTION_UPDATED: 'billing.subscription_updated',
-  SUBSCRIPTION_CANCELLED: 'billing.subscription_cancelled',
-  TRIAL_STARTED: 'billing.trial_started',
-
-  // Data
-  DATA_EXPORTED: 'data.exported',
-  ACCOUNT_DELETED: 'account.deleted',
-
-  // SSO (for future)
-  SSO_CONFIGURED: 'sso.configured',
-  SSO_ENABLED: 'sso.enabled',
-  SSO_DISABLED: 'sso.disabled',
-} as const;
-
-export type AuditActionType = typeof AuditAction[keyof typeof AuditAction];
-
-// Audit logs table - tracks all sensitive actions
-export const auditLogs = pgTable("audit_logs", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
-  actorId: uuid("actor_id"), // User who performed the action (null for system actions)
-  action: text("action").notNull(), // Action type from AuditAction
-  resourceType: text("resource_type"), // 'user', 'organization', 'integration', 'billing'
-  resourceId: text("resource_id"), // ID of the affected resource
-  description: text("description"), // Human-readable description
-  metadata: jsonb("metadata").default({}), // Additional context (old/new values, etc.)
-  ipAddress: text("ip_address"), // Client IP address
-  userAgent: text("user_agent"), // Browser/client info
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-// ============================================
 // LINGO TRANSLATION SYSTEM
 // Cross-team communication translation
 // ============================================
@@ -407,6 +344,9 @@ export const MomentumLockEventType = {
   REASSIGNED: 'reassigned',
   EXPIRED: 'expired',
   CANCELED: 'canceled',
+  ESCALATION_TRIGGERED: 'escalation_triggered',
+  ESCALATION_PAUSED: 'escalation_paused',
+  ESCALATION_RESUMED: 'escalation_resumed',
 } as const;
 
 export type MomentumLockEventTypeValue = typeof MomentumLockEventType[keyof typeof MomentumLockEventType];
@@ -432,9 +372,19 @@ export const momentumLocks = pgTable("momentum_locks", {
   wakeUpDeliveredAt: timestamp("wake_up_delivered_at", { withTimezone: true }),
   dmChannelId: text("dm_channel_id"),                       // DM channel ID for message updates
   dmMessageTs: text("dm_message_ts"),                       // DM message timestamp for updates
+  // Escalation chain system
+  escalationChain: text("escalation_chain").array(),        // Array of Slack user IDs for escalation
+  currentEscalationLevel: integer("current_escalation_level").default(0), // Current position in escalation chain (0 = owner)
+  escalationPaused: boolean("escalation_paused").default(false), // Whether auto-escalation is paused
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [
+  // Composite indexes for common query patterns
+  index("momentum_locks_workspace_status_idx").on(table.workspaceId, table.status),
+  index("momentum_locks_owner_status_idx").on(table.ownerUserId, table.status),
+  index("momentum_locks_requester_created_idx").on(table.requesterUserId, table.createdAt),
+  index("momentum_locks_deadline_idx").on(table.deadlineAt),
+]);
 
 // Momentum Lock Events - tracks all state transitions
 export const momentumLockEvents = pgTable("momentum_lock_events", {
@@ -444,7 +394,10 @@ export const momentumLockEvents = pgTable("momentum_lock_events", {
   actorUserId: text("actor_user_id"),                       // Slack user who triggered the event (null for system events)
   payload: jsonb("payload").default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [
+  // Index for fetching events by lock with chronological ordering
+  index("momentum_lock_events_lock_created_idx").on(table.lockId, table.createdAt),
+]);
 
 // ============================================
 // BETA REQUESTS
@@ -481,8 +434,6 @@ export type UserProviderCredential = typeof userProviderCredentials.$inferSelect
 export type BillingEvent = typeof billingEvents.$inferSelect;
 export type CommandEvent = typeof commandEvents.$inferSelect;
 export type NewCommandEvent = typeof commandEvents.$inferInsert;
-export type AuditLog = typeof auditLogs.$inferSelect;
-export type NewAuditLog = typeof auditLogs.$inferInsert;
 export type DepartmentLingoProfile = typeof departmentLingoProfiles.$inferSelect;
 export type NewDepartmentLingoProfile = typeof departmentLingoProfiles.$inferInsert;
 export type TermTranslation = typeof termTranslations.$inferSelect;

@@ -13,7 +13,6 @@ import {
   getUserOrgContext,
   getOrganizationMembers,
 } from '@/lib/rbac';
-import { audit } from '@/lib/audit';
 
 // GET /api/team - List organization members
 export async function GET() {
@@ -118,9 +117,6 @@ export async function POST(request: NextRequest) {
         .update({ organization_id: context.organizationId })
         .eq('user_id', existingProfile.user_id);
 
-      // Log audit event
-      await audit.memberInvited(context.organizationId, context.userId, email.toLowerCase());
-
       return NextResponse.json({
         success: true,
         message: 'User added to organization',
@@ -135,9 +131,6 @@ export async function POST(request: NextRequest) {
       .select('invite_code')
       .eq('id', context.organizationId)
       .single();
-
-    // Log audit event for pending invite
-    await audit.memberInvited(context.organizationId, context.userId, email.toLowerCase());
 
     return NextResponse.json({
       success: true,

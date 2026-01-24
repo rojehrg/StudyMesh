@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Webhook } from 'standardwebhooks';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { audit } from '@/lib/audit';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger({ service: 'billing' });
@@ -200,9 +199,6 @@ async function handleSubscriptionActive(
     periodEnd: periodEndIso,
   });
 
-  // Audit trail
-  await audit.subscriptionCreated(org.id, null, plan);
-
   log.info('Subscription activated', { organizationId: org.id, plan, subscriptionId });
 }
 
@@ -344,9 +340,6 @@ async function handleSubscriptionCancelled(
     subscriptionId,
     previousPlan,
   });
-
-  // Audit trail
-  await audit.subscriptionCancelled(org.id, null);
 
   log.info('Subscription cancelled, reverted to free', { organizationId: org.id, previousPlan });
 }

@@ -40,9 +40,6 @@ export const Permission = {
   ANALYTICS_VIEW: 'analytics:view',
   ANALYTICS_EXPORT: 'analytics:export',
 
-  // Audit logs
-  AUDIT_VIEW: 'audit:view',
-
   // SSO configuration
   SSO_VIEW: 'sso:view',
   SSO_MANAGE: 'sso:manage',
@@ -69,7 +66,6 @@ const rolePermissions: Record<OrganizationRoleType, PermissionType[]> = {
     Permission.INTEGRATIONS_MANAGE,
     Permission.ANALYTICS_VIEW,
     Permission.ANALYTICS_EXPORT,
-    Permission.AUDIT_VIEW,
     Permission.SSO_VIEW,
     Permission.SSO_MANAGE,
   ],
@@ -91,7 +87,6 @@ const rolePermissions: Record<OrganizationRoleType, PermissionType[]> = {
     Permission.INTEGRATIONS_MANAGE,
     Permission.ANALYTICS_VIEW,
     Permission.ANALYTICS_EXPORT,
-    Permission.AUDIT_VIEW,
     Permission.SSO_VIEW,
     // No SSO_MANAGE (owner only)
   ],

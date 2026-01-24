@@ -14,7 +14,16 @@ import { createLogger } from '@/lib/logger';
 import { EVENTS, type EventName } from './events';
 
 // Re-export events for convenience
-export { EVENTS, type EventName } from './events';
+export { EVENTS, FUNNELS, type EventName, type FunnelName, type FunnelMetadata } from './events';
+
+// Re-export server analytics utilities
+export {
+  createServerAnalytics,
+  trackFunnel,
+  shutdownServerAnalytics,
+  ServerAnalytics,
+  type AnalyticsContext,
+} from './server';
 
 const log = createLogger({ service: 'analytics' });
 

@@ -1024,7 +1024,7 @@ async function handleLockModalSubmission(payload: any) {
     });
   }
 
-  const { ownerId, requiredOutcome, deadlineAt } = formData;
+  const { ownerId, requiredOutcome, deadlineAt, fallbackUserId } = formData;
   const { channelId, threadTs, requesterId } = metadata;
 
   try {
@@ -1057,6 +1057,7 @@ async function handleLockModalSubmission(payload: any) {
       createdByUserId: user.id,
       requesterUserId: requesterId,
       ownerUserId: ownerId,
+      fallbackUserId: fallbackUserId || null,
       requiredOutcome,
       deadlineAt,
       ownerTimezone,

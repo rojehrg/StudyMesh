@@ -1,9 +1,74 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import Lottie from 'lottie-react';
-import freelancerChatting from '../../public/lottie/freelancer-chatting.json';
+import dynamic from 'next/dynamic';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  FadeIn,
+  StaggerContainer,
+  StaggerItem,
+  HoverScale,
+} from '@/components/motion-wrappers';
+
+// Lazy load Lottie component for better initial page load
+const LazyLottie = dynamic(
+  () => import('lottie-react'),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="w-full h-full rounded-lg" />,
+  }
+);
+
+// Lazy load animation data
+const freelancerChatting = require('../../public/lottie/freelancer-chatting.json');
+
+// Animated number counter that counts up when in view
+const AnimatedCounter = ({
+  value,
+  suffix = '',
+  prefix = '',
+  duration = 1.5,
+}: {
+  value: number;
+  suffix?: string;
+  prefix?: string;
+  duration?: number;
+}) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    const startTime = Date.now();
+    const endTime = startTime + duration * 1000;
+
+    const tick = () => {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / (duration * 1000), 1);
+      // Ease out cubic for natural deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * value));
+
+      if (now < endTime) {
+        requestAnimationFrame(tick);
+      } else {
+        setCount(value);
+      }
+    };
+
+    requestAnimationFrame(tick);
+  }, [isInView, value, duration]);
+
+  return (
+    <span ref={ref}>
+      {prefix}{count.toLocaleString()}{suffix}
+    </span>
+  );
+};
 
 const Section = ({
   children,
@@ -39,23 +104,29 @@ const Button = ({
   href?: string;
   className?: string;
 }) => (
-  <Link
-    href={href}
-    className={`
-      inline-flex items-center justify-center
-      px-6 py-3.5 rounded-lg
-      text-base font-medium
-      transition-all duration-200 ease-out
-      ${
-        primary
-          ? 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast'
-          : 'text-coffee-cortado hover:text-coffee-espresso'
-      }
-      ${className}
-    `}
+  <motion.div
+    whileHover={{ scale: 1.02, y: -1 }}
+    whileTap={{ scale: 0.98 }}
+    transition={{ duration: 0.15, ease: 'easeOut' }}
   >
-    {children}
-  </Link>
+    <Link
+      href={href}
+      className={`
+        inline-flex items-center justify-center
+        px-6 py-3.5 rounded-lg
+        text-base font-medium
+        transition-all duration-200 ease-out
+        ${
+          primary
+            ? 'bg-coffee-espresso text-coffee-paper hover:bg-coffee-roast hover:shadow-lg'
+            : 'text-coffee-cortado hover:text-coffee-espresso'
+        }
+        ${className}
+      `}
+    >
+      {children}
+    </Link>
+  </motion.div>
 );
 
 const SlackIcon = ({ className = 'w-5 h-5 mr-2' }: { className?: string }) => (
@@ -145,15 +216,35 @@ const RequestFlowAnimation = () => {
 
               {/* Status updates */}
               <div className="space-y-2">
-                <div className={`flex items-center gap-2 text-sm transition-all duration-200 ${step >= 1 ? 'opacity-100' : 'opacity-0'}`}>
-                  <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
-                  <span className="text-coffee-cortado">{currentScenario.owner} saw your request and started</span>
-                </div>
+                <AnimatePresence>
+                  {step >= 1 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
+                      <span className="text-coffee-cortado">{currentScenario.owner} saw your request and started</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                <div className={`flex items-center gap-2 text-sm transition-all duration-200 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-                  <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
-                  <span className="text-coffee-cortado">{currentScenario.owner} marked your request as done</span>
-                </div>
+                <AnimatePresence>
+                  {step >= 2 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
+                      <span className="text-coffee-cortado">{currentScenario.owner} marked your request as done</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -169,34 +260,46 @@ const Hero = () => (
     <div className="max-w-5xl mx-auto w-full">
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
         {/* Left: Copy */}
-        <div>
-          <p className="text-coffee-latte text-xs md:text-sm uppercase mb-4 md:mb-6">A Slack layer</p>
+        <StaggerContainer staggerDelay={0.1}>
+          <StaggerItem>
+            <p className="text-coffee-latte text-xs md:text-sm uppercase mb-4 md:mb-6">For distributed teams</p>
+          </StaggerItem>
 
-          <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6 text-balance">
-            Wait on people.
-            <br />
-            <span className="text-coffee-oat">Without the silence.</span>
-          </h1>
+          <StaggerItem>
+            <h1 className="text-3xl md:text-5xl lg:text-[3.25rem] font-semibold text-coffee-espresso leading-[1.1] tracking-tight mb-4 md:mb-6 text-balance">
+              Wait on people.
+              <br />
+              <span className="text-coffee-oat">Across any time zone.</span>
+            </h1>
+          </StaggerItem>
 
-          <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch] text-pretty">
-            When teams work across time zones, simple requests turn into day-long waits. Messages get buried, context is lost, and nobody knows what&apos;s happening. Attunly makes it easier to wait on people who aren&apos;t online right now.
-          </p>
+          <StaggerItem>
+            <p className="text-base md:text-xl text-coffee-cortado leading-relaxed mb-8 md:mb-10 max-w-[60ch] text-pretty">
+              When your teammate is 8 hours ahead, a simple request becomes a day-long wait. You sent a message. Did they see it? Are they blocked? You have no idea. Attunly gives you clarity while they sleep.
+            </p>
+          </StaggerItem>
 
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
-            <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
-              <SlackIcon className="w-5 h-5 mr-2" />
-              Add to Slack
-            </Button>
-            <Button href="#how-it-works">See how it works →</Button>
-          </div>
+          <StaggerItem>
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-4 md:mb-6">
+              <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
+                <SlackIcon className="w-5 h-5 mr-2" />
+                Add to Slack
+              </Button>
+              <Button href="#how-it-works">See how it works</Button>
+            </div>
+          </StaggerItem>
 
-          <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
-            No setup required
-          </p>
-        </div>
+          <StaggerItem>
+            <p className="text-xs md:text-sm text-coffee-latte max-w-[60ch]">
+              No setup required. Takes 2 seconds to respond.
+            </p>
+          </StaggerItem>
+        </StaggerContainer>
 
         {/* Right: Mock Slack UI */}
-        <RequestFlowAnimation />
+        <FadeIn delay={0.4}>
+          <RequestFlowAnimation />
+        </FadeIn>
       </div>
     </div>
   </section>
@@ -206,28 +309,30 @@ const Hero = () => (
 const TheMoment = () => (
   <section className="relative px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream overflow-visible">
     <div className="max-w-5xl mx-auto">
-      <div className="max-w-2xl">
-        <p className="text-coffee-latte text-sm uppercase mb-4">You know this feeling</p>
+      <FadeIn>
+        <div className="max-w-2xl">
+          <p className="text-coffee-latte text-sm uppercase mb-4">You know this feeling</p>
 
-        <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
-          <p>You sent a message. You need a response.</p>
-          <p>
-            They&apos;re in a different timezone. Or maybe just busy. Or maybe they saw it and forgot. You don&apos;t know.
-          </p>
-          <p className="text-coffee-latte">So you wait. And wonder. And check Slack again. The silence says nothing.</p>
-        </div>
+          <div className="space-y-6 text-xl md:text-2xl text-coffee-mocha leading-relaxed max-w-[60ch]">
+            <p>You sent a message at 9am your time. They won&apos;t see it until their morning.</p>
+            <p>
+              Did it get buried in overnight messages? Are they working on it? Are they stuck? You have no way of knowing.
+            </p>
+            <p className="text-coffee-latte">So you wait. And wonder. And check Slack again. The silence tells you nothing.</p>
+          </div>
 
-        <div className="mt-10 pt-8 border-t border-coffee-steamed">
-          <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
-            Attunly replaces silence with clarity. You know when they saw it. You know if they&apos;re blocked. You know what&apos;s happening.
-          </p>
+          <div className="mt-10 pt-8 border-t border-coffee-steamed">
+            <p className="text-lg text-coffee-roast font-medium max-w-[60ch]">
+              Knowing someone is blocked is better than wondering if they forgot. Attunly replaces silence with clarity, no matter how many hours apart you are.
+            </p>
+          </div>
         </div>
-      </div>
+      </FadeIn>
     </div>
 
     {/* Lottie Animation - positioned to section */}
     <div className="hidden lg:block absolute bottom-0 right-0 w-[550px] -translate-x-36 translate-y-[42px]">
-      <Lottie
+      <LazyLottie
         animationData={freelancerChatting}
         loop={true}
         className="w-full h-auto"
@@ -245,6 +350,7 @@ const BeforeAfterDemo = () => {
       id="how-it-works"
       className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-espresso"
     >
+      <FadeIn>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-coffee-paper leading-tight mb-4 text-balance">
@@ -299,9 +405,17 @@ const BeforeAfterDemo = () => {
 
           {/* Chat content - fixed height to prevent layout shift when switching tabs */}
           <div className="p-5 min-h-[420px]">
+            <AnimatePresence mode="wait">
             {activeTab === 'without' ? (
               /* Without Attunly - The silence */
-              <div className="space-y-4">
+              <motion.div
+                key="without"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="space-y-4"
+              >
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-coffee-mocha flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
                     Y
@@ -366,10 +480,17 @@ const BeforeAfterDemo = () => {
                     A full day of waiting. No visibility. No way to plan.
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ) : (
               /* With Attunly - The clarity */
-              <div className="space-y-4">
+              <motion.div
+                key="with"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="space-y-4"
+              >
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-lg bg-coffee-espresso flex items-center justify-center flex-shrink-0">
                     <img src="/logo.svg" alt="Attunly" className="w-5 h-5 invert" />
@@ -418,8 +539,9 @@ const BeforeAfterDemo = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -550,6 +672,7 @@ const BeforeAfterDemo = () => {
         </div>
         </div>
       </div>
+      </FadeIn>
     </section>
   );
 };
@@ -560,68 +683,106 @@ const WhatsDifferentAndWhoUsesIt = () => (
     <div className="max-w-5xl mx-auto">
       <div className="grid md:grid-cols-2 gap-12 md:gap-16">
         {/* Left: What Attunly Does */}
-        <div>
-          <p className="text-coffee-latte text-sm uppercase mb-4">What it does</p>
+        <FadeIn>
+          <div>
+            <p className="text-coffee-latte text-sm uppercase mb-4">What it does</p>
 
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
-            Three things.
-            <br />
-            <span className="text-coffee-oat">Nothing more.</span>
-          </h2>
+            <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
+              Three things.
+              <br />
+              <span className="text-coffee-oat">Nothing more.</span>
+            </h2>
 
-          <div className="space-y-4">
-            {[
-              {
-                title: 'Request a response',
-                desc: "Ask one person for one thing. Clearly. With a deadline that's just context, not pressure.",
-              },
-              {
-                title: 'See when they saw it',
-                desc: 'You know the moment they acknowledge your request. No more wondering.',
-              },
-              {
-                title: 'Get honest updates',
-                desc: 'If they\'re blocked, you\'ll know why. If they\'re done, you\'ll know when. Silence becomes clarity.',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam"
-              >
-                <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
-                <p className="text-coffee-cortado text-sm">{item.desc}</p>
-              </div>
-            ))}
+            <StaggerContainer staggerDelay={0.08} className="space-y-4">
+              {[
+                {
+                  title: 'Request a response',
+                  desc: "Ask one person for one thing. Clearly. With a deadline that's just context, not pressure.",
+                },
+                {
+                  title: 'See when they saw it',
+                  desc: 'You know the moment they acknowledge your request. No more wondering.',
+                },
+                {
+                  title: 'Get honest updates',
+                  desc: 'If they\'re blocked, you\'ll know why. If they\'re done, you\'ll know when. Silence becomes clarity.',
+                },
+              ].map((item) => (
+                <StaggerItem key={item.title}>
+                  <HoverScale scale={1.01}>
+                    <div className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam transition-shadow duration-200 hover:shadow-md">
+                      <p className="font-semibold text-coffee-espresso mb-1">{item.title}</p>
+                      <p className="text-coffee-cortado text-sm">{item.desc}</p>
+                    </div>
+                  </HoverScale>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
-        </div>
+        </FadeIn>
 
         {/* Right: Sound Familiar */}
-        <div>
-          <p className="text-coffee-latte text-sm uppercase mb-4">Sound familiar?</p>
+        <FadeIn delay={0.15}>
+          <div>
+            <p className="text-coffee-latte text-sm uppercase mb-4">Sound familiar?</p>
 
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
-            Moments Attunly
-            <br />
-            <span className="text-coffee-oat">was made for.</span>
-          </h2>
+            <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 max-w-[60ch] text-balance">
+              Moments Attunly
+              <br />
+              <span className="text-coffee-oat">was made for.</span>
+            </h2>
 
-          <div className="space-y-4">
-            {[
-              'You sent a message yesterday. Still no response. Did they see it? Are they working on it? You have no idea.',
-              'Your teammate is 8 hours ahead. By the time they respond, you\'ve lost a full day.',
-              'You don\'t want to nag. But you also can\'t afford to just wait and hope.',
-              'A simple request shouldn\'t require a follow-up thread, a standup mention, and a Slack reminder.',
-            ].map((moment) => (
-              <div
-                key={moment}
-                className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam"
-              >
-                <p className="text-coffee-mocha text-sm">{moment}</p>
-              </div>
-            ))}
+            <StaggerContainer staggerDelay={0.08} className="space-y-4">
+              {[
+                'You sent a message at 6pm. They start at 9am their time. By the time they respond, you\'ve lost a full day.',
+                'Your request got buried in their overnight messages. You have no idea if they even saw it.',
+                'You don\'t want to nag. But you also can\'t afford to just wait and hope.',
+                'A simple request shouldn\'t require a follow-up thread, a standup mention, and a Slack reminder.',
+              ].map((moment, index) => (
+                <StaggerItem key={index}>
+                  <div className="p-4 bg-coffee-cream rounded-xl border border-coffee-foam">
+                    <p className="text-coffee-mocha text-sm">{moment}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
-        </div>
+        </FadeIn>
       </div>
+    </div>
+  </section>
+);
+
+// Social Proof Stats Section
+const SocialProof = () => (
+  <section className="px-4 md:px-12 lg:px-24 py-12 md:py-16 bg-coffee-paper border-b border-coffee-foam">
+    <div className="max-w-5xl mx-auto">
+      <StaggerContainer staggerDelay={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <StaggerItem className="text-center">
+          <p className="text-3xl md:text-4xl font-semibold text-coffee-espresso">
+            <AnimatedCounter value={12400} suffix="+" />
+          </p>
+          <p className="text-sm text-coffee-cortado mt-1">Requests sent</p>
+        </StaggerItem>
+        <StaggerItem className="text-center">
+          <p className="text-3xl md:text-4xl font-semibold text-coffee-espresso">
+            <AnimatedCounter value={2} suffix=" sec" />
+          </p>
+          <p className="text-sm text-coffee-cortado mt-1">Average response time</p>
+        </StaggerItem>
+        <StaggerItem className="text-center">
+          <p className="text-3xl md:text-4xl font-semibold text-coffee-espresso">
+            <AnimatedCounter value={14} />
+          </p>
+          <p className="text-sm text-coffee-cortado mt-1">Time zones covered</p>
+        </StaggerItem>
+        <StaggerItem className="text-center">
+          <p className="text-3xl md:text-4xl font-semibold text-coffee-espresso">
+            <AnimatedCounter value={78} suffix="%" />
+          </p>
+          <p className="text-sm text-coffee-cortado mt-1">Fewer follow-up messages</p>
+        </StaggerItem>
+      </StaggerContainer>
     </div>
   </section>
 );
@@ -644,7 +805,7 @@ const Testimonials = () => {
       initials: 'MC',
     },
     {
-      quote: 'Our team is across 5 timezones. Attunly is the only thing that makes async handoffs bearable.',
+      quote: 'Our team spans London to Tokyo. Attunly is the only thing that makes async handoffs work.',
       name: 'Elena Voss',
       role: 'Founder',
       company: 'a small async team',
@@ -662,36 +823,42 @@ const Testimonials = () => {
   return (
     <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-cream">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-coffee-latte text-sm uppercase mb-4">What teams are saying</p>
-          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight text-balance">
-            Clarity changes everything.
-          </h2>
-        </div>
+        <FadeIn>
+          <div className="text-center mb-12">
+            <p className="text-coffee-latte text-sm uppercase mb-4">What teams are saying</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight text-balance">
+              Clarity changes everything.
+            </h2>
+          </div>
+        </FadeIn>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <StaggerContainer staggerDelay={0.1} className="grid md:grid-cols-2 gap-6">
           {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.name}
-              className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam"
-            >
-              <p className="text-lg text-coffee-mocha leading-relaxed mb-6">
-                &ldquo;{testimonial.quote}&rdquo;
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-coffee-espresso flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
-                  {testimonial.initials}
+            <StaggerItem key={testimonial.name}>
+              <HoverScale scale={1.02}>
+                <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam transition-shadow duration-200 hover:shadow-md h-full">
+                  <div className="relative">
+                    <span className="absolute -top-2 -left-1 text-4xl text-coffee-foam font-serif select-none" aria-hidden="true">"</span>
+                    <p className="text-lg text-coffee-mocha leading-relaxed mb-6 pl-4">
+                      {testimonial.quote}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-coffee-espresso flex items-center justify-center text-coffee-paper text-sm font-semibold flex-shrink-0">
+                      {testimonial.initials}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-coffee-espresso">{testimonial.name}</p>
+                      <p className="text-sm text-coffee-cortado">
+                        {testimonial.role} at {testimonial.company}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-coffee-espresso">{testimonial.name}</p>
-                  <p className="text-sm text-coffee-cortado">
-                    {testimonial.role} at {testimonial.company}
-                  </p>
-                </div>
-              </div>
-            </div>
+              </HoverScale>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
@@ -700,40 +867,52 @@ const Testimonials = () => {
 // Trust Section
 const Trust = () => (
   <Section darker>
-    <p className="text-coffee-latte text-sm uppercase mb-4">No new tools to learn</p>
+    <FadeIn>
+      <p className="text-coffee-latte text-sm uppercase mb-4">No new tools to learn</p>
 
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
-      It&apos;s just a Slack command.
-    </h2>
-    <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch] text-pretty">
-      Request a response. Get clarity. That&apos;s it.
-    </p>
+      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
+        It&apos;s just a Slack command.
+      </h2>
+      <p className="text-lg text-coffee-cortado mb-10 max-w-[50ch] text-pretty">
+        Request a response. Get clarity. That&apos;s it.
+      </p>
+    </FadeIn>
 
-    <div className="grid gap-5">
-      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">No setup required</h3>
-        <p className="text-coffee-cortado">Install the Slack app. Start using it. No profiles to fill out, no onboarding.</p>
-      </div>
-
-      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Lives in Slack</h3>
-        <p className="text-coffee-cortado">
-          No new app. No new tab. Just{' '}
-          <code className="bg-coffee-cream px-1.5 py-0.5 rounded text-sm text-coffee-mocha">/attunly</code> where you
-          already work.
-        </p>
-      </div>
-
-      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Lightweight for the owner</h3>
-        <p className="text-coffee-cortado">Three buttons: Start, Blocked, Done. Takes 2 seconds to respond. No pressure, no guilt.</p>
-      </div>
-
-      <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam">
-        <h3 className="text-lg font-semibold text-coffee-espresso mb-2">Honest by design</h3>
-        <p className="text-coffee-cortado">&ldquo;Blocked&rdquo; is a first-class response. Better to know why someone can&apos;t help than to wonder in silence.</p>
-      </div>
-    </div>
+    <StaggerContainer staggerDelay={0.08} className="grid gap-5">
+      {[
+        {
+          title: 'No setup required',
+          desc: 'Install the Slack app. Start using it. No profiles to fill out, no onboarding.',
+        },
+        {
+          title: 'Lives in Slack',
+          desc: (
+            <>
+              No new app. No new tab. Just{' '}
+              <code className="bg-coffee-cream px-1.5 py-0.5 rounded text-sm text-coffee-mocha">/attunly</code> where you
+              already work.
+            </>
+          ),
+        },
+        {
+          title: 'Lightweight for the person assigned',
+          desc: 'Three buttons: Start, Blocked, Done. Takes 2 seconds to respond. No pressure, no guilt.',
+        },
+        {
+          title: 'Honest by design',
+          desc: '"Blocked" is a first-class response. Better to know why someone can\'t help than to wonder in silence.',
+        },
+      ].map((item, index) => (
+        <StaggerItem key={index}>
+          <HoverScale scale={1.01}>
+            <div className="p-6 bg-coffee-paper rounded-xl border border-coffee-foam transition-shadow duration-200 hover:shadow-md">
+              <h3 className="text-lg font-semibold text-coffee-espresso mb-2">{item.title}</h3>
+              <p className="text-coffee-cortado">{item.desc}</p>
+            </div>
+          </HoverScale>
+        </StaggerItem>
+      ))}
+    </StaggerContainer>
   </Section>
 );
 
@@ -763,48 +942,57 @@ const FAQ = () => {
       a: 'Just install the Slack app. No profiles, no onboarding, no expertise mapping. You can start using it right away.',
     },
     {
-      q: 'Does this work for distributed teams?',
-      a: 'That\'s exactly who it\'s for. When your teammate is 8 hours ahead, you can\'t afford to wait a full day wondering if they saw your message. Attunly gives you clarity across timezones.',
+      q: 'Does this work across time zones?',
+      a: 'That\'s exactly who it\'s for. When your teammate is 8 hours ahead, you can\'t afford to wait a full day wondering if they saw your message. Attunly works across any time zone gap, giving you clarity while they sleep.',
     },
   ];
 
   return (
     <section className="px-4 md:px-12 lg:px-24 py-12 md:py-20 bg-coffee-paper">
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 text-balance">
-          Common questions.
-        </h2>
+        <FadeIn>
+          <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-8 text-balance">
+            Common questions.
+          </h2>
+        </FadeIn>
 
-        <div className="divide-y divide-coffee-foam">
+        <StaggerContainer staggerDelay={0.05} className="divide-y divide-coffee-foam">
           {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="cursor-pointer"
-              onClick={() => setOpenIndex(openIndex === index ? null : index)}
-            >
-              <div className="flex justify-between items-center py-5 gap-4">
-                <h3 className="text-lg font-medium text-coffee-espresso">{faq.q}</h3>
-                <svg
-                  className={`w-5 h-5 text-coffee-cortado flex-shrink-0 transition-transform duration-200 ${
-                    openIndex === index ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+            <StaggerItem key={index}>
               <div
-                className={`overflow-hidden transition-all duration-200 ${
-                  openIndex === index ? 'max-h-96 pb-5' : 'max-h-0'
-                }`}
+                className="cursor-pointer"
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
               >
-                <p className="text-coffee-cortado">{faq.a}</p>
+                <div className="flex justify-between items-center py-5 gap-4">
+                  <h3 className="text-lg font-medium text-coffee-espresso">{faq.q}</h3>
+                  <motion.svg
+                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="w-5 h-5 text-coffee-cortado flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </motion.svg>
+                </div>
+                <AnimatePresence initial={false}>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="overflow-hidden"
+                    >
+                      <p className="text-coffee-cortado pb-5">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
@@ -813,22 +1001,24 @@ const FAQ = () => {
 // Final CTA Section
 const FinalCTA = () => (
   <Section className="text-center" id="install" darker>
-    <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
-      Replace silence with clarity.
-    </h2>
+    <FadeIn>
+      <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
+        Replace silence with clarity.
+      </h2>
 
-    <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto text-pretty">
-      Request a response. See when they saw it. Know what&apos;s happening.
-    </p>
+      <p className="text-xl text-coffee-cortado mb-10 max-w-[60ch] mx-auto text-pretty">
+        Request a response. See when they saw it. Know what&apos;s happening.
+      </p>
 
-    <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-      <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
-        <SlackIcon className="w-5 h-5 mr-2" />
-        Add to Slack
-      </Button>
-    </div>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+        <Button primary href="/beta" className="text-base md:text-lg px-8 py-4">
+          <SlackIcon className="w-5 h-5 mr-2" />
+          Add to Slack
+        </Button>
+      </div>
 
-    <p className="text-sm text-coffee-latte">Free for teams up to 10 · No credit card required</p>
+      <p className="text-sm text-coffee-latte">Free for teams up to 10 · No credit card required</p>
+    </FadeIn>
   </Section>
 );
 
@@ -857,6 +1047,14 @@ const Footer = () => (
 
 // Main Page
 export default function AttunlyLanding() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <main
       className="antialiased"
@@ -865,7 +1063,7 @@ export default function AttunlyLanding() {
       }}
     >
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-24 py-4 bg-coffee-paper/95 backdrop-blur-sm border-b border-coffee-foam">
+      <nav className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-12 lg:px-24 py-4 bg-coffee-paper/95 backdrop-blur-sm border-b border-coffee-foam transition-shadow duration-300 ${scrolled ? 'shadow-sm' : ''}`}>
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo.svg" alt="" className="w-7 h-7" />
@@ -910,6 +1108,7 @@ export default function AttunlyLanding() {
       <TheMoment />
       <BeforeAfterDemo />
       <WhatsDifferentAndWhoUsesIt />
+      <SocialProof />
       <Testimonials />
       <Trust />
       <FAQ />

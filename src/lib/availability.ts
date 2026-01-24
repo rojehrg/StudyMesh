@@ -5,15 +5,24 @@
  * - Finding overlapping availability between users
  * - Suggesting meeting times
  * - Converting between timezones
+ * - Team timezone spread analysis
+ * - Optimal deadline finding
  */
 
-interface AvailabilitySlot {
+import {
+  getTimezoneOffset as getTzOffset,
+  formatRelativeTimezone,
+  isInWorkingHours,
+  getNextOccurrenceOfHour,
+} from "./timezone-utils";
+
+export interface AvailabilitySlot {
   day: number; // 0-6 (Mon-Sun)
   startSlot: number; // 0-47 (30-min intervals)
   endSlot: number;
 }
 
-interface UserAvailability {
+export interface UserAvailability {
   userId: string;
   timezone: string;
   slots: AvailabilitySlot[];
@@ -387,4 +396,191 @@ export function getTimeUntilNextAvailable(availability: UserAvailability): strin
   } else {
     return `Free in ${Math.round(nearestMinutes / (24 * 60))} days`;
   }
+}
+
+/**
+ * Team Timezone Spread
+ *
+ * Analyzes the timezone distribution across team members
+ * Returns min/max offset, spread, and overlap information
+ */
+export interface TimezoneSpread {
+  minOffset: number; // Westernmost offset in hours
+  maxOffset: number; // Easternmost offset in hours
+  spreadHours: number; // Total spread between min and max
+  minTimezone: string; // Westernmost timezone
+  maxTimezone: string; // Easternmost timezone
+  overlappingWorkingHours: number; // Hours of overlap in working hours (9-6)
+}
+
+/**
+ * Get the timezone spread across a team
+ * Useful for understanding how distributed a team is
+ */
+export function getTeamTimezoneSpread(members: UserAvailability[]): TimezoneSpread {
+  if (members.length === 0) {
+    return {
+      minOffset: 0,
+      maxOffset: 0,
+      spreadHours: 0,
+      minTimezone: "UTC",
+      maxTimezone: "UTC",
+      overlappingWorkingHours: 9, // Full overlap if no members
+    };
+  }
+
+  const now = new Date();
+
+  // Calculate offsets for all members
+  const memberOffsets = members.map((member) => ({
+    timezone: member.timezone,
+    offsetMinutes: getTzOffset(member.timezone, now),
+  }));
+
+  // Find min and max
+  const sorted = memberOffsets.sort((a, b) => a.offsetMinutes - b.offsetMinutes);
+  const westernmost = sorted[0];
+  const easternmost = sorted[sorted.length - 1];
+
+  const minOffsetHours = westernmost.offsetMinutes / 60;
+  const maxOffsetHours = easternmost.offsetMinutes / 60;
+  const spreadHours = maxOffsetHours - minOffsetHours;
+
+  // Calculate overlapping working hours
+  // Working hours: 9 AM to 6 PM (9 hours)
+  // If spread is less than 9 hours, there's full overlap
+  // If spread is more than 9 hours, overlap reduces
+  const workingHoursDuration = 9;
+  const overlappingWorkingHours = Math.max(0, workingHoursDuration - spreadHours);
+
+  return {
+    minOffset: minOffsetHours,
+    maxOffset: maxOffsetHours,
+    spreadHours,
+    minTimezone: westernmost.timezone,
+    maxTimezone: easternmost.timezone,
+    overlappingWorkingHours,
+  };
+}
+
+/**
+ * Optimal Deadline Suggestion
+ *
+ * Suggests a deadline that respects both parties' working hours
+ * and includes an 8-hour sleep buffer
+ */
+export interface OptimalDeadline {
+  deadline: Date;
+  ownerLocalTime: string;
+  requesterLocalTime: string;
+  reasoning: string;
+}
+
+/**
+ * Find an optimal deadline considering both timezones
+ * Takes into account working hours and sleep buffer
+ */
+export function findOptimalDeadline(
+  ownerTz: string,
+  requesterTz: string,
+  preferredHours: number = 24, // Default: 24 hours from now
+  workingHoursStart: number = 9,
+  workingHoursEnd: number = 18
+): OptimalDeadline {
+  const now = new Date();
+  const sleepBufferHours = 8;
+
+  // Start with preferred deadline
+  let deadline = new Date(now.getTime() + preferredHours * 60 * 60 * 1000);
+
+  // Get owner's local time at the deadline
+  const ownerTime = new Date(deadline.toLocaleString("en-US", { timeZone: ownerTz }));
+  const ownerHour = ownerTime.getHours();
+
+  let reasoning = "";
+
+  // Check if deadline falls in owner's sleep window (10 PM - 7 AM)
+  if (ownerHour >= 22 || ownerHour < 7) {
+    // Push to 9 AM owner time next day
+    deadline = getNextOccurrenceOfHour(ownerTz, workingHoursStart, deadline);
+    reasoning = "Adjusted to avoid sleep hours";
+  }
+  // Check if deadline falls outside working hours
+  else if (ownerHour < workingHoursStart) {
+    // Push to start of working hours
+    deadline = getNextOccurrenceOfHour(ownerTz, workingHoursStart, deadline);
+    reasoning = "Adjusted to working hours start";
+  } else if (ownerHour >= workingHoursEnd) {
+    // Push to next day working hours
+    deadline = getNextOccurrenceOfHour(ownerTz, workingHoursStart, new Date(deadline.getTime() + 12 * 60 * 60 * 1000));
+    reasoning = "Adjusted to next day working hours";
+  } else {
+    reasoning = "Within working hours";
+  }
+
+  // Ensure minimum sleep buffer
+  const hoursFromNow = (deadline.getTime() - now.getTime()) / (60 * 60 * 1000);
+  if (hoursFromNow < sleepBufferHours) {
+    deadline = new Date(now.getTime() + sleepBufferHours * 60 * 60 * 1000);
+    reasoning = "Minimum 8-hour buffer applied";
+  }
+
+  // Format times for display
+  const ownerLocalTime = new Intl.DateTimeFormat("en-US", {
+    timeZone: ownerTz,
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(deadline);
+
+  const requesterLocalTime = new Intl.DateTimeFormat("en-US", {
+    timeZone: requesterTz,
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(deadline);
+
+  return {
+    deadline,
+    ownerLocalTime,
+    requesterLocalTime,
+    reasoning,
+  };
+}
+
+/**
+ * Format timezone context for display
+ * Shows the relative difference from the user's perspective
+ * e.g., "9 hours ahead of you" or "same timezone"
+ */
+export function formatTimezoneContext(
+  targetTimezone: string,
+  userTimezone: string = Intl.DateTimeFormat().resolvedOptions().timeZone
+): string {
+  return formatRelativeTimezone(userTimezone, targetTimezone);
+}
+
+/**
+ * Check if a user is currently in working hours
+ */
+export function isUserInWorkingHours(
+  timezone: string,
+  startHour: number = 9,
+  endHour: number = 18
+): boolean {
+  return isInWorkingHours(timezone, startHour, endHour);
+}
+
+/**
+ * Get formatted current time in a timezone
+ */
+export function getCurrentTimeFormatted(timezone: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(new Date());
 }

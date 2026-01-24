@@ -18,7 +18,6 @@ import {
   OrganizationRole,
   OrganizationRoleType,
 } from '@/lib/rbac';
-import { audit } from '@/lib/audit';
 
 interface RouteParams {
   params: Promise<{ userId: string }>;
@@ -124,23 +123,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const supabase = await createClient();
 
-    // Get current member info for audit logging
-    const { data: memberData } = await supabase
-      .from('organization_members')
-      .select(`
-        role,
-        profiles (first_name, last_name, email)
-      `)
-      .eq('user_id', userId)
-      .eq('organization_id', context.organizationId)
-      .maybeSingle();
-
-    const oldRole = memberData?.role || 'unknown';
-    const profile = memberData?.profiles as any;
-    const memberName = profile?.first_name && profile?.last_name
-      ? `${profile.first_name} ${profile.last_name}`
-      : profile?.email || 'Unknown';
-
     // Update the role
     const { error } = await supabase
       .from('organization_members')
@@ -149,16 +131,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .eq('organization_id', context.organizationId);
 
     if (error) throw error;
-
-    // Log audit event
-    await audit.memberRoleChanged(
-      context.organizationId,
-      context.userId,
-      userId,
-      memberName,
-      oldRole,
-      role
-    );
 
     return NextResponse.json({
       success: true,
@@ -200,13 +172,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const supabase = await createClient();
 
-    // Get target member info for validation and audit logging
+    // Get target member info for validation
     const { data: targetMember } = await supabase
       .from('organization_members')
-      .select(`
-        role,
-        profiles (first_name, last_name, email)
-      `)
+      .select('role')
       .eq('user_id', userId)
       .eq('organization_id', context.organizationId)
       .maybeSingle();
@@ -217,11 +186,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         { status: 400 }
       );
     }
-
-    const profile = targetMember?.profiles as any;
-    const memberName = profile?.first_name && profile?.last_name
-      ? `${profile.first_name} ${profile.last_name}`
-      : profile?.email || 'Unknown';
 
     // Remove from organization_members
     const { error: removeError } = await supabase
@@ -237,9 +201,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       .from('profiles')
       .update({ organization_id: null })
       .eq('user_id', userId);
-
-    // Log audit event
-    await audit.memberRemoved(context.organizationId, context.userId, userId, memberName);
 
     return NextResponse.json({
       success: true,

@@ -27,6 +27,9 @@ export function ThemeToggle() {
     );
   }
 
+  // Compute the current mode label for screen readers
+  const currentModeLabel = theme === "light" ? "Light mode" : theme === "dark" ? "Dark mode" : "System theme";
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -35,10 +38,11 @@ export function ThemeToggle() {
           size="icon"
           className="h-9 w-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none data-[state=open]:ring-0"
           onClick={(e) => e.stopPropagation()}
+          aria-label={`Toggle theme, current mode: ${currentModeLabel}`}
         >
-          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" aria-hidden="true" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" aria-hidden="true" />
+          <span className="sr-only">Toggle theme, current mode: {currentModeLabel}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8}>

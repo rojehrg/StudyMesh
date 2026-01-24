@@ -160,6 +160,8 @@ export async function canAssignRoleToUser(roleToAssign: OrganizationRoleType): P
 
 /**
  * Get all members of the current user's organization with their roles
+ * Includes the organization owner (from organizations.owner_id) even if they
+ * don't have a record in organization_members
  */
 export async function getOrganizationMembers() {
   const context = await getUserOrgContext();
@@ -167,6 +169,14 @@ export async function getOrganizationMembers() {
 
   const supabase = await createClient();
 
+  // Get organization owner
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('owner_id, created_at')
+    .eq('id', context.organizationId)
+    .single();
+
+  // Get members from organization_members table
   const { data: members } = await supabase
     .from('organization_members')
     .select(`
@@ -189,5 +199,43 @@ export async function getOrganizationMembers() {
     .eq('organization_id', context.organizationId)
     .order('joined_at', { ascending: true });
 
-  return members ?? [];
+  const membersList = members ?? [];
+
+  // Check if owner is already in the members list
+  const ownerInMembers = membersList.find(m => m.user_id === org?.owner_id);
+
+  if (org?.owner_id && !ownerInMembers) {
+    // Fetch owner's profile
+    const { data: ownerProfile } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, email, department, major, slack_connected, slack_handle, avatar_url')
+      .eq('user_id', org.owner_id)
+      .single();
+
+    if (ownerProfile) {
+      // Add owner to the beginning of the list
+      return [
+        {
+          id: `owner-${org.owner_id}`,
+          user_id: org.owner_id,
+          role: OrganizationRole.OWNER,
+          joined_at: org.created_at,
+          invited_by: null,
+          profiles: ownerProfile,
+        },
+        ...membersList,
+      ];
+    }
+  }
+
+  // If owner is in members, ensure they have the owner role displayed
+  if (ownerInMembers) {
+    return membersList.map(m =>
+      m.user_id === org?.owner_id
+        ? { ...m, role: OrganizationRole.OWNER }
+        : m
+    );
+  }
+
+  return membersList;
 }

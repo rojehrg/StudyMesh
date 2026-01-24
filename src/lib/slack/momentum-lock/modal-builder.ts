@@ -2,9 +2,21 @@
  * Momentum Lock Modal Builder
  *
  * Builds Block Kit modals for lock creation and editing.
+ * Includes intelligent deadline defaults and owner context.
  */
 
-import { InferredLock, getDeadlineOptions, formatDeadline } from "./inference";
+import {
+  InferredLock,
+  OwnerContext,
+  PersonSuggestion,
+  getDeadlineOptions,
+  formatDeadline,
+  getOwnerContext,
+  getIntelligentDeadlineDefault,
+  suggestRelevantPeople,
+} from "./inference";
+import { getTimezoneAbbrev } from "@/lib/availability";
+import { isInWorkingHours, getCurrentHourInTimezone } from "@/lib/timezone-utils";
 
 // Slack API types (simplified)
 interface SlackBlock {
@@ -29,87 +41,168 @@ export interface LockModalConfig {
   requesterId: string;
   inference: InferredLock;
   threadParticipants?: Array<{ id: string; name: string }>;
+  ownerTimezone?: string | null;
+  requesterTimezone?: string | null;
+  personSuggestions?: PersonSuggestion[];
 }
 
 export interface LockModalPrivateMetadata {
   channelId: string;
   threadTs?: string;
   requesterId: string;
+  ownerTimezone?: string;
+  requesterTimezone?: string;
 }
 
 const CALLBACK_ID_DRAFT = "momentum_lock_draft";
 const CALLBACK_ID_EDIT = "momentum_lock_edit";
 
 /**
- * Build the main lock creation modal
+ * Build the main lock creation modal with intelligent defaults
  */
 export function buildLockDraftModal(config: LockModalConfig): SlackView {
-  const { channelId, threadTs, requesterId, inference } = config;
+  const {
+    channelId,
+    threadTs,
+    requesterId,
+    inference,
+    ownerTimezone,
+    requesterTimezone,
+    personSuggestions,
+  } = config;
 
-  const deadlineOptions = getDeadlineOptions();
+  // Get owner context if timezone is available
+  const ownerContext = ownerTimezone ? getOwnerContext(ownerTimezone) : null;
+
+  // Get deadline options with intelligent recommendations
+  const deadlineOptions = getDeadlineOptions(ownerTimezone, ownerContext);
+
+  // Find the recommended option or default to "End of their day"
+  const recommendedIndex = deadlineOptions.findIndex(opt => opt.recommended) || 2;
+  const defaultOption = deadlineOptions[recommendedIndex];
 
   const metadata: LockModalPrivateMetadata = {
     channelId,
     threadTs,
     requesterId,
+    ownerTimezone: ownerTimezone || undefined,
+    requesterTimezone: requesterTimezone || undefined,
   };
 
-  const blocks: SlackBlock[] = [
-    // Owner - who do you need a response from
-    {
-      type: "input",
-      block_id: "owner_block",
-      label: { type: "plain_text", text: "Who do you need a response from?" },
-      element: {
-        type: "users_select",
-        action_id: "owner_select",
-        placeholder: { type: "plain_text", text: "Select a person" },
-        ...(inference.primaryOwner && { initial_user: inference.primaryOwner }),
-      },
-    },
+  const blocks: SlackBlock[] = [];
 
-    // Required Outcome - what do you need from them
-    {
-      type: "input",
-      block_id: "outcome_block",
-      label: { type: "plain_text", text: "What do you need from them?" },
-      element: {
-        type: "plain_text_input",
-        action_id: "outcome_input",
-        placeholder: { type: "plain_text", text: "e.g., Confirm the API change is safe to ship" },
-        ...(inference.requiredOutcome && { initial_value: inference.requiredOutcome }),
-        max_length: 200,
-      },
-      hint: {
-        type: "plain_text",
-        text: "One sentence is enough. This helps them understand what you're waiting on.",
-      },
-    },
+  // Add owner context section if we have timezone info
+  if (ownerContext && inference.primaryOwner) {
+    blocks.push(buildOwnerContextSection(ownerContext, inference.primaryOwner));
+    blocks.push({ type: "divider" });
+  }
 
-    // Deadline - when do you need to hear back
-    {
-      type: "input",
-      block_id: "deadline_block",
-      label: { type: "plain_text", text: "When do you need to hear back?" },
-      element: {
-        type: "static_select",
-        action_id: "deadline_select",
-        placeholder: { type: "plain_text", text: "Select a time" },
-        initial_option: {
-          text: { type: "plain_text", text: deadlineOptions[1].label },
-          value: deadlineOptions[1].value,
+  // Owner - who do you need a response from
+  blocks.push({
+    type: "input",
+    block_id: "owner_block",
+    label: { type: "plain_text", text: "Who do you need a response from?" },
+    element: {
+      type: "users_select",
+      action_id: "owner_select",
+      placeholder: { type: "plain_text", text: "Select a person" },
+      ...(inference.primaryOwner && { initial_user: inference.primaryOwner }),
+    },
+  });
+
+  // Show person suggestions if available and no owner inferred
+  if (personSuggestions && personSuggestions.length > 0 && !inference.primaryOwner) {
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `*Suggested:* ${personSuggestions
+            .slice(0, 3)
+            .map(s => `<@${s.userId}>`)
+            .join(", ")} (based on thread activity)`,
         },
-        options: deadlineOptions.map(opt => ({
-          text: { type: "plain_text", text: opt.label },
-          value: opt.value,
-        })),
-      },
-      hint: {
-        type: "plain_text",
-        text: "This is just for context. It's okay if they can't respond by then.",
-      },
+      ],
+    });
+  }
+
+  // Required Outcome - what do you need from them
+  blocks.push({
+    type: "input",
+    block_id: "outcome_block",
+    label: { type: "plain_text", text: "What do you need from them?" },
+    element: {
+      type: "plain_text_input",
+      action_id: "outcome_input",
+      placeholder: { type: "plain_text", text: "e.g., Confirm the API change is safe to ship" },
+      ...(inference.requiredOutcome && { initial_value: inference.requiredOutcome }),
+      max_length: 200,
     },
-  ];
+    hint: {
+      type: "plain_text",
+      text: "One sentence is enough. This helps them understand what you're waiting on.",
+    },
+  });
+
+  // Deadline - when do you need to hear back
+  blocks.push({
+    type: "input",
+    block_id: "deadline_block",
+    label: { type: "plain_text", text: "When do you need to hear back?" },
+    element: {
+      type: "static_select",
+      action_id: "deadline_select",
+      placeholder: { type: "plain_text", text: "Select a time" },
+      initial_option: {
+        text: { type: "plain_text", text: defaultOption.label },
+        value: defaultOption.value,
+      },
+      options: deadlineOptions.map(opt => ({
+        text: {
+          type: "plain_text",
+          text: opt.description ? `${opt.label} (${opt.description})` : opt.label,
+        },
+        value: opt.value,
+      })),
+    },
+    hint: {
+      type: "plain_text",
+      text: ownerContext
+        ? `Their current time: ${ownerContext.localTime}. This is just for context.`
+        : "This is just for context. It's okay if they can't respond by then.",
+    },
+  });
+
+  // Fallback owner - optional backup person
+  blocks.push({
+    type: "input",
+    block_id: "fallback_block",
+    optional: true,
+    label: { type: "plain_text", text: "Backup person (optional)" },
+    element: {
+      type: "users_select",
+      action_id: "fallback_select",
+      placeholder: { type: "plain_text", text: "Select a backup" },
+    },
+    hint: {
+      type: "plain_text",
+      text: "If the deadline approaches and they haven't started, we'll ask this person to help.",
+    },
+  });
+
+  // Add inference confidence footer if available
+  if (inference.confidenceDetails && inference.confidence !== 'low') {
+    blocks.push({ type: "divider" });
+    blocks.push({
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `_Auto-filled with ${inference.confidence} confidence based on thread context_`,
+        },
+      ],
+    });
+  }
 
   return {
     type: "modal",
@@ -119,6 +212,39 @@ export function buildLockDraftModal(config: LockModalConfig): SlackView {
     close: { type: "plain_text", text: "Cancel" },
     blocks,
     private_metadata: JSON.stringify(metadata),
+  };
+}
+
+/**
+ * Build owner context section showing timezone and availability info
+ */
+function buildOwnerContextSection(
+  ownerContext: OwnerContext,
+  ownerUserId: string
+): SlackBlock {
+  const tzAbbrev = ownerContext.timezone ? getTimezoneAbbrev(ownerContext.timezone) : '';
+
+  let statusText: string;
+  if (ownerContext.availabilityStatus === 'available') {
+    statusText = `Currently in working hours`;
+  } else if (ownerContext.availabilityStatus === 'outside_hours') {
+    if (ownerContext.hoursUntilWorkStart !== null) {
+      statusText = `Outside working hours (starts in ${ownerContext.hoursUntilWorkStart}h)`;
+    } else {
+      statusText = `Outside working hours`;
+    }
+  } else {
+    statusText = `Availability unknown`;
+  }
+
+  return {
+    type: "context",
+    elements: [
+      {
+        type: "mrkdwn",
+        text: `*<@${ownerUserId}>:* ${ownerContext.localTime} ${tzAbbrev} | ${statusText}`,
+      },
+    ],
   };
 }
 
@@ -233,6 +359,7 @@ export interface ParsedLockForm {
   ownerId: string;
   requiredOutcome: string;
   deadlineAt: Date;
+  fallbackUserId?: string;
 }
 
 export function parseLockFormValues(values: Record<string, any>): ParsedLockForm | null {
@@ -240,6 +367,7 @@ export function parseLockFormValues(values: Record<string, any>): ParsedLockForm
     const ownerId = values.owner_block?.owner_select?.selected_user;
     const requiredOutcome = values.outcome_block?.outcome_input?.value;
     const deadlineValue = values.deadline_block?.deadline_select?.selected_option?.value;
+    const fallbackUserId = values.fallback_block?.fallback_select?.selected_user;
 
     if (!ownerId || !requiredOutcome) {
       return null;
@@ -249,6 +377,7 @@ export function parseLockFormValues(values: Record<string, any>): ParsedLockForm
       ownerId,
       requiredOutcome,
       deadlineAt: deadlineValue ? new Date(deadlineValue) : new Date(Date.now() + 16 * 60 * 60 * 1000),
+      fallbackUserId: fallbackUserId || undefined,
     };
   } catch {
     return null;

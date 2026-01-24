@@ -7,7 +7,12 @@
  */
 
 import { buildLockDraftModal, openModal } from "./modal-builder";
-import { inferLockFromThread, type SlackMessage } from "./inference";
+import {
+  inferLockFromThread,
+  suggestRelevantPeople,
+  type SlackMessage,
+  type InferredLock,
+} from "./inference";
 
 export interface LockCommandParams {
   teamId: string;
@@ -75,23 +80,20 @@ export async function handleLockCommand(params: LockCommandParams): Promise<{
   }
 
   // Default empty inference
-  let inference: {
-    requiredOutcome: string | null;
-    primaryOwner: string | null;
-    fallbackOwner: string | null;
-    deadline: Date | null;
-    impactStatement: string | null;
-    confidence: "high" | "medium" | "low";
-    missingField: "owner" | "deadline" | "outcome" | null;
-  } = {
+  let inference: InferredLock = {
     requiredOutcome: null,
     primaryOwner: null,
     fallbackOwner: null,
     deadline: null,
+    deadlineSource: null,
     impactStatement: null,
     confidence: "low",
+    confidenceDetails: null,
     missingField: null,
   };
+
+  // Person suggestions based on thread context
+  let personSuggestions: ReturnType<typeof suggestRelevantPeople> = [];
 
   // If invoked from a thread, try to infer lock details
   if (threadTs) {
@@ -102,34 +104,31 @@ export async function handleLockCommand(params: LockCommandParams): Promise<{
     if (messages.length > 0) {
       console.log("[Lock Command] Running thread inference on", messages.length, "messages");
 
-      const inferredLock = await inferLockFromThread(messages, userId, teamId);
+      // Run inference
+      inference = await inferLockFromThread(messages, userId, teamId);
 
-      inference = {
-        requiredOutcome: inferredLock.requiredOutcome,
-        primaryOwner: inferredLock.primaryOwner,
-        fallbackOwner: inferredLock.fallbackOwner,
-        deadline: inferredLock.deadline,
-        impactStatement: inferredLock.impactStatement,
-        confidence: inferredLock.confidence,
-        missingField: inferredLock.missingField,
-      };
+      // Get person suggestions for smart recommendations
+      personSuggestions = suggestRelevantPeople(messages, userId);
 
       console.log("[Lock Command] Inference complete", {
         confidence: inference.confidence,
         hasOwner: !!inference.primaryOwner,
         hasOutcome: !!inference.requiredOutcome,
         hasDeadline: !!inference.deadline,
+        deadlineSource: inference.deadlineSource,
+        personSuggestionCount: personSuggestions.length,
       });
     }
   }
 
-  // Build modal with inferred values (or empty if no thread context)
+  // Build modal with inferred values and smart suggestions
   const modal = buildLockDraftModal({
     triggerId,
     channelId,
     threadTs: threadTs || undefined,
     requesterId: userId,
     inference,
+    personSuggestions: personSuggestions.length > 0 ? personSuggestions : undefined,
   });
 
   // Open the modal

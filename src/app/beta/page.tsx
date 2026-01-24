@@ -87,15 +87,26 @@ export default function BetaPage() {
               <p className="text-coffee-cortado mb-8 text-pretty">
                 We'll reach out when it's your turn to join.
               </p>
-              <Link
-                href="/"
-                className="inline-flex items-center text-coffee-mocha hover:text-coffee-espresso transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to home
-              </Link>
+
+              {/* CTA section */}
+              <div className="space-y-4">
+                <p className="text-sm text-coffee-mocha font-medium">Ready to get started?</p>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-lg bg-coffee-espresso text-coffee-paper font-medium hover:bg-coffee-roast transition-all"
+                >
+                  Create your account
+                </Link>
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center text-coffee-cortado hover:text-coffee-espresso transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to home
+                </Link>
+              </div>
             </div>
           ) : (
             // Form state

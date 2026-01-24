@@ -5,7 +5,7 @@
  * and authentication helpers for API routes.
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ZodError, ZodSchema, ZodIssue } from "zod";
 import * as Sentry from "@sentry/nextjs";
 import { getUserOrgContext, type UserOrgContext } from "@/lib/rbac";
@@ -220,8 +220,8 @@ export async function requireOrgAuth(): Promise<
 // ============================================
 
 type ApiHandler<T = unknown> = (
-  request: Request,
-  context?: { params: Record<string, string> }
+  request: NextRequest,
+  context?: { params: Promise<Record<string, string>> }
 ) => Promise<NextResponse<T>>;
 
 /**

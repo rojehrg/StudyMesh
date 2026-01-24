@@ -1,23 +1,28 @@
 /**
  * Momentum Locks Cron Job
  *
- * MVP: Only marks expired locks.
- *
- * Disabled for MVP:
- * - Wake-up deliveries (DMs sent immediately on lock creation)
- * - Escalations (no fallback owners in MVP)
+ * Processes:
+ * - Expirations: Marks locks as expired when deadline passes
+ * - Wake-up deliveries: Sends DMs when owner comes online (timezone-aware)
+ * - Escalations: Notifies fallback owner when deadline approaches
+ * - Reminders: Sends friendly/urgent reminders based on deadline proximity
  */
 
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { momentumLocks, momentumLockEvents } from '@/lib/db/schema';
-import { eq, and, isNull, lt, lte } from 'drizzle-orm';
+import { momentumLocks, momentumLockEvents, MomentumLockStatus } from '@/lib/db/schema';
+import { eq, and, isNull, lt, gt } from 'drizzle-orm';
 import { createLogger } from '@/lib/logger';
 import {
   buildWakeUpMessage,
-  buildEscalationMessage,
   generateThreadLink,
 } from '@/lib/slack/momentum-lock/messages';
+import { processAllRemindersAndEscalations } from '@/lib/slack/momentum-lock/reminders';
+import {
+  shouldEscalate,
+  determineEscalationTarget,
+  executeEscalation,
+} from '@/lib/slack/momentum-lock/escalation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -209,74 +214,89 @@ async function processWakeUpDeliveries(): Promise<number> {
 }
 
 /**
- * Process escalations
+ * Process escalation chain
  *
- * Find active locks where:
- * - Has a fallback owner
- * - Deadline is within 3 hours
- * - Status is still 'active' (not started/blocked/done)
- * - Escalation not already sent
+ * Enhanced escalation logic using the escalation chain system:
+ * - Evaluates locks based on 75% deadline threshold
+ * - Respects escalation_paused flag
+ * - Supports multi-level escalation chains
+ * - Logs escalation_triggered events
  */
-async function processEscalations(): Promise<number> {
-  const threeHoursFromNow = new Date(Date.now() + 3 * 60 * 60 * 1000);
+async function processEscalationChain(): Promise<{ escalated: number; skipped: number }> {
+  const now = new Date();
 
-  const locksNeedingEscalation = await db
+  // Find active locks that might need escalation
+  const activeLocks = await db
     .select()
     .from(momentumLocks)
     .where(
       and(
-        eq(momentumLocks.status, 'active'),
-        isNull(momentumLocks.escalationSentAt),
-        lte(momentumLocks.deadlineAt, threeHoursFromNow)
+        eq(momentumLocks.status, MomentumLockStatus.ACTIVE),
+        gt(momentumLocks.deadlineAt, now) // Not yet expired
       )
     );
 
   let escalated = 0;
+  let skipped = 0;
 
-  for (const lock of locksNeedingEscalation) {
-    // Must have a fallback owner
-    if (!lock.fallbackUserId) {
+  for (const lock of activeLocks) {
+    // Convert dates for proper type handling
+    const lockWithDates = {
+      ...lock,
+      deadlineAt: new Date(lock.deadlineAt),
+      createdAt: new Date(lock.createdAt),
+      updatedAt: new Date(lock.updatedAt),
+      escalationSentAt: lock.escalationSentAt ? new Date(lock.escalationSentAt) : null,
+      wakeUpDeliveredAt: lock.wakeUpDeliveredAt ? new Date(lock.wakeUpDeliveredAt) : null,
+    };
+
+    // Check if this lock should be escalated
+    const escalationCheck = shouldEscalate(lockWithDates);
+
+    if (!escalationCheck.shouldEscalate) {
+      log.debug('Skipping escalation', {
+        lockId: lock.id,
+        reason: escalationCheck.skipReason,
+      });
+      skipped++;
       continue;
     }
 
-    // Check if fallback is awake
-    // Note: We don't have fallback timezone stored, so we assume they're awake
-    // In production, you'd want to store this
+    // Get the next escalation target
+    const target = determineEscalationTarget(lockWithDates);
 
-    // Generate thread link
-    const threadLink = generateThreadLink(lock.workspaceId, lock.channelId, lock.threadTs);
+    if (!target) {
+      log.debug('No escalation target available', { lockId: lock.id });
+      skipped++;
+      continue;
+    }
 
-    // Build and send escalation message
-    const message = buildEscalationMessage(lock, threadLink);
-    const sent = await sendDM(lock.fallbackUserId, message);
+    // Execute the escalation
+    const result = await executeEscalation(
+      lockWithDates,
+      target.userId,
+      target.level,
+      escalationCheck.reason || 'deadline_approaching'
+    );
 
-    if (sent) {
-      // Update the lock
-      await db
-        .update(momentumLocks)
-        .set({ escalationSentAt: new Date() })
-        .where(eq(momentumLocks.id, lock.id));
-
-      // Log event
-      await db.insert(momentumLockEvents).values({
-        lockId: lock.id,
-        eventType: 'escalated',
-        actorUserId: undefined, // System-triggered
-        payload: {
-          escalatedTo: lock.fallbackUserId,
-          reason: 'deadline_approaching',
-        },
-      });
-
+    if (result.success) {
       escalated++;
-      log.info('Escalation sent', {
+      log.info('Escalation chain triggered', {
         lockId: lock.id,
-        fallbackUserId: lock.fallbackUserId,
+        escalatedTo: target.userId,
+        level: target.level,
+        reason: escalationCheck.reason,
       });
+    } else {
+      log.error('Escalation failed', {
+        lockId: lock.id,
+        error: result.error,
+      });
+      skipped++;
     }
   }
 
-  return escalated;
+  return { escalated, skipped };
 }
 
 /**
@@ -328,25 +348,37 @@ export async function GET(request: Request) {
   log.info('Cron job started');
 
   try {
-    // MVP: Only process expirations
-    // Wake-up and escalation disabled (DMs sent immediately, no fallback)
-    const expirations = await processExpirations();
+    // Process all: expirations, wake-ups, escalation chain, and reminders
+    const [expirations, wakeUps, escalationChainResults, reminderResults] = await Promise.all([
+      processExpirations(),
+      processWakeUpDeliveries(),
+      processEscalationChain(),
+      processAllRemindersAndEscalations(),
+    ]);
 
-    log.info('Cron job completed', { expirations });
+    log.info('Cron job completed', {
+      expirations,
+      wakeUps,
+      escalations: escalationChainResults.escalated,
+      escalationsSkipped: escalationChainResults.skipped,
+      reminders: reminderResults.reminders.sent,
+    });
 
     return NextResponse.json({
       success: true,
       processed: {
         expirations,
-        // MVP: disabled
-        wakeUps: 0,
-        escalations: 0,
+        wakeUps,
+        escalations: escalationChainResults.escalated,
+        escalationsSkipped: escalationChainResults.skipped,
+        reminders: reminderResults.reminders.sent,
       },
     });
-  } catch (error: any) {
-    log.error('Cron job failed', { error: error.message });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    log.error('Cron job failed', { error: errorMessage });
     return NextResponse.json(
-      { error: 'Internal error', message: error.message },
+      { error: 'Internal error', message: errorMessage },
       { status: 500 }
     );
   }
