@@ -20,14 +20,40 @@ function parseUserMention(text: string): string | null {
 /**
  * Slack Slash Command Handler
  *
- * Subcommands:
+ * Supports both unified and individual commands:
+ *
+ * Unified (via /attunly):
  * - /attunly         → Open lock creation modal (default)
  * - /attunly lock    → Open lock creation modal
  * - /attunly status  → Show your active locks (ephemeral)
  * - /attunly help    → Show available commands (ephemeral)
  *
+ * Individual commands (same endpoint, different Slack command):
+ * - /standup         → Auto-generate standup from locks
+ * - /status          → Show your active locks
+ * - /digest          → Weekly activity summary
+ * - /whosnow         → Who's online right now
+ * - /handoff @user   → EOD handoff summary
+ * - /overlap @user   → Find working hour overlap
+ *
  * IMPORTANT: Must respond within 3 seconds or Slack shows an error.
+ *
+ * To register individual commands in Slack API Dashboard,
+ * point each command to the same endpoint: /api/slack/commands
  */
+
+/**
+ * Map direct command names to their subcommand equivalents
+ */
+const DIRECT_COMMAND_MAP: Record<string, string> = {
+  '/standup': 'standup',
+  '/status': 'status',
+  '/digest': 'digest',
+  '/whosnow': 'whosnow',
+  '/handoff': 'handoff',
+  '/overlap': 'overlap',
+};
+
 export async function POST(request: Request) {
   try {
     // Get raw body for signature verification
@@ -45,7 +71,7 @@ export async function POST(request: Request) {
 
     // Parse form-urlencoded body
     const params = new URLSearchParams(body);
-    const command = params.get('command');
+    const command = params.get('command') || '';
     const text = params.get('text') || '';
     const userId = params.get('user_id');
     const userName = params.get('user_name');
@@ -70,10 +96,18 @@ export async function POST(request: Request) {
       });
     }
 
-    // Parse subcommand from text
-    const subcommand = text.trim().toLowerCase().split(/\s+/)[0] || '';
+    // Determine subcommand: check for direct command first, then parse from text
+    let subcommand: string;
+    if (DIRECT_COMMAND_MAP[command]) {
+      // Direct command like /standup, /status, etc.
+      subcommand = DIRECT_COMMAND_MAP[command];
+      console.log('[Slack Command] Direct command detected:', command, '->', subcommand);
+    } else {
+      // Parse subcommand from text (for /attunly <subcommand>)
+      subcommand = text.trim().toLowerCase().split(/\s+/)[0] || '';
+    }
 
-    console.log('[Slack Command] Processing subcommand:', subcommand || '(none)');
+    console.log('[Slack Command] Processing subcommand:', subcommand || '(none)', 'from command:', command);
 
     // Route to appropriate handler based on subcommand
     switch (subcommand) {

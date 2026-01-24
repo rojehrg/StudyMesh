@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard01, ArrowRightMd, Users } from "react-coolicons";
+import { CreditCard01, ArrowRightMd, Users, MailSend } from "react-coolicons";
 import { Lock, LockOpen, AlertTriangle } from "lucide-react";
 import { PageLoader, LottieLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
@@ -330,6 +330,35 @@ function BillingContent() {
         <p className="text-coffee-cortado mt-1">Manage your subscription and view usage statistics</p>
       </div>
 
+      {/* Trial Banner */}
+      {billingData.isOnTrial && billingData.trialDaysRemaining && (
+        <div className="bg-gradient-to-r from-coffee-oat/20 to-coffee-cream rounded-xl border border-coffee-oat/30 p-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-coffee-oat/20 rounded-lg flex items-center justify-center">
+                <span className="text-lg font-bold text-coffee-oat">{billingData.trialDaysRemaining}</span>
+              </div>
+              <div>
+                <p className="font-semibold text-coffee-espresso">
+                  {billingData.trialDaysRemaining === 1 ? "Last day" : `${billingData.trialDaysRemaining} days left`} of your {billingData.trialPlan || "Pro"} trial
+                </p>
+                <p className="text-sm text-coffee-cortado">
+                  {billingData.trialEndsAt && `Ends on ${new Date(billingData.trialEndsAt).toLocaleDateString("en-US", { month: "long", day: "numeric" })}`}
+                </p>
+              </div>
+            </div>
+            {billingData.isOwner && (
+              <Button
+                onClick={() => setSelectedPlan("pro")}
+                className="bg-coffee-espresso hover:bg-coffee-mocha text-white"
+              >
+                Upgrade Now
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Subscription Info */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-coffee-espresso">Current Subscription</h2>
@@ -401,18 +430,28 @@ function BillingContent() {
           {/* Action Buttons */}
           <div className="pt-4 border-t border-coffee-foam flex flex-wrap gap-3">
             {billingData.hasActiveSubscription && billingData.isOwner && (
-              <Button
-                variant="outline"
-                onClick={handleManageSubscription}
-                disabled={portalLoading}
-              >
-                {portalLoading ? (
-                  <LottieLoader size="sm" className="w-4 h-4 mr-2" />
-                ) : (
-                  <CreditCard01 className="w-4 h-4 mr-2" />
-                )}
-                Manage Subscription
-              </Button>
+              <div className="w-full space-y-3">
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={handleManageSubscription}
+                    disabled={portalLoading}
+                  >
+                    {portalLoading ? (
+                      <LottieLoader size="sm" className="w-4 h-4 mr-2" />
+                    ) : (
+                      <CreditCard01 className="w-4 h-4 mr-2" />
+                    )}
+                    Manage Subscription
+                  </Button>
+                </div>
+                <p className="text-xs text-coffee-latte">
+                  Need to update payment method, cancel, or modify your plan? Contact support at{" "}
+                  <a href="mailto:billing@attunly.com" className="text-coffee-mocha underline hover:text-coffee-espresso">
+                    billing@attunly.com
+                  </a>
+                </p>
+              </div>
             )}
 
             {showUpgrade && billingData.isOwner && !selectedPlan && (
@@ -639,6 +678,44 @@ function BillingContent() {
           </div>
         </div>
       </section>
+
+      {/* Enterprise Section */}
+      {billingData.plan !== "enterprise" && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-coffee-espresso">Need More?</h2>
+
+          <div className="bg-gradient-to-br from-coffee-cream to-coffee-foam/50 rounded-xl border border-coffee-foam p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-coffee-espresso rounded-xl flex items-center justify-center flex-shrink-0">
+                <Users className="w-6 h-6 text-coffee-paper" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-coffee-espresso mb-1">Enterprise Plan</h3>
+                <p className="text-coffee-cortado text-sm mb-4">
+                  For larger teams with custom requirements. Get unlimited seats, SSO integration, custom integrations, dedicated support, and flexible billing.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = "mailto:sales@attunly.com?subject=Enterprise%20Inquiry"}
+                    className="border-coffee-espresso text-coffee-espresso hover:bg-coffee-espresso hover:text-coffee-paper"
+                  >
+                    <MailSend className="w-4 h-4 mr-2" />
+                    Contact Sales
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => window.open("https://cal.com/attunly/enterprise", "_blank")}
+                    className="text-coffee-cortado hover:text-coffee-espresso"
+                  >
+                    Schedule a Call
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
     </motion.div>
   );
 }

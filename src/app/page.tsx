@@ -164,7 +164,8 @@ const RequestFlowAnimation = () => {
   const currentScenario = scenarios[scenarioIndex];
 
   useEffect(() => {
-    const timings = [2500, 1500, 2000]; // Time to show each step
+    // Increased timings for smoother pacing - gives users more time to absorb each state
+    const timings = [3000, 2000, 2500]; // Time to show each step
 
     const timeout = setTimeout(() => {
       if (step < 2) {
@@ -219,10 +220,15 @@ const RequestFlowAnimation = () => {
                 <AnimatePresence>
                   {step >= 1 && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 25,
+                        duration: 0.5,
+                      }}
                       className="flex items-center gap-2 text-sm"
                     >
                       <div className="w-2 h-2 rounded-full bg-coffee-oat"></div>
@@ -234,10 +240,16 @@ const RequestFlowAnimation = () => {
                 <AnimatePresence>
                   {step >= 2 && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 25,
+                        duration: 0.5,
+                        delay: 0.1, // Staggered delay for second element
+                      }}
                       className="flex items-center gap-2 text-sm"
                     >
                       <div className="w-2 h-2 rounded-full bg-coffee-espresso"></div>
@@ -410,10 +422,15 @@ const BeforeAfterDemo = () => {
               /* Without Attunly - The silence */
               <motion.div
                 key="without"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                initial={{ opacity: 0, x: -20, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 20, scale: 0.98 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 350,
+                  damping: 30,
+                  duration: 0.5,
+                }}
                 className="space-y-4"
               >
                 <div className="flex items-start gap-3">
@@ -485,10 +502,15 @@ const BeforeAfterDemo = () => {
               /* With Attunly - The clarity */
               <motion.div
                 key="with"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                initial={{ opacity: 0, x: 20, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -20, scale: 0.98 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 350,
+                  damping: 30,
+                  duration: 0.5,
+                }}
                 className="space-y-4"
               >
                 <div className="flex items-start gap-3">

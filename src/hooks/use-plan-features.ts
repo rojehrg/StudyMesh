@@ -192,13 +192,47 @@ export function getPlanDisplayName(plan: PlanName): string {
 
 /**
  * Get plan pricing info for display
+ * Note: Starter is flat rate, Pro is per-seat
  */
-export function getPlanPricing(plan: PlanName): { monthly: number; yearly: number } {
-  const pricing: Record<PlanName, { monthly: number; yearly: number }> = {
-    free: { monthly: 0, yearly: 0 },
-    starter: { monthly: 8, yearly: 77 }, // $77/year = ~$6.40/month
-    pro: { monthly: 15, yearly: 144 }, // $144/year = $12/month
-    enterprise: { monthly: 25, yearly: 240 },
+export function getPlanPricing(plan: PlanName): {
+  monthly: number;
+  yearly: number;
+  isPerSeat: boolean;
+  minSeats?: number;
+  description: string;
+} {
+  const pricing: Record<PlanName, {
+    monthly: number;
+    yearly: number;
+    isPerSeat: boolean;
+    minSeats?: number;
+    description: string;
+  }> = {
+    free: {
+      monthly: 0,
+      yearly: 0,
+      isPerSeat: false,
+      description: 'Free forever, up to 5 seats',
+    },
+    starter: {
+      monthly: 19,
+      yearly: 190, // ~$15.80/month when billed annually
+      isPerSeat: false,
+      description: '$19/month flat rate, up to 10 seats',
+    },
+    pro: {
+      monthly: 8,
+      yearly: 80, // ~$6.67/seat/month when billed annually
+      isPerSeat: true,
+      minSeats: 10,
+      description: '$8/seat/month, minimum 10 seats',
+    },
+    enterprise: {
+      monthly: 0, // Custom pricing
+      yearly: 0,
+      isPerSeat: false,
+      description: 'Custom pricing, contact sales',
+    },
   };
   return pricing[plan];
 }
