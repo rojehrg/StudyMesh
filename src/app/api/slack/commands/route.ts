@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import { verifySlackRequest } from '@/lib/slack/verify-signature';
 import { handleLockCommand } from '@/lib/slack/momentum-lock/command-handler';
+import { handleStatusCommand } from '@/lib/slack/momentum-lock/status-handler';
 
 /**
  * Slack Slash Command Handler
  *
- * /attunly - Opens the Momentum Lock modal
+ * Subcommands:
+ * - /attunly         → Open lock creation modal (default)
+ * - /attunly lock    → Open lock creation modal
+ * - /attunly status  → Show your active locks (ephemeral)
+ * - /attunly help    → Show available commands (ephemeral)
  *
  * IMPORTANT: Must respond within 3 seconds or Slack shows an error.
  */
@@ -43,7 +48,7 @@ export async function POST(request: Request) {
     });
 
     // Check if we have required params
-    if (!triggerId || !teamId || !userId || !channelId) {
+    if (!teamId || !userId || !channelId) {
       console.error('[Slack Command] Missing required params');
       return NextResponse.json({
         response_type: 'ephemeral',
@@ -51,23 +56,57 @@ export async function POST(request: Request) {
       });
     }
 
-    // All /attunly commands open the Momentum Lock modal
-    console.log('[Slack Command] Opening Momentum Lock modal');
+    // Parse subcommand from text
+    const subcommand = text.trim().toLowerCase().split(/\s+/)[0] || '';
 
-    const result = await handleLockCommand({
-      teamId,
-      userId,
-      channelId,
-      triggerId,
-    });
+    console.log('[Slack Command] Processing subcommand:', subcommand || '(none)');
 
-    if (result.success) {
-      return new NextResponse(null, { status: 200 });
-    } else {
-      return NextResponse.json({
-        response_type: 'ephemeral',
-        text: result.error || 'Failed to open Momentum Lock. Please try again.',
-      });
+    // Route to appropriate handler based on subcommand
+    switch (subcommand) {
+      case 'status':
+        // /attunly status - Show user's active locks
+        return handleStatusCommand({ teamId, userId, channelId });
+
+      case 'help':
+        // /attunly help - Show available commands
+        return NextResponse.json({
+          response_type: 'ephemeral',
+          text: '*Attunly Commands*\n\n' +
+            '*·* `/attunly` - Create a momentum lock\n' +
+            '*·* `/attunly status` - See your active locks\n' +
+            '*·* `/attunly help` - Show this help message',
+        });
+
+      case 'lock':
+      case '':
+      default:
+        // /attunly or /attunly lock - Open the lock creation modal
+        // Requires triggerId for modal
+        if (!triggerId) {
+          console.error('[Slack Command] Missing triggerId for modal');
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: 'Something went wrong. Please try again.',
+          });
+        }
+
+        console.log('[Slack Command] Opening Momentum Lock modal');
+
+        const result = await handleLockCommand({
+          teamId,
+          userId,
+          channelId,
+          triggerId,
+        });
+
+        if (result.success) {
+          return new NextResponse(null, { status: 200 });
+        } else {
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: result.error || 'Failed to open Momentum Lock. Please try again.',
+          });
+        }
     }
   } catch (error) {
     console.error('[Slack Command] Error:', error);
