@@ -864,6 +864,85 @@ const Testimonials = () => {
   );
 };
 
+// Beyond Requests Section - Daily Commands
+const BeyondRequests = () => {
+  const commands = [
+    {
+      cmd: '/attunly whosnow',
+      title: 'See who\'s awake',
+      desc: 'Know who\'s in working hours before you reach out. No more guessing who\'s available across time zones.',
+    },
+    {
+      cmd: '/attunly overlap @user',
+      title: 'Find your window',
+      desc: 'Discover shared working hours with any teammate. See exactly when your schedules align.',
+    },
+    {
+      cmd: '/attunly handoff @user',
+      title: 'End of day ritual',
+      desc: 'Pass context before you sign off. See what you owe each other, organized for smooth handoffs.',
+    },
+    {
+      cmd: '/attunly standup',
+      title: 'Standup in seconds',
+      desc: 'Auto-generate your standup from active locks. What you\'re working on, what\'s blocking you, done.',
+    },
+    {
+      cmd: '/attunly digest',
+      title: 'Weekly pulse',
+      desc: 'Team activity at a glance. How many locks completed, average response times, team rhythm.',
+    },
+  ];
+
+  return (
+    <section className="px-4 md:px-12 lg:px-24 py-16 md:py-32 bg-coffee-paper">
+      <div className="max-w-5xl mx-auto">
+        <FadeIn>
+          <div className="text-center mb-12">
+            <p className="text-coffee-latte text-sm uppercase mb-4">More than requests</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-coffee-espresso leading-tight mb-4 text-balance">
+              Daily commands that keep
+              <br />
+              <span className="text-coffee-oat">distributed teams in sync.</span>
+            </h2>
+            <p className="text-lg text-coffee-cortado max-w-[50ch] mx-auto text-pretty">
+              Beyond creating locks, Attunly helps you coordinate across time zones with simple Slack commands.
+            </p>
+          </div>
+        </FadeIn>
+
+        <StaggerContainer staggerDelay={0.08} className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {commands.map((command, index) => (
+            <StaggerItem key={command.cmd} className={index === 4 ? 'md:col-span-2 lg:col-span-1' : ''}>
+              <HoverScale scale={1.02}>
+                <div className="p-6 bg-coffee-cream rounded-xl border border-coffee-foam h-full transition-shadow duration-200 hover:shadow-md">
+                  <code className="inline-block bg-coffee-paper px-2.5 py-1 rounded text-sm text-coffee-mocha font-mono mb-3 border border-coffee-foam">
+                    {command.cmd}
+                  </code>
+                  <h3 className="text-lg font-semibold text-coffee-espresso mb-2">
+                    {command.title}
+                  </h3>
+                  <p className="text-coffee-cortado text-sm">
+                    {command.desc}
+                  </p>
+                </div>
+              </HoverScale>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <FadeIn delay={0.3}>
+          <div className="mt-10 text-center">
+            <p className="text-coffee-latte text-sm">
+              Type <code className="bg-coffee-cream px-1.5 py-0.5 rounded text-coffee-mocha">/attunly help</code> in Slack to see all commands.
+            </p>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+};
+
 // Trust Section
 const Trust = () => (
   <Section darker>
@@ -1111,6 +1190,7 @@ export default function AttunlyLanding() {
       <SocialProof />
       <Testimonials />
       <Trust />
+      <BeyondRequests />
       <FAQ />
       <FinalCTA />
       <Footer />
