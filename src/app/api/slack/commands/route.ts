@@ -2,6 +2,20 @@ import { NextResponse } from 'next/server';
 import { verifySlackRequest } from '@/lib/slack/verify-signature';
 import { handleLockCommand } from '@/lib/slack/momentum-lock/command-handler';
 import { handleStatusCommand } from '@/lib/slack/momentum-lock/status-handler';
+import { handleWhosNowCommand } from '@/lib/slack/momentum-lock/whosnow-handler';
+import { handleHandoffCommand } from '@/lib/slack/momentum-lock/handoff-handler';
+import { handleOverlapCommand } from '@/lib/slack/momentum-lock/overlap-handler';
+import { handleStandupCommand } from '@/lib/slack/momentum-lock/standup-handler';
+import { handleDigestCommand } from '@/lib/slack/momentum-lock/digest-handler';
+
+/**
+ * Parse a Slack user mention from command text
+ * Returns the user ID or null if no valid mention found
+ */
+function parseUserMention(text: string): string | null {
+  const match = text.match(/<@([A-Z0-9]+)(?:\|[^>]+)?>/);
+  return match ? match[1] : null;
+}
 
 /**
  * Slack Slash Command Handler
@@ -67,14 +81,57 @@ export async function POST(request: Request) {
         // /attunly status - Show user's active locks
         return handleStatusCommand({ teamId, userId, channelId });
 
+      case 'whosnow':
+        // /attunly whosnow - Show who's online right now
+        return handleWhosNowCommand({ teamId, userId, channelId });
+
+      case 'handoff': {
+        // /attunly handoff @user - EOD handoff summary
+        const handoffTarget = parseUserMention(text);
+        if (!handoffTarget) {
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: 'Usage: `/attunly handoff @username`',
+          });
+        }
+        return handleHandoffCommand({ teamId, userId, targetUserId: handoffTarget, channelId });
+      }
+
+      case 'overlap': {
+        // /attunly overlap @user - Find working hour overlap
+        const overlapTarget = parseUserMention(text);
+        if (!overlapTarget) {
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: 'Usage: `/attunly overlap @username`',
+          });
+        }
+        return handleOverlapCommand({ teamId, userId, targetUserId: overlapTarget, channelId });
+      }
+
+      case 'standup':
+        // /attunly standup - Auto-generate standup from locks
+        return handleStandupCommand({ teamId, userId, channelId });
+
+      case 'digest':
+        // /attunly digest - Weekly activity summary
+        return handleDigestCommand({ teamId, userId, channelId });
+
       case 'help':
         // /attunly help - Show available commands
         return NextResponse.json({
           response_type: 'ephemeral',
           text: '*Attunly Commands*\n\n' +
-            '*·* `/attunly` - Create a momentum lock\n' +
-            '*·* `/attunly status` - See your active locks\n' +
-            '*·* `/attunly help` - Show this help message',
+            '*Creating & Tracking:*\n' +
+            '*-* `/attunly` - Create a momentum lock\n' +
+            '*-* `/attunly status` - See your active locks\n\n' +
+            '*Coordination:*\n' +
+            '*-* `/attunly whosnow` - Who is online right now?\n' +
+            '*-* `/attunly overlap @user` - Find working hour overlap\n' +
+            '*-* `/attunly handoff @user` - EOD handoff summary\n\n' +
+            '*Reporting:*\n' +
+            '*-* `/attunly standup` - Auto-generate standup from locks\n' +
+            '*-* `/attunly digest` - Weekly activity summary',
         });
 
       case 'lock':
