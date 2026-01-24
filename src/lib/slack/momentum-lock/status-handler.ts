@@ -6,10 +6,9 @@
  */
 
 import { NextResponse } from "next/server";
-import { db, withRetry } from "@/lib/db";
-import { momentumLocks, profiles, MomentumLockStatus } from "@/lib/db/schema";
+import { db } from "@/lib/db";
+import { momentumLocks, MomentumLockStatus } from "@/lib/db/schema";
 import { eq, and, inArray, asc } from "drizzle-orm";
-import { formatHoursUntilDeadline } from "./messages";
 
 export interface StatusCommandParams {
   teamId: string;
@@ -20,6 +19,29 @@ export interface StatusCommandParams {
 interface SlackBlock {
   type: string;
   [key: string]: unknown;
+}
+
+/**
+ * Format hours remaining in human-readable format
+ */
+function formatTimeRemaining(hoursRemaining: number): string {
+  if (hoursRemaining < 0) {
+    return "overdue";
+  }
+  if (hoursRemaining < 1) {
+    const minutes = Math.round(hoursRemaining * 60);
+    return minutes <= 1 ? "less than a minute" : `${minutes}m`;
+  }
+  if (hoursRemaining < 24) {
+    const hours = Math.round(hoursRemaining);
+    return `${hours}h`;
+  }
+  const days = Math.floor(hoursRemaining / 24);
+  const remainingHours = Math.round(hoursRemaining % 24);
+  if (remainingHours === 0) {
+    return `${days}d`;
+  }
+  return `${days}d ${remainingHours}h`;
 }
 
 /**
@@ -41,7 +63,7 @@ function formatLockForStatus(
   const now = new Date();
   const deadline = new Date(lock.deadlineAt);
   const hoursRemaining = (deadline.getTime() - now.getTime()) / (60 * 60 * 1000);
-  const timeText = formatHoursUntilDeadline(hoursRemaining);
+  const timeText = formatTimeRemaining(hoursRemaining);
 
   // Status indicator
   const statusIndicator =
@@ -159,33 +181,29 @@ export async function handleStatusCommand(
     // Query locks in parallel: owned + requested
     const [ownedLocks, requestedLocks] = await Promise.all([
       // Locks I own (need to deliver)
-      withRetry(() =>
-        db
-          .select()
-          .from(momentumLocks)
-          .where(
-            and(
-              eq(momentumLocks.workspaceId, teamId),
-              eq(momentumLocks.ownerUserId, userId),
-              inArray(momentumLocks.status, ACTIVE_STATUSES)
-            )
+      db
+        .select()
+        .from(momentumLocks)
+        .where(
+          and(
+            eq(momentumLocks.workspaceId, teamId),
+            eq(momentumLocks.ownerUserId, userId),
+            inArray(momentumLocks.status, ACTIVE_STATUSES)
           )
-          .orderBy(asc(momentumLocks.deadlineAt))
-      ),
+        )
+        .orderBy(asc(momentumLocks.deadlineAt)),
       // Locks I requested (waiting on)
-      withRetry(() =>
-        db
-          .select()
-          .from(momentumLocks)
-          .where(
-            and(
-              eq(momentumLocks.workspaceId, teamId),
-              eq(momentumLocks.requesterUserId, userId),
-              inArray(momentumLocks.status, ACTIVE_STATUSES)
-            )
+      db
+        .select()
+        .from(momentumLocks)
+        .where(
+          and(
+            eq(momentumLocks.workspaceId, teamId),
+            eq(momentumLocks.requesterUserId, userId),
+            inArray(momentumLocks.status, ACTIVE_STATUSES)
           )
-          .orderBy(asc(momentumLocks.deadlineAt))
-      ),
+        )
+        .orderBy(asc(momentumLocks.deadlineAt)),
     ]);
 
     console.log("[Status Command] Found locks", {
