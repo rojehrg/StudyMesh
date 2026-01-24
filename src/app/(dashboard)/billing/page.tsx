@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard01, ArrowRightMd, Users, MailSend } from "react-coolicons";
+import { CreditCard01, ArrowRightMd, Users, MailOpen } from "react-coolicons";
 import { Lock, LockOpen, AlertTriangle } from "lucide-react";
 import { PageLoader, LottieLoader } from "@/components/loading-states";
 import { motion } from "framer-motion";
@@ -700,7 +700,7 @@ function BillingContent() {
                     onClick={() => window.location.href = "mailto:sales@attunly.com?subject=Enterprise%20Inquiry"}
                     className="border-coffee-espresso text-coffee-espresso hover:bg-coffee-espresso hover:text-coffee-paper"
                   >
-                    <MailSend className="w-4 h-4 mr-2" />
+                    <MailOpen className="w-4 h-4 mr-2" />
                     Contact Sales
                   </Button>
                   <Button
