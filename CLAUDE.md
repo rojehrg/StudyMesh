@@ -1,129 +1,211 @@
-# CLAUDE.md
-
-This file provides context for Claude when working on the Attunly codebase.
+# Attunly
 
 ## Project Overview
 
-**Attunly** is a Slack-first micro-ticket system for teams. The core feature is **Momentum Locks** - lightweight async accountability requests embedded in Slack.
+**Slack-first async coordination platform**
 
-Key feature:
-- **Momentum Locks** - Request responses from teammates with deadlines, track status (Start → Blocked → Done), and get notifications
+Attunly tracks attention, not just tasks. While task tools track work state, Attunly tracks human state - knowing when someone is focused, available, or needs protection from interruptions.
 
-## Tech Stack
+### Core Insight
+Traditional task tools answer "what needs to be done?" Attunly answers "who can help right now, and how do I get their attention without disrupting their flow?"
 
-- **Framework:** Next.js 16 (App Router, Turbopack)
-- **Database:** Supabase (PostgreSQL + Auth)
-- **ORM:** Drizzle
-- **Styling:** Tailwind CSS with custom coffee color palette
-- **UI Components:** Radix UI primitives
-- **Payments:** Stripe
-- **Testing:** Vitest + Playwright
+### Value Proposition
+- Reduce context-switching costs by batching interruptions
+- Respect focus time and working hours across timezones
+- Escalate intelligently when deadlines approach
+- Surface team availability without manual status updates
+
+---
+
+## Slack Commands
+
+### Primary Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/attunly` or `/attunly lock` | Create momentum lock (with AI inference from thread context) |
+| `/attunly status` | Show your active locks |
+| `/attunly help` | Show available commands |
+| `/attunly whosnow` | Who's in working hours now |
+| `/attunly overlap @user` | Find working hour overlap with another user |
+| `/attunly handoff @user` | EOD handoff summary |
+| `/attunly standup` | Auto-generated standup from recent activity |
+| `/attunly digest` | Weekly activity summary |
+
+### Shortcut Aliases
+
+| Alias | Equivalent |
+|-------|------------|
+| `/standup` | `/attunly standup` |
+| `/status` | `/attunly status` |
+| `/digest` | `/attunly digest` |
+| `/whosnow` | `/attunly whosnow` |
+| `/handoff` | `/attunly handoff` |
+| `/overlap` | `/attunly overlap` |
+
+---
+
+## Momentum Locks
+
+Momentum locks are the core feature - requests for attention that respect the recipient's focus and timezone.
+
+### Lock Creation
+- Invoked via `/attunly` or `/attunly lock`
+- AI inference from thread context when invoked in a thread
+- Modal for setting urgency, deadline, and escalation preferences
+
+### Lock Status Lifecycle
+
+```
+draft → active → started → blocked → done
+```
+
+| Status | Meaning |
+|--------|---------|
+| `draft` | Lock created but not submitted |
+| `active` | Waiting for owner to start |
+| `started` | Owner has begun working on it |
+| `blocked` | Owner is blocked, needs help |
+| `done` | Lock completed |
+
+### Features
+- **Multi-level escalation chains** - Define who to escalate to if unacknowledged
+- **Timezone-aware wake-up delivery** - Delivers when recipient enters working hours
+- **Proactive deadline alerts** - Notifies requester at 75% of time elapsed if not started
+- **Smart reminders** - 12h, 3h, 1h before deadline
+
+---
+
+## Supernatural Features
+
+Features that "just work" without user configuration:
+
+### Timezone Awareness
+- Shows owner's local time in all lock displays
+- Detects working hours (8am-6pm local time)
+- Detects sleep windows automatically
+- Schedules deliveries for appropriate times
+
+### Proactive Alerts
+- At 75% of deadline elapsed: notifies requester if lock not started
+- Gives requester time to escalate or find alternative help
+
+### Working Hours Detection
+- Default: 8am-6pm in user's local timezone
+- Respects focus by not delivering outside working hours
+- Shows "available" / "in working hours" status for team
+
+### Sleep Window Detection
+- Automatically detects likely sleep hours
+- Holds non-urgent notifications until wake-up time
+
+---
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── (dashboard)/     # Authenticated app pages
-│   │   ├── dashboard/   # Main dashboard
-│   │   ├── analytics/   # Lock analytics
-│   │   ├── team/        # Team management
-│   │   └── settings/    # User settings
-│   ├── (auth)/          # Login/signup flows
-│   ├── (onboarding)/    # New user onboarding
-│   ├── api/             # API routes
-│   │   ├── slack/       # Slack webhooks, commands, interactions
-│   │   ├── cron/        # Momentum lock reminders
-│   │   └── billing/     # Stripe integration
-│   └── page.tsx         # Landing page
-├── components/
-│   ├── ui/              # Radix-based primitives
-│   └── loading-states.tsx
+│   ├── api/
+│   │   ├── slack/          # Slack webhook handlers
+│   │   └── cron/           # Scheduled jobs
+│   └── ...
 ├── lib/
-│   ├── supabase/        # Supabase client (server/client)
-│   ├── slack/           # Slack API helpers
-│   │   └── momentum-lock/  # Lock creation, messages, modals
-│   ├── db/              # Drizzle schema and queries
-│   └── rbac.ts          # Role-based access control
+│   └── slack/
+│       └── momentum-lock/  # Core momentum lock handlers
+└── ...
+docs/
+└── features/               # Feature specifications
 ```
 
-## Brand Guidelines
+---
 
-**CRITICAL:** Follow `ATTUNLY_BRAND_SYSTEM.md` for all UI work.
+## Key Handlers
 
-Key rules:
-- **Coffee color palette only** - No blue, green, red, or purple
-- **No icons** except Slack logo and mesh mark
-- **No emojis** in UI or copy
-- **Serif typography** (Source Serif 4)
-- **Calm, editorial feel** - Not typical SaaS
+### Momentum Lock Module (`src/lib/slack/momentum-lock/`)
 
-Color reference:
-```
-coffee-espresso: #1a1614  (primary text, buttons)
-coffee-cortado:  #6b5d54  (body text)
-coffee-latte:    #8c7b70  (muted text)
-coffee-foam:     #e8e2dc  (borders)
-coffee-cream:    #f6f3f0  (alt backgrounds)
-coffee-paper:    #fffcf9  (primary background)
-```
+| File | Purpose |
+|------|---------|
+| `command-handler.ts` | Slash command parsing + AI thread inference |
+| `modal-builder.ts` | Lock creation modal construction |
+| `status-handler.ts` | Status display and updates |
+| `escalation.ts` | Multi-level escalation chain logic |
+| `messages.ts` | All Slack message builders |
+| `reminders.ts` | Reminder scheduling and delivery |
+| `whosnow-handler.ts` | Team availability display |
+| `overlap-handler.ts` | Timezone overlap calculation |
+| `handoff-handler.ts` | EOD handoff summaries |
+| `standup-handler.ts` | Auto-generated standup |
+| `digest-handler.ts` | Weekly digest generation |
 
-## Common Patterns
+---
 
-### API Routes
-```typescript
-// Always check auth first
-const context = await getUserOrgContext();
-if (!context) {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
-```
+## Cron Jobs
 
-### Supabase Queries
-```typescript
-// Server-side
-import { createClient } from '@/lib/supabase/server';
-const supabase = await createClient();
+### `momentum-locks` (`src/app/api/cron/momentum-locks/`)
 
-// Client-side
-import { createClient } from '@/lib/supabase/client';
-const supabase = createClient();
-```
+Runs periodically to handle:
+- Lock expirations
+- Wake-up deliveries (timezone-aware)
+- Escalation triggers
+- Proactive alerts (75% threshold)
+- Reminder deliveries (12h, 3h, 1h)
 
-### Loading States
-```typescript
-import { PageLoader, CardSkeleton } from '@/components/loading-states';
-```
+### `digest` (`src/app/api/cron/digest/`)
 
-## Commands
+Weekly job to generate and deliver activity digests.
 
-```bash
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run test         # Run Vitest tests
-npm run test:e2e     # Run Playwright tests
-```
-
-## Key Files
-
-- `src/app/api/slack/commands/route.ts` - `/attunly` slash command (opens lock modal)
-- `src/app/api/slack/interactions/route.ts` - Button clicks, modal submissions
-- `src/lib/slack/momentum-lock/` - Lock creation, messages, inference, modals
-- `src/lib/db/schema/index.ts` - Database schema (momentum_locks, momentum_lock_events)
-- `src/lib/rbac.ts` - Auth context and permissions
+---
 
 ## Database
 
-Key tables:
-- `momentum_locks` - Lock records (owner, requester, deadline, status)
-- `momentum_lock_events` - Event log (started, blocked, done)
-- `profiles` - User profiles with Slack ID, timezone
+### Core Tables
 
-## Environment Variables
+- `momentum_locks` - Lock records with status, deadlines, escalation config
+- `users` - User profiles with timezone info
+- `teams` - Workspace/team records
+- `events` - Activity event log
 
-Required in `.env.local`:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`
-- `SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`
-- `STRIPE_SECRET_KEY`
+### Key Lock Fields
+
+| Field | Purpose |
+|-------|---------|
+| `status` | Current lock status (draft/active/started/blocked/done) |
+| `deadline` | When the lock expires |
+| `urgency` | Priority level |
+| `escalation_chain` | JSON array of escalation levels |
+| `escalation_level` | Current escalation level (0-indexed) |
+| `last_escalated_at` | Timestamp of last escalation |
+| `alert_sent_at` | When 75% alert was sent |
+| `reminder_12h_sent` | Boolean for 12h reminder |
+| `reminder_3h_sent` | Boolean for 3h reminder |
+| `reminder_1h_sent` | Boolean for 1h reminder |
+
+### Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `lock.created` | New lock created |
+| `lock.started` | Owner started working |
+| `lock.completed` | Lock marked done |
+| `lock.escalated` | Escalated to next level |
+| `lock.alert_sent` | 75% proactive alert sent |
+| `lock.reminder_sent` | Deadline reminder sent |
+| `lock.expired` | Lock expired without completion |
+
+---
+
+## Development
+
+### Tech Stack
+- Next.js (App Router)
+- TypeScript
+- Slack Bolt SDK
+- PostgreSQL (via Drizzle ORM)
+- Vercel (deployment)
+
+### Environment Variables
+- `SLACK_BOT_TOKEN` - Bot OAuth token
+- `SLACK_SIGNING_SECRET` - Request verification
+- `DATABASE_URL` - PostgreSQL connection string
+- `OPENAI_API_KEY` - For AI thread inference
