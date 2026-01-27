@@ -437,6 +437,10 @@ export async function openModal(triggerId: string, view: SlackView): Promise<{ s
   }
 
   try {
+    // 2.5-second timeout (Slack trigger_id expires after 3 seconds)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
     const response = await fetch("https://slack.com/api/views.open", {
       method: "POST",
       headers: {
@@ -447,7 +451,10 @@ export async function openModal(triggerId: string, view: SlackView): Promise<{ s
         trigger_id: triggerId,
         view,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     const data = await response.json();
 
@@ -459,6 +466,9 @@ export async function openModal(triggerId: string, view: SlackView): Promise<{ s
 
     return { success: true };
   } catch (error: any) {
+    if (error.name === "AbortError") {
+      return { success: false, error: "Request timed out - trigger_id may have expired" };
+    }
     return { success: false, error: error.message };
   }
 }
