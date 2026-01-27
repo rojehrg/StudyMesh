@@ -132,14 +132,12 @@ export async function handleLockCommand(params: LockCommandParams): Promise<{
   });
 
   // Open the modal
-  const opened = await openModal(triggerId, modal);
+  const result = await openModal(triggerId, modal);
 
-  if (!opened) {
-    console.error("[Lock Command] Failed to open modal");
-    return { success: false, error: "Failed to open modal" };
+  if (!result.success) {
+    return { success: false, error: result.error || "Failed to open modal" };
   }
 
-  console.log("[Lock Command] Modal opened successfully");
   return { success: true };
 }
 

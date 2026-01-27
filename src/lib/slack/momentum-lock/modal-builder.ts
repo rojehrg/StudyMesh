@@ -145,6 +145,16 @@ export function buildLockDraftModal(config: LockModalConfig): SlackView {
   });
 
   // Deadline - when do you need to hear back
+  // Build options with consistent text format
+  const formattedOptions = deadlineOptions.map(opt => ({
+    text: {
+      type: "plain_text" as const,
+      text: opt.description ? `${opt.label} (${opt.description})` : opt.label,
+    },
+    value: opt.value,
+  }));
+  const initialOption = formattedOptions[recommendedIndex];
+
   blocks.push({
     type: "input",
     block_id: "deadline_block",
@@ -153,17 +163,8 @@ export function buildLockDraftModal(config: LockModalConfig): SlackView {
       type: "static_select",
       action_id: "deadline_select",
       placeholder: { type: "plain_text", text: "Select a time" },
-      initial_option: {
-        text: { type: "plain_text", text: defaultOption.label },
-        value: defaultOption.value,
-      },
-      options: deadlineOptions.map(opt => ({
-        text: {
-          type: "plain_text",
-          text: opt.description ? `${opt.label} (${opt.description})` : opt.label,
-        },
-        value: opt.value,
-      })),
+      initial_option: initialOption,
+      options: formattedOptions,
     },
     hint: {
       type: "plain_text",
@@ -427,24 +428,15 @@ export { CALLBACK_ID_DRAFT, CALLBACK_ID_EDIT, CALLBACK_ID_BLOCKED_REASON };
 
 /**
  * Open a modal via Slack API
+ * Returns { success: true } or { success: false, error: string }
  */
-export async function openModal(triggerId: string, view: SlackView): Promise<boolean> {
+export async function openModal(triggerId: string, view: SlackView): Promise<{ success: boolean; error?: string }> {
   const token = process.env.SLACK_BOT_TOKEN;
   if (!token) {
-    console.error("[Modal] SLACK_BOT_TOKEN not set");
-    return false;
+    return { success: false, error: "SLACK_BOT_TOKEN not set" };
   }
 
-  console.log("[Modal] Opening modal", {
-    callback_id: view.callback_id,
-    trigger_id_prefix: triggerId.substring(0, 20),
-  });
-
   try {
-    // 2.5-second timeout (Slack trigger_id expires after 3 seconds)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
-
     const response = await fetch("https://slack.com/api/views.open", {
       method: "POST",
       headers: {
@@ -455,30 +447,18 @@ export async function openModal(triggerId: string, view: SlackView): Promise<boo
         trigger_id: triggerId,
         view,
       }),
-      signal: controller.signal,
     });
-
-    clearTimeout(timeoutId);
 
     const data = await response.json();
 
     if (!data.ok) {
-      console.error("[Modal] Slack API error:", {
-        error: data.error,
-        response_metadata: data.response_metadata,
-        callback_id: view.callback_id,
-      });
-      return false;
+      const errorDetail = data.response_metadata?.messages?.join(", ");
+      console.error("[Modal] Slack API error:", data.error, data.response_metadata);
+      return { success: false, error: `Slack error: ${data.error}${errorDetail ? `. ${errorDetail}` : ''}` };
     }
 
-    console.log("[Modal] Modal opened successfully", { callback_id: view.callback_id });
-    return true;
+    return { success: true };
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.error("[Modal] Timeout - trigger_id may have expired");
-    } else {
-      console.error("[Modal] Exception:", error.message);
-    }
-    return false;
+    return { success: false, error: error.message };
   }
 }
